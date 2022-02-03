@@ -1,2 +1,1 @@
-# Saphire
-Repositório oficial da bot Saphire
+## Código em manutenção
