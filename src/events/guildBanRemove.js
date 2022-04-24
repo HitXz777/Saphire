@@ -1,15 +1,19 @@
-const { MessageEmbed, Permissions } = require('discord.js')
-const { e } = require('../../database/emojis.json')
-const client = require('../../index')
-const Data = require('../../Routes/functions/data')
-const { ServerDb } = require('../../Routes/functions/database')
+const { MessageEmbed, Permissions } = require('discord.js'),
+    { e } = require('../../JSON/emojis.json'),
+    client = require('../../index'),
+    Data = require('../../modules/functions/plugins/data'),
+    Database = require('../../modules/classes/Database')
 
 client.on('guildBanRemove', async ban => {
 
     if (!ban.guild.me.permissions.has(Permissions.FLAGS.VIEW_AUDIT_LOG) || !ban.guild) { return }
 
-    let IdChannel = ServerDb.get(`Servers.${ban.guild.id}.LogChannel`)
-    const channel = await ban.guild.channels.cache.get(IdChannel)
+    let guild = await Database.Guild.findOne({ id: ban.guild.id })
+
+    if (!guild)
+        return Database.registerServer(ban.guild, client)
+
+    const channel = await ban.guild.channels.cache.get(guild?.LogChannel)
     if (!channel) return
 
     const fetchedLogs = await ban.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_BAN_REMOVE', })

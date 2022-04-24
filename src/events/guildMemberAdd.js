@@ -1,113 +1,161 @@
-const { DatabaseObj, ServerDb } = require('../../Routes/functions/database') // Database
-const { e, config } = DatabaseObj // Emoji Handler e config.json
-const { Permissions } = require('discord.js')
-const client = require('../../index')
-const Notify = require('../../Routes/functions/notify') // Função que manda uma mensagem no canal logs do Servidor
-const Super = require('../../Routes/classes/SupremacyClass') // Class do Servidor
+const { DatabaseObj: { e, config } } = require('../../modules/functions/plugins/database'),
+    { Permissions } = require('discord.js'),
+    client = require('../../index'),
+    Notify = require('../../modules/functions/plugins/notify'),
+    Database = require('../../modules/classes/Database')
 
-// Sempre que um membro entrar em algum servidor, este evento é emitido, porém, o único parametro é o próprio member
 client.on('guildMemberAdd', async (member) => {
 
-    if (!member.guild.available) return // Se não tem guild, retorna (Ocorre de vez em quando)
+    if (!member.guild.available) return
 
-    const Server = new Super.ServerManager(member.guild) // Um new class do servidor
+    const guild = await Database.Guild.findOne({ id: member.guild.id }, 'Prefix Autorole WelcomeChannel Antifake LogChannel'),
+        clientData = await Database.Client.findOne({ id: client.user.id }, 'PremiumServers')
 
-    // Declaração de todas as variáveis (ou quase todas)
-    const { prefix, Autorole1, Autorole2, BlockPermissionsArray, Canal, CanalDB, Emoji, Mensagem, Role1, Role2 } = {
-        prefix: Server.prefix,
-        Autorole1: Server.Autorole.First, // ID do Autorole 1
-        Autorole2: Server.Autorole.Second, // ID do Autorole 2
-        BlockPermissionsArray: Server.Autorole.BlockPermissionsAutorole, // Permissões bloqueadas pelo autorole
-        Canal: await member.guild.channels.cache.get(ServerDb.get(`Servers.${member.guild.id}.WelcomeChannel.Canal`)), // Canal de boas-vindas (Bot manda mensagens de boas-vindas neste canal)
-        CanalDB: Server.WelcomeSystem.CanalDB, // ID do Canal de boas-vindas
-        Emoji: Server.WelcomeSystem.Emoji, // Emoji da mensagem de boas-vindas
-        Mensagem: Server.WelcomeSystem.Mensagem, // Mensagem de boas-vindas
-        Role1: await member.guild.roles.cache.get(ServerDb.get(`Servers.${member.guild.id}.Autorole.First`)), // Função que pega o cargo do Autorole 1
-        Role2: await member.guild.roles.cache.get(ServerDb.get(`Servers.${member.guild.id}.Autorole.Second`)), // Função que pega o cargo do Autorole 2
+    if (!guild) return Database.registerServer(member.guild, client)
+
+    if (guild.Antifake && !clientData?.PremiumServers?.includes(member.guild.id)) {
+
+        await Database.Guild.updateOne(
+            { id: member.guild.id },
+            { $unset: { Antifake: 1 } }
+        )
+        return Notify(member.guild.id, 'ANTIFAKE PREMIUM SYSTEM - DESATIVADO', 'Este servidor não faz mais parte da lista de Servidores Premium.')
+
     }
 
-    Welcome(); // Bem-vindo
-    CheckRoles() // Check das roles para ver se está tudo certo
+    if (guild.Antifake && clientData?.PremiumServers?.includes(member.guild.id)) {
 
-    async function CheckRoles() {
+        if (!member.guild.me.permissions.toArray().includes('KICK_MEMBERS')) {
 
-        // Se tiver algum cargo no autorole e o bot não tiver permissão, ele deleta as autoroles configuradas da database e notifica no canal Logs
-        if ((Role1 || Role2) && !member.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES)) {
-            Server.Delete.Autorole()
-            return Notify(member.guild.id, 'Autorole System', 'Eu não tenho a permissão **GERENCIAR CARGOS**. Por favor, ative-a e configure novamente o autorole.')
+            await Database.Guild.updateOne(
+                { id: member.guild.id },
+                { $unset: { Antifake: 1 } }
+            )
+            return Notify(member.guild.id, 'ANTIFAKE PREMIUM SYSTEM - DESATIVADO', `Eu não tenho a permissão **Expulsar Membros** ativada. Ative a permissão e reative o sistema usando \`${guild.Prefix || '-'}antifake on\``)
+
         }
 
-        // Se tiver o ID do cargo Autorole na database e não haver o cargo no servidor, deleta o ID da database
-        if (Autorole1 && !Role1) Server.Delete.AutoroleFirst()
-        if (Autorole2 && !Role2) Server.Delete.AutoroleSecond()
+        let timeCreate = member.user.createdAt.getTime()
+        if ((Date.now() - timeCreate) < 604800000) return kick()
 
-        // Se tem a autorole, ativa a função que adiciona o cargo
-        if (Role1) AutoroleSystem(Autorole1)
-        if (Role2) AutoroleSystem(Autorole2)
+        function kick() {
+            member.kick(['ANTIFAKE SYSTEM']).then(() => {
+                Notify(member.guild.id, 'ANTIFAKE SYSTEM', `Entrada impedida do usuário **${member.user.tag}** *\`${member.id}\`* por ter a conta criada a menos de 7 dias.\n📅 **${client.formatTimestamp(timeCreate)}**`)
+                return
+            }).catch(async (err) => {
+                await Database.Guild.updateOne(
+                    { id: member.guild.id },
+                    { $unset: { Antifake: 1 } }
+                )
+                return Notify(member.guild.id, 'ANTIFAKE SYSTEM - DESATIVADO', `Houve um erro na expulsão de um usuário fake.\n\`${err}\``)
+            })
+        }
+    }
+
+    const
+        prefix = guild.Prefix || config.prefix,
+        RolesId = guild?.Autorole || [],
+        CanalDB = guild?.WelcomeChannel?.Canal,
+        Emoji = guild?.WelcomeChannel?.Emoji || e.Join,
+        Mensagem = guild?.WelcomeChannel?.Mensagem || 'entrou no servidor.',
+        Canal = member?.guild.channels.cache.get(guild?.WelcomeChannel?.Canal)
+
+    Welcome()
+    AutoroleSystem()
+    function AutoroleSystem() {
+
+        if (!member.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES) && RolesId.length > 0) {
+
+            DeleteAutorole()
+            return Notify(member.guild.id, 'Autorole System', 'Eu não tenho a permissão **GERENCIAR CARGOS**. Todos os cargos configurados foram removidos do banco de dados e o sistema Autorole foi desativado.')
+        }
+
+        if (RolesId.length < 1) return
+
+        for (const roleId of RolesId) {
+
+            let role = member.guild.roles.cache.get(`${roleId}`),
+                validate = true
+
+            if (!role) {
+                RemoveRole(roleId)
+                validate = false
+            }
+
+            const RolePermissions = role?.permissions.toArray() || [],
+                BlockPermissionsArray = ['KICK_MEMBERS', 'BAN_MEMBERS', 'MANAGE_GUILD', 'MANAGE_MESSAGES', 'MUTE_MEMBERS', 'DEAFEN_MEMBERS', 'MOVE_MEMBERS', 'MANAGE_NICKNAMES', 'MANAGE_ROLES', 'ADMINISTRATOR', 'MODERATE_MEMBERS']
+
+            for (const perm of RolePermissions) {
+                if (BlockPermissionsArray.includes(perm)) {
+                    RemoveRole(role.id)
+                    validate = false
+                    Notify(member.guild.id, 'Autorole System', `O cargo **${role}** possui a permissão **${config.Perms[perm]}** ativada.\nVisando a segurança e o bem-estar do servidor, o **Autorole** deste cargo foi desabilitado.`);
+                }
+            }
+
+            if (validate) addRole(role)
+            continue
+        }
 
         return
+
     }
 
-    function AutoroleSystem(RoleDB) {
+    function addRole(role) {
 
-        const role = member.guild.roles.cache.get(RoleDB)
-        if (!role?.id) return DisableAutorole(RoleDB)
-
-        // Aqui pegamos todas as permissões do cargo
-        const RolePermissions = role?.permissions.toArray() || []
-        // Verificamos em um loop se o cargo do autorole não possui nenhuma permissão que possa prejudicar o servidor
-        for (const perm of RolePermissions) {
-            if (BlockPermissionsArray.includes(perm)) {
-                DisableAutorole(role.id) // Se tem, deletamos o id do cargo na database, desativamos o autorole e notificamos no canal log
-                return Notify(member.guild.id, 'Autorole System', `O cargo **${role}** possui a permissão **${perm}** ativada.\nVisando a segurança e o bem-estar do servidor, o **Autorole** deste cargo foi desabilitado.`);
-            }
-        }
-
-        // Retormos a adição do canal no membro
         return member.roles.add(role).catch(err => {
 
-            // Se por algum motivo o cargo for desconhecido ou o cargo for deletado antes da adição, deletamos o cargo da database e notificação o canal log
             if (err.code === 10011 || err.code === 50028) {
-                if (Autorole1 === role.id)
-                    Server.Autorole1Delete()
-
-                if (Autorole2 === role.id)
-                    Server.Autorole2Delete()
-
-                return Notify(member.guild.id, 'Autorole System', 'O cargo configurado como **Autorole** é desconhecido. As configurações deste cargo foram deletadas do meu banco de dados.')
+                RemoveRole(role.id)
+                return Notify(member.guild.id, 'Autorole System', 'Um dos cargos configurado como **Autorole** é desconhecido. As configurações deste cargo foram deletadas do meu banco de dados.')
             }
 
             return Notify(member.guild.id, 'Autorole System', `Houve um erro na adição de cargo referente ao **Autorole**. Caso não saiba resolver o problema, utilize o comando \`${prefix}bug\` e relate o probrema.\n\`${err}\``)
         })
-
-    }
-
-    // Desativando o autorole 1 e 2 caso necessário
-    function DisableAutorole(RoleId) {
-        if (Autorole1 === RoleId)
-            Server.Delete.AutoroleFirst()
-
-        if (Autorole2 === RoleId)
-            Server.Delete.AutoroleSecond()
     }
 
     async function Welcome() {
 
-        if (!Canal && CanalDB) // Não existe o canal de boas-vindas no servidor, mas o ID do canal está na Database.
-            return Server.Delete.WelcomeChannel() // Deleta o ID do canal excluido da Database
+        if (!Canal && CanalDB) return DelWelcomeSystem()
 
-        if (!Canal?.id) return // Se não tem o canal, retorna
+        if (!Canal) return
 
-        // Verificamos se a bot tem permissão para mandar mensagem, caso não tenho, desativamos o welcomesystem e notificamos no canal logs.
         if (!Canal?.permissionsFor(member.guild.me).has(Permissions.FLAGS.SEND_MESSAGES)) {
-            Server.Delete.WelcomeChannel()
+            DelWelcomeSystem()
             return Notify(member.guild.id, 'Sem permissão', `Eu não tenho permissão para enviar mensagens de boas-vindas no canal ${Canal}. Eu desativei este sistema até que corrijam este problema.`)
         }
 
-        // Caso dê algum erro ao enviar a mensagem no canal solicitado pelos administradores do servidor, o bot me notifica (Rody) informando o erro
-        Canal.send(`${Emoji} | ${member} ${Mensagem}`).catch(err => {
-            Server.Delete.WelcomeChannel()
-            client.users.cache.get(config.ownerId).send(`${e.Warn} | Erro no evento "guildMemberAdd" (Linha Emit: 90)\n\`${err}\``)
+        return Canal.send(`${Emoji} | ${member} ${Mensagem}`).catch(async err => {
+
+            DelWelcomeSystem()
+            return client.users.cache.get(config.ownerId).send(`${e.Warn} | Erro no evento "guildMemberAdd"\n\`${err}\``)
         })
+    }
+
+    async function DelWelcomeSystem() {
+
+        await Guild.updateOne(
+            { id: member.guild.id },
+            { $unset: { WelcomeChannel: 1 } }
+        )
+
+        Notify(member.guild.id, 'Recurso desabilitado - Boas-Vindas', `O canal presente no meu banco de dados é compátivel com nenhum dos canais deste servidor. Reconfigure utilizando o comando \`${prefix}welcomechannel\``)
+        return
+    }
+
+    async function DeleteAutorole() {
+
+        return await Database.Guild.updateOne(
+            { id: member.guild.id },
+            { $unset: { Autorole: 1 } }
+        )
+
+    }
+
+    async function RemoveRole(roleId) {
+        return await Database.Guild.updateOne(
+            { id: member.guild.id },
+            { $pull: { Autorole: roleId } }
+        )
     }
 })

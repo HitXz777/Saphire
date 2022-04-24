@@ -1,14 +1,21 @@
 const
-    { ServerDb, sdb, DatabaseObj: { e, config } } = require('../../Routes/functions/database'),
+    { DatabaseObj: { e, config } } = require('../../modules/functions/plugins/database'),
     client = require('../../index'),
-    { MessageEmbed } = require('discord.js')
+    { MessageEmbed } = require('discord.js'),
+    Database = require('../../modules/classes/Database')
 
 client.on("guildDelete", async (guild) => {
 
-    ServerDb.delete(`Servers.${guild.id}`)
-    sdb.delete(`Client.MuteSystem.${guild.id}`)
+    if (!guild) return
 
-    let owner = await guild.fetchOwner(),
+    await Database.Guild.deleteOne({ id: guild.id })
+
+    await Database.Client.updateOne(
+        { id: client.user.id },
+        { $pull: { PremiumServers: guild.id } }
+    )
+
+    let owner = await guild.members.cache.get(guild.ownerId),
         Embed = new MessageEmbed()
             .setColor('RED')
             .setTitle(`${e.Loud} Um servidor me removeu`)
@@ -16,6 +23,6 @@ client.on("guildDelete", async (guild) => {
             .addField('Servidor', `${guild.name} *\`(${guild.id})\`*`)
             .addField('Status', `**Dono:** ${owner.user.tag} *\`(${owner.user.id})\`*\n**Membros:** ${guild.memberCount}`)
 
-    await client.channels.cache.get(config.LogChannelId)?.send(`${e.Deny} | O servidor **${guild.name}** foi excluído com sucesso!`).catch(() => { })
-    return await client.channels.cache.get(config.guildDeleteChannelId)?.send({ embeds: [Embed] }).catch(() => { })
+    client.channels.cache.get(config.LogChannelId)?.send(`${e.Database} | DATABASE | O servidor **${guild.name}** foi removido com sucesso!`).catch(() => { })
+    return client.channels.cache.get(config.guildDeleteChannelId)?.send({ embeds: [Embed] }).catch(() => { })
 })

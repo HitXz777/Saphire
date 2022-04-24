@@ -1,5 +1,4 @@
-const { DatabaseObj } = require('../../Routes/functions/database')
-const { e, config } = DatabaseObj
+const { DatabaseObj: { e, config } } = require('../../modules/functions/plugins/database')
 const { MessageEmbed } = require('discord.js')
 const client = require('../../index')
 

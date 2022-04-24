@@ -1,15 +1,20 @@
-const { DatabaseObj, ServerDb, sdb } = require('../../Routes/functions/database')
-const { e } = DatabaseObj
-const client = require('../../index')
-const { Permissions, MessageEmbed } = require('discord.js')
-const Data = require('../../Routes/functions/data')
+const { DatabaseObj: { e } } = require('../../modules/functions/plugins/database'),
+    client = require('../../index'),
+    { Permissions, MessageEmbed } = require('discord.js'),
+    Data = require('../../modules/functions/plugins/data'),
+    Database = require('../../modules/classes/Database')
 
 client.on('guildMemberRemove', async (member) => {
 
-    if (!member.guild.available) return
+    if (!member || !member.guild || !member.guild.available) return
 
-    if (ServerDb.get(`Servers.${member.guild.id}.AfkSystem.${member.id}`))
-        ServerDb.delete(`Servers.${member.guild.id}.AfkSystem.${member.id}`)
+    let guild = await Database.Guild.findOne({ id: member.guild.id }, 'AfkSystem LogChannel LeaveChannel')
+
+    if (guild?.AfkSystem?.find(arr => arr.MemberId === member.id))
+        await Database.Guild.updateOne(
+            { id: member.guild.id },
+            { $pull: { 'AfkSystem': { MemberId: member.id } } }
+        )
 
     LeaveMember(); Notify()
 
@@ -17,7 +22,7 @@ client.on('guildMemberRemove', async (member) => {
 
         if (member.id === client.user.id) return
         if (!member.guild.me.permissions.has(Permissions.FLAGS.VIEW_AUDIT_LOG) || !member.guild) { return }
-        const channel = await client.channels.cache.get(ServerDb.get(`Servers.${member.guild.id}.LogChannel`))
+        const channel = await client.channels.cache.get(guild?.LogChannel)
         if (!channel) return
 
         const fetchedLogs = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_KICK' }),
@@ -42,13 +47,26 @@ client.on('guildMemberRemove', async (member) => {
             )
             .setFooter(`${member.guild.name}`, member.guild.iconURL({ dynamic: true }))
 
-        channel ? channel.send({ embeds: [embed] }).catch(() => { }) : ''
+        return channel ? channel.send({ embeds: [embed] }).catch(() => { }) : null
     }
 
     async function LeaveMember() {
-        let LeaveChannel = ServerDb.get(`Servers.${member.guild.id}.LeaveChannel.Canal`)
-        sdb.delete(`Client.MuteSystem.${member.guild.id}.${member.id}`)
-        return await member.guild.channels.cache.get(LeaveChannel)?.send(`${e.Leave} | ${member.user.username} saiu do servidor.`).catch(() => { })
+
+        let LeaveChannel = member.guild.channels.cache.get(guild?.LeaveChannel?.Canal)
+
+        if (!LeaveChannel) return unset()
+
+        let emoji = guild.LeaveChannel.Emoji || e.Leave,
+            mensagem = guild.LeaveChannel.Mensagem || 'saiu do servidor.'
+
+        return LeaveChannel?.send(`${emoji} | ${member.user.username} ${mensagem}`).catch(() => unset())
+    }
+
+    async function unset() {
+        await Database.Guild.updateOne(
+            { id: member.guild.id },
+            { $unset: { LeaveChannel: 1 } }
+        )
     }
 
 })

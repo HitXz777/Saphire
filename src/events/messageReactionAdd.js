@@ -1,5 +1,5 @@
 const client = require('../../index'),
-    { Giveaway } = require('../../Routes/functions/database')
+    Database = require('../../modules/classes/Database')
 
 client.on('messageReactionAdd', async (reaction, user) => {
 
@@ -8,13 +8,17 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot) return
     if (!reaction.message.guild) return
 
+    const message = reaction.message
     if (reaction.emoji.name !== '🎉') return
 
-    const message = reaction.message,
-        Sorteio = Giveaway.get(`Giveaways.${message.guild.id}.${message.id}`)
+    const Sorteio = await Database.Giveaway.findOne({ MessageID: message.id })
 
-    if (Sorteio?.Actived)
-        return Giveaway.push(`Giveaways.${message.guild.id}.${message.id}.Participants`, user.id)
+    if (Sorteio?.Actived) {
+        await Database.Giveaway.updateOne(
+            { MessageID: message.id },
+            { $push: { Participants: user.id } }
+        )
+    }
 
     return
 

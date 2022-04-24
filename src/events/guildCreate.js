@@ -1,30 +1,22 @@
-const { DatabaseObj, ServerDb, db } = require('../../Routes/functions/database'),
-    { e, config } = DatabaseObj,
+const { DatabaseObj: { e, config } } = require('../../modules/functions/plugins/database'),
     { MessageEmbed, Permissions } = require('discord.js'),
-    { RegisterServer } = require('../../Routes/functions/register'),
-    client = require('../../index')
+    client = require('../../index'),
+    Database = require('../../modules/classes/Database')
 
 client.on("guildCreate", async (guild) => {
+    
+    let clientData = await Database.Client.findOne({ id: client.user.id }, 'Blacklist'),
+        blacklistServers = clientData?.Blacklist?.Guilds || []
 
-    let blacklistServers = db.get(`BlacklistServers_${guild.id}`)
-    if (blacklistServers) {
-        SendAdder()
-        return guild.leave().catch(async err => {
-            return await client.cache.get(config.owner).send(`${e.Deny} | Não foi possível sair da ${guild.id} \`${guild.id}\` que está na blacklist.\n\`${err}\``).catch(() => { })
-        })
-    }
+    if (blacklistServers.some(data => data?.id === guild.id))
+        return guild.leave().catch(async err => client.cache.get(config.owner).send(`${e.Deny} | Não foi possível sair da ${guild.id} \`${guild.id}\` que está na blacklist.\n\`${err}\``).catch(() => { }))
 
-    // Envia uma mensagem no primeiro canal que tem permissão
-    Hello();
+    let server = await Database.Guild.findOne({ id: guild.id })
+    if (!server) await Database.registerServer(guild, client)
 
-    // Avisa no servidor principal o nome/id/link do servidor em que foi adicionada
-    WarnGuildCreate();
-
-    // Manda uma mensagem pra quem adicionou o bot
-    SendAdder();
-
-    // Registra o servidor no banco de dados
-    if (!ServerDb.get(`Servers.${guild.id}`)) RegisterServer(guild)
+    Hello()
+    WarnGuildCreate()
+    SendAdder()
 
     async function Hello() {
         let FirstMessageChannel = await guild.channels.cache.find(channel => channel.type === 'GUILD_TEXT' && channel.permissionsFor(guild.me).has(Permissions.FLAGS.SEND_MESSAGES))
@@ -32,30 +24,28 @@ client.on("guildCreate", async (guild) => {
     }
 
     async function WarnGuildCreate() {
+
         let owner = await guild.fetchOwner(),
-            CanalDeConvite = await guild.channels.cache.find(channel => channel.type === 'GUILD_TEXT' && channel.permissionsFor(guild.me).has(Permissions.FLAGS.CREATE_INSTANT_INVITE)),
-            channel = await client.channels.cache.get(config.guildCreateChannelId),
-            Register
+            CanalDeConvite = guild.channels.cache.find(channel => channel.type === 'GUILD_TEXT' && channel.permissionsFor(guild.me).has(Permissions.FLAGS.CREATE_INSTANT_INVITE)),
+            channel = client.channels.cache.get(config.guildCreateChannelId),
+            Register,
+            databaseGuilds = await Database.Guild.find({})
 
-        if (!channel) return await client.users.cache.get(`${config.ownerId}`).send(`${e.Deny} | Um servidor me adicionou, porém não tem o canal de envio. Servidor: ${guild.name} \`${guild.id}\`.\n\`Linha Code: 32\``).catch(err => { })
+        if (!channel) return client.users.cache.get(`${config.ownerId}`).send(`${e.Deny} | Um servidor me adicionou, porém não tem o canal de envio. Servidor: ${guild.name} \`${guild.id}\`.\n\`Linha Code: 32\``).catch(err => { })
 
-        !ServerDb.get(`Servers.${guild.id}`)
-            ? Register = `${e.Deny} | Registro no banco de dados indefinido.`
-            : Register = `${e.Check} | Registro no banco de dados concluido!`
+        Register = databaseGuilds.some(g => g.id === guild.id)
+            ? `${e.Database} | DATABASE | Registro no banco de dados concluido!`
+            : `${e.Database} | DATABASE | Registro no banco de dados indefinido.`
 
         const Embed = new MessageEmbed().setColor('GREEN').setTitle(`${e.Loud} Um servidor me adicionou`).setDescription(`${Register}`).addField('Status', `**Dono:** ${owner.user.tag} *\`(${owner.user.id})\`*\n**Membros:** ${guild.memberCount}`)
 
         async function WithChannel() {
-            if (guild.me.permissions.toArray().includes('CREATE_INSTANT_INVITE')) {
-                CanalDeConvite.createInvite({ maxAge: 0 }).then(ChannelInvite => {
-                    Embed.addField('Servidor', `[${guild.name}](${ChannelInvite.url}) *\`(${guild.id})\`*`)
-                    channel.send({ embeds: [Embed] }).catch(async err => {
-                        return client.users.cache.get(`${config.ownerId}`).send(`${e.Deny} | Erro ao registrar um servidor no canal definido. Servidor: ${guild.id} \`${guild.id}\`.\n\`${err}\`Linha Code: 47`).catch(err => { })
-                    })
+            CanalDeConvite.createInvite({ maxAge: 0 }).then(ChannelInvite => {
+                Embed.addField('Servidor', `[${guild.name}](${ChannelInvite.url}) *\`(${guild.id})\`*`)
+                channel.send({ embeds: [Embed] }).catch(async err => {
+                    await client.users.cache.get(`${config.ownerId}`).send(`${e.Deny} | Erro ao registrar um servidor no canal definido. Servidor: ${guild.id} \`${guild.id}\`.\n\`${err}\`Linha Code: 47`).catch(err => { })
                 })
-            } else {
-                return WithoutChannel()
-            }
+            }).catch(() => { WithoutChannel() })
         }
 
         async function WithoutChannel() {
@@ -65,21 +55,24 @@ client.on("guildCreate", async (guild) => {
             })
         }
 
-        CanalDeConvite ? WithChannel() : WithoutChannel()
+        return CanalDeConvite ? WithChannel() : WithoutChannel()
     }
 
     async function SendAdder() {
         if (!guild.me.permissions.has(Permissions.FLAGS.VIEW_AUDIT_LOG))
             return
 
-        const fetchedLogs = await guild.fetchAuditLogs({ limit: 1, type: 'BOT_ADD', })
-        const guildLog = fetchedLogs.entries.first()
-        const { executor, target } = guildLog
-        if (!guildLog) return
+        const fetchedLogs = await guild.fetchAuditLogs({ limit: 1, type: 'BOT_ADD', }),
+            guildLog = fetchedLogs.entries.first()
+        
+            if (!guildLog) return
+
+        let { executor, target } = guildLog
+
 
         if (target.id !== client.user.id || !executor)
             return
 
-        executor.send(`${e.SaphireHi} Oiiee.\n \nJá que foi você que me adicionou no servidor ${guild.name}, quero dizer que você pode personalizar e ativar vários comandos indo no painel \`${config.prefix}help\` na sessão **Configurações** e também em **Servidor**.\n \nQualquer problema, você pode entrar no meu servidor que a Saphire's Team vai te ajudar em tudo.\n \n*Obs: Caso eu tenha saído do servidor, isso quer dizer que o servidor "${guild.name}" está na blacklist.*\n${config.ServerLink}`).catch(() => { })
+        return executor.send(`${e.SaphireHi} Oiiee.\n \nJá que foi você que me adicionou no servidor ${guild.name}, quero dizer que você pode personalizar e ativar vários comandos indo no painel \`${config.prefix}help\` na sessão **Configurações** e também em **Servidor**.\n \nQualquer problema, você pode entrar no meu servidor que a Saphire's Team vai te ajudar em tudo.\n \n*Obs: Caso eu tenha saído do servidor, isso quer dizer que o servidor "${guild.name}" está na blacklist.*\n${config.ServerLink}`).catch(() => { })
     }
 })
