@@ -1,6 +1,6 @@
-const canvacord = require('canvacord/src/Canvacord')
-const Discord = require("discord.js")
-const { e } = require('../../../database/emojis.json')
+const canvacord = require('canvacord/src/Canvacord'),
+    { MessageAttachment } = require("discord.js"),
+    { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'tapão',
@@ -11,21 +11,25 @@ module.exports = {
     usage: '<tapão> [@user]',
     description: 'Tapão',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let user = message.mentions.users.first() || message.mentions.repliedUser || message.author
-        let avatar = user.displayAvatarURL({ dynamic: false, format: "png", size: 1024 })
-        let MsgAuthorAvatar = message.author.displayAvatarURL({ dynamic: false, format: "png", size: 1024 })
+        let user = message.mentions.users.first() || message.mentions.repliedUser || message.author,
+            avatar = user.displayAvatarURL({ dynamic: false, format: "png", size: 1024 }),
+            MsgAuthorAvatar = message.author.displayAvatarURL({ dynamic: false, format: "png", size: 1024 })
 
         if (user.id === message.author.id) return message.reply(`${e.Deny} | Marca @alguem`)
+
+        const msg = await message.reply(`${e.Loading} | Carregando...`)
+
         if (user.id === client.user.id) {
             const image = await canvacord.slap(avatar, MsgAuthorAvatar)
-            let slap = new Discord.MessageAttachment(image, "slap.png")
-            return message.reply({ content: 'Baaaaka!', files: [slap] })
+            let slap = new MessageAttachment(image, "slap.png")
+            return msg.edit({ content: 'Baaaaka!', files: [slap] }).catch(() => { })
         } else {
             const image = await canvacord.slap(MsgAuthorAvatar, avatar)
-            let slap = new Discord.MessageAttachment(image, "slap.png")
-            message.reply({ files: [slap] })
+            let slap = new MessageAttachment(image, "slap.png")
+            msg.delete().catch(() => { })
+            return message.reply({ files: [slap] })
         }
     }
 }

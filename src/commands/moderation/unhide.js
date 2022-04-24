@@ -1,5 +1,5 @@
 const { Permissions } = require('discord.js')
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'unhide',
@@ -11,7 +11,7 @@ module.exports = {
     usage: 'unhide <#channel>/<user>',
     description: 'Libere o chat para que todos vejam.',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel
         let user = message.mentions.members.first() || message.mentions.roles.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0])

@@ -1,6 +1,5 @@
-const { g } = require('../../../Routes/Images/gifs.json')
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
+const { g } = require('../../../modules/Images/gifs.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'chupar',
@@ -11,22 +10,16 @@ module.exports = {
     usage: '<chupar> <@user>',
     description: 'Huuuum',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+        let rand = g.Chupar[Math.floor(Math.random() * g.Chupar.length)],
+            user = message.mentions.members.first() || message.mentions.repliedUser
 
-        let NoReactAuthor = sdb.get(`Users.${message.author.id}.NoReact`)
-        if (NoReactAuthor) return message.reply(`${e.Deny} | Você está com o \`${prefix}noreact\` ativado.`)
-
-        let rand = g.Chupar[Math.floor(Math.random() * g.Chupar.length)]
-        let user = message.mentions.users.first() || message.member
+        if (!user) return message.reply(`${e.Info} | Marca alguém.`)
 
         if (user.id === client.user.id) return message.reply(`${e.MaikaAngry} Sai pra lá, HENTAI!!!`)
 
         if (user.id === message.author.id) { return message.reply(`${e.Deny} | Você é esquisito(a)`) }
-
-        let NoReact = sdb.get(`Users.${user.id}.NoReact`)
-        if (NoReact) return message.reply(`${e.Deny} | Este usuário está com o \`${prefix}noreact\` ativado.`)
 
         const embed = new MessageEmbed()
             .setColor('#246FE0')
@@ -35,7 +28,7 @@ module.exports = {
             .setFooter('🔁 retribuir')
 
         return message.reply({ embeds: [embed] }).then(msg => {
-            sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+
             msg.react('🔁').catch(() => { }) // Check
 
             const filter = (reaction, u) => { return ['🔁'].includes(reaction.emoji.name) && u.id === user.id }
@@ -44,13 +37,13 @@ module.exports = {
                 const reaction = collected.first()
 
                 if (reaction.emoji.name === '🔁') {
-                    sdb.delete(`Request.${message.author.id}`)
+
                     const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`${message.author}, ${user} retribuiu a chupada`).setFooter(`${message.author.id}/${user.id}`).setImage(g.Chupar[Math.floor(Math.random() * g.Chupar.length)])
                     msg.edit({ embeds: [TradeEmbed] }).catch(() => { })
                 }
 
             }).catch(() => {
-                sdb.delete(`Request.${message.author.id}`)
+
                 embed.setColor('RED').setFooter(`${message.author.id}/${user.id}`)
                 msg.edit({ embeds: [embed] }).catch(() => { })
             })

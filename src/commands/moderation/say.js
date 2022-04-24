@@ -1,6 +1,5 @@
-const { DatabaseObj } = require('../../../Routes/functions/database')
-const { e, config } = DatabaseObj
-const { Permissions } = require('discord.js')
+const { DatabaseObj: { e } } = require('../../../modules/functions/plugins/database'),
+    { Permissions } = require('discord.js')
 
 module.exports = {
     name: 'say',
@@ -10,18 +9,22 @@ module.exports = {
     usage: '<say> <conteúdo da sua mensagem>',
     description: 'Diga algo no chat atráves de mim',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (message.author.id !== config.ownerId && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES))
-            return message.reply(`${e.Deny} | Permissão necessária: Gerenciar Mensagens`)
+        let clientData = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores'),
+            mods = clientData.Moderadores || [],
+            adms = clientData.Administradores || []
+
+        if (!mods.includes(message.author.id) && !adms.includes(message.author.id) && !message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES))
+            return message.reply(`${e.Deny} | Permissão necessária: \`Gerenciar Mensagens\``)
 
         let Message = args.join(' ')
         if (!Message) return message.reply(`${e.Deny} | Você precisa dizer algo para que eu envie.`)
 
-        let SayMessage = message.author.id === config.ownerId ? `${Message}` : `${Message}\n \n*Por: ${message.author}*`
+        let porAuthor = mods.includes(message.author.id) || adms.includes(message.author.id) ? '' : ` \n \n*Por: ${message.author.tag}*`
 
         message.delete().catch(() => { })
-        return message.channel.send(`${SayMessage}`)
+        return message.channel.send(`${Message}${porAuthor}`)
 
     }
 }

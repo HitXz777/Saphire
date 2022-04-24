@@ -1,5 +1,5 @@
 const
-    { e } = require('../../../database/emojis.json'),
+    { e } = require('../../../JSON/emojis.json'),
     ms = require('ms'),
     parsems = require('parse-ms')
 
@@ -12,23 +12,27 @@ module.exports = {
     emoji: '🔇',
     usage: '<mute> <@user> [Tempo] [Motivo]',
     description: 'Mutar membros do servidor',
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let user = message.guild.members.cache.get(args[0]) || message.mentions.members.first(),
+        let user = message.guild.members.cache.get(args[0]) || message.mentions.members.first() || message.mentions.repliedUser,
             emojis = ['✅', '❌'],
-            whoIs = message.author.id === user?.id ? 'Você' : user?.user?.username || 'Indefinido'
+            member = message.guild.members.cache.get(user?.id)
+            whoIs = message.author.id === user?.id ? 'Você' : user?.user?.username || user?.username
 
-        if (!args[1] || !user)
+        if (!member)
             return message.reply(`${e.Deny} | Você deve me dizer o tempo do castigo/mute **e** o usuário a ser mutado.\n${e.Info} | Exemplo: \`${prefix}mute @user 1h 10m\` *(d, h, m - Dias, Horas, Minutos)*`)
 
-        if (user.id === message.author.id)
+        if (member.id === message.author.id)
             return message.reply(`${e.Deny} | Você não pode mutar você mesmo, não é?`)
 
-        if (!user.moderatable)
+        if (!member.moderatable)
             return message.reply(`${e.Deny} | Ops... ${whoIs} tem muito poder...`)
 
-        if (user.id === client.user.id)
+        if (member.id === client.user.id)
             return message.reply(`${e.Deny} | Não me muta... Que coisa feia!`)
+
+        if (member.permissions.toArray().includes('ADMINISTRATOR'))
+            return message.reply(`${e.Deny} | Eu não posso castigar administradores...`)
 
         let time = validateTime(args),
             validateReactionCollectorCancel = false
@@ -40,7 +44,7 @@ module.exports = {
 
         for (const i of emojis) msg.react(i).catch(() => { })
 
-        msg.createReactionCollector({
+        return msg.createReactionCollector({
             filter: (reaction, u) => emojis.includes(reaction.emoji.name) && u.id === message.author.id,
             time: 30000
         })
@@ -52,7 +56,8 @@ module.exports = {
 
                     try {
 
-                        user.timeout(time, `Castigo efetuado por ${message.author.tag}`)
+                        member.timeout(time, `Castigo efetuado por ${message.author.tag}`)
+
                         return msg.edit(`${e.Check} | Mute efetuado com sucesso!`).catch(() => message.channel.send(`${e.Check} | Mute efetuado com sucesso!`))
 
                     } catch (err) {

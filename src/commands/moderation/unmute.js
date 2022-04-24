@@ -1,5 +1,5 @@
 const
-    { e } = require('../../../database/emojis.json')
+    { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'unmute',
@@ -11,7 +11,7 @@ module.exports = {
     usage: '<unmute> <@user/id>',
     description: 'Desmute membros mutados',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.guild.members.cache.get(args[0])
 

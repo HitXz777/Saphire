@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'signo',
@@ -8,7 +8,7 @@ module.exports = {
     usage: '<signo>',
     description: 'Defina seu signo no perfil',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const embed = new MessageEmbed()
             .setColor('#9266CC')
@@ -16,58 +16,47 @@ module.exports = {
             .setDescription(`♈ Áries\n♉ Touro\n♊ Gêmeos\n♋ Câncer\n♌ Leão\n♍ Virgem\n♎ Libra\n♏ Escorpião\n♐ Sagitário\n♑ Capricórnio\n♒ Aquário\n♓ Peixes\n${e.Deny} Cancelar`)
             .setFooter('Responda em 15 segundos')
 
-        let aries = "♈ Áries"
-        let touro = "♉ Touro"
-        let gemeos = "♊ Gêmeos"
-        let cancer = "♋ Câncer"
-        let leao = "♌ Leão"
-        let virgem = "♍ Virgem"
-        let libra = "♎ Libra"
-        let escorpiao = "♏ Escorpião"
-        let sagitario = "♐ Sagitário"
-        let capricornio = "♑ Capricórnio"
-        let aquario = "♒ Aquário"
-        let peixes = "♓ Peixes"
+        const msg = await message.reply({ embeds: [embed] }).catch(() => { }),
+            collector = message.channel.createMessageCollector({ filter: m => m.author.id === message.author.id, max: 1, time: 15000 })
 
-        message.reply({ embeds: [embed] }).catch(() => { }).then(embedmsg => {
+                .on('collect', m => {
+                    let content = m.content.toLowerCase()
 
-            const filter = m => m.author.id === message.author.id
-            const collector = message.channel.createMessageCollector({ filter, max: 1, time: 15000 });
+                    switch (content) {
+                        case 'peixes': SetSignoProfile("♓ Peixes"); break;
+                        case 'aquário': SetSignoProfile("♒ Aquário"); break;
+                        case 'capricórnio': SetSignoProfile("♑ Capricórnio"); break;
+                        case 'sagitário': SetSignoProfile("♐ Sagitário"); break;
+                        case 'escorpião': SetSignoProfile("♏ Escorpião"); break;
+                        case 'libra': SetSignoProfile("♎ Libra"); break;
+                        case 'áries': SetSignoProfile("♈ Áries"); break;
+                        case 'touro': SetSignoProfile("♉ Touro"); break;
+                        case 'câncer': SetSignoProfile("♋ Câncer"); break;
+                        case 'gêmeos': SetSignoProfile("♊ Gêmeos"); break;
+                        case 'leão': SetSignoProfile("♌ Leão"); break;
+                        case 'virgem': SetSignoProfile("♍ Virgem"); break;
+                        case 'cancelar': collector.stop(); break;
+                        default: Cancel(); break;
+                    }
 
-            collector.on('collect', m => {
-                let content = m.content.toLowerCase()
+                });
 
-                switch (content) {
-                    case 'peixes': SetSignoProfile(peixes); break;
-                    case 'aquário': SetSignoProfile(aquario); break;
-                    case 'capricórnio': SetSignoProfile(capricornio); break;
-                    case 'sagitário': SetSignoProfile(sagitario); break;
-                    case 'escorpião': SetSignoProfile(escorpiao); break;
-                    case 'libra': SetSignoProfile(libra); break;
-                    case 'áries': SetSignoProfile(aries); break;
-                    case 'touro': SetSignoProfile(touro); break;
-                    case 'câncer': SetSignoProfile(cancer); break;
-                    case 'gêmeos': SetSignoProfile(gemeos); break;
-                    case 'leão': SetSignoProfile(leao); break;
-                    case 'virgem': SetSignoProfile(virgem); break;
-                    case 'cancelar': embedmsg.delete().catch(() => { }); break;
-                    default: Cancel(); break;
-                }
+        return
 
-            });
+        function Cancel() {
+            return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [] }).catch(() => { })
+        }
 
-            function Cancel() {
-                embed.setColor('RED').setTitle(`${e.Deny} | Request cancelada!`).setDescription('Nenhum signo definido.').setFooter(message.author.id)
-                embedmsg.edit({ embeds: [embed] }).catch(() => { })
-            }
+        async function SetSignoProfile(signo) {
 
-            function SetSignoProfile(signo) {
-                if (sdb.get(`Users.${message.author.id}.Perfil.Signo`) === signo) return message.channel.send(`${e.Info} | ${message.author}, este já é o seu signo definido.`)
-                sdb.set(`Users.${message.author.id}.Perfil.Signo`, `${signo}`)
-                embed.setColor('GREEN').setTitle(`${e.Check} | Signo alterado com sucesso!`).setDescription(`Definido: ${signo}`).setFooter(message.author.id)
-                embedmsg.edit({ embeds: [embed] }).catch(() => { })
-            }
+            let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Signo'),
+                sig = data.Perfil?.Signo
 
-        })
+            if (sig === signo) return message.channel.send(`${e.Info} | ${message.author}, este já é o seu signo definido.`)
+            Database.updateUserData(message.author.id, 'Perfil.Signo', signo)
+            embed.setColor('GREEN').setTitle(`${e.Check} | Signo alterado com sucesso!`).setDescription(`Definido: ${signo}`).setFooter(message.author.id)
+            msg.edit({ embeds: [embed] }).catch(() => { })
+        }
+
     }
 }

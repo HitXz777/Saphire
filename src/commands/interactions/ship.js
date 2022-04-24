@@ -1,5 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-const { g } = require('../../../Routes/Images/gifs.json')
+const { e } = require('../../../JSON/emojis.json')
+const { g } = require('../../../modules/Images/gifs.json')
 
 module.exports = {
   name: 'ship',
@@ -10,12 +10,9 @@ module.exports = {
   usage: '<ship> [@user/@user]',
   description: 'Veja o amor, sinta o amor',
 
-  run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+  run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     let user = message.mentions.members.first()
-
-    let NoReactAuthor = sdb.get(`Users.${message.author.id}.NoReact`)
-    if (NoReactAuthor) return message.reply(`${e.Deny} | Você está com o \`${prefix}noreact\` ativado.`)
 
     const LoveEmbedSemArgs = new MessageEmbed()
       .setColor('RED')
@@ -28,9 +25,6 @@ module.exports = {
     if (user.id === client.user.id) { return message.reply(`${e.Deny} | Opa, opa! Eu não namoro ninguém, muito menos gosto, vou ficar te devendo essa.`) }
     if (user.id === message.author.id) { return message.reply(`${e.Deny} | Gostei do seu amor próprio, mas assim... Não é assim que esse comando funciona sabe...`) }
     if (args[2]) { return message.reply(`${e.Deny} | Só marca até duas pessoas, tá bom?`) }
-
-    let NoReact = sdb.get(`Users.${user.id}.NoReact`)
-    if (NoReact) return message.reply(`${e.Deny} | Este usuário está com o \`${prefix}noreact\` ativado.`)
 
     if (args[1]) {
       let user2 = message.mentions.members.last()

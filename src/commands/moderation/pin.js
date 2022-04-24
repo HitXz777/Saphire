@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'pin',
@@ -10,7 +10,7 @@ module.exports = {
     usage: '<pin> (Mencione a mensagem em forma de resposta)',
     description: 'Fixa a mensagem mencionada',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         message.fetchReference(true).then(msg => {
             if (msg.pinned) return message.reply(`📌 | Este mensagem já está fixada.`)

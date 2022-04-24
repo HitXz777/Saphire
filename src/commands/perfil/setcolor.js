@@ -1,5 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-const Colors = require('../../../Routes/functions/colors')
+const { e } = require('../../../JSON/emojis.json')
+const Database = require('../../../modules/classes/Database')
 
 module.exports = {
     name: 'setcolor',
@@ -9,11 +9,14 @@ module.exports = {
     usage: '<setcolor> <#CódigoHex>',
     description: 'Defina a cor das suas embeds',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.SaphireObs} | Você pode definir as cores das suas mensagens usando este comando.\nExemplo: \`${prefix}setcolor #00FFFF\` - Se quiser umas cores, use \`${prefix}cor\` que te mando algumas, você também pode pegar qualquer cor usando as configurações do servidor na sessão onde muda as cores dos cargos.\n \nCaso queria deixar ela igual a cor do seu cargo/nome. Basta usar \`${prefix}setcolor off\``)
-        if (!sdb.get(`Users.${message.author.id}.Color.Perm`)) return message.reply(`${e.Deny} | Você precisa comprar a permissão 🎨 \`Cores\` para usar este comando.`)
-        if (args[0].length !== 7) return message.reply(`${e.SaphireRaiva} | Os códigos #HEX possuem **7 caracteres**`)
+
+        let data = await Database.User.findOne({ id: message.author.id }, 'Color')
+
+        if (!data.Color?.Perm) return message.reply(`${e.Deny} | Você precisa comprar a permissão 🎨 \`Cores\` para usar este comando.`)
+        if (args[0].length !== 7) return message.reply(`${e.SaphireRaiva} | Os códigos #HEX possuem apenas **7 caracteres**`)
 
         if (['off', 'delete', 'deletar', 'tirar'].includes(args[0]?.toLowerCase())) return SetColorOff()
 
@@ -28,16 +31,16 @@ module.exports = {
         }
 
         function SetColorOff() {
-            sdb.delete(`Users.${message.author.id}.Color.Set`)
+            Database.delete(message.author.id, 'Color.Set')
             return message.reply(`${e.SaphireFeliz} | Sua cor foi deletada e agora eu vou pegar a cor do seu cargo pra colocar nas suas mensagens.`)
-
         }
 
-        function setHex(value) {
-            sdb.set(`Users.${message.author.id}.Color.Set`, value)
+        async function setHex(value) {
+
+            Database.updateUserData(message.author.id, 'Color.Set', value)
 
             const ConfirmateEmbed = new MessageEmbed()
-                .setColor(Colors(message.member))
+                .setColor(value)
                 .setDescription(`${e.Check} | ${message.author} alterou a sua cor para \`${value}\``)
             return message.channel.send({ embeds: [ConfirmateEmbed] })
         }

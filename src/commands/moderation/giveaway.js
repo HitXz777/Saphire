@@ -1,12 +1,11 @@
-const { e } = require('../../../database/emojis.json'),
-    { ServerDb, Giveaway } = require('../../../Routes/functions/database'),
+const { e } = require('../../../JSON/emojis.json'),
     ms = require('ms'),
-    Data = require('../../../Routes/functions/data'),
+    Data = require('../../../modules/functions/plugins/data'),
     Aliases = ['sorteio', 'gw']
 
 module.exports = {
     name: 'giveaway',
-    aliases: Aliases,
+    aliases: ['sorteio', 'gw'],
     category: 'moderation',
     UserPermissions: ['MANAGE_CHANNELS', 'MANAGE_MESSAGES'],
     ClientPermissions: ['ADD_REACTIONS'],
@@ -14,7 +13,7 @@ module.exports = {
     usage: '<giveaway> <info>',
     description: 'Fazer sorteios é divertido, né?',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const embed = new MessageEmbed().setColor(client.blue)
 
@@ -30,10 +29,11 @@ module.exports = {
 
         async function CreateNewGiveaway() {
 
-            let WinnersAmount = args[1],
+            let guild = await Database.Guild.findOne({ id: message.guild.id }, 'GiveawayChannel'),
+                WinnersAmount = args[1],
                 Time = args[2],
                 Prize = args.slice(3).join(' '),
-                ChannelId = ServerDb.get(`Servers.${message.guild.id}.GiveawayChannel`),
+                ChannelId = guild?.GiveawayChannel,
                 Channel = message.guild.channels.cache.get(ChannelId),
                 TimeMs
 
@@ -41,7 +41,12 @@ module.exports = {
                 return message.reply(`${e.Deny} | Para criar um sorteio, o servidor deve ter um canal de sorteio configurado. Tem tudo no \`${prefix}giveaway info\`, dá uma olhadinha.`)
 
             if (ChannelId && !Channel) {
-                ServerDb.delete(`Servers.${message.guild.id}.GiveawayChannel`)
+
+                await Database.Guild.updateOne(
+                    { id: message.guild.id },
+                    { $unset: { GiveawayChannel: 1 } }
+                )
+
                 return message.reply(`${e.Deny} | Para criar um sorteio, o servidor deve ter um canal de sorteio configurado. Tem tudo no \`${prefix}giveaway info\`, dá uma olhadinha.`)
             }
 
@@ -73,11 +78,7 @@ module.exports = {
             if (TimeMs > 2592000000)
                 return message.reply(`${e.Deny} | O tempo limite é de 30 dias.`)
 
-            const msg = await Channel.send({
-                embeds: [
-                    embed.setTitle(`${e.Loading} | Construindo sorteio...`)
-                ]
-            })
+            const msg = await Channel.send({ embeds: [embed.setTitle(`${e.Loading} | Construindo sorteio...`)] })
 
             embed
                 .setTitle(`🎉 Sorteios ${message.guild.name}`)
@@ -103,37 +104,37 @@ module.exports = {
                         inline: true
                     }
                 )
-                .setFooter(`Giveaway ID: ${msg.id}`)
+                .setFooter(`Giveaway ID: ${msg?.id}`)
 
-            if (!msg.id)
-                return message.reply(`${e.Deny} | Fala ao obter o ID da mensagem do sorteio. Verifique se eu realmente tenho permissão para enviar mensagem no canal de sorteios.`)
+            if (!msg?.id)
+                return message.reply(`${e.Deny} | Falha ao obter o ID da mensagem do sorteio. Verifique se eu realmente tenho permissão para enviar mensagem no canal de sorteios.`)
 
-            Giveaway.set(`Giveaways.${message.guild.id}.${msg.id}`, {
-                Prize: Prize,
-                Winners: WinnersAmount,
-                TimeMs: TimeMs,
-                DateNow: Date.now(),
-                ChannelId: ChannelId,
-                Participants: [],
-                Actived: true,
-                MessageLink: msg.url,
-                Sponsor: message.author.id,
-                TimeEnding: Data(TimeMs)
+            new Database.Giveaway({ // new Class Model
+                MessageID: msg.id, // Id da Mensagem
+                GuildId: message.guild.id, // Id do Servidor
+                Prize: Prize, // Prêmio do sorteio
+                Winners: WinnersAmount, // Quantos vencedores
+                TimeMs: TimeMs, // Tempo do Sorteio
+                DateNow: Date.now(), // Agora
+                ChannelId: ChannelId, // Id do Canal
+                Participants: [], // Array pra dar push em quem entra no sorteio
+                Actived: true, // Ativado
+                MessageLink: msg.url, // Link da mensagem
+                Sponsor: message.author.id, // Quem fez o sorteio
+                TimeEnding: Data(TimeMs) // Hora que termina o sorteio
+            }).save()
+
+            msg.edit({ embeds: [embed] }).catch(async (err) => {
+                msg.delete().catch(() => { })
+
+                Database.deleteGiveaway(msg.id)
+                return message.channel.send(`${e.Warn} | Erro ao criar o sorteio.`)
             })
 
-            setTimeout(() => msg.edit({ embeds: [embed] }).catch((err) => {
+            msg.react('🎉').catch(async () => {
                 msg.delete().catch(() => { })
 
-                Giveaway.delete(`Giveaways.${message.guild.id}.${msg.id}`)
-
-                return message.channel.send(`${e.Warn} | Erro ao criar o sorteio.`)
-            }), 1500)
-
-            msg.react('🎉').catch(() => {
-                msg.delete().catch(() => { })
-
-                Giveaway.delete(`Giveaways.${message.guild.id}.${msg.id}`)
-
+                Database.deleteGiveaway(msg.id)
                 return message.channel.send(`${e.Warn} | Erro ao reagir no sorteio.`)
             })
 
@@ -150,39 +151,48 @@ module.exports = {
             if (!GwId)
                 return message.reply(`${e.Info} | Forneça o ID do sorteio. Você pode ver todos os ids em \`${prefix}giveaway list\` ou copiando o ID da mensagem do sorteio. Você também pode usar o comando \`${prefix}giveaway para deletar todos os sorteios de uma vez.\``)
 
-            if (!Giveaway.get(`Giveaways.${message.guild.id}.${GwId}`))
+            let sorteio = await Database.Giveaway.findOne({ MessageID: GwId })
+
+            if (!sorteio)
                 return message.reply(`${e.Deny} | Sorteio não encontrado para exclusão.`)
 
             let Emojis = ['✅', '❌'],
-                msg = await message.reply(`${e.QuestionMark} | Deseja deletar o sorteio \`${GwId}\`?`)
+                msg = await message.reply(`${e.QuestionMark} | Deseja deletar o sorteio \`${GwId}\`?`),
+                react = false
 
-            for (const emoji of Emojis)
-                msg.react(emoji).catch(() => { })
+            for (const emoji of Emojis) msg.react(emoji).catch(() => { })
 
             const collector = msg.createReactionCollector({
                 filter: (reaction, user) => Emojis.includes(reaction.emoji.name) && user.id === message.author.id,
                 time: 30000
             })
 
-                .on('collect', (reaction) => {
+                .on('collect', async (reaction) => {
 
                     if (reaction.emoji.name === Emojis[1]) // X
                         return collector.stop()
 
-                    Giveaway.delete(`Giveaways.${message.guild.id}.${GwId}`)
+                    Database.deleteGiveaway(GwId)
+                    react = true
                     return msg.edit(`${e.Check} | Sorteio deletado com sucesso!`).catch(() => { })
 
                 })
 
-                .on('end', () => msg.edit(`${e.Deny} | Comando cancelado.`))
+                .on('end', () => {
+                    if (react) return
+                    return msg.edit({ content: `${e.Deny} | Comando cancelado.` }).catch(() => { })
+                })
 
             async function DeleteAllData() {
 
-                if (!Giveaway.get(`Giveaways.${message.guild.id}`))
+                let gwData = await Database.Giveaway.find({ GuildId: message.guild.id })
+
+                if (!gwData || gwData.length === 0)
                     return message.reply(`${e.Deny} | Este servidor não tem nenhum sorteio.`)
 
                 let Emojis = ['✅', '❌'],
-                    msg = await message.reply(`${e.QuestionMark} | Deseja deletar todos os sorteios deste servidor?`)
+                    msg = await message.reply(`${e.QuestionMark} | Deseja deletar todos os sorteios deste servidor?`),
+                    react = false
 
                 for (const emoji of Emojis)
                     msg.react(emoji).catch(() => { })
@@ -192,23 +202,26 @@ module.exports = {
                     time: 30000
                 })
 
-                    .on('collect', (reaction) => {
+                    .on('collect', async (reaction) => {
 
                         if (reaction.emoji.name === Emojis[1]) // X
                             return collector.stop()
-
-                        Giveaway.delete(`Giveaways.${message.guild.id}`)
+                        react = true
+                        Database.deleteGiveaway(message.guild.id, true)
                         return msg.edit(`${e.Check} | Todos os sorteios foram deletados.`)
 
                     })
 
-                    .on('end', () => msg.edit(`${e.Deny} | Comando cancelado.`))
+                    .on('end', () => {
+                        if (react) return
+                        return msg.edit(`${e.Deny} | Comando cancelado.`)
+                    })
 
             }
 
         }
 
-        function Reroll() {
+        async function Reroll() {
 
             let GwId = args[1],
                 Amount = args[2] || 1
@@ -216,53 +229,61 @@ module.exports = {
             if (!GwId)
                 return message.reply(`${e.Info} | Forneça o ID do sorteio para reroll. Você pode ver em \`${prefix}giveaway list\` ou copiando o ID da mensagem do sorteio.`)
 
-            if (!Giveaway.get(`Giveaways.${message.guild.id}.${GwId}`))
-                return message.reply(`${e.Deny} | Sorteio não encontrado para exclusão.`)
+            let sorteio = await Database.Giveaway.findOne({ MessageID: GwId })
 
-            if (Giveaway.get(`Giveaways.${message.guild.id}.${GwId}.Actived`))
+            if (!sorteio)
+                return message.reply(`${e.Deny} | Sorteio não encontrado para reroll. \`${prefix}gw reroll GiveawayID QuatidadeDeVencedores\``)
+
+            if (sorteio?.Actived)
                 return message.reply(`${e.Deny} | Este sorteio ainda está ativado e não é possível o Reroll antes do término. Caso você queira finalizar este sorteio antes da hora, use o comando \`${prefix}giveaway finish ${GwId}\``)
 
             if (isNaN(Amount))
                 return message.reply(`${e.Deny} | A quantidade de vencedores para reroll deve ser um número de 1~20`)
 
-            return NewReroll(GwId, Amount)
+            return NewReroll(sorteio, GwId, Amount)
 
         }
 
-        function FinishGiveaway() {
+        async function FinishGiveaway() {
 
             let GwId = args[1]
 
             if (!GwId)
                 return message.reply(`${e.Info} | Forneça o ID do sorteio para finaliza-lo. Você pode ver em \`${prefix}giveaway list\` ou copiando o ID da mensagem do sorteio.`)
 
-            if (!Giveaway.get(`Giveaways.${message.guild.id}.${GwId}`))
+            let sorteio = await Database.Giveaway.findOne({ MessageID: GwId }, 'Actived')
+
+            if (!sorteio)
                 return message.reply(`${e.Deny} | Sorteio não encontrado.`)
 
-            if (!Giveaway.get(`Giveaways.${message.guild.id}.${GwId}.Actived`))
+            if (!sorteio?.Actived)
                 return message.reply(`${e.Deny} | Este sorteio já foi está finalizado.`)
 
-            Giveaway.set(`Giveaways.${message.guild.id}.${GwId}.DateNow`, 0)
+            await Database.Giveaway.updateOne(
+                { MessageID: GwId },
+                { DateNow: 0 }
+            )
+
             return message.reply(`${e.Check} | Sorteio finalizado com sucesso!`)
 
         }
 
         async function GiveawayList() {
 
-            let Sorteios = Object.keys(Giveaway.get(`Giveaways.${message.guild.id}`) || {})
+            let Sorteios = await Database.Giveaway.find({ GuildId: message.guild.id })
 
-            if (Sorteios.length === 0)
+            if (!Sorteios || Sorteios.length === 0)
                 return message.reply(`${e.Deny} | Este servidor não tem nenhum sorteio na lista.`)
 
             let Embeds = EmbedGenerator(),
                 Control = 0,
                 Emojis = ['◀️', '▶️', '❌'],
-                msg = await message.reply({ embeds: [Embeds[0]] })
+                msg = await message.reply({ embeds: [Embeds[0]] }),
+                react = false
 
-            if (Embeds.length < 2) return
-
-            for (const emoji of Emojis)
-                msg.react(emoji).catch(() => { })
+            if (Embeds.length > 1)
+                for (const emoji of Emojis)
+                    msg.react(emoji).catch(() => { })
 
             const collector = msg.createReactionCollector({
                 filter: (reaction, user) => Emojis.includes(reaction.emoji.name) && user.id === message.author.id,
@@ -273,7 +294,7 @@ module.exports = {
 
                     if (reaction.emoji.name === Emojis[2]) // X
                         return collector.stop()
-
+                    react = true
                     return reaction.emoji.name === Emojis[0] // Left
                         ? (() => {
 
@@ -290,25 +311,27 @@ module.exports = {
 
                 })
 
-                .on('end', () => msg.edit({ content: `${e.Deny} | Comando cancelado.` }).catch(() => { }))
+                .on('end', () => {
+                    if (react) return
+                    return msg.edit({ content: `${e.Deny} | Comando cancelado.` }).catch(() => { })
+                })
 
             function EmbedGenerator() {
 
                 let amount = 5,
                     Page = 1,
                     embeds = [],
-                    Sorteio = Giveaway.get(`Giveaways.${message.guild.id}`),
                     length = Sorteios.length / 5 <= 1 ? 1 : parseInt((Sorteios.length / 5) + 1)
 
                 for (let i = 0; i < Sorteios.length; i += 5) {
 
                     let current = Sorteios.slice(i, amount),
-                        description = current.map(Gw => `> 🆔 \`${Gw}\`\n> ⏱️ Término: \`${Sorteio[Gw]?.TimeEnding}\`\n> ${Sorteio[Gw]?.Actived ? `${e.Check} Ativado` : `${e.Deny} Desativado`}\n> ${e.Info} \`${prefix}giveaway info ${Gw}\`\n--------------------`).join("\n")
+                        description = current.map(Gw => `> 🆔 \`${Gw.MessageID}\`\n> ⏱️ Término: \`${Gw.TimeEnding}\`\n> ${Gw?.Actived ? `${e.Check} Ativado` : `${e.Deny} Desativado`}\n> ${e.Info} \`${prefix}giveaway info ${Gw.MessageID}\`\n--------------------`).join("\n") || false
 
                     if (current.length > 0) {
 
                         embeds.push({
-                            color: 'GREEN',
+                            color: client.blue,
                             title: `${e.Tada} Sorteios ${message.guild.name} ${length > 1 ? `- ${Page}/${length}` : ''}`,
                             description: `${description || 'Nenhum sorteio encontrado'}`,
                             footer: {
@@ -326,6 +349,8 @@ module.exports = {
                 return embeds;
             }
 
+            return
+
         }
 
         async function GiveawayInfo() {
@@ -334,12 +359,7 @@ module.exports = {
 
             MessageId ? (async () => {
 
-                let GiveawayDatabase = Giveaway.get(`Giveaways.${message.guild.id}`),
-                    sorteio = Giveaway.get(`Giveaways.${message.guild.id}.${MessageId}`)
-
-                if (!GiveawayDatabase)
-                    return message.reply(`${e.Info} | Este servidor não tem nenhum sorteio na lista.`)
-
+                let sorteio = await Database.Giveaway.findOne({ MessageID: MessageId })
                 if (!sorteio) return message.reply(`${e.Deny} | Id inválido ou sorteio inexistente.`)
 
                 let WinnersAmount = sorteio?.Winners,
@@ -362,7 +382,8 @@ module.exports = {
                     Emojis = ['⬅️', '➡️', '❌'],
                     Control = 0,
                     Embeds = EmbedGenerator(),
-                    msg = await message.reply({ embeds: [Embeds[0]] })
+                    msg = await message.reply({ embeds: [Embeds[0]] }),
+                    react = false
 
                 if (Embeds.length === 1)
                     return
@@ -380,6 +401,7 @@ module.exports = {
                         if (reaction.emoji.name === Emojis[2])
                             return collector.stop()
 
+                        react = true
                         return reaction.emoji.name === Emojis[0]
                             ? (() => {
 
@@ -397,8 +419,8 @@ module.exports = {
                     })
 
                     .on('end', () => {
-
-                        msg.edit({ content: `${e.Deny} | Comando desativado` }).catch(() => { })
+                        if (react) return
+                        return msg.edit({ content: `${e.Deny} | Comando desativado` }).catch(() => { })
 
                     })
 
@@ -416,8 +438,13 @@ module.exports = {
 
                                 let Member = message.guild.members.cache.get(Participante)
 
-                                return Member ? `> ${Member.user.tag.replace(/`/g, '')} - \`${Member.id}\`` : (() => {
-                                    Giveaway.pull(`Giveaways.${message.guild.id}.${MessageId}.Participants`, Participante)
+                                return Member ? `> ${Member.user.tag.replace(/`/g, '')} - \`${Member.id}\`` : (async () => {
+
+                                    await Database.Giveaway.updateOne(
+                                        { MessageID: MessageId },
+                                        { $pull: { Participants: Participante } }
+                                    )
+
                                     return `> ${e.Deny} Usuário deletado`
                                 })()
 
@@ -510,11 +537,14 @@ module.exports = {
             if (!MessageId)
                 return message.reply(`${e.Info} | Forneça o ID do sorteio para resetar o tempo. Você pode ver usando \`${prefix}giveaway list\``)
 
-            if (!Giveaway.get(`Giveaways.${message.guild.id}.${MessageId}`))
+            let sorteio = await Database.Giveaway.findOne({ MessageID: MessageId })
+
+            if (!sorteio)
                 return message.reply(`${e.Deny} | Sorteio não encontrado.`)
 
             let Emojis = ['✅', '❌'],
-                msg = await message.reply(`${e.QuestionMark} | Deseja resetar o tempo do sorteio \`${MessageId}\`?`)
+                msg = await message.reply(`${e.QuestionMark} | Deseja resetar o tempo do sorteio \`${MessageId}\`?`),
+                react = false
 
             for (const emoji of Emojis)
                 msg.react(emoji).catch(() => { })
@@ -524,21 +554,30 @@ module.exports = {
                 time: 30000
             })
 
-                .on('collect', (reaction) => {
+                .on('collect', async (reaction) => {
 
                     if (reaction.emoji.name === Emojis[1]) // X
                         return collector.stop()
 
-                    const Time = Giveaway.get(`Giveaways.${message.guild.id}.${MessageId}.TimeMs`)
+                    const Time = sorteio.TimeMs
 
-                    Giveaway.set(`Giveaways.${message.guild.id}.${MessageId}.DateNow`, Date.now())
-                    Giveaway.set(`Giveaways.${message.guild.id}.${MessageId}.TimeEnding`, Data(Time))
-                    Giveaway.set(`Giveaways.${message.guild.id}.${MessageId}.Actived`, true)
+                    await Database.Giveaway.updateOne(
+                        { MessageID: MessageId },
+                        {
+                            DateNow: Date.now(),
+                            TimeEnding: Data(Time),
+                            Actived: true
+                        }
+                    )
+                    react = true
                     return msg.edit(`${e.Check} | Sorteio resetado com sucesso. *Não é necessário os membros entrar novamente*`).catch(() => { })
 
                 })
 
-                .on('end', () => msg.edit(`${e.Deny} | Comando cancelado.`))
+                .on('end', () => {
+                    if (react) return
+                    return msg.edit(`${e.Deny} | Comando cancelado.`)
+                })
 
         }
 
@@ -546,13 +585,19 @@ module.exports = {
             return message.reply(`${e.Info} | Não sabe usar o comando de sorteio? Tenta usar o comando \`${prefix}giveaway info\``)
         }
 
-        function ConfigGiveawayChannel() {
+        async function ConfigGiveawayChannel() {
 
-            let Channel = message.mentions.channels.first() || message.channel
+            let Channel = message.mentions.channels.first() || message.channel,
+                react = false
 
             if (['off', 'desligar', 'excluir', 'apagar', 'delete', 'del'].includes(args[1]?.toLowerCase())) return DeleteGiveawaysConfig()
 
-            ServerDb.set(`Servers.${message.guild.id}.GiveawayChannel`, Channel.id)
+            await Database.Guild.updateOne(
+                { id: message.guild.id },
+                { GiveawayChannel: Channel.id },
+                { upsert: true }
+            )
+
             return message.reply(`${e.Check} | O canal ${Channel} foi configurado com sucesso como Canal de Sorteios!`)
 
             async function DeleteGiveawaysConfig() {
@@ -570,57 +615,60 @@ module.exports = {
                     .on('collect', (reaction) => {
 
                         return reaction.emoji.name === '✅'
-                            ? (() => {
-                                ServerDb.delete(`Servers.${message.guild.id}.GiveawayChannel`)
-                                Giveaway.delete(`Giveaways.${message.guild.id}`)
+                            ? (async () => {
+
+                                await Database.Giveaway.deleteMany(
+                                    { GuildId: message.guild.id },
+                                )
+
+                                await Database.Guild.updateOne(
+                                    { id: message.guild.id },
+                                    { $unset: { GiveawayChannel: 1 } }
+                                )
+
+                                react = true
                                 return message.reply(`${e.Check} | Todos os sorteios e configurações foram deletados.`)
                             })()
                             : collector.stop()
 
                     })
 
-                    .on('end', () => msg.edit(`${e.Deny} | Comando cancelado.`))
-
-
+                    .on('end', () => {
+                        if (react) return
+                        msg.edit(`${e.Deny} | Comando cancelado.`)
+                    })
 
                 return
             }
 
         }
 
-        function NewReroll(MessageId, Vencedores) {
+        async function NewReroll(sorteio, MessageId, Vencedores) {
+
+            if (!sorteio)
+                return message.reply(`${e.Deny} | Sorteio não encontrado para reroll.`)
 
             let embed = new MessageEmbed(),
-                sorteio = Giveaway.get(`Giveaways.${message.guild.id}.${MessageId}`),
                 WinnersAmount = parseInt(Vencedores),
-                Participantes = sorteio?.Participants,
+                Participantes = sorteio?.Participants || [],
                 Channel = message.guild.channels.cache.get(sorteio?.ChannelId),
                 Sponsor = sorteio?.Sponsor,
-                Prize = sorteio?.Prize,
+                Prize = sorteio?.Prize || 'Indefinido',
                 MessageLink = sorteio?.MessageLink
-
-            if (!sorteio) {
-                Giveaway.delete(`Giveaways.${message.guild.id}.${MessageId}`)
-                return message.reply(`${e.Deny} | Sorteio não encontrado para reroll.`)
-            }
 
             if (!Channel)
                 return message.reply(`${e.Deny} | Canal não encontrado.`)
 
-            if (Participantes.length === 0) {
-
-                Channel.send(`${e.Deny} | Reroll cancelado por falta de participantes.\n🔗 | Sorteio link: ${sorteio?.MessageLink}`)
-                return Giveaway.delete(`Giveaways.${message.guild.id}.${MessageId}`)
-
+            if (!Participantes || Participantes.length === 0) {
+                Database.deleteGiveaway(MessageId)
+                return Channel.send(`${e.Deny} | Reroll cancelado por falta de participantes.\n🔗 | Sorteio link: ${sorteio?.MessageLink}`)
             }
 
             let vencedores = GetWinners(Participantes, WinnersAmount)
 
             if (vencedores.length === 0) {
-
-                Channel.send(`${e.Deny} | Reroll cancelado por falta de participantes.\n🔗 | Giveaway Reference: ${MessageLink || 'Link indisponível'}`)
-                return Giveaway.delete(`Giveaways.${message.guild.id}.${MessageId}`)
-
+                Database.deleteGiveaway(MessageId)
+                return Channel.send(`${e.Deny} | Reroll cancelado por falta de participantes.\n🔗 | Giveaway Reference: ${MessageLink || 'Link indisponível'}`)
             }
 
             let vencedoresMapped = vencedores.map(memberId => `${GetMember(memberId)}`).join('\n')
@@ -654,10 +702,13 @@ module.exports = {
                         )
                 ]
 
-            }).catch(() => Giveaway.delete(`Giveaways.${message.guild.id}.${MessageId}`))
+            }).catch(() => Database.deleteGiveaway(MessageId))
 
-            if (Giveaway.get(`Giveaways.${message.guild.id}.${MessageId}`))
-                Giveaway.set(`Giveaways.${message.guild.id}.${MessageId}.TimeToDelete`, Date.now())
+            if (sorteio)
+                Database.Giveaway.updateOne(
+                    { MessageID: MessageId },
+                    { TimeToDelete: Date.now() }
+                )
 
             function GetWinners(WinnersArray, Amount) {
 
@@ -673,11 +724,7 @@ module.exports = {
                             Winners.push(GetUserWinner())
 
                     })()
-                    : (() => {
-
-                        Winners.push(...WinnersArray)
-
-                    })()
+                    : (() => Winners.push(...WinnersArray))()
 
                 function GetUserWinner() {
 
@@ -693,9 +740,14 @@ module.exports = {
                 const member = message.guild.members.cache.get(memberId)
 
                 return member
-                    ? `${member} *\`${member?.id || 'Id desconhecido'}\`*`
-                    : (() => {
-                        Giveaway.pull(`Giveaways.${message.guild.id}.${MessageId}.Participants`, memberId)
+                    ? `${member} *\`${member?.id || '0'}\`*`
+                    : (async () => {
+
+                        await Database.Giveaway.updateOne(
+                            { MessageID: MessageId },
+                            { $pull: { Participants: memberId } }
+                        )
+
                         return `${e.Deny} Usuário não encontrado.`
                     })()
             }

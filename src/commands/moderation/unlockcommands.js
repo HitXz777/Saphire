@@ -1,6 +1,4 @@
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
-const { ServerDb } = require('../../../Routes/functions/database')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'unlockcommands',
@@ -12,41 +10,37 @@ module.exports = {
     usage: '<unlockcommands> <channel>',
     description: 'Destranque meus comandos em canais que foram bloqueados.',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
-        let channel = message.mentions.channels.first() || message.channel
+        let channel = message.mentions.channels.first() || message.channel,
+            guild = await Database.Guild.findOne({ id: message.guild.id }, 'Blockchannels')
 
-        if (!ServerDb.get(`Servers.${message.guild.id}.Blockchannels.${channel.id}`) && !ServerDb.get(`Servers.${message.guild.id}.Blockchannels.Bots.${message.channel.id}`)) return message.reply(`${e.Check} | ${channel} já está desbloqueado.`)
+        if (!guild?.Blockchannels?.Channels?.includes(channel.id) && !guild?.Blockchannels?.Bots?.includes(channel.id)) return message.reply(`${e.Info} | O canal ${channel} não está desbloqueado.`)
 
-        return message.reply(`${e.QuestionMark} | Você deseja desbloquear todos os comandos no canal ${channel}?`).then(msg => {
-            sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-            msg.react('✅').catch(() => { }) // e.Check
-            msg.react('❌').catch(() => { }) // X
+        const msg = await message.reply(`${e.QuestionMark} | Você deseja desbloquear todos os comandos no canal ${channel}?`),
+            emojis = ['✅', '❌'],
+            filter = (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id
 
-            const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+        for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
-            msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                const reaction = collected.first()
+        return msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(async collected => {
+            const reaction = collected.first()
 
-                if (reaction.emoji.name === '✅') {
-                    msg.edit(`${e.Loading} | Autenticando...`)
-                    setTimeout(() => {
-                        sdb.delete(`Request.${message.author.id}`)
-                        ServerDb.delete(`Servers.${message.guild.id}.Blockchannels.${message.channel.id}`)
-                        ServerDb.delete(`Servers.${message.guild.id}.Blockchannels.Bots.${message.channel.id}`)
-                        msg.edit(`${e.Check} | Request autenticada.`)
-                        return message.reply(`🔓 | ${message.author} desbloqueou todos os comandos (meu e de outros bots) no canal ${channel}.`)
-                    }, 2000)
+            if (reaction.emoji.name === emojis[0]) {
 
-                } else {
-                    sdb.delete(`Request.${message.author.id}`)
-                    msg.edit(`${e.Deny} | Request cancelada por: ${message.author}`)
-                }
-            }).catch(err => {
-                sdb.delete(`Request.${message.author.id}`)
-                msg.edit(`${e.Deny} | Request cancelada por: Tempo expirado.`)
-            })
-        })
+                await Database.Guild.updateOne(
+                    { id: message.guild.id },
+                    {
+                        $pull: {
+                            'Blockchannels.Channels': channel.id,
+                            'Blockchannels.Bots': channel.id
+                        }
+                    }
+                )
+
+                return msg.edit(`🔓 | ${message.author} desbloqueou todos os comandos (meu e de outros bots) no canal ${channel}.`)
+
+            } else { return msg.edit(`${e.Deny} | Request cancelada por: ${message.author}`) }
+        }).catch(() => msg.edit(`${e.Deny} | Request cancelada por: Tempo expirado.`))
     }
 }

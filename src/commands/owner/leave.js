@@ -1,14 +1,15 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'leave',
     aliases: ['sair', 'kitar'],
     category: 'owner',
     emoji: `${e.OwnerCrow}`,
+    owner: true,
     usage: '<leave> <GuildID>',
     description: 'Permite meu criador me tirar de qualquer servidor',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.Deny} | Informe o ID do servidor para que eu possa sair.`)
 

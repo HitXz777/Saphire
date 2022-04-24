@@ -1,6 +1,6 @@
 
-const { e } = require('../../../database/emojis.json')
-const Error = require('../../../Routes/functions/errors')
+const { e } = require('../../../JSON/emojis.json')
+const Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
     name: 'slowmode',
@@ -12,7 +12,7 @@ module.exports = {
     usage: '<slowmode> <TEMPO EM SEGUNDOS> [#canal(opicional)]',
     description: 'Ative o slowmode no chat',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let canal = message.mentions.channels.first() || message.channel
 

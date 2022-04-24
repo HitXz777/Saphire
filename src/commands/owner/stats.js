@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json'),
+const { e } = require('../../../JSON/emojis.json'),
     axios = require('axios')
 require('dotenv').config()
 
@@ -6,10 +6,11 @@ module.exports = {
     name: 'stats',
     aliases: ['s'],
     category: 'owner',
-    emoji: '🏓',
+    emoji: e.OwnerCrow,
+    owner: true,
     description: 'Stats Bot',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const msg = await message.reply(`${e.Loading} | Obtendo os dados necessários...`),
             info = (await axios.get(`https://discloud.app/status/bot/${client.user.id}`, {

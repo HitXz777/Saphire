@@ -1,6 +1,5 @@
-const { DatabaseObj } = require('../../../Routes/functions/database')
-const { e, config } = DatabaseObj
-const Error = require('../../../Routes/functions/errors')
+const { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
+const Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
   name: 'clear',
@@ -12,7 +11,7 @@ module.exports = {
   usage: '<clear> [@user/bots/images/all] [quantidade]',
   description: 'Limpezinha básica',
 
-  run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+  run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     const clearembed = new MessageEmbed()
       .setColor('#246FE0')
@@ -116,8 +115,6 @@ module.exports = {
     }
 
     async function NewClearNuke() {
-      if (db.get(`Servers.${message.guild.id}.ClearNuke`))
-        return message.reply(`${e.Info} | Já tem um \`${prefix}clear nuke\` rolando neste servidor.`)
 
       if (args[1])
         return message.reply(`${e.Deny} | Nada além do primeiro argumento! Use \`${prefix}clear\` para mais informações.`)
@@ -127,11 +124,9 @@ module.exports = {
       while (i) {
         if (!message.channel) {
           i = false
-          db.delete(`Servers.${message.guild.id}.ClearNuke`)
           return
         }
 
-        db.set(`Servers.${message.guild.id}.ClearNuke`, true)
         let deleteAble = await message.channel.messages.fetch({ limit: 100 }).catch(err => { return })
         if (deleteAble.size < 100 || messages >= 900) {
           await message.channel.bulkDelete(deleteAble).catch(err => {
@@ -149,18 +144,14 @@ module.exports = {
             Error(message, err)
             return message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.ServerLink}).\n\`${err}\``)
           })
-          db.add('Client.GlobalClearNuke', deleteAble.size)
           messages += deleteAble.size
           i = false
           message.channel.send(`${e.Check} | Deletei um total de ${messages} mensagens sob as ordens de ${message.author}.\n${e.SaphireObs} | Mensagens acima de 14 dias não podem ser apagadas.`)
-          db.delete(`Servers.${message.guild.id}.ClearNuke`)
           messages = 0
           return
         }
-        if (db.get('Client.GlobalClearNuke') >= 2500) { setTimeout(() => { db.set('Client.GlobalClearNuke', 0) }, 3000) }
         await message.channel.bulkDelete(deleteAble).catch(() => { })
         messages += deleteAble.size
-        db.add('Client.GlobalClearNuke', deleteAble.size)
       }
     }
 

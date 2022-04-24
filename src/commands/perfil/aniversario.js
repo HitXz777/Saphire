@@ -1,5 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
+const { e } = require('../../../JSON/emojis.json'),
+    moment = require('moment')
 
 module.exports = {
     name: 'aniversario',
@@ -10,86 +10,110 @@ module.exports = {
     usage: '<niver> <dia> <mes> <ano>',
     description: 'Configure seu aniversário no seu perfil',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+        if (!args[0]) return message.reply({
+            embeds: [
+                new MessageEmbed()
+                    .setColor('#246FE0')
+                    .setTitle('🎉 Data de Aniversário')
+                    .setDescription('Defina sua data de aniversário no seu perfil atráves deste comando.')
+                    .addField(`${e.On} Ative`, `\`${prefix}setniver 15/03/2007\``)
+                    .addField(`${e.Off} Desative`, `\`${prefix}setniver delete\``)
+                    .setFooter('Siga o formato, ok? Idade limite: 80 Anos')
+            ]
+        })
 
-        const NiverEmbed = new MessageEmbed()
-            .setColor('#246FE0')
-            .setTitle('🎉 Data de Aniversário')
-            .setDescription(`Defina sua data de aniversário no seu perfil atráves deste comando.\n \n${e.SaphireObs} | É obrigatório seguir o formato. Ok?\nCom **espaçamento** e no **formato DD MM AAAA**`)
-            .addField(`${e.On} Ative`, `\`${prefix}setniver 15 03 2007\``)
-            .addField(`${e.Off} Desative`, `\`${prefix}setniver delete\``)
-            .setFooter('Siga o formato, ok?')
-
-        if (!args[0]) return message.reply({ embeds: [NiverEmbed] })
-
-        let niver = sdb.get(`Users.${message.author.id}.Perfil.Aniversario`) || false
+        let user = await Database.User.findOne({ id: message.author.id }, 'Perfil.Aniversario'),
+            niver = user?.Perfil?.Aniversario
 
         if (['off', 'delete', 'del', 'deletar'].includes(args[0]?.toLowerCase())) return DeleteBirthData()
-        let dia = parseInt(args[0])
-        let mes = parseInt(args[1])
-        let ano = parseInt(args[2])
-        if (!dia || !mes || !ano) return message.reply(`${e.Info} | Segue esse formato -> **DD MM AAAA** | **26 06 1999**`)
-        if (isNaN(dia) || isNaN(mes) || isNaN(ano)) return message.reply(`${e.Deny} | Datas são **NÚMEROS**, ok?`)
-        if (args[0].length !== 2) return message.reply(`${e.Deny} | Dias contém apenas 2 caractes, ele vão de 01 a 31`)
-        if (args[1].length !== 2) return message.reply(`${e.Deny} | Meses contém apenas 2 caractes, ele vão de 01 a 12`)
-        if (args[2].length !== 4) return message.reply(`${e.Deny} | Os anos válidos estão entre 1910 e 2015`)
 
-        // Dia
-        if (dia > 31 || dia < 1) return message.reply(`${e.Deny} | Hey, fala um dia do mês! Eu acho que os meses começa no dia 1 e termina no dia 31`)
+        if (args[2]) return message.reply(`${e.Deny} | Só a data, ok?`)
 
-        // Mês
-        if (mes > 12 || mes < 1) return message.reply(`${e.Deny} | Quantos meses tem seu ano?`)
-        if (dia > 28 && mes === 02) return message.reply(`${e.Deny} | Fevereiro não tem mais de 28 dias`)
-        if ((dia >= 31) && ['02', '04', '06', '09', '10', '11'].includes(args[1])) return message.reply(`${e.Deny} | Esse mês não tem o dia 31, baka.`)
+        if (!args[0].includes('/')) return message.reply(`${e.Deny} | Segue a forma certa, ok? \`15/03/2007\` - DD/MM/AAAA`)
 
-        // Ano
-        if (ano > 2015 || ano < 1910) return message.reply(`${e.Deny} | Os anos válidos estão entre 1910 e 2015`)
+        let check = args[0].split('/')
 
-        if (args[3]) return message.reply(`${e.Deny} | Só a data, ok?`)
+        if (!check[0] || !check[1] || !check[2] || !check[0].length > 2 || !check[1].length > 2 || !check[2].length > 4)
+            return message.reply(`${e.Deny} | Segue a forma certa, ok? \`15/03/2007\` - DD/MM/AAAA`)
 
-        let NewData = `${dia}/${mes}/${ano}`
+        const data = moment(args[0], "DDMMYYYY"),
+            formatedData = data.locale('BR').format('L')
 
-        niver === NewData ? message.reply(`${e.Info} | Esta já é sua data de aniversário atual.`) : SetNewData(NewData)
+        if (!data.isValid())
+            return message.reply(`${e.Deny} | A sua data de aniversário está errada. Você certinho e tenta de novo, ok?`)
 
-        function SetNewData(data) {
+        if (data.isBefore(eightyYears()) || data.isAfter(Now()))
+            return message.reply(`${e.Deny} | As datas disponíveis estão entre: \`${Now(true)}\` & \`${eightyYears(true)}\``)
 
-            return message.reply(`${e.QuestionMark} | Você confirma a sua data de aniversário? \`${data}\``).then(msg => {
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                msg.react('✅').catch(() => { }) // Check
-                msg.react('❌').catch(() => { }) // X
+        return niver === formatedData ? message.reply(`${e.Info} | Esta já é sua data de aniversário atual.`) : SetNewData(formatedData)
 
-                const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+        async function SetNewData(data) {
 
-                msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                    const reaction = collected.first()
+            const msg = await message.reply(`${e.QuestionMark} | Você confirma alterar sua data de aniversário para: \`${data}\`?`)
 
-                    if (reaction.emoji.name === '✅') {
-                        sdb.delete(`Request.${message.author.id}`)
-                        sdb.set(`Users.${message.author.id}.Perfil.Aniversario`, `${data}`)
-                        return msg.edit(`${e.Check} | Data de aniversário atualizada com sucesso!`)
-                    } else {
-                        sdb.delete(`Request.${message.author.id}`)
-                        return msg.edit(`${e.Deny} | Comando cancelado.`)
-                    }
-                }).catch(() => {
-                    sdb.delete(`Request.${message.author.id}`)
-                    return msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`)
-                })
+            msg.react('✅').catch(() => { }) // Check
+            msg.react('❌').catch(() => { }) // X
 
-            })
+            return msg.awaitReactions({
+                filter: (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+                max: 1,
+                time: 15000,
+                errors: ['time']
+            }).then(collected => {
+                const reaction = collected.first()
+
+                if (reaction.emoji.name === '✅') {
+                    Database.updateUserData(message.author.id, 'Perfil.Aniversario', data)
+                    return msg.edit(`${e.Check} | Data de aniversário atualizada com sucesso!`)
+                } else { return msg.edit(`${e.Deny} | Comando cancelado.`) }
+            }).catch(() => msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`))
+
+
         }
 
         function DeleteBirthData() {
-            niver ? Delete() : message.reply(`${e.Info} | O sua data de aniversário já está resetada.`)
 
-            function Delete() {
-                sdb.delete(`Users.${message.author.id}.Perfil.Aniversario`)
-                message.reply(`${e.Check} | ${message.author} resetou sua data de aniversário.`)
+            if (niver) {
+                Database.delete(message.author.id, 'Perfil.Aniversario')
+                return message.channel.send(`${e.Check} | ${message.author} deletou sua data de aniversário.`)
             }
+
+            return message.reply(`${e.Info} | O sua data de aniversário já está resetada.`)
         }
 
-
     }
+}
+
+function Now(formatBr = false) {
+
+    const date = new Date(Date.now() - 410248800000)
+    date.setHours(date.getHours() - 3)
+
+    let Dia = FormatNumber(date.getDate()),
+        Ano = date.getFullYear()
+
+    if (formatBr)
+        return `${Dia}/${FormatNumber(date.getMonth() + 1)}/${Ano}`
+
+    return `${Ano}-${FormatNumber(date.getMonth() + 1)}-${Dia}`
+}
+
+function eightyYears(formatBr = false) {
+
+    const date = new Date(Date.now() - 3155760000000)
+    date.setHours(date.getHours() - 3)
+
+    let Dia = FormatNumber(date.getDate()),
+        Ano = date.getFullYear()
+
+    if (formatBr)
+        return `${Dia}/${FormatNumber(date.getMonth() + 1)}/${Ano}`
+
+    return `${Ano}-${FormatNumber(date.getMonth() + 1)}-${Dia}`
+}
+
+function FormatNumber(data) {
+    return data < 10 ? `0${data}` : data
 }

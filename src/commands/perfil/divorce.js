@@ -1,53 +1,59 @@
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
-const Data = require('../../../Routes/functions/data')
+const { e } = require('../../../JSON/emojis.json')
+const Data = require('../../../modules/functions/plugins/data')
 
 module.exports = {
     name: 'divorcio',
-    aliases: ['divórcio', 'divorce'],
+    aliases: ['divórcio', 'divorce', 'divorciar'],
     category: 'perfil',
     ClientPermissions: ['ADD_REACTIONS'],
     emoji: '💔',
     usage: '<divorce>',
     description: 'Divorcie do seu casamento',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
-        if (!sdb.get(`Users.${message.author.id}.Perfil.Marry`)) return message.reply(`${e.Deny} | Você não está em um relacionamento.`)
-        let ParID = sdb.get(`Users.${message.author.id}.Perfil.Marry`)
+        let author = await Database.User.findOne({ id: message.author.id }, 'id Perfil.Marry')
+        authorData = {
+            conjugate: author?.Perfil?.Marry?.Conjugate,
+            StartAt: author?.Perfil?.Marry?.StartAt
+        }
 
-        return message.reply(`${e.QuestionMark} | Você deseja colocar um fim no seu casamento com <@${ParID}>?`).then(msg => {
-            sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-            msg.react('✅').catch(() => { }) // Check
-            msg.react('❌').catch(() => { }) // X
+        if (!authorData?.conjugate) return message.reply(`${e.Deny} | Você não está em um relacionamento.`)
 
-            const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+        let user = client.users.cache.get(authorData?.conjugate)
 
-            msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                const reaction = collected.first()
+        if (!user) {
+            Database.delete(message.author.id, 'Perfil.Marry')
+            Database.deleteUser(authorData?.conjugate)
+            return message.reply(`${e.Deny} | Eu não achei o seu parceiro/a. Removi ele/a do meu banco de dados e retirei seu casamento.`)
+        }
 
-                if (reaction.emoji.name === '✅') {
-                    sdb.delete(`Request.${message.author.id}`)
-                    Divorce()
-                } else {
-                    sdb.delete(`Request.${message.author.id}`)
-                    msg.edit(`${e.Deny} | Comando cancelado.`)
-                }
-            }).catch(() => {
-                sdb.delete(`Request.${message.author.id}`)
-                msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`)
-            })
+        const msg = await message.reply(`${e.QuestionMark} | Você deseja colocar um fim no seu casamento com ${user.tag}?`)
 
-            async function Divorce() {
-                sdb.set(`Users.${ParID}.Perfil.Marry`, false)
-                sdb.set(`Users.${message.author.id}.Perfil.Marry`, false)
+        msg.react('✅').catch(() => { }) // Check
+        msg.react('❌').catch(() => { }) // X
 
-                msg.edit(`${e.Check} | Divórcio concluído! Você não está mais se relacionando com <@${ParID}>.\nDivórcio pedido em: \`${Data()}\``)
+        msg.awaitReactions({
+            filter: (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+            max: 1,
+            time: 15000,
+            errors: ['time']
+        }).then(collected => {
+            const reaction = collected.first()
 
-                let Par = await client.users.cache.get(ParID)
-                Par ? Par.send(`${e.Info} | ${message.author} > ${message.author.tag} \`${message.author.id}\` < pôs um fim no casamento.\nDivórcio pedido em: \`${Data()}\``).catch(() => { }) : ''
+            if (reaction.emoji.name === '✅') {
+                Database.delete(message.author.id, 'Perfil.Marry')
+                Database.delete(user.id, 'Perfil.Marry')
+
+                msg.edit(`${e.Check} | Divórcio concluído! Você não está mais se relacionando com ${user.tag}.\nDivórcio pedido em: \`${Data()}\``).catch(() => { })
+
+                return user.send(`${e.Info} | ${message.author.tag} \`${message.author.id}\` pôs um fim no casamento.\n> Divórcio pedido em: \`${Data()}\`\n> Tempo de casados: \`${client.GetTimeout(Date.now() - authorData.StartAt, 0, false)}\``).catch(() => { })
+
             }
-        })
+
+            return msg.edit(`${e.Deny} | Comando cancelado.`)
+
+        }).catch(() => msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`).catch(() => { }))
+
     }
 }

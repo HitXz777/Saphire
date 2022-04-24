@@ -1,6 +1,5 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const { Permissions } = require('discord.js')
-const { ServerDb } = require('../../../Routes/functions/database')
 
 module.exports = {
     name: 'channel',
@@ -12,27 +11,31 @@ module.exports = {
     usage: '<channel>',
     description: 'Configure os canais rapidamente',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) return message.reply(`${e.SadPanda} | Eu preciso da permissão \`GERENCIAR CANAIS\` para executar este comando.`)
 
-        const noargs = new MessageEmbed()
-            .setColor('#246FE0')
-            .setTitle('🛠️ Gerenciamento de Canais')
-            .setDescription('Com este comando você pode gerenciar os canais rapidamente.\n<opicional>')
-            .addField('Mude o Nome', `\`${prefix}channel name <#canal> NomeDoCanal\``)
-            .addField('Mude o Tópico', `\`${prefix}channel topic <#canal> O novo tópico irado do canal\``)
-            .addField('Crie Canais', `\`${prefix}channel create text/voice NomeDoCanal\``)
-            .addField('Delete Canais', `\`${prefix}channel delete <#canal>\``)
-            .addField('Clone', `\`${prefix}channel clone <#canal>\``)
-            .addField('Pegue o ID', `\`${prefix}channel id <#canal>\``)
-            .addField('Crie um convite', `\`${prefix}channel invite <#canal>\``)
-            .addField('Sincrozine as permissiões com a categoria', `\`${prefix}channel sync [#canal]\``)
-            .addField('Crie canais Farming', `\`${prefix}channel farm buscar/pescar/mine\``)
-            .addField('Crie o canal de level up', `\`${prefix}channel levelup\``)
+        if (!args[0] || ['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return message.reply({
+            embeds: [
+                new MessageEmbed()
+                    .setColor('#246FE0')
+                    .setTitle('🛠️ Gerenciamento de Canais')
+                    .setDescription('Com este comando você pode gerenciar os canais rapidamente.\n<opicional>')
+                    .addField('Mude o Nome', `\`${prefix}channel name <#canal> NomeDoCanal\``)
+                    .addField('Mude o Tópico', `\`${prefix}channel topic <#canal> O novo tópico irado do canal\``)
+                    .addField('Crie Canais', `\`${prefix}channel create text/voice NomeDoCanal\``)
+                    .addField('Delete Canais', `\`${prefix}channel delete <#canal>\``)
+                    .addField('Clone', `\`${prefix}channel clone <#canal>\``)
+                    .addField('Pegue o ID', `\`${prefix}channel id <#canal>\``)
+                    .addField('Crie um convite', `\`${prefix}channel invite <#canal>\``)
+                    .addField('Sincrozine as permissiões com a categoria', `\`${prefix}channel sync [#canal]\``)
+                    .addField('Crie o canal de level up', `\`${prefix}channel levelup\``)
+            ]
+        })
 
         const canal = message.mentions.channels.first() || message.channel
-        if (!args[0]) return message.reply({ embeds: [noargs] })
+
+        if (!canal) return message.reply(`${e.Deny} | Nenhum canal foi encontrado.`).catch(() => { })
 
         switch (args[0]) {
             case 'name': case 'nome':
@@ -58,9 +61,6 @@ module.exports = {
                 break;
             case 'sync': case 'sincronize': case 'sincronizar':
                 Sync()
-                break;
-            case 'farm': case 'farmin': case 'farming':
-                Farm()
                 break;
             case 'level': case 'levelchannel': case 'xpchannel': case 'levelup':
                 LevelChannel()
@@ -143,11 +143,11 @@ module.exports = {
         }
 
         function ChannelDelete() {
-            if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+
             if (args[2]) return message.reply(`${e.Deny} | Tenta usar assim.\n\`${prefix}channel delete [#Canal(opcional)]\``)
 
             return message.reply(`${e.QuestionMark} | Este comando vai literalmente deletar o canal ${canal}, deseja prosseguir?`).then(msg => {
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+
                 msg.react('✅').catch(() => { }) // Check
                 msg.react('❌').catch(() => { }) // X
 
@@ -157,7 +157,7 @@ module.exports = {
                     const reaction = collected.first()
 
                     if (reaction.emoji.name === '✅') {
-                        sdb.delete(`Request.${message.author.id}`)
+
                         canal.delete().catch(err => {
                             if (err.code === 50074)
                                 return message.channel.send(`${e.Info} | Não é possível deletar um canal do tipo **Comunidade.**`)
@@ -166,11 +166,11 @@ module.exports = {
                         })
                         return msg.edit(`${e.Check} | Canal deletado com sucesso!`).catch(() => { })
                     } else {
-                        sdb.delete(`Request.${message.author.id}`)
+
                         return msg.edit(`${e.Deny} | Request cancelada.`).catch(() => { })
                     }
                 }).catch(() => {
-                    sdb.delete(`Request.${message.author.id}`)
+
                     return msg.edit(`${e.Deny} | Request cancelada por tempo expirado.`).catch(() => { })
                 })
             })
@@ -197,73 +197,22 @@ module.exports = {
             }).catch(err => { return message.channel.send(`${e.Deny} | Ocorreu um erro ao trocar o nome do canal.\n\`${err}\``) })
         }
 
-        async function Farm() {
-
-            switch (args[1]) {
-                case 'busca': case 'buscar':
-                    BuscaChannel()
-                    break;
-                case 'pesca': case 'pescar':
-                    PescaChannel()
-                    break;
-                case 'mine': case 'minerar':
-                    MineChannel()
-                    break;
-                default:
-                    message.reply(`${e.Deny} | Opções válidas para criação de canais farming: \`busca\` \`pesca\` \`minerar\``)
-                    break;
-            }
-
-            function BuscaChannel() {
-                if (ServerDb.get(`Servers.${message.guild.id}.Farm.BuscaChannel`))
-                    message.reply(`${e.Info} | O canal <#${ServerDb.get(`Servers.${message.guild.id}.Farm.BuscaChannel`)}> foi deletado da minha database.`)
-
-                message.guild.channels.create('floresta-cammum', {
-                    type: 'GUILD_TEXT', topic: `Use "${prefix}busca" para farmar`, rateLimitPerUser: 1, reason: `${message.author.tag} solicitou a criação deste canal.`
-                }).then(channel => {
-                    ServerDb.set(`Servers.${message.guild.id}.Farm.BuscaChannel`, channel.id)
-                    channel.send(`${e.Nagatoro} | Neste canal está liberado a farming \`${prefix}busca\`. Boa sorte!`).catch(() => { })
-                    return message.reply(`${e.Check} | Canal farming criado com sucesso! | ${channel}`)
-                }).catch(err => { message.channel.send(`${e.Deny} | Ocorreu um erro ao criar o canal farming.\n\`${err}\``) })
-            }
-
-            function PescaChannel() {
-                if (ServerDb.get(`Servers.${message.guild.id}.Farm.PescaChannel`))
-                    message.reply(`${e.Info} | O canal <#${ServerDb.get(`Servers.${message.guild.id}.Farm.PescaChannel`)}> foi deletado da minha database.`)
-
-                message.guild.channels.create('farm-pesca', {
-                    type: 'GUILD_TEXT', topic: `Use "${prefix}pesca" para farmar`, rateLimitPerUser: 1, reason: `${message.author.tag} solicitou a criação deste canal.`
-                }).then(channel => {
-                    ServerDb.set(`Servers.${message.guild.id}.Farm.PescaChannel`, channel.id)
-                    channel.send(`${e.Nagatoro} | Neste canal está liberado a farming \`${prefix}pesca\`. Boa sorte!`).catch(() => { })
-                    return message.reply(`${e.Check} | Canal farming criado com sucesso! | ${channel}`)
-                }).catch(err => { message.channel.send(`${e.Deny} | Ocorreu um erro ao criar o canal farming.\n\`${err}\``) })
-            }
-
-            function MineChannel() {
-                if (ServerDb.get(`Servers.${message.guild.id}.Farm.MineChannel`))
-                    return message.reply(`${e.Info} | Já existe um canal farming neste servidor. -> <#${ServerDb.get(`Servers.${message.guild.id}.Farm.MineChannel`)}>`)
-
-                message.guild.channels.create('mineração', {
-                    type: 'GUILD_TEXT', topic: `Use "${prefix}mine" para farmar`, rateLimitPerUser: 1, reason: `${message.author.tag} solicitou a criação deste canal.`
-                }).then(channel => {
-                    ServerDb.set(`Servers.${message.guild.id}.Farm.MineChannel`, channel.id)
-                    channel.send(`${e.Nagatoro} | Neste canal está liberado a farming \`${prefix}mine\`. Boa sorte!`).catch(() => { })
-                    return message.reply(`${e.Check} | Canal farming criado com sucesso! | ${channel}`)
-                }).catch(err => { message.channel.send(`${e.Deny} | Ocorreu um erro ao criar o canal farming.\n\`${err}\``) })
-            }
-        }
-
         async function LevelChannel() {
-            let CanalAtual = await message.guild.channels.cache.get(ServerDb.get(`Servers.${message.guild.id}.XPChannel`))
 
-            if (ServerDb.get(`Servers.${message.guild.id}.XPChannel`) && !CanalAtual)
-                ServerDb.delete(`Servers.${message.guild.id}.XPChannel`)
+            let data = await Database.Guild.findOne({ id: message.guild.id }, 'XPChannel')
+
+            let CanalAtual = await message.guild.channels.cache.get(data.XPChannel)
+
+            if (data.XPChannel && !CanalAtual)
+                await Database.Guild.updateOne(
+                    { id: message.guild.id },
+                    { $unset: { XPChannel: 1 } }
+                )
 
             if (CanalAtual)
                 return message.reply(`${e.Deny} | Não é possível criar outro canal de Level Up. Canal atual: ${CanalAtual}`)
 
-            message.guild.channels.create(`${client.user.username}'s level-up`, {
+            return message.guild.channels.create(`${client.user.username}'s level-up`, {
                 topic: `Canal de Level up da Bot ${client.user.username}`,
                 permissionOverwrites: [
                     {
@@ -272,10 +221,14 @@ module.exports = {
                     },
                 ],
                 reason: `${message.author.tag} solicitou a criação deste canal.`
-            }).then(channel => {
-                ServerDb.set(`Servers.${message.guild.id}.XPChannel`, channel.id)
+            }).then(async channel => {
+
+                await Database.Guild.updateOne(
+                    { id: message.guild.id },
+                    { XPChannel: channel.id }
+                )
                 channel.send(`${e.NezukoDance} O canal de level-up foi ativado e configurado com sucesso! Eu fechei o canal para @.everyone, mas se quiser abrir, só digitar \`${prefix}unlock\``)
-                message.channel.send(`${e.Check} | Canal criado com sucesso! Ele está aqui: ${channel}`)
+                return message.channel.send(`${e.Check} | Canal criado com sucesso! Ele está aqui: ${channel}`)
             }).catch(err => {
                 return message.channel.send(`${e.Deny} | Ocorreu um erro na criação do canal de level up. Caso não saiba resolver sozinho*(a)*, reporte o bug usando \`${prefix}bug\` que a minha equipe te dará o suporte necessário.\n\`${err}\``)
             })

@@ -1,6 +1,5 @@
-const { f } = require('../../../database/frases.json')
-const { e } = require('../../../database/emojis.json')
-const { ServerDb } = require('../../../Routes/functions/database')
+const { e } = require('../../../JSON/emojis.json'),
+    Database = require('../../../modules/classes/Database')
 
 module.exports = {
     name: 'lockcommands',
@@ -12,80 +11,76 @@ module.exports = {
     usage: '<lockcommands> <channel>',
     description: 'Tranque meus comandos em canais específicos para que não seja usados. (ADM\'s são imunes)',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
         let channel = message.mentions.channels.first() || message.channel
 
-        const InfoEmbed = new MessageEmbed()
-            .setColor('#246FE0')
-            .setTitle(`${e.Deny} Bloqueio de Comandos`)
-            .setDescription('Com este comando, torna-se possível o bloqueio dos meus comandos ou comandos de outros bots em canais específicos.')
-            .addField(`${e.On} Bloqueie meus comandos`, `\`${prefix}lockcommands\``)
-            .addField(`${e.On} Bloqueie todos os bots`, `\`${prefix}lockcommands bots\``)
-            .addField(`${e.Off} Desative`, `\`${prefix}unlockcommands\``)
+        if (['info', 'informações', 'informação', 'help', 'ajuda'].includes(args[0]?.toLowerCase()))
+            return message.reply({
+                embeds: [
+                    new MessageEmbed()
+                        .setColor('#246FE0')
+                        .setTitle(`${e.Deny} Bloqueio de Comandos`)
+                        .setDescription('Com este comando, torna-se possível o bloqueio dos meus comandos ou comandos de outros bots em canais específicos.')
+                        .addField(`${e.On} Bloqueie meus comandos`, `\`${prefix}lockcommands\``)
+                        .addField(`${e.On} Bloqueie todos os bots`, `\`${prefix}lockcommands bots\``)
+                        .addField(`${e.Off} Desative`, `\`${prefix}unlockcommands\``)
 
-        if (['info', 'informações', 'informação', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return message.reply({ embeds: [InfoEmbed] })
+                ]
+            })
+
+        let guild = await Database.Guild.findOne({ id: message.guild.id }, 'Blockchannels')
+
         if (['bots', 'bot'].includes(args[0]?.toLowerCase())) return BloquearBots()
 
-        if (ServerDb.get(`Servers.${message.guild.id}.Blockchannels.${channel.id}`)) { return message.reply(`${e.Check} | ${channel} já está bloqueado. \`${prefix}lockcommands info\``) }
+        if (guild?.Blockchannels.Channels?.includes(channel.id)) return message.reply(`${e.Info} | O canal ${channel} já está bloqueado. \`${prefix}lockcommands info\``)
 
-        return message.reply(`${e.QuestionMark} | Você deseja bloquear todos os meus comandos no canal ${channel}?`).then(msg => {
-            sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-            msg.react('✅').catch(() => { }) // e.Check
-            msg.react('❌').catch(() => { }) // X
+        const msg = await message.reply(`${e.QuestionMark} | Você deseja bloquear todos os meus comandos no canal ${channel}?`),
+            emojis = ['✅', '❌'],
+            filter = (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id
 
-            const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+        for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
-            msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
+        return msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(async collected => {
+            const reaction = collected.first()
+
+            if (reaction.emoji.name === emojis[0]) {
+
+                await Database.Guild.updateOne(
+                    { id: message.guild.id },
+                    { $push: { 'Blockchannels.Channels': channel.id } },
+                    { upsert: true }
+                )
+
+                return msg.edit(`✅ | ${message.author} bloqueou todos os meus comandos no canal ${channel}.`)
+
+            } else { return msg.edit(`${e.Deny} | Request cancelada por: ${message.author}`) }
+        }).catch(() => msg.edit(`${e.Deny} | Request cancelada por: Tempo expirado.`))
+
+        async function BloquearBots() {
+
+            if (guild?.Blockchannels.Bots?.includes(channel.id)) return message.reply(`${e.Check} | ${channel} já está bloqueado. \`${prefix}lockcommands info\``)
+
+            const msg = await message.channel.send(`${e.QuestionMark} | ${message.author}, você quer bloquear todos os comandos de todos os bots neste canal?\n${e.SaphireObs} | Vale lembrar que Administradores **NÃO** são imunes a esse bloqueio.`),
+                emojis = ['✅', '❌'],
+                filter = (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id
+
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
+
+            return msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(async collected => {
                 const reaction = collected.first()
 
-                if (reaction.emoji.name === '✅') {
-                    sdb.delete(`Request.${message.author.id}`)
-                    ServerDb.set(`Servers.${message.guild.id}.Blockchannels.${message.channel.id}`, true)
-                    return msg.edit(`✅ | ${message.author} bloqueou todos os meus comandos no canal ${channel}.`).then(msg => {
-                        ServerDb.get(`Servers.${message.guild.id}.Blockchannels.Bots.${channel.id}`) ? '' : BloquearBots()
-                    }).catch(() => { })
-                } else {
-                    sdb.delete(`Request.${message.author.id}`)
-                    msg.edit(`${e.Deny} | Request cancelada por: ${message.author}`).then(msg => {
-                        ServerDb.get(`Servers.${message.guild.id}.Blockchannels.Bots.${channel.id}`) ? '' : BloquearBots()
-                    }).catch(() => { })
-                }
-            }).catch(err => {
-                sdb.delete(`Request.${message.author.id}`)
-                msg.edit(`${e.Deny} | Request cancelada por: Tempo expirado.`)
-            })
-        })
+                if (reaction.emoji.name === emojis[0]) {
 
-        function BloquearBots() {
-            if (ServerDb.get(`Servers.${message.guild.id}.Blockchannels.Bots.${channel.id}`)) { return message.reply(`${e.Check} | ${channel} já está bloqueado. \`${prefix}lockcommands info\``) }
-            
-            setTimeout(() => {
-                message.channel.send(`${e.QuestionMark} | ${message.author}, você quer bloquear todos os comandos de todos os bots neste canal?\n${e.SaphireObs} | Vale lembrar que Administradores **NÃO** são imunes a esse bloqueio.`).then(msg => {
-                    sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                    msg.react('✅').catch(() => { }) // e.Check
-                    msg.react('❌').catch(() => { }) // X
+                    await Database.Guild.updateOne(
+                        { id: message.guild.id },
+                        { $push: { 'Blockchannels.Bots': channel.id } },
+                        { upsert: true }
+                    )
+                    return msg.edit(`✅ | ${message.author} bloqueou todos comandos de todos os bots canal ${channel}.`).catch(() => { })
 
-                    const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
-
-                    msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                        const reaction = collected.first()
-
-                        if (reaction.emoji.name === '✅') {
-                            sdb.delete(`Request.${message.author.id}`)
-                            ServerDb.set(`Servers.${message.guild.id}.Blockchannels.Bots.${message.channel.id}`, true)
-                            return msg.edit(`✅ | ${message.author} bloqueou todos comandos de todos os bots canal ${channel}.`).catch(() => { })
-                        } else {
-                            sdb.delete(`Request.${message.author.id}`)
-                            msg.edit(`${e.Deny} | Request cancelada por: ${message.author}`)
-                        }
-                    }).catch(err => {
-                        sdb.delete(`Request.${message.author.id}`)
-                        msg.edit(`${e.Deny} | Request cancelada por: Tempo expirado.`)
-                    })
-                })
-            }, 2500)
+                } else { return msg.edit(`${e.Deny} | Request cancelada por: ${message.author}`) }
+            }).catch(() => msg.edit(`${e.Deny} | Request cancelada por: Tempo expirado.`))
         }
 
     }

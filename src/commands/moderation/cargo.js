@@ -1,12 +1,11 @@
 const
-    { e } = require('../../../database/emojis.json'),
-    { f } = require('../../../database/frases.json'),
+    { e } = require('../../../JSON/emojis.json'),
     { Permissions } = require('discord.js'),
-    Error = require('../../../Routes/functions/errors'),
-    Colors = require('../../../Routes/functions/colors'),
-    { config } = require('../../../database/config.json')
+    Error = require('../../../modules/functions/config/errors'),
+    Colors = require('../../../modules/functions/plugins/colors'),
+    { config } = require('../../../JSON/config.json')
 
-// #246FE0 - Azul Saphire
+
 module.exports = {
     name: 'cargo',
     aliases: ['cargos', 'role', 'roles'],
@@ -15,7 +14,7 @@ module.exports = {
     usage: '<role> <add/remove/edit>... Usa role info aí vai...',
     description: 'Gerencie os cargos do servidor',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let Role = message.mentions.roles.first() || message.guild.roles.cache.get(args[2]) || message.guild.roles.cache.get(args[1]) || message.guild.roles.cache.find(r => r.name == args[1]) || message.guild.roles.cache.find(r => r.name == args[2])
         if (['info', 'help', 'ajuda', 'informações'].includes(args[0]?.toLowerCase()))
@@ -23,8 +22,6 @@ module.exports = {
 
         if (!message.guild.me.permissions.has(Permissions.FLAGS.ADMINISTRATOR))
             return message.reply(`${e.Info} | Eu preciso da permissão \`**ADMINISTRADOR**\` ativada para gerenciar e buscar informações dos cargos mencionados.`)
-
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
 
         let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[2]) || message.guild.members.cache.get(args[1]) || message.member
 
@@ -103,7 +100,7 @@ module.exports = {
             }
 
             return message.reply(`${e.QuestionMark} | Confirme a exclusão do cargo: ${Role}`).then(msg => {
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+
                 msg.react('✅').catch(() => { }) // Check
                 msg.react('❌').catch(() => { }) // X
 
@@ -113,7 +110,7 @@ module.exports = {
                     const reaction = collected.first()
 
                     if (reaction.emoji.name === '✅') {
-                        sdb.delete(`Request.${message.author.id}`)
+
                         Role.delete(`${message.author.tag} solicitou a exclusão deste cargo.`)
                             .then(DeletedRole => { msg.edit(`${e.Check} | O cargo **${DeletedRole.name}** foi deletado com sucesso!`).catch(() => { }) })
                             .catch(err => {
@@ -126,11 +123,11 @@ module.exports = {
                                 message.channel.send(`${e.Warn} | Houve um erro ao deletar este cargo.\n\`${err}\``)
                             });
                     } else {
-                        sdb.delete(`Request.${message.author.id}`)
+
                         msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
                     }
                 }).catch(() => {
-                    sdb.delete(`Request.${message.author.id}`)
+
                     msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`).catch(() => { })
                 })
 
@@ -165,7 +162,7 @@ module.exports = {
                 if (NovoNome.length > 100) return message.reply(`${e.Deny} | Nomes de cargos não podem ultrapassar **100 caracteres**.`)
 
                 return message.reply(`${e.Check} | Você confirma trocar o nome do cargo de **${Role.name}** para **${NovoNome}**?`).then(msg => {
-                    sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+
                     msg.react('✅').catch(() => { }) // Check
                     msg.react('❌').catch(() => { }) // X
 
@@ -175,7 +172,7 @@ module.exports = {
                         const reaction = collected.first()
 
                         if (reaction.emoji.name === '✅') {
-                            sdb.delete(`Request.${message.author.id}`)
+
                             Role.setName(NovoNome, `${message.author.tag} alterou o nome deste cargo.`)
                                 .then(updated => msg.edit(`${e.Check} | O nome do cargo foi alterado para: ${updated.name}`).catch(() => { }))
                                 .catch(err => {
@@ -187,11 +184,11 @@ module.exports = {
                                     message.channel.send(`${e.Warn} | Houve um erro ao editar este cargo.\n\`${err}\``)
                                 });
                         } else {
-                            sdb.delete(`Request.${message.author.id}`)
+
                             msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
                         }
                     }).catch(() => {
-                        sdb.delete(`Request.${message.author.id}`)
+
                         msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`).catch(() => { })
                     })
 
@@ -222,7 +219,7 @@ module.exports = {
                     value === null ? NovaCor = 'Cinza Padrão' : NovaCor = NovaCor
 
                     return message.reply(`${e.QuestionMark} | Confirma trocar a cor do cargo **${Role.name}** para \`${NovaCor}\``).then(msg => {
-                        sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+
                         msg.react('✅').catch(() => { }) // Check
                         msg.react('❌').catch(() => { }) // X
 
@@ -232,7 +229,7 @@ module.exports = {
                             const reaction = collected.first()
 
                             if (reaction.emoji.name === '✅') {
-                                sdb.delete(`Request.${message.author.id}`)
+
                                 Role.setColor(value, `${message.author.tag} alterou a cor deste cargo.`)
                                     .then(() => msg.edit(`${e.Check} | A cor do cargo foi atualizada com sucesso!`).catch(() => { }))
                                     .catch(err => {
@@ -245,11 +242,11 @@ module.exports = {
                                         message.channel.send(`${e.Warn} | Houve um erro ao editar este cargo.\n\`${err}\``)
                                     })
                             } else {
-                                sdb.delete(`Request.${message.author.id}`)
+
                                 msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
                             }
                         }).catch(() => {
-                            sdb.delete(`Request.${message.author.id}`)
+
                             msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`).catch(() => { })
                         })
 
@@ -301,7 +298,7 @@ module.exports = {
         }
 
         function RoleInfo() {
-            
+
             if (!Role) return message.channel.send(`${e.Info} | @Marque, diga o ID ou o nome do cargo para que eu possa pegar as informações.`)
 
             let permissions = Role.permissions.toArray() || [],
@@ -415,12 +412,15 @@ module.exports = {
             return message.reply(`${e.Info} | Você não sabe usar este comando? Tenta usar \`${prefix}cargo info\``)
         }
 
-        function RoleInfoEmbed() {
+        async function RoleInfoEmbed() {
+
+            let color = await Colors(message.author.id)
+
             return message.reply({
                 embeds:
                     [
                         new MessageEmbed()
-                            .setColor(Colors(message.member))
+                            .setColor(color)
                             .setTitle(`${e.Gear} Gerenciamento Avançado de Cargos ${client.user.username}`)
                             .setDescription(`Com esse comando é possível gerenciar os cargos do servidor de uma maneira simples, sem precisar ficar entrando nas configurações. E o comando inteiro é divido em categorias.`)
                             .addFields(

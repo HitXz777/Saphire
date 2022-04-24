@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const { Permissions } = require('discord.js')
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
     usage: '<move> <@membro/Id>',
     description: 'Mova membros para a sua call',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let member = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0])
 

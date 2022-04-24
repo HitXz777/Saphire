@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'nsfw',
@@ -10,7 +10,7 @@ module.exports = {
     usage: '<nsfw>',
     description: 'Configure um canal para maiores ou menores de idade',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel
 

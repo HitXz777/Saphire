@@ -1,6 +1,5 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const { Permissions } = require('discord.js')
-const Error = require('../../../Routes/functions/errors')
 
 module.exports = {
     name: 'setnickname',
@@ -12,10 +11,10 @@ module.exports = {
     usage: '<setnickname> <@user>/<NovoNome>',
     description: 'Mude o seu nome ou os dos usuários se tiver cargo',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
+        let user = message.mentions.members.first() || message.guild.members.cache.get(message.mentions.repliedUser?.id) || message.guild.members.cache.find(data => data.displayName?.toLowerCase() === args[0]?.toLowerCase() || data.user.tag?.toLowerCase() === args[0]?.toLowerCase() || data.user.discriminator === args[0] || data.user.id === args[0])
 
-        let user = message.mentions.members.first() || message.mentions.repliedUser
         if (user) {
 
             if (user.id === message.guild.ownerId)
@@ -31,36 +30,34 @@ module.exports = {
             const member = message.guild.members.cache.get(user.id)
 
             let nick = args.join(" ")
-            if (args[0]) { if (args[0].startsWith('<@') && args[0].endsWith('>')) nick = args.slice(1).join(" ") }
+            if (args[0] && args[0].startsWith('<@') && args[0].endsWith('>')) nick = args.slice(1).join(" ")
             if (nick.length > 32) return message.reply(`${e.Deny} | O nome não pode ultrapassar **32 Caracteres**`)
 
-            member.setNickname(nick).then(() => {
+            return member.setNickname(nick).then(() => {
                 return message.reply(`${e.Check} | Feito.`)
             }).catch(err => {
                 return message.reply(`${e.Deny} | Eu não posso mudar o nome deste ser poderoso. ||*(Zoeira, só deu algum erro bobo)*||\n\`${err}\``)
             })
 
-        } else if (!user) {
-
-            const nick = args.join(" ")
-            if (nick.length > 32) { return message.reply(`${e.Deny} | O tamanho máximo do nome é de **32 caracteres**.`) }
-
-            if (message.author.id === message.guild.ownerId) return message.reply(`${e.Deny} | Não posso alterar o nome do dono do servidor.`)
-            const member = message.guild.members.cache.get(message.author.id)
-
-            member.setNickname(nick).then(() => {
-                return message.reply(`${e.Check} | Prontinho.`)
-            }).catch(err => {
-                if (err.code === 10009)
-                    return message.reply(`${e.Deny} | Eu não tenho permissão suficiente, poxa! Pode ativar a permissão \`GERENCIAR APELIDOS\` não? É rapidinho ${e.SaphireCry}`)
-
-                if (err.code === 50013)
-                    return message.reply(`${e.SaphireCry} | Eu não tenho poder suficiente... Poxa...`)
-
-                return message.reply(`${e.Deny} | Vish, algo deu errado aqui...\n\`${err}\``)
-            })
-        } else {
-            return message.reply(`${e.SaphireQ} | Acho que você fez algo e parou onde não deveria estar.\nUse \`${prefix}help setnickname\` e veja como user este comando`)
         }
+
+        const nick = args.join(" ")
+        if (nick.length > 32) return message.reply(`${e.Deny} | O tamanho máximo do nome é de **32 caracteres**.`)
+
+        if (message.author.id === message.guild.ownerId) return message.reply(`${e.Deny} | Não posso alterar o nome do dono do servidor.`)
+        const member = message.guild.members.cache.get(message.author.id)
+
+        return member.setNickname(nick).then(() => {
+            return message.reply(`${e.Check} | Prontinho.`)
+        }).catch(err => {
+            if (err.code === 10009)
+                return message.reply(`${e.Deny} | Eu não tenho permissão suficiente, poxa! Pode ativar a permissão \`GERENCIAR APELIDOS\` não? É rapidinho ${e.SaphireCry}`)
+
+            if (err.code === 50013)
+                return message.reply(`${e.SaphireCry} | Eu não tenho poder suficiente... Poxa...`)
+
+            return message.reply(`${e.Deny} | Vish, algo deu errado aqui...\n\`${err}\``)
+        })
+        
     }
 }

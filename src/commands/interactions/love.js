@@ -1,6 +1,5 @@
-const { g } = require('../../../Routes/Images/gifs.json')
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
+const { g } = require('../../../modules/Images/gifs.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'love',
@@ -11,22 +10,16 @@ module.exports = {
     usage: '<love> <@user>',
     description: 'O amor é tão lindo',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+        let rand = g.TeAmo[Math.floor(Math.random() * g.TeAmo.length)],
+            user = message.mentions.members.first() || message.mentions.repliedUser
 
-        let NoReactAuthor = sdb.get(`Users.${message.author.id}.NoReact`)
-        if (NoReactAuthor) return message.reply(`${e.Deny} | Você está com o \`${prefix}noreact\` ativado.`)
-
-        let rand = g.TeAmo[Math.floor(Math.random() * g.TeAmo.length)]
-        let user = message.mentions.users.first() || message.member
+        if (!user) return message.reply(`${e.Info} | Marca alguém.`)
 
         if (user.id === client.user.id) return message.reply(`${e.Nagatoro} Eu também me amo`)
 
         if (user.id === message.author.id) return message.reply(`${e.Deny} | Assim... Eu admiro seu amor próprio, mas sabe? Que tal @marcar alguém?`)
-
-        let NoReact = sdb.get(`Users.${user.id}.NoReact`)
-        if (NoReact) return message.reply(`${e.Deny} | Este usuário está com o \`${prefix}noreact\` ativado.`)
 
         const embed = new MessageEmbed()
             .setColor('#246FE0')
@@ -35,7 +28,7 @@ module.exports = {
             .setFooter('❤️ retribuir')
 
         return message.reply({ embeds: [embed] }).then(msg => {
-            sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+            
             msg.react('❤️').catch(() => { }) // Check
 
             const filter = (reaction, u) => { return ['❤️'].includes(reaction.emoji.name) && u.id === user.id }
@@ -44,13 +37,13 @@ module.exports = {
                 const reaction = collected.first()
 
                 if (reaction.emoji.name === '❤️') {
-                    sdb.delete(`Request.${message.author.id}`)
+                    
                     const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`❤️ ${user} também te ama ${message.author} ❤️`).setFooter(`${message.author.id}/${user.id}`).setImage(g.TeAmo[Math.floor(Math.random() * g.TeAmo.length)])
                     msg.edit({ embeds: [TradeEmbed] }).catch(() => { })
                 }
 
             }).catch(() => {
-                sdb.delete(`Request.${message.author.id}`)
+                
                 embed.setColor('RED').setFooter(`${message.author.id}/${user.id}`)
                 msg.edit({ embeds: [embed] }).catch(() => { })
             })

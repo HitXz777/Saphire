@@ -1,28 +1,28 @@
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
-const Colors = require('../../../Routes/functions/colors')
+const { e } = require('../../../JSON/emojis.json')
+const Colors = require('../../../modules/functions/plugins/colors')
 
 module.exports = {
     name: 'setsexo',
-    aliases: ['sexo', 'gênero',  'genero', 'setgenero', 'setgênero'],
+    aliases: ['sexo', 'gênero', 'genero', 'setgenero', 'setgênero'],
     category: 'perfil',
     ClientPermissions: ['ADD_REACTIONS'],
     emoji: '🌛',
     usage: '<setsexo>',
     description: 'Defina seu sexo no perfil',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let sexo = sdb.get(`Users.${message.author.id}.Perfil.Sexo`)
+        let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Sexo')
+        let sexo = data.Perfil?.Sexo,
+            color = await Colors(message.author.id)
 
         const embed = new MessageEmbed()
-            .setColor(Colors(message.member))
+            .setColor(color)
             .setTitle('Escolha seu sexo')
             .setDescription('♂️ Homem\n♀️ Mulher\n🏳️‍🌈 LGBTQIA+\n*️⃣ Indefinido\n🚁 Helicóptero de Guerra')
 
         return message.reply({ embeds: [embed] }).then(msg => {
-            sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+
             msg.react('❌').catch(() => { }) // Cancel
             if (sexo == "♂️ Homem") {
                 msg.react('♀️').catch(() => { }) // Mulher
@@ -72,49 +72,49 @@ module.exports = {
                 }
 
             }).catch(() => {
-                sdb.delete(`Request.${message.author.id}`)
+
                 msg.edit({ embeds: [embed.setColor('RED').setDescription(`${e.Deny} | Tempo expirado`)] }).catch(() => { })
             })
 
             function Homem() {
-                sdb.delete(`Request.${message.author.id}`)
+
                 embed.setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('♂️ Homem')
-                sdb.set(`Users.${message.author.id}.Perfil.Sexo`, "♂️ Homem")
+                Database.updateUserData(message.author.id, 'Perfil.Sexo', "♂️ Homem")
                 msg.edit({ embeds: [embed] }).catch(() => { })
             }
 
             function Mulher() {
-                sdb.delete(`Request.${message.author.id}`)
+
                 embed.setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('♀️ Mulher')
-                sdb.set(`Users.${message.author.id}.Perfil.Sexo`, "♀️ Mulher")
+                Database.updateUserData(message.author.id, 'Perfil.Sexo', "♀️ Mulher")
                 msg.edit({ embeds: [embed] }).catch(() => { })
             }
 
             function LGBT() {
-                sdb.delete(`Request.${message.author.id}`)
+
                 embed.setColor('GREEN').setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('🏳️‍🌈 LGBTQIA+')
-                sdb.set(`Users.${message.author.id}.Perfil.Sexo`, "🏳️‍🌈 LGBTQIA+")
+                Database.updateUserData(message.author.id, 'Perfil.Sexo', "🏳️‍🌈 LGBTQIA+")
                 msg.edit({ embeds: [embed] }).catch(() => { })
             }
 
             function Indefinido() {
-                sdb.delete(`Request.${message.author.id}`)
+
                 embed.setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('*️⃣ Indefinido')
-                sdb.set(`Users.${message.author.id}.Perfil.Sexo`, "*️⃣ Indefinido")
+                Database.updateUserData(message.author.id, 'Perfil.Sexo', "*️⃣ Indefinido")
                 msg.edit({ embeds: [embed] }).catch(() => { })
             }
 
             function Helicoptero() {
-                sdb.delete(`Request.${message.author.id}`)
+
                 embed.setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('🚁 Helicóptero de Guerra')
-                sdb.set(`Users.${message.author.id}.Perfil.Sexo`, "🚁 Helicóptero de Guerra")
+                Database.updateUserData(message.author.id, 'Perfil.Sexo', "🚁 Helicóptero de Guerra")
                 msg.edit({ embeds: [embed] }).catch(() => { })
             }
 
             function Cancel() {
-                sdb.delete(`Request.${message.author.id}`)
+
                 embed.setColor('RED').setTitle(`${e.Deny} Request Cancelada!`).setDescription('O sexo não foi alterado')
-                msg.edit({ embeds: [embed] }).catch(() => { })
+                return msg.edit({ embeds: [embed] }).catch(() => { })
             }
         })
     }
