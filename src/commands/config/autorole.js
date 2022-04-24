@@ -1,8 +1,5 @@
-const { Permissions } = require('discord.js')
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
-const Error = require('../../../Routes/functions/errors')
-const { ServerDb } = require('../../../Routes/functions/database')
+const { Permissions } = require('discord.js'),
+    { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'autorole',
@@ -14,249 +11,184 @@ module.exports = {
     usage: '<autorole> <1/2> <role> | <status> | <1/2> <off>',
     description: 'Selecione um cargo para todos que entrem no servidor.',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let role = message.mentions.roles.first()
-        let Autorole1 = ServerDb.get(`Servers.${message.guild.id}.Autorole.First`)
-        let Autorole2 = ServerDb.get(`Servers.${message.guild.id}.Autorole.Second`)
+        let role = message.mentions.roles.first(),
+            guild = await Database.Guild.findOne({ id: message.guild.id }, 'Autorole'),
+            rolesId = guild?.Autorole || []
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+        if (!args[0]) return message.reply({
+            embeds: [
+                new MessageEmbed()
+                    .setColor('#246FE0')
+                    .setTitle(`${e.Verify} Autorole System`)
+                    .setDescription(`O Sistema ${client.user.username}'s Autorole garante até 10 cargos.`)
+                    .addField(`${e.QuestionMark} **O que é Autorole?**`, `Autorole é um sistema automático em que todo membro que entrar no servidor, receberá um cargo (dado por mim) pré definido pela staff do servidor.`)
+                    .addField(`${e.Warn} ATENÇÃO`, `\n1. Para perfeito funcionamento, o meu cargo **DEVE** estar **ACIMA** dos cargos definidos.\n \n2. Não é permito cargos com a permissões **administrativas** ativadas. Caso ative pós configuração, o cargo será deletado da configuração autorole na entrada de um novo membro.\n \n3. Cargos em que eu não tenho poder de manusea-los, também serão removidos.`)
+                    .addField('• Comandos do Autorole', `\`${prefix}autorole add @cargo\`\n\`${prefix}autorole Status\``, true)
+                    .addField('• Comando de desativação', `\`${prefix}autorole remove all\`\n\`${prefix}autorole remove @cargo\``, true)
+                    .addField(`${e.SaphireObs} Forte recomendação`, `Ative a função \`${prefix}logs\`.\nLá eu mandarei relatórios se qualquer coisa der errado ou algum bobinho(a) fizer besteira com os cargos.`)
+            ]
+        })
 
-        const AutoroleArgs0 = new MessageEmbed()
-            .setColor('#246FE0')
-            .setTitle(`${e.Verify} Autorole System`)
-            .setDescription(`O Sistema ${client.user.username} garante 2 autoroles simuntâneas.`)
-            .addField(`${e.QuestionMark} **O que é Autorole?**`, `Autorole é um sistema automático em que todo membro que entrar no servidor, receberá um cargo (dado por mim) pré definido pela staff do servidor.`)
-            .addField(`${e.Warn} ATENÇÃO`, `\n1. Para perfeito funcionamento, o meu cargo **DEVE** estar **ACIMA** dos cargos definidos.\n \n2. Não é permito cargos com a permissão **ADMINISTRADOR, KICK/BAN, GERENCIAMENTOS** ativada. Caso ative pós configuração, o cargo será deletado da configuração autorole na entrada de um novo membro.\n \n3. Cargos em que eu não tenho poder de manusea-los, também serão ignorados.`)
-            .addField('• Comandos do Autorole', `\`${prefix}autorole 1 @cargo\`\n\`${prefix}autorole 2 @cargo\`\n\`${prefix}autorole Status\``, true)
-            .addField('• Comando de desativação', `\`${prefix}autorole 1/2 off\`\n\`${prefix}autorole off\``, true)
-            .addField(`${e.SaphireObs} Forte recomendação`, `Ative a função \`${prefix}logs\`.\nLá eu mandarei relatórios se qualquer coisa der errado ou algum bobinho(a) fizer besteira com os cargos.`)
-            .setFooter(`${prefix}sugest | ${prefix}bug | ${prefix}logs`)
+        if (['status', 'stats', 'info'].includes(args[0]?.toLowerCase())) return GetAndSendAutoroleStatus()
+        if (['off', 'desligar', 'desativar', 'remove', 'del', 'delete', 'excluir', 'tirar'].includes(args[0]?.toLowerCase())) return DisableAutorole()
+        if (['add', 'adicionar', 'colocar'].includes(args[0]?.toLowerCase())) return AddAutorole()
+        return message.reply(`${e.Deny} | Você está nas profundezas do código do autorole. Use \`${prefix}help autorole\` ou apenas \`${prefix}autorole\` que eu te mando todos os comandos do sistema.`)
 
-        if (!args[0]) return message.reply({ embeds: [AutoroleArgs0] })
+        async function AddAutorole() {
 
-        if (['status', 'stats', 'info'].includes(args[0]?.toLowerCase())) {
-            const AutoroleEmbed = new MessageEmbed().setColor('#246FE0').setTitle(':satellite: | Autorole System Status')
-            let Role1 = Autorole1 ? `<@&${Autorole1}>` : 'Desativado'
-            let Role2 = Autorole2 ? `<@&${Autorole2}>` : 'Desativado'
-            return message.reply({ embeds: [AutoroleEmbed.setDescription(`Autorole 1: ${Role1}\nAutorole 2: ${Role2}`)] })
-        }
+            if (!role)
+                return message.reply(`${e.Info} | Para adicionar cargos ao autorole, basta usar o comando: \`${prefix}autorole add @cargo\``)
 
-        if (['off', 'desligar', 'desativar'].includes(args[0]?.toLowerCase())) {
+            if (rolesId.length >= 10)
+                return message.reply(`${e.Deny} | O autorole deste servidor já atingiu o limite máximo de 10 cargos cadastrados.`)
 
-            let autorole = ServerDb.get(`Servers.${message.guild.id}.Autorole.First`) || ServerDb.get(`Servers.${message.guild.id}.Autorole.Second`)
-            if (autorole === null || autorole === undefined) { return message.reply(`${e.Info} | O Autorole System já está desativado.`) }
-
-            let AutoroleUm = ServerDb.get(`Servers.${message.guild.id}.Autorole.First`)
-            if (AutoroleUm) AutoroleUm = `<@&${ServerDb.get(`Servers.${message.guild.id}.Autorole.First`)}>`
-            if (!AutoroleUm) AutoroleUm = 'Desativado'
-
-            let AutoroleDois = ServerDb.get(`Servers.${message.guild.id}.Autorole.Second`)
-            if (AutoroleDois) AutoroleDois = `<@&${ServerDb.get(`Servers.${message.guild.id}.Autorole.Second`)}>`
-            if (!AutoroleDois) AutoroleDois = 'Desativado'
-
-            return message.reply(`${e.QuestionMark} | Você deseja desativar o sistema de autorole?\nAutorole 1: ${AutoroleUm}\nAutorole 2: ${AutoroleDois}`).then(msg => {
-                msg.react('✅').catch(() => { }) // e.Check
-                msg.react('❌').catch(() => { }) // X
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-
-                const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
-
-                msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                    const reaction = collected.first()
-
-                    if (reaction.emoji.name === '✅') {
-                        sdb.delete(`Request.${message.author.id}`)
-                        ServerDb.set(`Servers.${message.guild.id}.Autorole`, false)
-                        return msg.edit(`${e.Menhera} | Prontinho! Eu desativei o Autorole System.`).catch(() => { })
-
-                    } else {
-                        msg.edit(`${e.Deny} | Request Cancelada`).catch(() => { })
-                        sdb.delete(`Request.${message.author.id}`)
-                    }
-                }).catch(() => {
-                    msg.edit(`${e.Deny} | Request Cancelada: Tempo expirado`).catch(() => { })
-                    sdb.delete(`Request.${message.author.id}`)
-                })
-            }).catch(err => {
-                Error(message, err)
-                sdb.delete(`Request.${message.author.id}`)
-                return message.reply(`${e.Warn} | Houve um erro ao executar este comando\n\`${err}\``)
-            })
-        }
-
-        if (args[0] === '1') {
-
-            if (['off', 'desligar', 'desativar'].includes(args[1])) {
-
-                if (!Autorole1) return message.reply(`${e.Deny} O Autorole 1 já está desativado.`)
-
-                if (Autorole1 === Autorole1) {
-
-                    return message.reply(`${e.QuestionMark} | Você deseja desativar o Autorole 1? --> <@&${Autorole1}>`).then(msg => {
-                        msg.react('✅').catch(() => { }) // e.Check
-                        msg.react('❌').catch(() => { }) // X
-                        sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-
-                        const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
-
-                        msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                            const reaction = collected.first()
-
-                            if (reaction.emoji.name === '✅') {
-                                sdb.delete(`Request.${message.author.id}`)
-                                ServerDb.delete(`Servers.${message.guild.id}.Autorole.First`)
-                                return msg.edit(`${e.SadPanda} | Adeeeus carguinho... Foi bom enquanto durou.`).catch(() => { })
-                            } else {
-                                msg.edit(`${e.Deny} | Request Cancelada`).catch(() => { })
-                                sdb.delete(`Request.${message.author.id}`)
-                            }
-
-                        }).catch(err => {
-                            msg.edit(`${e.Deny} | Request Cancelada: Tempo expirado`).catch(() => { })
-                            sdb.delete(`Request.${message.author.id}`)
-                        })
-                    }).catch(err => {
-                        Error(message, err)
-                        sdb.delete(`Request.${message.author.id}`)
-                        message.reply(`${e.Warn} | Houve um erro ao executar este comando\n\`${err}\``)
-                    })
-                } else {
-                    return message.reply(`${e.Deny} O Autorole 1 já está desativado.`)
-                }
+            if (['@here', '@everyone'].includes(args[1])) {
+                const msg = await message.reply(`${e.Hmmm}`)
+                return setTimeout(() => msg.edit(`Olha... Eu não vou nem comentar sob tal atrocidade.`).catch(() => { }), 3000)
             }
 
-            if (args[1] === '@everyone') return message.reply(`${e.Hmmm}`).then(() => { message.channel.send(`Eu não vou nem comentar sob tal atrocidade.`).catch(() => { }) })
-            if (args[1] === '@here') return message.reply(`${e.Hmmm}`).then(() => { message.channel.send(`Está de brincation with me?`).catch(() => { }) })
-            if (!role) return message.reply(`${e.Deny} | Mencione um cargo que deseja como Autorole 1.`)
             if (role.botRole) return message.reply(`${e.Deny} | Sério que você quer configurar um cargo de bot como autorole? ${e.SaphireWhat}`)
             if (!role.editable) return message.reply(`${e.Deny} | Eu não tenho permissão para gerenciar o cargo selecionado.`)
-            if (role.id === Autorole1) return message.reply(`${e.Deny} | O cargo mencionado é o mesmo do Autorole 1.`)
-            if (role.id === Autorole2) return message.reply(`${e.Deny} | O cargo mencionado é o mesmo do Autorole 2.`)
-            if (message.author.id !== message.guild.ownerId) { if (role.comparePositionTo(message.member.roles.highest) > -1) { return message.reply(`${e.Deny} | Você não tem permissão para gerenciar o cargo ${role}.`) } }
-            if (role.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) { return message.reply(`${e.Deny} | Você não pode configurar um cargo com permissão de "ADMINISTRADOR" ativada como Autorole.`) }
+            if (rolesId.includes(role.id)) return message.reply(`${e.Deny} | O cargo mencionado já foi configurado como autorole.`)
+            if (message.author.id !== message.guild.ownerId && role.comparePositionTo(message.member.roles.highest) > -1) return message.reply(`${e.Deny} | Você não tem permissão para gerenciar este cargo.`)
+            if (role.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return message.reply(`${e.Deny} | Você não pode configurar um cargo com permissão de "ADMINISTRADOR" ativada como Autorole.`)
 
-            return message.reply(`${e.QuestionMark} | Você deseja configurar o cargo "${role}" como Autorole 1?`).then(msg => {
-                msg.react('✅').catch(() => { }) // Check
-                msg.react('❌').catch(() => { }) // X
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+            const emojis = ['✅', '❌'],
+                msg = await message.reply(`${e.QuestionMark} | Você deseja configurar o cargo "${role} *\`${role.id}\`*" como autorole?`)
 
-                const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
-                msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                    const reaction = collected.first()
-
-                    if (reaction.emoji.name === '✅') {
-                        ServerDb.set(`Servers.${message.guild.id}.Autorole.First`, role.id)
-                        sdb.delete(`Request.${message.author.id}`)
-                        return msg.edit(`${e.CatJump} | Deixa comigo! Eu darei o cargo ${role} para todos os novos integrantes daqui pra frente.`).catch(() => { })
-                    } else {
-                        sdb.delete(`Request.${message.author.id}`)
-                        msg.edit(`${e.Deny} | Request Cancelada`).catch(() => { })
-                    }
-                }).catch(() => {
-                    sdb.delete(`Request.${message.author.id}`)
-                    msg.edit(`${e.Deny} | Request Cancelada: Tempo expirado`).catch(() => { })
-                })
+            return msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                errors: ['time']
             })
+
+                .on('collect', async (reaction) => {
+
+                    if (reaction.emoji.name === emojis[0]) {
+
+                        await Database.Guild.updateOne(
+                            { id: message.guild.id },
+                            { $push: { Autorole: role.id } },
+                            { upsert: true }
+                        )
+
+                        return msg.edit(`${e.Check} | O cargo ${role} foi adicionado e configurado com sucesso!`).catch(() => { })
+
+                    } else { return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { }) }
+
+                })
+
+                .on('end', collected => {
+
+                    if (collected.size === 0)
+                        return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+
+                })
+
         }
 
-        if (args[0] === '2') {
+        async function DisableAutorole() {
 
-            if (['off', 'desligar', 'desativar'].includes(args[1])) {
+            if (['all', 'tudo', 'todos', 'todas'].includes(args[0]?.toLowerCase())) return DeleteRole('', true)
 
-                if (!Autorole2) return message.reply(`${e.Deny} O Autorole 2 já está desativado.`)
+            if (rolesId.length <= 0)
+                return message.reply(`${e.Deny} | O autorole deste servidor não possui nenhum cargo definido como autorole.`)
 
-                if (Autorole2 === Autorole2) {
+            if (!role)
+                return message.reply(`${e.Info} | Para remover cargos do autorole, basta usar o comando: \`${prefix}autorole remove @cargo\``)
 
-                    return message.reply(`${e.QuestionMark} | Você deseja desativar o Autorole 2? --> <@&${Autorole2}>`).then(msg => {
-                        msg.react('✅').catch(() => { }) // e.Check
-                        msg.react('❌').catch(() => { }) // X
-                        sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+            if (!rolesId.includes(role.id))
+                return message.reply(`${e.Deny} | Este cargo não está configurado como autorole.`)
 
-                        const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+            const emojis = ['✅', '❌'],
+                msg = await message.reply(`${e.QuestionMark} | Você deseja remover o cargo "${role} *\`${role.id}\`*" do autorole?`)
 
-                        msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                            const reaction = collected.first()
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
-                            if (reaction.emoji.name === '✅') {
-                                sdb.delete(`Request.${message.author.id}`)
-                                ServerDb.delete(`Servers.${message.guild.id}.Autorole.Second`)
-                                return msg.edit(`${e.SadPanda} | Adeeeus carguinho... Vou sentir saudades.`).catch(() => { })
-                            } else {
-                                sdb.delete(`Request.${message.author.id}`)
-                                msg.edit(`${e.Deny} | Request Cancelada`).catch(() => { })
-                            }
-
-                        }).catch(err => {
-                            sdb.delete(`Request.${message.author.id}`)
-                            msg.edit(`${e.Deny} | Request Cancelada: Tempo expirado`).catch(() => { })
-                        })
-                    })
-
-                } else {
-                    return message.reply(`${e.Deny} O Autorole 2 já está desativado.`)
-                }
-            }
-
-            if (args[1] === '@everyone') {
-                return message.reply(`${e.Hmmm}`).then(() => {
-                    message.channel.send(`Eu não vou nem comentar sob tal atrocidade.`)
-                }).catch(() => { })
-            }
-            if (args[1] === '@here') {
-                return message.reply(`${e.Hmmm}`).then(() => {
-                    message.channel.send(`${e.SaphireRaiva} Está de brincation with me?`)
-                }).catch(() => { })
-            }
-
-            if (!role) { return message.reply(`${e.Deny} | Mencione um cargo que deseja como Autorole 2.`) }
-            if (role.botRole) { return message.reply(`${e.Deny} | Sério que você quer configurar um cargo de bot como autorole? ${e.SaphireWhat}`) }
-            if (!role.editable) { return message.reply(`${e.Deny} | Eu não tenho permissão para gerenciar o cargo selecionado.`) }
-            if (role.id === Autorole1) { return message.reply(`${e.Deny} | O cargo mencionado é o mesmo do Autorole 1.`) }
-            if (role.id === Autorole2) { return message.reply(`${e.Deny} | O cargo mencionado já é o Autorole 2.`) }
-            if (message.author.id !== message.guild.ownerId) { if (role.comparePositionTo(message.member.roles.highest) > -1) { return message.reply(`${e.Deny} | Você não tem permissão para gerenciar o cargo ${role}.`) } }
-            if (role.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) { return message.reply(`${e.Deny} | Você não pode configurar um cargo com permissão de "ADMINISTRADOR" ativada como Autorole.`) }
-
-            return message.reply(`${e.QuestionMark} | Você deseja configurar o cargo "${role}" como Autorole 2?`).then(msg => {
-                msg.react('✅').catch(() => { }) // e.Check
-                msg.react('❌').catch(() => { }) // X
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-
-                const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
-
-                msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                    const reaction = collected.first()
-
-                    if (reaction.emoji.name === '✅') {
-
-                        msg.edit(`${e.Loading} | Autenticando...`).catch(() => { })
-                        try {
-                            ServerDb.set(`Servers.${message.guild.id}.Autorole.Second`, role.id)
-                            sdb.delete(`Request.${message.author.id}`)
-                            return msg.edit(`${e.NezukoJump} | Deixa comigo! Eu darei o cargo ${role} para todos os novos integrantes daqui pra frente.`)
-
-                        } catch (err) {
-                            Error(message, err)
-                            sdb.delete(`Request.${message.author.id}`)
-                            return message.reply(`${e.Warn} | Houve um erro ao executar este comando\n\`${err}\``)
-                        }
-
-                    } else {
-                        sdb.delete(`Request.${message.author.id}`)
-                        msg.edit(`${e.Deny} | Request Cancelada`).catch(() => { })
-                    }
-                }).catch(() => {
-                    sdb.delete(`Request.${message.author.id}`)
-                    msg.edit(`${e.Deny} | Request Cancelada: Tempo expirado`).catch(() => { })
-                })
-            }).catch(err => {
-                Error(message, err)
-                sdb.delete(`Request.${message.author.id}`)
-                return message.reply(`${e.Warn} | Houve um erro ao executar este comando\n\`${err}\``)
+            return msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                errors: ['time']
             })
-        } else {
-            return message.reply(`${e.Deny} | Você está nas profundezas do código do autorole. Use \`${prefix}help autorole\` ou apenas \`${prefix}autorole\` que eu te mando todos os comandos do sistema.`)
+
+                .on('collect', async (reaction) => {
+
+                    if (reaction.emoji.name === emojis[0]) {
+
+                        await Database.Guild.updateOne(
+                            { id: message.guild.id },
+                            { $pull: { Autorole: role.id } }
+                        )
+
+                        return msg.edit(`${e.Check} | O cargo ${role} foi removido do autorole com sucesso!`).catch(() => { })
+
+                    } else { return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { }) }
+
+                })
+
+                .on('end', collected => {
+
+                    if (collected.size === 0)
+                        return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+
+                })
+
         }
+
+        function GetAndSendAutoroleStatus() {
+
+            let validate = []
+
+            for (const id of rolesId) {
+                validate.includes(id)
+                    ? DeleteRole(id)
+                    : validate.push(id)
+            }
+
+            const RolesMapped = validate.map((roleId, i) => {
+
+                let Cargo = message.guild.roles.cache.get(`${roleId}`)
+                if (!Cargo) DeleteRole(roleId)
+
+                return Cargo ? `${i + 1}. ${Cargo}` : `${i + 1} ${e.Deny} | Cargo não encontrado. (Removido da Database)`
+
+            }).join('\n')
+
+            return message.reply({
+                embeds: [
+                    new MessageEmbed()
+                        .setColor('#246FE0')
+                        .setTitle(':satellite: | Autorole System Status')
+                        .setDescription(`${RolesMapped || 'Nenhum cargo foi configurado ainda'}`)
+                ]
+            })
+
+        }
+
+        async function DeleteRole(roleId, all = false) {
+
+            if (all) {
+
+                if (!rolesId || rolesId.length === 0)
+                    return message.reply(`${e.Deny} | Este servidor não tem nenhum cargo configurado no autorole.`)
+
+                await Database.Guild.updateOne(
+                    { id: message.guild.id },
+                    { $unset: { Autorole: 1 } }
+                )
+                return message.reply(`${e.Check} | Todos os cargos configurados como autorole foram removidos e o sistema foi desativado.`)
+            }
+
+            await Database.Guild.updateOne(
+                { id: message.guild.id },
+                { $pull: { Autorole: roleId } }
+            )
+            return
+        }
+
     }
 }

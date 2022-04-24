@@ -1,7 +1,5 @@
-const { f } = require('../../../database/frases.json')
 const { Permissions, MessageActionRow, MessageSelectMenu } = require('discord.js')
-const { DatabaseObj } = require('../../../Routes/functions/database')
-const { e, config, N } = DatabaseObj
+const { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
 
 module.exports = {
     name: 'faq',
@@ -11,9 +9,8 @@ module.exports = {
     usage: '<faq>',
     description: 'Obtenha ajuda com a Saphire nas perguntas frequentes',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
-
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+        
         const link1Real = 'https://mpago.la/2YbvxZd'
         const LinkServidor = `${config.ServerLink}`
         
@@ -34,11 +31,7 @@ module.exports = {
                         value: 'home',
                     },
                     {
-                        label: `A ${client.user.username} me mandou fechar uma request.`,
-                        value: 'request'
-                    },
-                    {
-                        label: 'Eu tenho um sugestão, Como eu envio?',
+                        label: 'Eu tenho um sugestão, como eu envio?',
                         value: 'sugest'
                     },
                     {
@@ -54,7 +47,7 @@ module.exports = {
                         value: 'vip'
                     },
                     {
-                        label: 'Como eu consigo os itens do slot que não podem ser comprados?',
+                        label: 'Para que serve os itens consumíveis?',
                         value: 'itens'
                     },
                     {
@@ -68,10 +61,6 @@ module.exports = {
                     {
                         label: `A ${client.user.username} relogou e não me devolveu meu dinheiro`,
                         value: 'moneyback'
-                    },
-                    {
-                        label: 'Como posso divulgar meu servidor na comunidade da Saphire?',
-                        value: 'div'
                     },
                     {
                         label: `Posso entrar pra ${client.user.username}'s Team?`,
@@ -98,7 +87,7 @@ module.exports = {
             const collector = msg.createMessageComponentCollector({ filtro, idle: 60000 });
 
             collector.on('end', async (collected) => {
-                sdb.delete(`Request.${message.author.id}`)
+                
                 msg.edit({ components: [] }).catch(() => { })
             })
 
@@ -111,9 +100,6 @@ module.exports = {
                 switch (valor) {
                     case 'home':
                         msg.edit({ embeds: [FaqEmbed] }).catch(() => { })
-                        break;
-                    case 'request':
-                        Request()
                         break;
                     case 'sugest':
                         Sugest()
@@ -136,9 +122,6 @@ module.exports = {
                     case 'comprovante':
                         Comprovante()
                         break;
-                    case 'div':
-                        Div()
-                        break;
                     case 'nocommands':
                         NoCommands()
                         break;
@@ -159,21 +142,6 @@ module.exports = {
                         break;
                 }
             })
-
-            function Request() {
-
-                const RequestEmbed = new MessageEmbed()
-                    .setColor('#246FE0')
-                    .setTitle(`${e.Info} | ${client.user.username} Requests`)
-                    .setDescription(`O sistema de Request foi implementado pelo ${N.Rody} no dia 10/09/2021, visando o flood de requests envolvendo reações(emojis) e spamms de mensagem que acessam diretamente as configurações do Discord.`)
-                    .addField(`${e.QuestionMark} O que é Request?`, `Requests são chamados que os Bots fazem diretamente ao Discord para executar alguma atividade, por exemplo, adicionar reações nas mensagens ou adicionar cargos.`)
-                    .addField(`${e.Info} Aviso de Request Aberta`, `${e.Deny} | ${f.Request}\n \nSe você já viu a mensagem acima, indica que você tem alguma tarefa pendente/em aberto com a ${client.user.username}. Basta concluir o comando que você abriu que o bloqueio some.`)
-                    .addField(`${e.QuestionMark} Eu fechei o comando mas continuo com o aviso`, `Não se preocupe. Em caso de "bugs" no fechamento do comando, por padrão, a ${client.user.username} exclui as requests abertas de 2 em 2 minutos.`)
-                    .addField(`${e.QuestionMark} Tenho outra dúvida`, `Você pode acessar o \`${prefix}faq\` ou entrar no [meu servidor](${config.ServerLink})`)
-                    .setFooter(`Em casos de bugs extremos, existe o comando "${prefix}del request" que deleta todas as requests.`)
-
-                return msg.edit({ embeds: [RequestEmbed] }).catch(() => { })
-            }
 
             function Sugest() {
                 const SugestEmbed = new MessageEmbed()
@@ -199,7 +167,7 @@ module.exports = {
                         new MessageEmbed()
                             .setColor('#246FE0')
                             .setTitle(`${e.Deny} | Blacklist`)
-                            .setDescription('Caso você tenha entrado na blacklist, isso quer dizer que você abusou/forçou usar um comando que não é aberto ao público. Comandos testes ou em fase BETA. Por não ser um comando 100% pronto, a blacklist garante a segurança dos servidores adicionando os usuários que forçam a entrada em certos comandos.\n \nSe você ver um aviso dizendo "Este comando é de classe Moderador/Beta/Owner-Desenvolvedor" e você não puder usa-lo, não force a entrada do mesmo.')
+                            .setDescription(`Caso você tenha entrado na blacklist, quer dizer que vou quebrou alguma regra importante. Tente contactar um moderador usando o comando \`${prefix}mods\` e esclareça suas duvidas.`)
                     ]
                 }).catch(() => { })
             }
@@ -223,11 +191,8 @@ module.exports = {
                     .setColor('#246FE0')
                     .setTitle('📋 Itens e suas funções')
                     .setDescription('Todos os dados de todos os itens aqui em baixo')
-                    .addField('Itens Únicos', `Itens únicos são aqueles que você consegue comprar apenas um.\n \n🎣 \`Vara de Pesca\` Use para pescar \`${prefix}pescar\`\n🔫 \`Arma\` Use para assaltar e se proteger \`${prefix}assaltar @user\`\n${e.Balaclava} \`Balaclava\` Use no comando \`${prefix}crime\`\n${e.Helpier} \`Ajudante\` Te dá +5% de chance de sucesso no \`${prefix}crime\` por 7 dias.`)
-                    .addField('Itens Consumiveis', `Itens consumiveis são aqueles que são gastos a cada vez que é usado\n \n⛏️ \`Picareta\` Use para minerar \`${prefix}cavar\`\n🪓 \`Machado\` Use na floresta \`${prefix}floresta\`\n🎫 \`Ticket\` Aposte na loteria \`${prefix}buy ticket\`\n🎟️ \`Fichas\` Use na roleta \`${prefix}roleta\`\n💌 \`Cartas\` Use para conquistar alguém \`${prefix}carta\`\n🥘 \`Comida\` Use na floresta\` ${prefix}buscar\`\n🪱 \`Iscas\` Use para pescar \`${prefix}pescar\`\n🥤 \`Água\` Use para minerar \`${prefix}minerar\``)
-                    .addField('Itens Especiais', `Itens especiais são aqueles que são pegos na sorte nos mini-games\n \n${e.Star} \`Vip\` Mais informações no comando \`${prefix}vip\`\n${e.Loli} \`Loli\` Adquira na pesca \`${prefix}pescar\`\n🔪 \`Faca\` Adquira na pesca \`${prefix}pescar\`\n${e.Fossil} \`Fossil\` Adquira na mineração \`${prefix}minerar\`\n🦣 \`Mamute\` Adquira na mineração \`${prefix}minerar\`\n🐶 \`Brown\` Adquira na Floresta Cammum \`${prefix}floresta\`\n🥎 \`Bola do Brown\` Adquira na Floresta Cammum \`${prefix}floresta\`\n💊 \`Remédio do Velho Welter\` Adquira na Floresta Cammum \`${prefix}floresta\`\n${e.Doguinho} \`Cachorrinho/a\` Adquira no Castelo Heslow \`${prefix}medalha\`\n🏅 \`Medalha\` Adquira no Castelo Heslow \`${prefix}medalha\``)
+                    .addField('Itens Consumiveis', `Itens consumiveis são aqueles que são gastos a cada vez que é usado\n \n🎫 \`Ticket\` Aposte na loteria \`${prefix}buy ticket\`\n💌 \`Cartas\` Use para conquistar alguém \`${prefix}carta\``)
                     .addField('Perfil', 'Itens de perfil são aqueles que melhora seu perfil\n \n⭐ `Estrela` Estrelas no perfil')
-                    .addField('Itens Coletaveis', 'Itens coletaveis são aqueles que você consegue nos mini-games, você pode vende-los para conseguir mais dinheiro.\n \n🍤 `Camarões` - Baú do Tesouro `' + prefix + 'pescar`\n🐟 `Peixes` - Baú do Tesouro `' + prefix + 'pescar`\n🌹 `Rosas` - Floresta Cammum `' + prefix + 'floresta`\n🍎 `Maças` - Floresta Cammum `' + prefix + 'floresta`\n🦴 `Ossos` - Mineração `' + prefix + 'minerar`\n🪨 `Minérios` - Mineração `' + prefix + 'minerar`\n💎 `Diamantes` - Mineração `' + prefix + 'minerar`')
                     .addField('Permissões', `Permissões libera comandos bloqueados\n \n🔰 \`Título\` Mude o título no perfil \`${prefix}titulo <Novo Título>\`\n🎨 \`Cores\` Mude as cores das suas mensagens \`${prefix}setcolor <#CódigoHex>\``)
 
                 msg.edit({ embeds: [ItensEmbed] }).catch(() => { })
@@ -269,16 +234,8 @@ module.exports = {
                 const MoneybackEmbed = new MessageEmbed()
                     .setColor('#246FE0')
                     .setTitle(`${client.user.username} SAPHIRE BANDIDAAAA`)
-                    .setDescription('Use o mesmo comando que o seu dinheiro está no cache do comando. O Sistema de Proteção da Saphire garante o extorno do dinheiro ao usar o comando novamente.')
+                    .setDescription(`Entre no meu [servidor](${config.ServerLink}) e fale com alguém da Saphire\'s Team sobre isso, o dinheiro será extornado.`)
                 msg.edit({ embeds: [MoneybackEmbed] }).catch(() => { })
-            }
-
-            function Div() {
-                const DivEmbed = new MessageEmbed()
-                    .setColor('#246FE0')
-                    .setTitle(`${e.SaphireFeliz} Comunidade Saphiry`)
-                    .setDescription(`É fácil fácil! Configure seu servidor usando a Saphire e mostre no [meu servidor](${config.ServerLink}). A minha equipe adicionará seu servidor a minha lista de comunidades.`)
-                msg.edit({ embeds: [DivEmbed] }).catch(() => { })
             }
 
             function St() {

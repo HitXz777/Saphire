@@ -1,10 +1,9 @@
-const { f } = require('../../../database/frases.json')
-const { BgWall, DatabaseObj } = require('../../../Routes/functions/database')
-const { stripIndent } = require('common-tags')
-const { config, e, N, Wallpapers } = DatabaseObj
-const Error = require('../../../Routes/functions/errors')
-const IsUrl = require('../../../Routes/functions/isurl')
-const Colors = require('../../../Routes/functions/colors')
+const { DatabaseObj: { config, e } } = require('../../../modules/functions/plugins/database'),
+    Error = require('../../../modules/functions/config/errors'),
+    IsUrl = require('../../../modules/functions/plugins/isurl'),
+    Colors = require('../../../modules/functions/plugins/colors'),
+    Ark = require('ark.db'),
+    BgWall = new Ark.Database('../../../JSON/wallpaperanime.json')
 
 module.exports = {
     name: 'wallpaper',
@@ -13,150 +12,178 @@ module.exports = {
     ClientPermissions: ['ADD_REACTIONS', 'EMBED_LINKS'],
     emoji: '🖥️',
     usage: '<wallpaper>',
-    description: `Wallpaper de Animes | Imagens por: ${N.Gowther}`,
+    description: `Wallpaper de Animes`,
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+        let animes = Object.keys(BgWall.get('Wallpapers') || {}).sort().map(anime => `${prefix}w ${anime}`),
+            amount = 0,
+            N = Database.Names
 
-        let animes, amount = 0
+        async function SendEmbed() {
 
-        try {
-            animes = Object.keys(Wallpapers).sort().map(anime => `${prefix}w ${anime}`)
-        } catch (err) { return Error(message, err) }
+            amount = Object.values(BgWall.get('Wallpapers') || {}).flat().length
 
-        const WallPapersIndents = stripIndent`${animes.slice(0, 30).join('\n') || 'Em breve'}`,
-            WallPapersIndents2 = stripIndent`${animes.slice(30, 60).join('\n') || 'Em breve'}`,
-            WallPapersIndents3 = stripIndent`${animes.slice(60, 90).join('\n') || 'Em breve'}`,
-            WallPapersIndents4 = stripIndent`${animes.slice(90, 120).join('\n') || 'Em breve'}`
+            if (!animes || animes.length === 0) return message.reply(`${e.Deny} | Não há nenhum anime na minha database.`)
 
-        function SendEmbed() {
+            let emojis = ['⬅️', '➡️', '❌'],
+                embeds = EmbedGenerator() || [],
+                control = 0
 
-            return message.channel.send({ embeds: [new MessageEmbed().setDescription(`${e.Loading} Carregando...`)] }).then(msg => {
+            if (!embeds || embeds.length < 1) return message.channel.send(`${e.Info} | Nenhum anime foi encontrado no banco de dados.`)
 
-                try {
-                    for (const anime of Object.keys(BgWall.get('Wallpapers'))) {
-                        amount += Object.values(BgWall.get(`Wallpapers.${anime}`)).length
+            let msg = await message.channel.send({ embeds: [embeds[control]] }).catch(() => { })
+
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
+
+            let collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                max: 5,
+                idle: 30000,
+                errors: ['max', 'idle']
+            })
+
+                .on('collect', (reaction) => {
+
+                    if (reaction.emoji.name === emojis[2]) return collector.stop()
+
+                    if (reaction.emoji.name === emojis[0]) {
+                        control--
+                        return embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control++
                     }
-                } catch (err) {
-                    Error(message, err)
-                    message.reply(`${e.Warn} | Ocorreu um erro ao contabilizar a quantidade de animes presente na minha database.\n\`${err}\``)
-                }
 
-                let AnimeList1 = WallPapersIndents,
-                    AnimeList2 = WallPapersIndents2
-                msg.react('🔄').catch(() => { })
-                msg.react('❌').catch(() => { })
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
+                    if (reaction.emoji.name === emojis[1]) {
+                        control++
+                        return embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control--
+                    }
 
-                TradingEmbed(WallPapersIndents, WallPapersIndents2)
-
-                const filter = (reaction, user) => { return reaction.emoji.name === '🔄' && user.id === message.author.id; },
-                    collector = msg.createReactionCollector({ filter: filter, max: 5, idle: 30000, errors: ['max', 'idle'] }),
-                    filtercancel = (reaction, user) => { return reaction.emoji.name === '❌' && user.id === message.author.id; },
-                    collectorcancel = msg.createReactionCollector({ filter: filtercancel, max: 1, idle: 30000, errors: ['max', 'idle'] })
-
-                collector.on('collect', () => {
-                    TradingEmbed(AnimeList1 === WallPapersIndents ? AnimeList1 = WallPapersIndents3 : AnimeList1 = WallPapersIndents, AnimeList2 === WallPapersIndents2 ? AnimeList2 = WallPapersIndents4 : AnimeList2 = WallPapersIndents2)
-                });
-
-                collector.on('end', () => {
-                    sdb.delete(`Request.${message.author.id}`)
-                    msg.reactions.removeAll().catch(() => { })
-                });
-
-                collectorcancel.on('collect', () => {
-                    collector.stop()
-                    collectorcancel.stop()
                 })
 
-                function TradingEmbed(AnimesList, AnimesList2) {
-                    return msg.edit({
-                        embeds: [
-                            new MessageEmbed()
-                                .setColor('#246FE0')
-                                .setTitle(`🖥️ ${client.user.username} Wallpapers`)
-                                .setDescription(`Este comando foi reformado e pode haver um bug ali ou aqui. Caso ache um, use o comando \`${prefix}bug\` e reporte-o, ok? Você pode trocar as abas para ver mais animes clicando no emoji 🔄 ali em baixo.`)
-                                .addField(`${e.Warn} | Atenção!`, `\`\`\`txt\n1. Alguns wallpapers contém spoilers, tome cuidado!\n2. Não use espaços no nome do anime\`\`\``)
-                                .addField(`${e.Download} | Quer algum anime na lista?`, `\`\`\`Nos diga no formulário: ${prefix}sugest\`\`\``)
-                                .addField(`${e.Check} | Animes Disponíveis`, `\`\`\`txt\n${AnimesList}\`\`\``, true)
-                                .addField('⠀', `\`\`\`txt\n${AnimesList2}\`\`\``, true)
-                                .setFooter(`Package: ${animes.length} Animes e ${amount} Wallpapers | ${prefix}wallpaper credits | ${prefix}servers`)
-                        ]
-                    }).catch(err => {
-                        collector.stop()
-                        return message.reply(`${e.Warn} | Houve um erro na troca das embeds.\n\`${err}\``)
-                    })
+                .on('end', () => msg.reactions.removeAll().catch(() => { }))
+
+
+            function EmbedGenerator() {
+
+                let amountControl = 30,
+                    Page = 1,
+                    embeds = [],
+                    length = animes.length / 30 <= 1 ? 1 : parseInt((animes.length / 30) + 1)
+
+                for (let i = 0; i < animes.length; i += 30) {
+
+                    let current = animes.slice(i, amountControl),
+                        animesMapped = current.join('\n'),
+                        PageCount = `${length > 1 ? `${Page}/${length}` : ''}`
+
+                    if (current.length > 0) {
+
+                        embeds.push({
+                            color: '#246FE0',
+                            title: `🖥️ ${client.user.username} Wallpapers - ${PageCount}`,
+                            description: `Você pode trocar as abas para ver mais animes clicando nos emojis ali em baixo.`,
+                            fields: [
+                                {
+                                    name: `${e.Warn} | Atenção!`,
+                                    value: `\`\`\`txt\n1. Alguns wallpapers contém spoilers, tome cuidado!\n2. Não use espaços no nome do anime\`\`\``
+                                },
+                                {
+                                    name: `${e.Download} | Quer algum anime na lista?`,
+                                    value: `\`\`\`Nos diga no formulário: ${prefix}sugest\`\`\``
+                                },
+                                {
+                                    name: `${e.Check} | Animes Disponíveis`,
+                                    value: `\`\`\`txt\n${Page === 1 ? `${prefix}w random\n` : ''}${animesMapped}\`\`\``
+                                }
+                            ],
+                            footer: {
+                                text: `Package: ${animes.length} Animes e ${amount} Wallpapers | ${prefix}wallpaper credits | ${prefix}servers`
+                            }
+                        })
+
+                        Page++
+                        amountControl += 30
+
+                    }
+
                 }
-            })
+
+                return embeds;
+            }
+
         }
 
-        function WallPapers(Category) {
+        async function WallPapers(Category) {
 
-            if (!Category || Category.length <= 0)
+            if (!Category || Category.length === 0)
                 return message.reply(`${e.Info} | Este anime ainda não possui wallpapers.`)
 
-            let wallpaper = Category[Math.floor(Math.random() * Category.length)]
-            const WallPaperEmbed = new MessageEmbed()
-                .setColor('#246FE0')
-                .setDescription(`${e.Download} | [Baixar](${wallpaper}) wallpaper em qualidade original`)
-                .setImage(wallpaper)
+            let wallpaper = Category[Math.floor(Math.random() * Category.length)],
+                WallPaperEmbed = new MessageEmbed()
+                    .setColor('#246FE0')
+                    .setDescription(`${e.Download} | [Baixar](${wallpaper}) wallpaper em qualidade original`)
+                    .setImage(wallpaper)
 
-            return message.reply({ embeds: [WallPaperEmbed] }).then(msg => {
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                msg.react('🔄').catch(() => { }) // 1º Embed
-                msg.react('❌').catch(() => { })
+            const msg = await message.reply({ embeds: [WallPaperEmbed] }),
+                emojis = ['🔄', '❌']
 
-                let TradeFilter = (reaction, user) => { return reaction.emoji.name === '🔄' && user.id === message.author.id }; let TradeWallpaper = msg.createReactionCollector({ filter: TradeFilter, idle: 30000 })
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
-                TradeWallpaper.on('collect', (reaction, user) => {
-
-                    reaction.users.remove(message.author.id).catch(() => { TradeWallpaper.stop() })
-                    let WallTrade = Category[Math.floor(Math.random() * Category.length)]
-                    WallPaperEmbed.setDescription(`${e.Download} | [Baixar](${WallTrade}) wallpaper em qualidade original`).setImage(WallTrade)
-                    msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { })
-
-                })
-                TradeWallpaper.on('end', (reaction, user) => { sdb.delete(`Request.${message.author.id}`); msg.reactions.removeAll().catch(() => { }); WallPaperEmbed.setColor('RED').setFooter(`Sessão expirada | Wallpapers por: ${N.Gowther}`); msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { }) })
-
-                let CancelFilter = (reaction, user) => { return reaction.emoji.name === '❌' && user.id === message.author.id }; let CancelSession = msg.createReactionCollector({ filter: CancelFilter, max: 1, idle: 30000 })
-                CancelSession.on('collect', (reaction, user) => { msg.reactions.removeAll().catch(() => { }); WallPaperEmbed.setColor('RED').setFooter(`Sessão expirada | Wallpapers por: ${N.Gowther}`); msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { }) })
-                CancelSession.on('end', (reaction, user) => { sdb.delete(`Request.${message.author.id}`); msg.reactions.removeAll().catch(() => { }); WallPaperEmbed.setColor('RED').setFooter(`Sessão expirada | Wallpapers por: ${N.Gowther}`); msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { }) })
-
-            }).catch(err => {
-                Error(message, err)
-                sdb.delete(`Request.${message.author.id}`)
-                return message.reply(`${e.Warn} | Houve um erro ao executar este comando\n\`${err}\``)
+            let TradeWallpaper = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                idle: 30000
             })
+
+                .on('collect', (reaction) => {
+
+                    if (reaction.emoji.name === emojis[1]) return TradeWallpaper.stop()
+
+                    if (reaction.emoji.name === emojis[0]) {
+
+                        reaction.users.remove(message.author.id).catch(() => { })
+                        let WallTrade = Category[Math.floor(Math.random() * Category.length)]
+
+                        WallPaperEmbed.setImage(WallTrade)
+                            .setDescription(`${e.Download} | [Baixar](${WallTrade}) wallpaper em qualidade original`)
+
+                        return msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { })
+                    }
+                    return
+                })
+
+                .on('end', () => {
+                    msg.reactions.removeAll().catch(() => { });
+
+                    WallPaperEmbed.setColor('RED')
+                        .setFooter(`Sessão expirada | Wallpapers por: ${client.users.cache.get(N.Gowther)?.tag || 'Indefnido'}`)
+                    return msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { })
+                })
         }
 
         if (!args[0]) return SendEmbed()
 
-        if (['add', 'adicionar'].includes(args[0]?.toLowerCase()))
-            return NewWallpaperDatabase()
+        if (['add', 'adicionar'].includes(args[0]?.toLowerCase())) return NewWallpaperDatabase()
+        if (['new', 'novo'].includes(args[0]?.toLowerCase())) return NewAnimeDatabase()
+        if (['delete', 'del'].includes(args[0]?.toLowerCase())) return DelAnimeDatabase()
+        if (['random', 'aleatório', 'aleatório'].includes(args[0]?.toLowerCase())) return randomize()
 
-        if (['new', 'novo'].includes(args[0]?.toLowerCase()))
-            return NewAnimeDatabase()
-
-        if (['delete', 'del'].includes(args[0]?.toLowerCase()))
-            return DelAnimeDatabase()
-
-        if (['créditos', 'credits', 'creditos'].includes(args[0]?.toLowerCase())) {
+        if (['créditos', 'credits', 'creditos'].includes(args[0]?.toLowerCase()))
             return message.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(client.blue)
                         .setDescription(`${e.Info} | Abaixo, estão os créditos de todas as pessoas e o que elas fizeram na construção do comando \`${prefix}wallpaper\``)
-                        .addField('🤝 Créditos', `\`${N.Rody}\` - Idealizador, implementação dos Wallpapers ao banco de dados e código fonte da ${client.user.username}\n \n\`${N.Gowther}\` - Fornecedor de 100% dos Wallpapers, Organização de Links, dados e review técnico\n \n\`${N.Makol}\` - Review adição de Links e sequência de ordem`)
+                        .addField('🤝 Créditos', `\`${client.users.cache.get(N.Rody)?.tag || 'Indefnido'}\` - Idealizador, implementação dos Wallpapers ao banco de dados e código fonte da ${client.user.username}\n \n\`${client.users.cache.get(N.Gowther)?.tag || 'Indefnido'}\` - Fornecedor de 100% dos Wallpapers, Organização de Links, dados e review técnico\n \n\`${client.users.cache.get(N.Makol)?.tag || 'Indefnido'}\` - Review adição de Links e sequência de ordem`)
                 ]
             })
-        }
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) {
+
+            let color = await Colors(message.author.id)
+
             return message.channel.send({
                 embeds: [
                     new MessageEmbed()
-                        .setColor(Colors(message.member))
+                        .setColor(color)
                         .setTitle(`:tv: Comandos Wallpapers`)
                         .setDescription(`Aqui estão todos os comandos deste comando`)
                         .addFields(
@@ -177,22 +204,25 @@ module.exports = {
 
         return Check()
 
+        function randomize() {
+
+            let animesRandomize = Object.values(BgWall.get('Wallpapers') || {}).flat()
+
+            if (!animesRandomize || animesRandomize.length === 0)
+                return message.reply(`${e.Deny} | Nenhum wallpaper foi encontrado.`)
+
+            return WallPapers(animesRandomize)
+        }
+
         function Check() {
 
-            try {
+            let Animes = Object.keys(BgWall.get('Wallpapers') || {})
 
-                let Animes = Object.keys(BgWall.get('Wallpapers'))
+            let Key = Animes.find(data => data.toLowerCase() === args[0].toLowerCase())
 
-                for (const Key of Animes) {
-
-                    if (Key?.toLowerCase() === args[0]?.toLowerCase())
-                        return WallPapers(BgWall.get(`Wallpapers.${Key}`))
-
-                }
-
-                return message.reply(`${e.Deny} | Este anime não existe no meu banco de dados... Verefique os nomes usando somente \`${prefix}w\``)
-
-            } catch (err) { return Error(message, err) }
+            return Key
+                ? WallPapers(BgWall.get(`Wallpapers.${Key}`))
+                : message.reply(`${e.Deny} | Este anime não existe no meu banco de dados... Verifique os nomes usando somente \`${prefix}w\``)
 
         }
 
@@ -219,7 +249,7 @@ module.exports = {
                 return message.reply(`${e.Deny} | Forneça um link válido!`)
 
             try {
-                keys = Object.keys(Wallpapers)
+                keys = Object.keys(BgWall.get('Wallpapers') || {})
 
                 for (const anime of keys) {
                     let values = Object.values(BgWall.get(`Wallpapers.${anime}`))
@@ -267,7 +297,6 @@ module.exports = {
         }
 
         function DelAnimeDatabase() {
-
 
             if (message.author.id !== config.ownerId) {
                 return message.reply(`${e.Deny} | Este comando é privado ao meu criador.`)

@@ -1,7 +1,4 @@
-const { e } = require("../../../database/emojis.json")
-const { f } = require('../../../database/frases.json')
-const Error = require('../../../Routes/functions/errors')
-const { ServerDb } = require('../../../Routes/functions/database')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'ideiachannel',
@@ -13,77 +10,112 @@ module.exports = {
     usage: '<ideichannel> [#channel]',
     description: 'Selecione um canal para envio de ideias',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
-        if (['desligar', 'off'].includes(args[0]?.toLowerCase())) {
+        const guildData = await Database.Guild.findOne({ id: message.guild.id }, 'IdeiaChannel'),
+            atual = guildData?.IdeiaChannel
 
-            let canal = ServerDb.get(`Servers.${message.guild.id}.IdeiaChannel`)
-            if (!canal) return message.reply(`${e.Deny} | O sistema de ideias já está desativado`)
+        if (['desligar', 'off'].includes(args[0]?.toLowerCase())) return turnOff()
 
-            await message.guild.channels.fetch(canal).then(channel => {
+        let channel = message.mentions.channels.first() || message.channel
 
-                return message.channel.send(`${e.QuestionMark} | Deseja desativar o sistema de ideias? Canal atual: ${channel}`).then(msg => {
-                    sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                    msg.react('✅').catch(() => { }) // e.Check
-                    msg.react('❌').catch(() => { }) // X
+        if (channel.id === atual) return message.reply(`${e.Info} | Este já é o canal de ideias atual`)
 
-                    const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+        let msg = await message.reply(`${e.QuestionMark} | Deseja autenticar o canal ${channel} como canal de ideias?`),
+            emojis = ['✅', '❌'],
+            validate = false
 
-                    msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                        const reaction = collected.first()
+        for (let i of emojis) msg.react(i).catch(() => { })
 
-                        if (reaction.emoji.name === '✅') {
-                            sdb.delete(`Request.${message.author.id}`)
-                            ServerDb.delete(`Servers.${message.guild.id}.IdeiaChannel`)
-                            return msg.edit(`${e.SaphireFeliz} | Prontinho, sistema de ideias desativado.`).catch(() => { })
-                        } else {
-                            sdb.delete(`Request.${message.author.id}`)
-                            return message.channel.send(`${e.Deny} | Request cancelada.`)
-                        }
-                    }).catch(() => {
-                        sdb.delete(`Request.${message.author.id}`)
-                        msg.edit(`${e.Deny} | Request cancelada: Tempo expirado.`).catch(() => { })
-                    })
-                })
-            }).catch(() => {
-                sdb.delete(`Request.${message.author.id}`)
-                return message.reply(`${e.Deny} | O sistema de ideias já está desativado`)
+        const collector = msg.createReactionCollector({
+            filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+            time: 30000,
+            errors: ['time']
+        })
+
+            .on('collect', async (reaction, user) => {
+
+                if (reaction.emoji.name === '✅') {
+
+                    await Database.Guild.updateOne(
+                        { id: message.guild.id },
+                        { IdeiaChannel: channel.id },
+                        { upsert: true }
+                    )
+
+                    validate = true
+                    msg.edit(`${e.SaphireFeliz} | Prontinho, sistema de ideias ativado! Para mandar alguma ideia, só usar o comando: \`${prefix}ideia a sua ideia em diante...\``).catch(() => { })
+                }
+
+                return collector.stop()
+
             })
 
-        } else {
+            .on('end', () => {
 
-            let channel = message.mentions.channels.first() || message.channel
-            let atual = ServerDb.get(`Servers.${message.guild.id}.IdeiaChannel`)
+                if (!validate)
+                    return message.channel.send(`${e.Deny} | Request cancelada.`)
 
-            if (channel.id === atual) {
-                return message.reply(`${e.Info} | Este já é o canal de ideias atual`)
-            } else {
+                return
 
-                return message.reply(`${e.QuestionMark} | Deseja autenticar o canal ${channel} como canal de ideias?`).then(msg => {
-                    sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                    msg.react('✅').catch(() => { }) // e.Check
-                    msg.react('❌').catch(() => { }) // X
+            })
 
-                    const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+        async function turnOff() {
 
-                    msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                        const reaction = collected.first()
+            if (!atual) return message.reply(`${e.Deny} | O sistema de ideias já está desativado`)
 
-                        if (reaction.emoji.name === '✅') {
-                            sdb.delete(`Request.${message.author.id}`)
-                            ServerDb.set(`Servers.${message.guild.id}.IdeiaChannel`, channel.id)
-                            return msg.edit(`${e.NezukoJump} | Prontinho, sistema de ideias ativado.\nO comando é simples --> \`${prefix}ideia a sua ideia em diante\``).catch(() => { })
-                        } else {
-                            sdb.delete(`Request.${message.author.id}`)
-                            return message.channel.send(`${e.Deny} | Request cancelada.`)
-                        }
-                    }).catch(() => {
-                        sdb.delete(`Request.${message.author.id}`)
-                        msg.edit(`${e.Deny} | Request cancelada: Tempo expirado.`).catch(() => { })
-                    })
-                })
+            let channel = message.guild.channels.cache.get(atual)
+
+            if (!channel && atual) {
+                deleteChannel()
+                return message.reply(`${e.Deny} | O sistema de ideias já está desativado`)
             }
+
+            let msg = await message.channel.send(`${e.QuestionMark} | Deseja desativar o sistema de ideias? Canal atual: ${channel}`),
+                emojis = ['✅', '❌'],
+                validate = false
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+
+            const collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                errors: ['time']
+            })
+
+                .on('collect', (reaction, user) => {
+
+                    if (reaction.emoji.name === '✅') {
+                        deleteChannel()
+                        validate = true
+                        msg.edit(`${e.SaphireFeliz} | Prontinho, sistema de ideias desativado.`).catch(() => { })
+                    }
+
+                    return collector.stop()
+
+                })
+
+                .on('end', () => {
+
+                    if (!validate)
+                        return message.channel.send(`${e.Deny} | Request cancelada.`)
+
+                    return
+
+                })
+
+            return
+
         }
+
+        async function deleteChannel() {
+
+            await Database.Guild.updateOne(
+                { id: message.guild.id },
+                { $unset: { IdeiaChannel: 1 } }
+            )
+            return
+        }
+
     }
 }

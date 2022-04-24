@@ -1,9 +1,8 @@
 const { MessageAttachment } = require('discord.js')
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const { Canvas } = require('canvacord')
-const Error = require('../../../Routes/functions/errors')
+const Error = require('../../../modules/functions/config/errors')
 
-// #246FE0 - Azul Saphire
 module.exports = {
     name: 'bjo',
     category: 'images',
@@ -12,7 +11,7 @@ module.exports = {
     usage: '<bjo> [@user] [@user]',
     description: 'bjo meme',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user1 = message.mentions.users.first()
         if (!user1) return message.reply(`${e.Info} | Tenta assim: \`${prefix}bjo @user1 @user2\``)
@@ -21,10 +20,6 @@ module.exports = {
         let user2 = message.mentions.users.last()
         if (!user2) return message.reply(`${e.Info} | Tenta assim: \`${prefix}bjo @user1 @user2\``)
         let avatar2 = user2.displayAvatarURL({ format: 'png' })
-
-        if (sdb.get(`Users.${message.author.id}.NoReact`)) return message.reply(`${e.Deny} | Você está com o \`${prefix}noreact\` ativado.`)
-        if (sdb.get(`Users.${user1.id}.NoReact`)) return message.reply(`${e.Deny} | ${user1.tag} está com o \`${prefix}noreact\` ativado.`)
-        if (sdb.get(`Users.${user2.id}.NoReact`)) return message.reply(`${e.Deny} | ${user2.tag} está com o \`${prefix}noreact\` ativado.`)
 
         if (user1.id === user2.id)
             return message.reply(`${e.Info} | Tenta assim: \`${prefix}bjo @user1 @user2\``)

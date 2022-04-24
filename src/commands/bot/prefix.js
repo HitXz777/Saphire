@@ -1,116 +1,136 @@
-const { Permissions } = require('discord.js')
-const { f } = require('../../../database/frases.json')
-const { DatabaseObj, ServerDb } = require('../../../Routes/functions/database')
-const { e, config } = DatabaseObj
+const { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
 
 module.exports = {
     name: 'prefix',
     aliases: ['setprefix'],
     category: 'bot',
-    UserPermissions: ['MANAGE_GUILD'],
+    UserPermissions: ['ADMINISTRATOR'],
     ClientPermissions: ['ADD_REACTIONS'],
     emoji: `${e.ModShield}`,
     usage: '<NovoPrefix> | <reset>',
     description: 'Altere o prefixo ou reset para o padrão.',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
-
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const prefixembed = new MessageEmbed()
             .setColor('#246FE0')
             .setTitle(`${e.Info} Informações sobre Prefixo`)
-            .setDescription('Prefixo é o simbolo que você utiliza para executar comandos em bots no Discord.\nExemplo: `' + prefix + 'prefix` ou `' + prefix + 'help`')
+            .setDescription(`Prefixo é o simbolo que você utiliza para executar comandos em bots no Discord.\nExemplo: \`${prefix}prefix\` ou \`${prefix}help\``)
             .addFields(
                 {
                     name: '💡 Meus comandos de Prefix',
-                    value: '`' + prefix + 'prefix [NovoPrefixo]` Escolha meu novo prefixo\n`' + prefix + 'prefix reset` Resete meu prefixo para `-`'
+                    value: `\`${prefix}prefix [NovoPrefixo]\` Escolha meu novo prefixo\n\`${prefix}prefix reset\` Resete meu prefixo para \`-\`\``
                 }
-            )
+            ),
+            guild = await Database.Guild.findOne({ id: message.guild.id }),
+            newPrefix = args[0]
 
-        if (!args[0]) { return message.reply({ embeds: [prefixembed] }) }
-        if (!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) { return message.reply(`${e.Info} | Permissão necessária: "Administrador"`) }
+        if (!newPrefix) return message.reply({ embeds: [prefixembed] })
 
-        if (['reset', 'resetar', 'delete', 'deletar'].includes(args[0]?.toLowerCase())) {
+        if (['reset', 'resetar', 'delete', 'deletar', 'del'].includes(newPrefix?.toLowerCase())) return ResetPrefix()
 
+        if (newPrefix.length > 2) return message.reply(`${e.Deny} | O prefixo não pode ter mais de 2 caracteres.`)
+        if (!isNaN(newPrefix)) return message.reply(`${e.Deny} | O prefixo não pode ser um número.`)
+        if (args[1]) return message.reply(`${e.Deny} | O prefixo não pode ter espaços.`)
+        if (newPrefix === "<") return message.reply(`${e.Deny} | Prefixo não permitido.`)
+        if (newPrefix === config.prefix) return message.reply(`${e.Info} | Este já é o prefixo padrão. Caso queira resetar meu prefixo, use o comando \`${prefix}prefix reset\``)
 
-            if (prefix === config.prefix)
+        if (newPrefix) return SetNewPrefix()
+
+        return message.reply(`... Hum. Parece que você chegou nas profundezas do código. Que tal tentar usar o comando corretamente?`)
+
+        async function SetNewPrefix() {
+
+            let msg = await message.reply(`${e.QuestionMark} | Deseja alterar meu prefixo para: \`${newPrefix}\` ?`),
+                emojis = ['✅', '❌'],
+                control = false
+
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
+
+            const collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                errors: ['time']
+            })
+
+                .on('collect', async (reaction) => {
+
+                    if (reaction.emoji.name === emojis[0]) {
+                        msg.reactions.removeAll().catch(() => { })
+
+                        await Database.Guild.updateOne(
+                            { id: message.guild.id },
+                            { Prefix: newPrefix },
+                            { upsert: true }
+                        )
+
+                        control = true
+                        msg.edit(`${e.Database} | DATABASE | O prefixo deste servidor foi alterado para: \`${newPrefix}\``).catch(() => { })
+
+                    }
+
+                    return collector.stop()
+
+                })
+
+                .on('end', () => {
+
+                    if (!control) return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+                    return
+                })
+
+        }
+
+        async function ResetPrefix() {
+
+            if (prefix === config.prefix || !guild?.Prefix)
                 return message.reply(`${e.Info} | O prefixo atual é o meu padrão: \`${config.prefix}\``)
 
-            return message.reply(`${e.QuestionMark} | Você deseja resetar meu prefix para \`${config.prefix}\`?`).then(msg => {
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                msg.react('✅').catch(() => { }) // Check
-                msg.react('❌').catch(() => { }) // X
+            let msg = await message.reply(`${e.QuestionMark} | Você deseja resetar meu prefix para \`${config.prefix}\`?`),
+                emojis = ['✅', '❌'],
+                control = false
 
-                const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
-                msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] })
-                    .then(collected => {
-                        const reaction = collected.first()
-
-                        if (reaction.emoji.name === '✅') {
-                            sdb.delete(`Request.${message.author.id}`)
-                            ServerDb.delete(`Servers.${message.guild.id}.Prefix`)
-                            msg.edit(`${e.Check} | ${message.author.username} resetou meu prefixo para \`${config.prefix}\``).catch(() => { })
-                            msg.reactions.removeAll().catch(() => { })
-                        } else {
-                            sdb.delete(`Request.${message.author.id}`)
-                            msg.edit(`${e.NezukoDance} | Comando cancelado.`).catch(() => { })
-                            msg.reactions.removeAll().catch(() => { })
-                        }
-                    }).catch(() => {
-                        sdb.delete(`Request.${message.author.id}`)
-                        msg.edit('⏱️ | Comando cancelado por: Tempo Expirado.').catch(() => { })
-                        msg.reactions.removeAll().catch(() => { })
-                    })
+            const collector = msg.createReactionCollector({
+                filter: (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                errors: ['time']
             })
-        }
 
-        if (args[0].length > 2) { return message.reply(`${e.Itachi} | O prefixo não pode ter mais de 2 caracteres.`) }
-        if (!isNaN(args[0])) { return message.reply(`${e.Hmmm} | O prefixo não pode ser um número.`) }
-        if (args[1]) { return message.reply(`${e.Info} |O prefixo não pode ter espaços.`) }
+                .on('collect', async (reaction) => {
 
-        if (args[0]) {
+                    if (reaction.emoji.name === emojis[0]) {
 
-            return message.reply(`${e.QuestionMark} | Deseja alterar meu prefixo para: \`${args[0]}\` ?`).then(msg => {
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                msg.react('✅').catch(() => { }) // Check
-                msg.react('❌').catch(() => { }) // X
+                        DelPrefix()
 
-                const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+                        control = true
+                        msg.edit(`${e.Database} | DATABASE | O prefixo deste servidor foi resetado com sucesso.`).catch(() => { })
+                        return collector.stop()
 
-                msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                    const reaction = collected.first()
+                    } else { return collector.stop() }
 
-                    if (reaction.emoji.name === '✅') {
-                        msg.reactions.removeAll().catch(() => { })
-
-                        if (args[0] === `${config.prefix}`) {
-
-                            sdb.delete(`Request.${message.author.id}`)
-                            ServerDb.delete(`Servers.${message.guild.id}.Prefix`)
-                            msg.edit(`${e.Check} | ${message.author}, como \`${config.prefix}\` é o meu prefixo padrão, eu resetei o prefixo do servidor.`).catch(() => { })
-
-                        } else if (args[0] === "<") {
-
-                            return message.reply(`${e.Deny} Opa opa, você achou um prefixo proibido.`)
-
-                        } else {
-                            sdb.delete(`Request.${message.author.id}`)
-                            ServerDb.set(`Servers.${message.guild.id}.Prefix`, args[0])
-                            sdb.delete(`Request.${message.author.id}`)
-                            msg.edit(`${e.Check} | Prefixo \`${args[0]}\` novinho em folha! Só não esquece, ok? ${e.SaphireFeliz}`)
-                        }
-                    } else {
-                        sdb.delete(`Request.${message.author.id}`)
-                        msg.reactions.removeAll().catch(() => { })
-                        msg.edit(`${e.Deny} | Comando cancelado por: ${message.author}`).catch(() => { })
-                    }
-                }).catch(() => {
-                    sdb.delete(`Request.${message.author.id}`)
-                    msg.edit(`${e.Deny} | Comando cancelado por: Tempo expirado`).catch(() => { })
                 })
-            })
+
+                .on('end', () => {
+
+                    if (!control)
+                        return message.reply(`${e.Deny} | Comando cancelado.`)
+
+                    return
+
+                })
+
         }
+
+        async function DelPrefix() {
+
+            return await Database.Guild.updateOne(
+                { id: message.guild.id },
+                { $unset: { Prefix: 1 } }
+            )
+
+        }
+
     }
 }

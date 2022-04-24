@@ -1,9 +1,9 @@
 const { MessageAttachment } = require('discord.js')
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const { Canvas } = require('canvacord')
-const Error = require('../../../Routes/functions/errors')
+const Error = require('../../../modules/functions/config/errors')
 
-// #246FE0 - Azul Saphire
+
 module.exports = {
     name: 'youtube',
     aliases: ['ytb'],
@@ -13,7 +13,7 @@ module.exports = {
     usage: '<tby> [@user] <Text>',
     description: 'Youtube comentário',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first()
         if (!user) return message.reply(`${e.Info} | Tenta assim: \`${prefix}ytb @user O texto em diante\` *(Limite de 60 caracteres)*`)

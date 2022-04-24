@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'mods',
@@ -8,15 +8,20 @@ module.exports = {
     usage: '<mods>',
     description: 'Moderadores da Saphire',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let mods = Object.entries(sdb.get('Client.Moderadores') || [])
-        if (!mods.length) return message.reply(`${e.Check} | Nenhum mod na lista.`)
+        let clientData = await Database.Client.findOne({ id: client.user.id }, 'Moderadores'),
+            mods = clientData?.Moderadores || []
 
-        const Embed = new MessageEmbed()
-            .setColor('#246FE0')
-            .setTitle(`${e.ModShield} Lista de Moderadores`)
-            .setDescription(`${mods.map(([a, b]) => `**${client.users.cache.get(a)?.tag || 'Não encontrei este usuário'}**\n\`${b}\``).join('\n')}`)
-        return message.channel.send({ embeds: [Embed] })
+        if (mods.length < 1) return message.reply(`${e.Check} | Nenhum mod na lista.`)
+
+        return message.channel.send({
+            embeds: [
+                new MessageEmbed()
+                    .setColor('#246FE0')
+                    .setTitle(`${e.ModShield} Lista de Moderadores`)
+                    .setDescription(`${mods.map(modId => `**${client.users.cache.get(modId)?.tag || 'Não encontrei este usuário'}**\n\`${modId}\``).join('\n')}`)
+            ]
+        })
     }
 }

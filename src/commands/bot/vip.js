@@ -1,6 +1,4 @@
-const { DatabaseObj } = require('../../../Routes/functions/database')
-const { e, config, N} = DatabaseObj
-const { f } = require('../../../database/frases.json')
+const { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
 
 module.exports = {
     name: 'vip',
@@ -10,8 +8,7 @@ module.exports = {
     usage: '<vip>',
     description: 'Informações sobre o vip',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const link1Real = 'https://mpago.la/2YbvxZd'
         const LinkServidor = `${config.ServerLink}`

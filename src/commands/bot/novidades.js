@@ -1,5 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-const { config } = require('../../../database/config.json')
+const { e } = require('../../../JSON/emojis.json')
+const { config } = require('../../../JSON/config.json')
 
 module.exports = {
     name: 'novidades',
@@ -10,10 +10,10 @@ module.exports = {
     usage: '<news>',
     description: 'Pegue o cargo de novidades no meu servidor',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
-            return message.reply(`${e.Deny} | Este é um comando privado do meu servidor. Se você quiser entrar, só clicar no link. Será muito bem-vindo*(a)*\n \nhttps://discord.gg/3g8Sa4dUc9`)
+            return message.reply(`${e.Deny} | Este é um comando privado do meu servidor. Se você quiser entrar, só clicar no link. Será muito bem-vindo*(a)*\n \n${config.ServerLink}`)
 
         let RoleId = '914925531529609247',
             Role = message.guild.roles.cache.get(RoleId)

@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'gun',
@@ -8,13 +8,10 @@ module.exports = {
     usage: '<gun> <@user>',
     description: 'Quem atirar primeiro leva',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (db.get(`Gun${message.author.id}`))
-            return message.reply(`${e.Info} | Calminha aí! Você tem um gun aberto ainda.`)
-
-        const opponent = message.mentions.members.first() || message.member
-        if (opponent.id === message.author.id) return message.reply(`${e.Deny} | Mencione um oponente ou use o comando respondendo a mensagem do seu oponente.`)
+        const opponent = message.mentions.members.first() || message.mentions.repliedUser
+        if (!opponent || opponent.id === message.author.id) return message.reply(`${e.Deny} | Mencione um oponente ou use o comando respondendo a mensagem do seu oponente.`)
         if (opponent.user.bot) return message.reply(`${e.Deny} | Bots não podem brincar.`)
 
         const positions = {
@@ -46,50 +43,44 @@ module.exports = {
                     },
                 ],
             },
-        ];
+        ]
 
         const msg = await message.channel.send({
             content: positions.three,
             components: componentsArray,
-        });
-        db.set(`Gun${message.author.id}`, true)
+        }).catch(() => { })
 
         function countdown() {
-            setTimeout(() => { msg.edit({ content: positions.two, components: componentsArray, }); }, 1000);
-            setTimeout(() => { msg.edit({ content: positions.one, components: componentsArray, }); }, 2000);
-            setTimeout(() => { componentsArray[0].components[0].disabled = false; componentsArray[0].components[1].disabled = false; msg.edit({ content: positions.go, components: componentsArray, }); }, 3000);
+            setTimeout(() => { msg.edit({ content: positions.two, components: componentsArray, }).catch(() => { }); }, 1000);
+            setTimeout(() => { msg.edit({ content: positions.one, components: componentsArray, }).catch(() => { }); }, 2000);
+            setTimeout(() => { componentsArray[0].components[0].disabled = false; componentsArray[0].components[1].disabled = false; msg.edit({ content: positions.go, components: componentsArray, }).catch(() => { }); }, 3000);
         }
         countdown();
 
-        const filter = button => { return button.user.id == message.author.id || button.user.id == opponent.id; };
-
-        const button = await msg.awaitMessageComponent({ filter: filter, componentType: 'BUTTON', max: 1 });
+        const button = await msg.awaitMessageComponent({
+            filter: button => button.user.id == message.author.id || button.user.id == opponent.id,
+            componentType: 'BUTTON',
+            max: 1,
+            time: 10000
+        })
 
         componentsArray[0].components[0].disabled = true;
         componentsArray[0].components[1].disabled = true;
 
-        function DelTimeout() {
-            setTimeout(() => {
-                db.delete(`Gun${message.author.id}`)
-            }, 5000)
-        }
-        DelTimeout()
-        
-        if (button.customId === 'shoot1' && button.user.id == message.author.id) {
-            db.delete(`Gun${message.author.id}`)
-            return msg.edit({ content: positions.ended2, components: [] }).catch(() => { })
+        try {
 
-        } else if (button.customId === 'shoot2' && button.user.id == opponent.id) {
-            db.delete(`Gun${message.author.id}`)
-            return msg.edit({ content: positions.ended1, components: [] }).catch(() => { })
+            if (button.customId === 'shoot1' && button.user.id == message.author.id)
+                return msg.edit({ content: positions.ended2, components: [] }).catch(() => { })
 
-        } else if (button.customId === 'shoot1' && button.user.id == opponent.id) {
-            db.delete(`Gun${message.author.id}`)
-            return msg.edit({ content: `${e.Deny} | ${opponent} clicou errado!`, components: [] }).catch(() => { })
+            if (button.customId === 'shoot2' && button.user.id == opponent.id)
+                return msg.edit({ content: positions.ended1, components: [] }).catch(() => { })
 
-        } else if (button.customId === 'shoot2' && button.user.id == message.author.id) {
-            db.delete(`Gun${message.author.id}`)
-            return msg.edit({ content: `${e.Deny} | ${message.author} clicou errado!`, components: [] }).catch(() => { })
-        }
-    },
-};
+            if (button.customId === 'shoot1' && button.user.id == opponent.id)
+                return msg.edit({ content: `${e.Deny} | ${opponent} clicou errado!`, components: [] }).catch(() => { })
+
+            if (button.customId === 'shoot2' && button.user.id == message.author.id)
+                return msg.edit({ content: `${e.Deny} | ${message.author} clicou errado!`, components: [] }).catch(() => { })
+
+        } catch (err) { }
+    }
+}

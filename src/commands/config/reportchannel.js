@@ -1,6 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
-const { ServerDb } = require('../../../Routes/functions/database')
+const { e } = require('../../../JSON/emojis.json'),
+    Notify = require('../../../modules/functions/plugins/notify')
 
 module.exports = {
     name: 'reportchannel',
@@ -12,48 +11,106 @@ module.exports = {
     usage: '<reportchannel> [#canal]',
     description: 'Escolhe um canal para receber reports dos membros',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
-        let channel = message.mentions.channels.first() || message.channel
-        let canal = ServerDb.get(`Servers.${message.guild.id}.ReportChannel`)
+        let channel = message.mentions.channels.first() || message.channel,
+            guildData = await Database.Guild.findOne({ id: message.guild.id }, 'ReportChannel'),
+            canalDB = guildData?.ReportChannel
 
-        const noargs = new MessageEmbed()
-            .setColor('#246FE0') // red
-            .setTitle(':loudspeaker: Sistema de Report')
-            .setDescription('Com este comando, você ativará o meu sistema de report. Isso é bastante útil.')
-            .addField(`${e.QuestionMark} O que é o sistema de report?`, 'Com o meu sistema de report, os membros poderão reportar coisas ou outros membros de qualquer canal do servidor, não precisa está indo chamar mod/adm no privado para reportar.')
-            .addField(`${e.QuestionMark} Como funciona?`, 'Simples! o membro só precisa escrever `' + prefix + 'report blá blá blá` e o report será encaminhado para o canal definido. As mensagens serão deletadas na hora do envio, tornando o report anônimo e seguro, os únicos que verão o report, serão as pessoas que tem permissão para ver o canal definido.')
-            .addField('Comando de Ativação', '`' + prefix + 'setreportchannel #Canal`')
-            .addField('Comando de Desativação', '`' + prefix + 'setreportchannel off`')
-            .setFooter(`A ${client.user.username} não se responsabiliza pelo conteúdo enviado atráves deste sistema.`)
+        if (['help', 'ajuda', 'info'].includes(args[0]?.toLowerCase())) return message.reply({
+            embeds: [
+                new MessageEmbed()
+                    .setColor('RED')
+                    .setTitle(':loudspeaker: Sistema de Report')
+                    .setDescription('Com este comando, você ativará o meu sistema de report. Isso é bastante útil.')
+                    .addField(`${e.QuestionMark} O que é o sistema de report?`, 'Com o meu sistema de report, os membros poderão reportar coisas ou outros membros de qualquer canal do servidor, não precisa está indo chamar mod/adm no privado para reportar.')
+                    .addField(`${e.QuestionMark} Como funciona?`, 'Simples! o membro só precisa escrever `' + prefix + 'report blá blá blá` e o report será encaminhado para o canal definido. As mensagens serão deletadas na hora do envio, tornando o report anônimo e seguro, os únicos que verão o report, serão as pessoas que tem permissão para ver o canal definido.')
+                    .addField('Comando de Ativação', '`' + prefix + 'setreportchannel #Canal`')
+                    .addField('Comando de Desativação', '`' + prefix + 'setreportchannel off`')
+                    .setFooter(`A ${client.user.username} não se responsabiliza pelo conteúdo enviado atráves deste sistema.`)
+            ]
+        })
 
-        if (['help', 'ajuda'].includes(args[0]?.toLowerCase())) { return message.reply(noargs) }
-        if (args[1]) return message.reply(`${e.Deny} | Nada além do canal coisinha fofa ${e.SaphireFeliz}`)
+        if (['off', 'del', 'desativar', 'desligar', 'deletar'].includes(args[0])) return turnOff()
 
-        if (args[0] === 'off') {
-            if (!canal)
-                return message.reply(`${e.Info} | O Report System já está desativado.`)
+        if (channel.id === canalDB) return message.reply(`${e.Info} | Este canal já foi definido como Report Channel.`)
 
-            return message.channel.send(`${e.Loading} | Ok, espera um pouquinho... | ${canal}/${message.author.id}`).then(msg => {
-                sdb.delete(`Request.${message.author.id}`)
-                ServerDb.delete(`Servers.${message.guild.id}.ReportChannel`)
-                msg.edit(`${e.BrilanceBlob} | Nice, nice! Desativei o sistema de reports.`).catch(() => { })
-            }).catch(err => { return message.channel.send(`${e.Warn} | Ocorreu um erro na execução deste comando.\n\`${err}\``) })
+        let msg = await message.reply(`${e.Loading} | Quer ativar o sistema de reports neste servidor?`),
+            emojis = ['✅', '❌'],
+            validate = false
 
-        }
+        for (let i of emojis) msg.react(i).catch(() => { })
 
-        if (channel.id === canal) {
-            return message.reply(`${e.Info} | Este canal já foi definido como Report Channel.`)
-        } else if (channel !== canal) {
-            return message.reply(`${e.Loading} | Ooopa, entendido! Pera só um pouco. | ${channel.id}/${message.author.id}`).then(msg => {
-                sdb.delete(`Request.${message.author.id}`)
-                ServerDb.set(`Servers.${message.guild.id}.ReportChannel`, channel.id)
-                return msg.edit(`${e.NezukoJump} | Aeeee, sistema de report está ativadoooo!!\n\`${prefix}report [@user(opicional)] o seu reporte em diante\``)
+        const collector = msg.createReactionCollector({
+            filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+            time: 30000,
+            errors: ['time']
+        })
 
-            }).catch(err => {
-                sdb.delete(`Request.${message.author.id}`)
-                return message.channel.send(`${e.Warn} | Ocorreu um erro na execução deste comando.\n\`${err}\``)
+        collector.on('collect', async (reaction) => {
+
+            if (reaction.emoji.name === emojis[0]) {
+
+                await Database.Guild.updateOne(
+                    { id: message.guild.id },
+                    { ReportChannel: channel.id }
+                )
+
+                validate = true
+                Notify(message.guild.id, 'Recurso Ativado', `<@${message.author.id}> *\`${message.author.id}\`* ativou o sistema de Reports no servidor.`)
+                msg.edit(`${e.Check} | Ativadinho! Para reportar algo ou alguém, use o comando \`${prefix}report [@user(opicional)] e o seu report adiante...\``).catch(() => { })
+            }
+
+            return collector.stop()
+
+        })
+
+        collector.on('end', () => {
+
+            if (!validate) return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+            return
+        })
+
+
+
+        async function turnOff() {
+
+            if (!canalDB) return message.reply(`${e.Deny} | Não há nenhum canal de report deste servidor no meu banco de dados.`)
+
+            let msg = await message.reply(`${e.QuestionMark} | Deseja desativar o sistem de reports no servidor?`),
+                emojis = ['✅', '❌'],
+                validate = false
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+
+            const collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                errors: ['time']
+            })
+
+            collector.on('collect', async (reaction) => {
+
+                if (reaction.emoji.name === emojis[0]) {
+
+                    await Database.Guild.updateOne(
+                        { id: message.guild.id },
+                        { $unset: { ReportChannel: 1 } }
+                    )
+
+                    validate = true
+                    msg.edit(`${e.Check} | Canal de report desativado.`).catch(() => { })
+                    Notify(message.guild.id, 'Recurso desabilitado', `<@${message.author.id}> *\`${message.author.id}\`* desativou o Canal de Reportes no servidor.`)
+                }
+
+                return collector.stop()
+
+            })
+
+            collector.on('end', () => {
+
+                if (!validate) return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+                return
             })
         }
     }

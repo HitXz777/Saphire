@@ -1,8 +1,6 @@
-const ms = require("parse-ms")
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
-const Moeda = require('../../../Routes/functions/moeda')
-const { PushTransaction } = require('../../../Routes/functions/transctionspush')
+const ms = require("parse-ms"),
+  { e } = require('../../../JSON/emojis.json'),
+  Moeda = require('../../../modules/functions/public/moeda')
 
 module.exports = {
   name: 'esmola',
@@ -13,57 +11,59 @@ module.exports = {
   usage: '<esmola>',
   description: 'Mendigue dinheiro no chat',
 
-  run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+  run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-    let time = ms(300000 - (Date.now() - sdb.get(`Users.${message.author.id}.Timeouts.Esmola`)))
-    if (sdb.get(`Users.${message.author.id}.Timeouts.Esmola`) !== null && 300000 - (Date.now() - sdb.get(`Users.${message.author.id}.Timeouts.Esmola`)) > 0)
-      return message.reply(`${e.Deny} | Você já pediu esmola! Volte em: \`${time.minutes}m e ${time.seconds}s\``)
+    let autorData = await Database.User.findOne({ id: message.author.id }, 'Timeouts')
 
-    if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
-    let count = 0
+    let timeP = ms(300000 - (Date.now() - autorData.Timeouts.Esmola))
+    if (autorData.Timeouts.Esmola !== null && 300000 - (Date.now() - autorData.Timeouts.Esmola) > 0)
+      return message.reply(`${e.Deny} | Você já pediu esmola! Volte em: \`${timeP.minutes}m e ${timeP.seconds}s\``)
 
-    return message.reply(`${e.SadPepe} | ${message.author.username} está pedindo um pouco de dinheiro`).then(msg => {
-      sdb.set(`Users.${message.author.id}.Timeouts.Esmola`, Date.now())
-      sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-      for (const emoji of ['🪙', '❌']) {
-        msg.react(emoji).catch(() => { })
+    let count = 0,
+      moeda = await Moeda(message),
+      msg = await message.reply(`${e.SadPepe} | ${message.author.username} está pedindo um pouco de dinheiro`),
+      emojis = ['🪙', '❌']
+
+    Database.SetTimeout(message.author.id, 'Timeouts.Esmola')
+
+    for (const emoji of emojis) msg.react(emoji).catch(() => { })
+
+    collector = msg.createReactionCollector({
+      filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id !== client.user.id,
+      time: 30000
+    });
+
+    collector.on('collect', async (reaction, user) => {
+
+      if (reaction.emoji.name === emojis[0]) {
+        if (message.author.id === user.id) return
+
+        let userData = await Database.User.findOne({ id: user.id }, 'Balance')
+
+        let money = userData?.Balance
+        if (!money || money < 10) return message.channel.send(`${e.Deny} | ${user}, você não tem 10 ${moeda} na carteira para ajudar ${message.author}`)
+        Database.subtract(user.id, 10)
+        Database.add(message.author.id, 10)
+        count += 10
+        return message.channel.send(`${e.MoneyWings} | ${user} ajudou ${message.author} com 10 ${moeda}`)
       }
 
-      const filter = (reaction, user) => { return ['🪙', '❌'].includes(reaction.emoji.name) && user.id === user.id; };
+      if (reaction.emoji.name === emojis[1] && user.id === message.author.id)
+        return collector.stop()
 
-      const collector = msg.createReactionCollector({ filter, time: 30000 });
+    });
 
-      collector.on('collect', (reaction, user) => {
+    collector.on('end', () => {
 
-        if (reaction.emoji.name === '🪙') {
+      if (count > 0) {
+        Database.PushTransaction(
+          message.author.id,
+          `${e.gain} Recebeu ${count} Safiras de esmola`
+        )
+      }
 
-          if (user.id === client.user.id || user.id === message.author.id) return
-          let money = sdb.get(`Users.${user.id}.Balance`)
-          if (money < 50) { return message.channel.send(`${e.Deny} | ${user}, você não tem 50 ${Moeda(message)} na carteira para ajudar ${message.author}`) }
-          sdb.subtract(`Users.${user.id}.Balance`, 50)
-          sdb.add(`Users.${message.author.id}.Balance`, 50)
-          count += 50
-          message.channel.send(`${e.MoneyWings} | ${user} ajudou ${message.author} com 50 ${Moeda(message)}`)
-        }
+      return msg.edit(`${e.Deny} | ${message.author.username} recebeu ${count} ${moeda} de esmola.`)
+    });
 
-        if (reaction.emoji.name === '❌' && user.id === message.author.id) {
-          collector.stop()
-        }
-
-      });
-
-      collector.on('end', () => {
-        sdb.delete(`Request.${message.author.id}`)
-
-        if (count > 0) {
-          PushTransaction(
-            message.author.id,
-            `${e.BagMoney} Recebeu ${count} Moedas de esmola`
-          )
-        }
-
-        return msg.edit(`${e.Deny} | ${message.author.username} está pedindo um pouco de dinheiro | Esmola expirada`)
-      });
-    })
   }
 }

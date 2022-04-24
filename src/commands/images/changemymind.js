@@ -1,9 +1,9 @@
 const { MessageAttachment } = require('discord.js')
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const { Canvas } = require('canvacord')
-const Error = require('../../../Routes/functions/errors')
+const Error = require('../../../modules/functions/config/errors')
 
-// #246FE0 - Azul Saphire
+
 module.exports = {
     name: 'changemymind',
     aliases: ['cmm'],
@@ -13,7 +13,7 @@ module.exports = {
     usage: '<changemymind> <texto da foto>',
     description: 'Change my mind meme',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let text = args.join(' ')
         if (!text)

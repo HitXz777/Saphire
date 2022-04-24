@@ -1,10 +1,5 @@
-const { DatabaseObj: { e } } = require('../../../Routes/functions/database'),
-    Moeda = require('../../../Routes/functions/moeda'),
-    Vip = require('../../../Routes/functions/vip'),
-    parsems = require('parse-ms'),
-    Error = require('../../../Routes/functions/errors'),
-    { PushTransaction } = require('../../../Routes/functions/transctionspush'),
-    Data = require('../../../Routes/functions/data')
+const { DatabaseObj: { e } } = require('../../../modules/functions/plugins/database'),
+    Data = require('../../../modules/functions/plugins/data')
 
 module.exports = {
     name: 'resgatar',
@@ -14,42 +9,69 @@ module.exports = {
     usage: '<resgatar>',
     description: 'Resgate seu dinheiro em cache',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (args[0]) return GiftCode()
+        let data = await Database.Client.findOne({ id: client.user.id }, 'VipCodes'),
+            codes = data?.VipCodes
 
-        let cache = sdb.get(`Users.${message.author.id}.Cache.Resgate`) || 0
-        if (cache <= 0) return message.reply(`${e.PandaProfit} | Você não possui dinheiro no cache.`)
+        if (!codes || codes.length === 0) return message.reply(`${e.Deny} | Não há nenhum código vip em aberto no momento.`)
 
-        sdb.add(`Users.${message.author.id}.Balance`, cache)
-        PushTransaction(
-            message.author.id,
-            `${e.BagMoney} Resgatou ${cache} Moedas`
+        let userData = await Database.User.findOne({ id: message.author.id }, 'Vip'),
+            vipData = userData?.Vip,
+            TimeRemaing = vipData?.TimeRemaing || 0,
+            DateNow = vipData?.DateNow || Date.now(),
+            Permanent = vipData?.Permanent,
+            Code = args[0]
+
+        if (Permanent)
+            return message.reply(`${e.Info} | Você não pode resgatar códigos vip pois o seu é permanente.`)
+
+        let codeData = codes.find(dt => dt.code === Code)
+
+        if (!Code || !codeData)
+            return message.reply(`${e.Deny} | Código vip inexistente.`)
+
+        if (codeData.time === 1) {
+
+            await Database.User.updateOne(
+                { id: message.author.id },
+                { 'Vip.Permanent': true }
+            )
+
+            removeVipCode(Code)
+
+            return message.reply(`${e.Check} | Você resgatou um código vip permanente!`)
+        }
+
+        let Time = Data(TimeRemaing += codeData.time)
+
+        await Database.User.updateOne(
+            { id: message.author.id },
+            {
+                Vip: {
+                    DateNow: DateNow,
+                    TimeRemaing: TimeRemaing += codeData.time
+                }
+            },
+            { upsert: true }
         )
 
-        sdb.delete(`Users.${message.author.id}.Cache.Resgate`)
-        return message.channel.send(`${e.PandaProfit} | ${message.author} resgatou ${cache.toFixed(0)} ${Moeda(message)}`)
+        removeVipCode(Code)
+        return message.channel.send(`${e.Check} | ${message.author}, o código foi resgatado com sucesso! Seu vip acaba em \`${Time}\`\n${e.Info} | Para ver o tempo restante, use o comando \`${prefix}cooldown (${prefix}cd)\``)
 
-        function GiftCode() {
+        async function removeVipCode(code) {
 
-            let Code = args[0],
-                TimeRemaing = sdb.get(`Users.${message.author.id}.Timeouts.Vip.TimeRemaing`) || 0,
-                DateNow = sdb.get(`Users.${message.author.id}.Timeouts.Vip.DateNow`) || Date.now(),
-                ClientCodeVip = sdb.get(`Client.VipCodes.${Code}`) || 0,
-                Time = Data(ClientCodeVip += TimeRemaing),
-                Permanent = sdb.get(`Users.${message.author.id}.Timeouts.Vip.Permanent`)
-
-            if (Permanent)
-                return message.reply(`${e.Info} | O seu vip é permanente.`)
-
-            if (!ClientCodeVip)
-                return message.reply(`${e.Deny} | Código inválido.`)
-
-            sdb.set(`Users.${message.author.id}.Timeouts.Vip`, { DateNow: DateNow, TimeRemaing: TimeRemaing += sdb.get(`Client.VipCodes.${Code}`) })
-
-            message.channel.send(`${e.Check} | ${message.author}, o código foi resgatado com sucesso! Seu vip acaba em \`${Time}\``)
-
-            return sdb.delete(`Client.VipCodes.${Code}`)
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                {
+                    $pull: {
+                        VipCodes: {
+                            code: code
+                        }
+                    }
+                }
+            )
+            return
         }
 
     }

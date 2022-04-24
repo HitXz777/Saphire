@@ -1,8 +1,6 @@
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
+const { e } = require('../../../JSON/emojis.json')
 const { Util } = require('discord.js')
-const { parse } = require("twemoji-parser")
-const { ServerDb } = require('../../../Routes/functions/database')
+const Notify = require('../../../modules/functions/plugins/notify')
 
 module.exports = {
     name: 'welcomechannel',
@@ -14,14 +12,24 @@ module.exports = {
     usage: '<welcomechannel> [#channel] | [off]',
     description: 'Selecione um canal para eu avisar todos que chegarem no servidor',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
-        let channel = message.mentions.channels.first() || message.channel
+        let guildData = await Database.Guild.findOne({ id: message.guild.id }, 'WelcomeChannel LeaveChannel'),
+            channel = message.mentions.channels.first() || message.channel,
+            canal = guildData.WelcomeChannel.Canal,
+            WelcomeMsg = guildData.WelcomeChannel.Mensagem || 'entrou no servidor.',
+            WelcomeEmoji = guildData.WelcomeChannel.Emoji || `${e.Join}`,
+            channelWelcome = message.guild.channels.cache.get(canal)
 
-        let canal = ServerDb.get(`Servers.${message.guild.id}.WelcomeChannel.Canal`) || false
-        let WelcomeMsg = ServerDb.get(`Servers.${message.guild.id}.WelcomeChannel.Mensagem`) || 'entrou no servidor.'
-        let WelcomeEmoji = ServerDb.get(`Servers.${message.guild.id}.WelcomeChannel.Emoji`) || `${e.Join}`
+        if (canal && !channelWelcome) {
+
+            await Database.Guild.updateOne(
+                { id: message.guild.id },
+                { $unset: { WelcomeChannel: 1 } }
+            )
+
+            return message.reply(`${e.Deny} | O canal presente no meu banco de dados não corresponde a nenhum canal deste servidor. Por favor, use o comando novamente.`)
+        }
 
         if (['off', 'desligar'].includes(args[0]?.toLowerCase())) return SetWelcomeOff()
         if (['mensagem', 'edit', 'msg'].includes(args[0]?.toLowerCase())) return MsgEdit()
@@ -59,6 +67,10 @@ module.exports = {
                                 value: `\`${prefix}welcomechannel reset\``
                             },
                             {
+                                name: `${e.Reference} Canal Atual`,
+                                value: channelWelcome ? `${channelWelcome} \`${channelWelcome.id}\`` : 'N/A'
+                            },
+                            {
                                 name: `${e.Info} Informações`,
                                 value: `\`${prefix}welcomechannel info\``
                             }
@@ -67,37 +79,58 @@ module.exports = {
             })
         }
 
-        function ResetWelcome() {
-            if (!canal) return message.reply(`${e.Deny} | O sistema de boas-vindas deve estar ativado para usar esta função.`)
-            let MensagemCustom = `${WelcomeEmoji} ${WelcomeMsg}`
-            let MensagemPadrao = `${e.Join} 'entrou no servidor.'`
-            if (MensagemCustom === MensagemPadrao) return message.reply(`${e.Info} | A mensagem de boas-vindas já é a padrão.`)
+        async function ResetWelcome() {
 
-            ServerDb.delete(`Servers.${message.guild.id}.WelcomeChannel.Mensagem`)
-            ServerDb.delete(`Servers.${message.guild.id}.WelcomeChannel.Emoji`)
+            if (!canal) return message.reply(`${e.Deny} | O sistema de boas-vindas deve estar ativado para usar esta função.`)
+
+            if (!guildData?.WelcomeChannel?.Mensagem && !guildData?.WelcomeChannel?.Emoji) return message.reply(`${e.Deny} | A minha mensagem de boas-vindas já é a padrão.`)
+
+            await Database.Guild.updateOne(
+                { id: message.guild.id },
+                {
+                    $unset: {
+                        'WelcomeChannel.Emoji': 1,
+                        'WelcomeChannel.Mensagem': 1
+                    }
+                }
+            )
+
             return message.reply(`${e.Check} | ${message.author} resetou a minha mensagem de boas-vindas com sucesso!`)
         }
 
-        function MsgEdit() {
+        async function MsgEdit() {
             if (!canal) return message.reply(`${e.Deny} | O sistema de boas-vindas deve estar ativado para usar esta função.`)
 
             let mensagem = args.slice(1).join(' ')
             if (!mensagem) return message.channel.send(`${e.Info} | Mensagem de boas-vindas padrão: **${WelcomeMsg}**\n${e.SaphireObs} | Caso queira personalizar, use \`${prefix}welcome mensagem A mensagem de boas vindas\``)
             if (mensagem.length > 1400) return message.reply(`${e.Deny} | A mensagem de boas-vindas não pode ultrapassar **1400 caracteres**.`)
 
-            ServerDb.set(`Servers.${message.guild.id}.WelcomeChannel.Mensagem`, mensagem)
-            return message.channel.send(`${e.Check} | ${message.author} alterou a mensagem de boas-vindas para:\n${WelcomeEmoji} | <@${client.user.id}> ${ServerDb.get(`Servers.${message.guild.id}.WelcomeChannel.Mensagem`)}`)
+            if (mensagem === WelcomeMsg) return message.reply(`${e.Deny} | Está já é a mensagem presente no meu banco de dados.`)
+
+            await Database.Guild.updateOne(
+                { id: message.guild.id },
+                { 'WelcomeChannel.Mensagem': mensagem }
+            )
+
+            return message.channel.send(`${e.Check} | ${message.author} alterou a mensagem de boas-vindas para:\n${WelcomeEmoji} | <@${client.user.id}> ${mensagem}`)
         }
 
-        function Emoji() {
+        async function Emoji() {
             if (!canal) return message.reply(`${e.Deny} | O sistema de boas-vindas deve estar ativado para usar esta função.`)
 
             if (!args[1]) return message.reply(`${e.Info} | Tenta assim: \`${prefix}welcome emoji <EMOJI> (customizado pfo)\``)
             let emoji = Util.parseEmoji(args[1])
             if (args[2]) return message.reply(`${e.Deny} | Apenas o emoji, ok?`)
 
+            if (args[1] === WelcomeEmoji) return message.reply(`${e.Deny} | Este é o mesmo emoji configurado na mensagem de boas-vindas atual.`)
+
             if (emoji.id) {
-                ServerDb.set(`Servers.${message.guild.id}.WelcomeChannel.Emoji`, args[1])
+
+                await Database.Guild.updateOne(
+                    { id: message.guild.id },
+                    { 'WelcomeChannel.Emoji': args[1] }
+                )
+
                 return message.channel.send(`${e.Check} | ${message.author} alterou o emoji da mensagem de boas-vindas para:\n${args[1]} | <@${client.user.id}> ${WelcomeMsg}`)
             } else {
                 message.reply(`${e.Deny} | Este emoji não é um emoji customizado.`)
@@ -107,95 +140,130 @@ module.exports = {
         function SetWelcomeOff() {
             canal ? SetOff() : message.reply(`${e.Deny} | O Welcome System já está desativado.`)
 
-            function SetOff() {
-                message.reply(`${e.QuestionMark} | Você deseja desativar o Sistema de Boas-Vindas?`).then(msg => {
-                    sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                    msg.react('✅').catch(() => { }) // e.Check
-                    msg.react('❌').catch(() => { }) // X
+            async function SetOff() {
 
-                    const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+                let msg = await message.reply(`${e.QuestionMark} | Deseja desativar o sistema de boas-vindas?`),
+                    emojis = ['✅', '❌'],
+                    validate = false
 
-                    msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] })
-                        .then(collected => {
-                            const reaction = collected.first()
+                for (let i of emojis) msg.react(i).catch(() => { })
 
-                            if (reaction.emoji.name === '✅') {
-                                sdb.delete(`Request.${message.author.id}`)
-                                ServerDb.delete(`Servers.${message.guild.id}.WelcomeChannel`)
-                                msg.edit(`${e.Nagatoro} | Prontinho, agora eu não vou dizer mais nada quando alguém entrar no servidor.`).catch(() => { })
-                            } else {
-                                sdb.delete(`Request.${message.author.id}`)
-                                msg.edit(`${e.Deny} | Request abortada`).catch(() => { })
-                            }
-                        }).catch(() => {
-                            sdb.delete(`Request.${message.author.id}`)
-                            msg.edit(`${e.Deny} | Request abortada | Tempo excedido`).catch(() => { })
-                        })
+                const collector = msg.createReactionCollector({
+                    filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                    time: 30000,
+                    errors: ['time']
+                })
+
+                collector.on('collect', async (reaction) => {
+
+                    if (reaction.emoji.name === emojis[0]) {
+
+                        await Database.Guild.updateOne(
+                            { id: message.guild.id },
+                            { $unset: { WelcomeChannel: 1 } }
+                        )
+
+                        validate = true
+                        Notify(message.guild.id, 'Recurso desabilitado', `${message.author} \`${message.author.id}\` desativou o sistema de boas-vindas.`)
+                        msg.edit(`${e.Check} | Prontinho! Agora eu não vou avisar quando alguém entrar no servidor.`).catch(() => { })
+                    }
+
+                    return collector.stop()
+
+                })
+
+                collector.on('end', () => {
+
+                    if (!validate) return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+                    return
                 })
             }
         }
 
-        function SetWelcomeChannel() {
+        async function SetWelcomeChannel() {
+
             if (channel.id === canal)
                 return message.reply(`${e.Info} | Este canal já foi definido como Welcome Channel!`)
 
-            if (channel !== canal) {
+            let msg = await message.reply(`${e.QuestionMark} | Deseja ativar o sistema de boas-vindas no canal ${channel}?`),
+                emojis = ['✅', '❌'],
+                validate = false
 
-                return message.reply(`${e.QuestionMark} | Deseja configurar "${channel}" como canal de boas-vindas?`).then(msg => {
-                    sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                    msg.react('✅').catch(() => { }) // e.Check
-                    msg.react('❌').catch(() => { }) // X
+            for (let i of emojis) msg.react(i).catch(() => { })
 
-                    const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+            const collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                errors: ['time']
+            })
 
-                    msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] })
-                        .then(collected => {
-                            const reaction = collected.first()
+            collector.on('collect', async (reaction) => {
 
-                            if (reaction.emoji.name === '✅') {
-                                sdb.delete(`Request.${message.author.id}`)
-                                ServerDb.set(`Servers.${message.guild.id}.WelcomeChannel.Canal`, channel.id)
+                if (reaction.emoji.name === emojis[0]) {
 
-                                return msg.edit(`Aeee ${e.NezukoJump}! De agora em diante, vou falar no canal ${channel} sobre todo mundo que chegar aqui.\nTenta usar o \`${prefix}welcomechannel info\``).then(() => {
+                    await Database.Guild.updateOne(
+                        { id: message.guild.id },
+                        { 'WelcomeChannel.Canal': channel.id }
+                    )
 
-                                    if (ServerDb.get(`Servers.${message.guild.id}.LeaveChannel`))
-                                        return
+                    validate = true
+                    Notify(message.guild.id, 'Recurso ativado', `${message.author} \`${message.author.id}\` ativou o sistema de boas-vindas no canal ${channel}`)
+                    msg.edit(`${e.Check} | Prontinho! Agora eu vou avisar no canal ${channel} sempre que alguém entrar no servidor. Se quiser alterar o emoji ou a mensagem, só usar o comando \`${prefix}welcomechannel info\``).catch(() => { })
 
-                                    return message.channel.send(`${e.QuestionMark} | ${message.author}, posso ativar o sistema de saídas no "${channel}" também?`).then(msg => {
-                                        sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                                        msg.react('✅').catch(() => { }) // e.Check
-                                        msg.react('❌').catch(() => { }) // X
+                    if (!guildData.LeaveChannel.Canal) warnToActiveLeaveChannel()
+                }
 
-                                        const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+                return collector.stop()
 
-                                        msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] })
-                                            .then(collected => {
-                                                const reaction = collected.first()
+            })
 
-                                                if (reaction.emoji.name === '✅') {
-                                                    sdb.delete(`Request.${message.author.id}`)
-                                                    ServerDb.set(`Servers.${message.guild.id}.LeaveChannel.Canal`, channel.id)
-                                                    msg.edit(`${e.NezukoJump} | Ok, ok! Pode deixar comigo. Vou avisar no canal ${channel} sobre todo mundo que entrar e sair. ${e.Menhera}\nTenta usar o \`${prefix}welcomechannel info\``).catch(() => { })
-                                                } else {
-                                                    sdb.delete(`Request.${message.author.id}`)
-                                                    msg.edit(`${e.Deny} | Indicação abortada | ${client.user.id}`).catch(() => { })
-                                                }
-                                            }).catch(() => {
-                                                sdb.delete(`Request.${message.author.id}`)
-                                                msg.edit(`${e.Deny} | Indicação abortada | Tempo expirado`).catch(() => { })
-                                            })
-                                    })
-                                })
-                            } else {
-                                sdb.delete(`Request.${message.author.id}`)
-                                msg.edit(`${e.Deny} | Request abortada`).catch(() => { })
-                            }
-                        }).catch(() => {
-                            sdb.delete(`Request.${message.author.id}`)
-                            msg.edit(`${e.Deny} | Request abortada | Tempo excedido`).catch(() => { })
-                        })
-                })
-            }
+            collector.on('end', () => {
+
+                if (!validate) return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+                return
+            })
+
         }
+
+        async function warnToActiveLeaveChannel() {
+
+            let msg = await message.channel.send(`${e.QuestionMark} | Hey, ${message.author}! Eu vi que nesse servidor, não está ativado o sistema de saídas. É igual o sistema de boas-vindas, só que o contrário. Eu aviso todos que sairem.\n> Se você quiser que eu ative o sistema de saídas no canal ${channel}, é só confirmar.`),
+                emojis = ['✅', '❌'],
+                validate = false
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+
+            const collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                errors: ['time']
+            })
+
+            collector.on('collect', async (reaction) => {
+
+                if (reaction.emoji.name === emojis[0]) {
+
+                    await Database.Guild.updateOne(
+                        { id: message.guild.id },
+                        { 'LeaveChannel.Canal': channel.id }
+                    )
+
+                    validate = true
+                    Notify(message.guild.id, 'Recurso ativado', `${message.author} \`${message.author.id}\` ativou o sistema de boas-vindas no canal ${channel}`)
+                    msg.edit(`${e.Check} | Prontinho! Agora eu vou avisar sobre todos que entrarem e saírem do servidor.`).catch(() => { })
+                }
+
+                return collector.stop()
+
+            })
+
+            collector.on('end', () => {
+
+                if (!validate) return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+                return
+            })
+
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 const canvacord = require('canvacord/src/Canvacord')
 const Discord = require("discord.js")
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
   name: 'affect',
@@ -11,7 +11,7 @@ module.exports = {
   usage: '<affect> [@user]',
   description: 'Isso não afeta o bebê',
 
-  run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+  run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     let user = message.mentions.users.first() || message.author || message.mentions.repliedUser
     let avatar = user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 })

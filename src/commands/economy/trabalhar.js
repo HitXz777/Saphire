@@ -1,8 +1,6 @@
-const { e } = require('../../../database/emojis.json')
-const ms = require("parse-ms")
-const Moeda = require('../../../Routes/functions/moeda')
-const Vip = require('../../../Routes/functions/vip')
-const { PushTransaction } = require('../../../Routes/functions/transctionspush')
+const { e } = require('../../../JSON/emojis.json'),
+    Moeda = require('../../../modules/functions/public/moeda'),
+    Vip = require('../../../modules/functions/public/vip')
 
 module.exports = {
     name: 'trabalhar',
@@ -12,58 +10,54 @@ module.exports = {
     usage: '<trabalhar>',
     description: 'Trabalhe e ganhe uma quantia em dinheiro',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let vip = Vip(`${message.author.id}`)
+        let vip = await Vip(`${message.author.id}`),
+            moeda = await Moeda(message),
+            data = await Database.User.findOne({ id: message.author.id }, 'Timeouts.Work Perfil.Trabalho'),
+            job = data?.Perfil?.Trabalho
 
-        let time = ms(66400000 - (Date.now() - sdb.get(`Users.${message.author.id}.Timeouts.Work`)))
-        if (sdb.get(`Users.${message.author.id}.Timeouts.Work`) !== null && 66400000 - (Date.now() - sdb.get(`Users.${message.author.id}.Timeouts.Work`)) > 0)
-            return message.reply(`${e.Deny} | Você já trabalhou hoje, descance um pouco! Volte em \`${time.hours}h, ${time.minutes}m, e ${time.seconds}s\``)
+        if (client.Timeout(66400000, data.Timeouts?.Work))
+            return message.reply(`${e.Deny} | Você já trabalhou hoje, descance um pouco! Volte em \`${client.GetTimeout(66400000, data.Timeouts?.Work)}\``)
 
-        let luck = ['win', 'lose', 'lose', 'lose', 'lose']
-        let result = luck[Math.floor(Math.random() * luck.length)]
-        let gorjeta = parseInt([Math.floor(Math.random() * 1000) + 1])
-        let work = parseInt([Math.floor(Math.random() * 500) + 1])
-        let xp = parseInt([Math.floor(Math.random() * 200) + 1])
-        sdb.set(`Users.${message.author.id}.Timeouts.Work`, Date.now())
+        let result = Math.floor(Math.random() * 10) === 1,
+            gorjeta = parseInt([Math.floor(Math.random() * 50)]),
+            work = parseInt([Math.floor(Math.random() * 100)]),
+            xp = parseInt([Math.floor(Math.random() * 200) + 1]),
+            gorjetaAdded = '',
+            total = 0,
+            hasVip = vip ? `Bônus ${e.VipStar} | ` : `${e.Check} | `
+
+        if (work <= 10) work = 40
+
+        Database.SetTimeout(message.author.id, 'Timeouts.Work')
 
         if (vip) {
-            gorjeta = parseInt(gorjeta) + parseInt([Math.floor(Math.random() * gorjeta)])
-            work = parseInt(work) + parseInt([Math.floor(Math.random() * work)])
-            xp = parseInt(xp) + parseInt([Math.floor(Math.random() * xp)])
+            gorjeta += parseInt(gorjeta * 0.50)
+            total += gorjeta
+            work += parseInt(work * 0.40)
+            xp += parseInt(work * 0.60)
         }
 
-        result === "win" ? NewGorjeta() : Commum()
+        total += work
 
-        function Commum() {
-            sdb.add(`Users.${message.author.id}.Balance`, work)
-            sdb.add(`Users.${message.author.id}.Xp`, xp)
+        if (result) {
+            Database.add(message.author.id, gorjeta)
+            gorjetaAdded = ` + uma gorjeta de ${gorjeta} ${moeda}`
+        }
 
-            let comvip = `Bônus ${e.VipStar} | Você trabalhou e ganhou ${work} ${Moeda(message)} e ${xp} ${e.RedStar}XP`
-            let semvip = `${e.Check} | Você trabalhou e ganhou ${work} ${Moeda(message)} e ${xp} ${e.RedStar}XP\n${e.SaphireObs} | Sabia que Vips ganham bônus? \`${prefix}vip\``
+        Database.add(message.author.id, work)
+        Database.addItem(message.author.id, 'Xp', xp)
 
-            PushTransaction(
+        if (total > 0) {
+
+            Database.PushTransaction(
                 message.author.id,
-                `${e.BagMoney} Ganhou ${work} Moedas trabalhando`
+                `${e.gain} Recebeu ${total} Safiras trabalhando`
             )
-
-            vip ? message.reply(comvip) : message.reply(semvip)
         }
 
-        function NewGorjeta() {
-            sdb.add(`Users.${message.author.id}.Balance`, gorjeta)
-            sdb.add(`Users.${message.author.id}.Balance`, work)
-            sdb.add(`Users.${message.author.id}.Xp`, xp)
+        return message.reply(`${hasVip}Você trabalhou ${job ? `como **${job}**` : ''} e ganhou ${work} ${moeda} e ${xp} ${e.RedStar}XP${gorjetaAdded}\n${vip ? '' : `${e.SaphireObs} | Sabia que Vips ganham bônus? \`${prefix}vip\``}`)
 
-            let comvip = `Bônus ${e.VipStar} | Você trabalhou e ganhou ${work} ${Moeda(message)}, ${xp} ${e.RedStar}XP e uma gorjeta de ${gorjeta} ${Moeda(message)}`
-            let semvip = `${e.Check} | Você trabalhou e ganhou ${work} ${Moeda(message)}, ${xp} ${e.RedStar}XP e uma gorjeta de ${gorjeta} ${Moeda(message)}\n${e.SaphireObs} | Sabia que Vips ganham bônus? \`${prefix}vip\``
-
-            PushTransaction(
-                message.author.id,
-                `${e.BagMoney} Ganhou ${work + gorjeta} Moedas trabalhando`
-            )
-
-            vip ? message.reply(comvip) : message.reply(semvip)
-        }
     }
 }

@@ -1,8 +1,6 @@
-const { e } = require('../../../database/emojis.json')
-const Moeda = require('../../../Routes/functions/moeda')
-const { Util } = require('discord.js')
-const { parse } = require("twemoji-parser")
-const { ServerDb } = require('../../../Routes/functions/database')
+const { e } = require('../../../JSON/emojis.json'),
+    Moeda = require('../../../modules/functions/public/moeda'),
+    { Util } = require('discord.js')
 
 module.exports = {
     name: 'setmoeda',
@@ -13,9 +11,10 @@ module.exports = {
     usage: '<setmoeda> [emoji] [NomeDaMoeda]',
     description: 'Configure a moeda do jeito que você quiser',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let Edit = ServerDb.get(`Servers.${message.guild.id}.Moeda`)
+        let guildData = await Database.Guild.findOne({ id: message.guild.id }, 'Moeda')
+        let moedaAtual = guildData.Moeda
 
         if (!args[0]) return message.reply({
             embeds: [
@@ -26,7 +25,7 @@ module.exports = {
                     .addFields(
                         {
                             name: `${e.PandaProfit} Moeda Atual`,
-                            value: Moeda(message)
+                            value: await Moeda(message)
                         },
                         {
                             name: `${e.On} Edite a Moeda`,
@@ -55,28 +54,31 @@ module.exports = {
             return message.reply(`${e.Deny} | Primeiro um emoji customizado, depois o nome da moeda.\n${e.Gear} | Comando: \`${prefix}setmoeda [Emoji] NomeDaMoeda\``)
         }
 
-        if (NomeDaMoeda.id) {
-            Args1Emoji = message.guild.emojis.cache.find(emoji => emoji.id === NomeDaMoeda.id)
-            return message.reply(`${e.Deny} | Primeiro um emoji customizado, depois o nome da moeda.\n${e.Gear} | Comando: \`${prefix}setmoeda [Emoji] NomeDaMoeda\``)
-        } else {
-            Args1Emoji = false
-        }
-
-        if (NomeDaMoeda.length > 15) return message.reply(`${e.Deny} | O nome da moeda não pode ultrapassar **15 caracteres.**`)
+        if (!NomeDaMoeda || NomeDaMoeda.length > 15) return message.reply(`${e.Deny} | O nome da moeda não deve estar entre **15 caracteres.**\n${e.Gear} | Comando: \`${prefix}setmoeda [Emoji] NomeDaMoeda\``)
         if (Emoji && NomeDaMoeda) return SetMoeda()
+        return message.reply(`${e.Info} | Certifique-se de que você está usando o comando corretamente.\n${e.Gear} | Comando: \`${prefix}setmoeda [Emoji] NomeDaMoeda\``)
 
-        function SetMoeda() {
-            ServerDb.set(`Servers.${message.guild.id}.Moeda`, `${Emoji} ${NomeDaMoeda}`)
+        async function SetMoeda() {
+
+            await Database.Guild.updateOne(
+                { id: message.guild.id },
+                { Moeda: `${Emoji} ${NomeDaMoeda}` }
+            )
+
             return message.channel.send(`${e.Check} | ${message.author} trocou minha moeda para "${Emoji} ${NomeDaMoeda}"`)
         }
 
-        function ResetMoeda() {
-            if (!Edit) {
+        async function ResetMoeda() {
+            if (!moedaAtual)
                 return message.reply(`${e.Deny} | A moeda atual já é o padrão.`)
-            } else {
-                ServerDb.delete(`Servers.${message.guild.id}.Moeda`)
-                return message.channel.send(`${e.Check} | ${message.author} resetou minha moeda para "${e.Coin} Moedas".`)
-            }
+
+            await Database.Guild.updateOne(
+                { id: message.guild.id },
+                { $unset: { Moeda: 1 } }
+            )
+
+            return message.channel.send(`${e.Check} | ${message.author} resetou minha moeda para "${e.Coin} Safiras".`)
+
         }
     }
 }

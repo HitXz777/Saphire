@@ -1,7 +1,7 @@
 const { MessageAttachment } = require('discord.js')
 const { Canvas } = require("canvacord")
-const { e } = require('../../../database/emojis.json')
-const Error = require('../../../Routes/functions/errors')
+const { e } = require('../../../JSON/emojis.json')
+const Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
     name: 'triggered',
@@ -12,7 +12,7 @@ module.exports = {
     usage: '<trig> [@user]',
     description: 'Triggeeeeered!',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first() || await message.guild.members.cache.get(args[0]) || message.mentions.repliedUser || message.author
         let avatar = user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 })

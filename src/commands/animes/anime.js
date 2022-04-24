@@ -1,19 +1,20 @@
-const Kitsu = require('kitsu.js')
-const kitsu = new Kitsu()
-const translate = require('@iamtraction/google-translate')
-const { e } = require('../../../database/emojis.json')
-const Error = require('../../../Routes/functions/errors')
+const Kitsu = require('kitsu.js'),
+    kitsu = new Kitsu(),
+    translate = require('@iamtraction/google-translate'),
+    Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
     name: 'anime',
     aliases: ['searchanime', 'animes'],
     category: 'animes',
     ClientPermissions: ['EMBED_LINKS'],
-    emoji: `🔍`,
+    emoji: '🔍',
     usage: '<nome do anime>',
     description: 'Pesquisa de Animes',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+
+        const e = Database.Emojis
 
         const EmbedApresetation = new MessageEmbed()
             .setColor('#246FE0')
@@ -23,8 +24,8 @@ module.exports = {
 
         let search = args.join(" ")
         if (!search) { return message.reply({ embeds: [EmbedApresetation] }) }
-        if (search.length > 100) { return message.reply(`${e.Deny} | Por favor, tente algo com menos de **100 caracteres**, pelo bem do meu sistema ${e.Itachi}`) }
-        if (search.length < 4) { return message.reply(`${e.Deny} | Por favor, tente algo com mais de **4 caracteres**, pelo bem do meu sistema ${e.SadPanda}`) }
+        if (search.length > 100) return message.reply(`${e.Deny} | Por favor, tente algo com menos de **100 caracteres**, pelo bem do meu sistema ${e.Itachi}`)
+        if (search.length < 4) return message.reply(`${e.Deny} | Por favor, tente algo com mais de **4 caracteres**, pelo bem do meu sistema ${e.SadPanda}`)
 
         kitsu.searchAnime(search).then(async result => {
             if (result.length === 0) return message.reply(`${e.Deny} | Nenhum resultado obtido para: **${search}**`).catch(() => { })
@@ -83,7 +84,7 @@ module.exports = {
                         .addField('🗂️ Informações', `Nome Japonês: ${NomeJapones}\nFaixa Etária: ${IdadeRating}\nNSFW: ${NSFW}\NTipo: ${Status}`)
                         .addField('📊 Status', `Nota Média: ${Nota}\nRank: ${AnimeRanking}\nPopularidade: ${AnimePop}\nEpisódios: ${Epsodios}\nLancamento: ${Lancamento}\nTérmino: ${Termino}`)
 
-                    anime.posterImage?.original ? AnimeSearchEmbed.setImage(anime.posterImage.original)  : null
+                    anime.posterImage?.original ? AnimeSearchEmbed.setImage(anime.posterImage.original) : null
 
                     return message.reply({ embeds: [AnimeSearchEmbed] }).catch(err => {
                         Error(message, err)
@@ -96,7 +97,7 @@ module.exports = {
                         .setColor('GREEN')
                         .setTitle(`🔍 Pesquisa Requisitada: ${search}`)
                         .setDescription(`**📑 Sinopse**\n${Sinopse}`)
-                        .addField('🗂️ Informações', `Nome Japonês: ${NomeJapones}\Faixa Etária: ${IdadeRating}\nNSFW: ${NSFW}\nTipo: ${Status}`)
+                        .addField('🗂️ Informações', `Nome Japonês: ${NomeJapones}\nFaixa Etária: ${IdadeRating}\nNSFW: ${NSFW}\nTipo: ${Status}`)
                         .addField('📊 Status', `Nota Média: ${Nota}\nRank: ${AnimeRanking}\nPopularidade: ${AnimePop}\nEpisódios: ${Epsodios}\nLancamento: ${Lancamento}\nTérmino: ${new Date(Termino).toLocaleDateString("pt-br")}`)
 
                     anime.posterImage?.original ? AnimeSearchEmbed.setImage(anime.posterImage.original) : null

@@ -1,7 +1,5 @@
-const { Permissions } = require('discord.js')
-const { DatabaseObj } = require('../../../Routes/functions/database')
-const { e, config } = DatabaseObj
-const Error = require('../../../Routes/functions/errors')
+const { Permissions } = require('discord.js'),
+    { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
 
 module.exports = {
     name: 'comprovante',
@@ -11,15 +9,17 @@ module.exports = {
     usage: '<comprovante>',
     description: 'Comprove doações e adquira seu VIP mais bônus',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
             return message.reply(`${e.SaphireObs} | Este é um comando privado do meu servidor de suporte para comprovação de doações. Você fez alguma doação? Simples! Entre no meu servidor e usa o comando \`${prefix}comprovante\`.\nhttps://discord.gg/dDX47fEzb9`)
 
-        if (sdb.get(`Users.${message.author.id}.Cache.ComprovanteOpen`))
+        let user = await Database.User.findOne({ id: message.author.id }, 'Cache')
+
+        if (user?.Cache?.ComprovanteOpen)
             return message.reply(`${e.Deny} | Você já possui um canal de comprovação aberto!`)
 
-        await message.guild.channels.create(message.author.tag, {
+        let channel = await message.guild.channels.create(message.author.tag, {
             type: 'GUILD_TEXT',
             topic: `${message.author.id}`,
             parent: '893307009246580746',
@@ -34,28 +34,33 @@ module.exports = {
                     allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.ATTACH_FILES, Permissions.FLAGS.EMBED_LINKS],
                 },
             ]
-        }).then(channel => {
-            sdb.set(`Users.${message.author.id}.Cache.ComprovanteOpen`, true)
-            message.react(`${e.Check}`).catch(() => { })
-            channel.send(`${message.author}, mande o **COMPROVANTE** do pagamento/pix/transação contendo **DATA, HORA** e **VALOR**.\nCaso você queria VIP, é só dizer.\n \nPara fechar este canal, manda \`fechar\``)
-            message.reply(`Aqui está o seu canal: ${channel}`).then(Msg => {
-
-                // const filter = m => m.content?.toLowerCase() === ('close')
-                const filter = m => ['cancelar', 'cancel', 'close', 'fechar', 'terminar'].includes(m.content?.toLowerCase())
-                const collector = channel.createMessageCollector({ filter, max: 1, time: 300000 });
-
-                collector.on('collect', m => {
-                    sdb.set(`Users.${message.author.id}.Cache.ComprovanteOpen`, false)
-                    Msg.delete().catch(() => { })
-                    channel.delete().catch(() => { })
-                });
-            }).catch(err => {
-                Error(message, err)
-                return message.channel.send(`${e.Deny} | Ocorreu um erro ao criar o canal.\n\`${err}\``)
-            })
-        }).catch(err => {
-            Error(message, err)
-            return message.channel.send(`${e.Deny} | Ocorreu um erro ao criar o canal.\n\`${err}\``)
         })
+
+        await Database.User.updateOne(
+            { id: message.author.id },
+            { 'Cache.ComprovanteOpen': true },
+            { upsert: true }
+        )
+
+        message.react(`${e.Check}`).catch(() => { })
+        channel.send(`${message.author}, mande o **COMPROVANTE** do pagamento/pix/transação contendo **DATA, HORA** e **VALOR**.\nCaso você queria VIP, é só dizer.\n \nPara fechar este canal, manda \`fechar\``)
+
+        const Msg = await message.reply(`Aqui está o seu canal: ${channel}`),
+            collector = channel.createMessageCollector({
+                filter: m => ['cancelar', 'cancel', 'close', 'fechar', 'terminar'].includes(m.content?.toLowerCase()),
+                time: 1800000
+            });
+
+        collector.on('collect', async m => {
+
+            await Database.User.updateOne(
+                { id: message.author.id },
+                { $unset: { 'Cache.ComprovanteOpen': 1 } }
+            )
+
+            Msg.delete().catch(() => { })
+            return channel.delete().catch(() => { })
+        })
+
     }
 }

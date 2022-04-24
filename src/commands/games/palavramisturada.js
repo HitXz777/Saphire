@@ -1,27 +1,29 @@
-let { e } = require("../../../database/emojis.json"),
-    Moeda = require('../../../Routes/functions/moeda'),
-    IsMod = require('../../../Routes/functions/ismod'),
-    { Frases } = require('../../../Routes/functions/database')
+
+let { e } = require("../../../JSON/emojis.json"),
+    Moeda = require('../../../modules/functions/public/moeda'),
+    IsMod = require('../../../modules/functions/config/ismod')
 
 module.exports = {
     name: "palavramisturada",
-    aliases: ["mix", 'anagrama'],
+    aliases: ['mix', 'anagrama'],
     category: "game",
     emoji: "🔄",
     usage: "<mix> --- palavra",
     description: "Joguinho da palavra misturada",
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let Palavras = Frases.get('f.Mix'),
+        let Palavras = Database.Frases.get('f.Mix'),
             palavra,
-            mixed
+            mixed,
+            mod = await IsMod(message.author.id)
 
         if (Palavras?.length < 1)
             return message.reply(`${e.Deny} | Nenhuma palavra no registro.`)
 
-        if (["info", "help", "ajuda"].includes(args[0]?.toLowerCase())) return MixInfo()
+        if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return MixInfo()
         if (['list', 'lista', 'all', 'todas', 'tudo'].includes(args[0]?.toLowerCase())) return AllWords()
+        if (['stats', 'status', 'stat', 's'].includes(args[0]?.toLowerCase())) return statsUserMix()
         if (['add', 'adicionar', 'new'].includes(args[0]?.toLowerCase())) return AddNewWord()
         if (['del', 'deletar', 'delete', 'apagar', 'excluir'].includes(args[0]?.toLowerCase())) return DeleteWord()
 
@@ -41,6 +43,7 @@ module.exports = {
         async function start() {
 
             let msg = await message.channel.send(`${e.Loading} | Qual é a palavra? **\`${mixed}\`**`),
+                moeda = await Moeda(message),
                 control = false,
                 collector = message.channel.createMessageCollector({
                     filter: m => m.content.toLowerCase() === palavra,
@@ -51,11 +54,12 @@ module.exports = {
 
                         control = true
 
-                        sdb.add(`Users.${m.author.id}.Balance`, 150)
-
+                        Database.add(m.author.id, 15)
                         msg.delete().catch(() => { })
-                        message.channel.send(`${e.Check} | ${m.author} acertou a palavra: **\`${mixed}\`** -> **\`${palavra}\`**\n${e.PandaProfit} | +150 ${Moeda(message)}`).catch(() => { })
-                        return collector.stop()
+                        message.channel.send(`${e.Check} | ${m.author} acertou a palavra: **\`${mixed}\`** -> **\`${palavra}\`**\n${e.PandaProfit} | +15 ${moeda}`).catch(() => { })
+                        collector.stop()
+                        oneMoreMixCount(m.author.id)
+                        return GetAndValidateWord()
 
                     })
 
@@ -88,11 +92,19 @@ module.exports = {
                                 value: 'Acertar a palavra embaralhada'
                             },
                             {
+                                name: '💬 Mix Status',
+                                value: `\`${prefix}mix status <@user>\` Veja quantas palavras você ou alguém acertou`
+                            },
+                            {
+                                name: `${e.CoroaDourada} Mix Global Ranking`,
+                                value: `\`${prefix}rank mix <me/@user/local>\` Veja o ranking global do mix`
+                            },
+                            {
                                 name: '🔍 Mix List',
                                 value: `\`${prefix}mix list\``
                             },
-                            { 
-                                name : `${e.ModShield} Saphire's Team Moderators`,
+                            {
+                                name: `${e.ModShield} Saphire's Team Moderators`,
                                 value: `+ \`${prefix}mix add <palavra1, palavra2, palavra3...>\`\n- \`${prefix}mix del <palavra1, palavra2, palavra3...>\``
                             }
                         )
@@ -102,8 +114,6 @@ module.exports = {
         }
 
         async function AllWords() {
-
-            // TODO: Verificar se a função está correta
 
             if (Palavras?.length < 1)
                 return message.reply(`${e.Deny} | Nenhuma palavra no registro.`)
@@ -189,9 +199,9 @@ module.exports = {
 
         }
 
-        function AddNewWord() {
+        async function AddNewWord() {
 
-            if (!IsMod(message.author.id))
+            if (!mod)
                 return message.reply(`${e.Deny} | Este comando é privado aos Moderadores da Saphire's Team.`)
 
             if (!args[1])
@@ -214,16 +224,18 @@ module.exports = {
                 }
 
                 array.push(arg)
-                Frases.push('f.Mix', arg)
+                Database.Frases.push('f.Mix', arg)
             }
 
             return message.reply(`${array.length > 0 ? `${e.Check} | Palavras adicionadas: ${array.map(a => `\`${a}\``).join(', ')}` : `${e.Info} | Nenhuma palavra foi adicionada`}\n${denied.length > 0 ? `${e.Deny} | Palavras negadas: ${denied.map(a => `\`${a}\``).join(', ')}` : `${e.Check} | Nenhuma palavra foi negada`}`)
 
         }
 
-        function DeleteWord() {
+        async function DeleteWord() {
 
-            if (!IsMod(message.author.id))
+            let mod = await IsMod(message.author.id)
+
+            if (!mod)
                 return message.reply(`${e.Deny} | Este comando é privado aos Moderadores da Saphire's Team.`)
 
             if (!args[1])
@@ -243,13 +255,33 @@ module.exports = {
                 }
 
                 array.push(arg)
-                Frases.pull('f.Mix', arg)
+                Database.Frases.pull('f.Mix', arg)
             }
 
             return message.reply(`${array.length > 0 ? `${e.Check} | Palavras removidas: ${array.map(a => `\`${a}\``).join(', ')}` : `${e.Info} | Nenhuma palavra foi removida`}\n${denied.length > 0 ? `${e.Deny} | Palavras negadas: ${denied.map(a => `\`${a}\``).join(', ')}` : `${e.Check} | Nenhuma palavra foi negada`}`)
 
         }
 
+        async function oneMoreMixCount(userId) {
+            await Database.User.updateOne(
+                { id: userId },
+                { $inc: { MixCount: 1 } },
+                { upsert: true }
+            )
+            return
+        }
+
+        async function statsUserMix() {
+
+            let user = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.find(user => user.username?.toLowerCase() == args[0]?.toLowerCase() || user.tag?.toLowerCase() == args[0]?.toLowerCase() || user.id == args[0]) || message.author
+            let data = await Database.User.findOne({ id: user.id }, 'MixCount')
+
+            if (!data)
+                return message.reply(`${e.Database} | DATABASE | Nenhum dado sobre ${user.username} foi encontrado.`)
+
+            return message.reply(`💬 | **${user.id === message.author.id ? 'Você' : user.username}** já acertou ${data.MixCount || 0} palavras`)
+
+        }
     }
 }
 

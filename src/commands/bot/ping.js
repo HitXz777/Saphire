@@ -1,5 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-const Error = require('../../../Routes/functions/errors')
+const { e } = require('../../../JSON/emojis.json')
+const Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
     name: 'ping',
@@ -8,9 +8,9 @@ module.exports = {
     emoji: '🏓',
     description: 'Ping/Latency do bot',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
         await message.reply(`${e.Loading} Pinging...`).then(msg => {
-            msg.edit(`⏱️ Latency Client: ${client.ws.ping}ms | Latency Server: ${Math.floor(msg.createdAt - message.createdAt)}ms`).catch(() => { })
+            msg.edit(`⏱️ Latency Client: ${Math.floor(msg.createdAt - message.createdAt)}ms | Latency Server: ${client.ws.ping}ms`).catch(() => { })
         }).catch(err => {
             Error(message, err)
             return message.channel.send(`${e.Deny} | Ocorreu um erro no comando ping:\n\`${err}\``)

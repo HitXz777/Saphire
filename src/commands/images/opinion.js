@@ -1,9 +1,9 @@
 const { MessageAttachment } = require('discord.js')
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const { Canvas } = require('canvacord')
-const Error = require('../../../Routes/functions/errors')
+const Error = require('../../../modules/functions/config/errors')
 
-// #246FE0 - Azul Saphire
+
 module.exports = {
     name: 'opinion',
     aliases: ['opinião'],
@@ -13,7 +13,7 @@ module.exports = {
     usage: '<opinion> [@user] [msg]',
     description: 'Opinion meme',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first()
         if (!user) return message.reply(`${e.Info} | Tenta assim: \`${prefix}opinion @user O texto em diante\` *(Limite de 25 caracteres)*`)
