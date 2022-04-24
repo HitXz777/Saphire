@@ -1,5 +1,5 @@
 const translate = require('@iamtraction/google-translate')
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'translate',
@@ -10,7 +10,7 @@ module.exports = {
     usage: '<t> <sigla> <texto para traduzir>',
     description: 'Traduza palavras e textos de qualquer língua',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let googlepng = 'https://imgur.com/9kWn6Qp.png'
 
@@ -18,17 +18,21 @@ module.exports = {
             .setColor('#4295fb')
             .setAuthor('Google Tradutor', googlepng)
 
-        const lan = new MessageEmbed()
-            .setColor('RED') // Red
-            .setTitle(`${e.Info} | Siga o formato correto do tradutor`)
-            .setDescription(`\`${prefix}t en/pt/fr/lt A frase que deseja traduzir\``)
-
         let language = args[0]
-        let text = args.slice(1).join(" ")
+        let text = message.channel.messages.cache.get(message.reference?.messageId)?.content || args.slice(1).join(" ")
 
-        if (!language || language.length !== 2 || !text) { return message.reply({ embeds: [lan] }) }
+        if (!language || language.length !== 2 || !text) return message.reply({
+            embeds: [
+                new MessageEmbed()
+                    .setColor('RED') // Red
+                    .setTitle(`${e.Info} | Siga o formato correto do tradutor`)
+                    .setDescription(`\`${prefix}t en/pt/fr/lt A frase que deseja traduzir\``)
+            ]
+        })
 
-        translate(args.slice(1).join(" "), { to: language }).then(res => {
+        if (text.length < 2) return message.reply(`${e.Deny} | O texto informado é inválido.`)
+
+        translate(text, { to: language }).then(res => {
 
             Embed.addField('Texto', "```txt\n" + `${text}` + "\n```", false).addField('Tradução', "```txt\n" + `${res.text}` + "\n```", false)
             message.reply({ embeds: [Embed] })

@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'gado',
@@ -10,7 +10,7 @@ module.exports = {
     usage: '<gado> [@user]',
     description: 'Quanto % @user é gado(a)?',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let num = Math.floor(Math.random() * 100) + 1,
             user = message.mentions.members.first() || message.member,

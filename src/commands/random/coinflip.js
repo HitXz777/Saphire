@@ -1,5 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-// #246FE0 - Azul Saphire
+const { e } = require('../../../JSON/emojis.json')
+
 module.exports = {
     name: 'coinflip',
     aliases: ['caracoroa', 'caraoucoroa'],
@@ -9,7 +9,7 @@ module.exports = {
     usage: '<coinflip> <cara/coroa>',
     description: 'Cara ou coroa?',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let array = ["cara", "coroa"]
         let rand = array[Math.floor(Math.random() * array.length)]
@@ -17,7 +17,7 @@ module.exports = {
         if (args[1]) return message.channel.send(`${e.Deny} | Apenas \`cara\` ou \`coroa\` meu anjo.`)
         if (!['cara', 'coroa'].includes(args[0]?.toLowerCase())) return message.channel.send(`${e.Deny} | Insira \`cara\` ou \`coroa\` na frente do comando.`)
 
-        args[0].toLowerCase() == `${rand}` ? Win(args[0].toLowerCase()) : Lose(args[0].toLowerCase())
+        args[0]?.toLowerCase() == `${rand}` ? Win(args[0]?.toLowerCase()) : Lose(args[0]?.toLowerCase())
 
         function Win(value) {
             message.channel.send('https://imgur.com/sFBDKCA.gif').then(msg => {

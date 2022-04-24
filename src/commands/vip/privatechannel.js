@@ -1,10 +1,8 @@
-const { DatabaseObj } = require('../../../Routes/functions/database')
-const { e, config } = DatabaseObj
-const { f } = require('../../../database/frases.json')
-const { Permissions } = require('discord.js')
-const Error = require('../../../Routes/functions/errors')
-const Colors = require('../../../Routes/functions/colors')
-const Vip = require('../../../Routes/functions/vip')
+const { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database'),
+    { Permissions } = require('discord.js'),
+    Error = require('../../../modules/functions/config/errors'),
+    Colors = require('../../../modules/functions/plugins/colors'),
+    Vip = require('../../../modules/functions/public/vip')
 
 module.exports = {
     name: 'privatechannel',
@@ -15,19 +13,24 @@ module.exports = {
     usage: '<privatechannel> [info]',
     description: 'Crie um canal privado só pra você no meu servidor principal',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
             return message.reply(`${e.Deny} | Este é um comando privado do meu servidor principal. Você pode entrar se quiser.\n${config.ServerLink}`)
 
-        if (!Vip(`${message.author.id}`)) return message.reply(`${e.Deny} | Este comando é exclusivos para VIP's. Para saber mais, use \`${prefix}vip\``)
-        let CanalAtual = sdb.get(`Users.${message.author.id}.PrivateChannel.Channel`)
-        let CanalServer = await message.guild.channels.cache.get(CanalAtual)
+        let vip = await Vip(message.author.id)
 
-        let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[1])
+        if (!vip) return message.reply(`${e.Deny} | Este comando é exclusivos para VIP's. Para saber mais, use \`${prefix}vip\``)
+
+        let data = await Database.User.findOne({ id: message.author.id }, 'PrivateChannel')
+
+        let CanalAtual = data.PrivateChannel?.Channel,
+            CanalServer = message.guild.channels.cache.get(CanalAtual),
+            DataUsers = data.PrivateChannel?.Users || []
+        user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[1])
 
         if (CanalAtual && !CanalServer)
-            sdb.delete(`Users.${message.author.id}.PrivateChannel.Channel`)
+            Database.delete(message.author.id, 'PrivateChannel')
 
         if (['delete', 'deletar', 'excluir', 'fechar', 'apagar'].includes(args[0]?.toLowerCase()))
             return DeleteChannel()
@@ -55,7 +58,7 @@ module.exports = {
         async function EditChannelName() {
 
             if (!CanalServer)
-                return message.reply(`${e.Deny} | Você não possui um canal privado. Crie um e depois tenta usar este comando novamente.`)
+                return message.reply(`${e.Deny} | Você não possui um canal privado. Crie um e depois tente usar este comando novamente.`)
 
             let NomeDoCanal = args.slice(1).join(' ')
 
@@ -73,7 +76,7 @@ module.exports = {
 
         async function NewChannelVip() {
 
-            if (await message.guild.channels.cache.get(CanalAtual))
+            if (CanalServer)
                 return message.reply(`${e.Deny} | Você já tem um canal aberto no servidor: ${CanalServer}`)
 
             let NomeDoCanal = args.join(' ') || message.author.tag
@@ -96,9 +99,9 @@ module.exports = {
                     },
                 ]
             }).then(channel => {
-                sdb.set(`Users.${message.author.id}.PrivateChannel.Channel`, channel.id)
+                Database.updateUserData(message.author.id, 'PrivateChannel.Channel', channel.id)
                 channel.send(`${message.author}, este é o seu canal privado. Para excluir ele, use o comando \`${prefix}privatechannel delete\``)
-                message.reply(`${e.Check} | O seu canal privado foi criado com sucesso! ${channel}`)
+                return message.reply(`${e.Check} | O seu canal privado foi criado com sucesso! ${channel}`)
             }).catch(err => {
                 Error(message, err)
                 return message.channel.send(`${e.Deny} | Ocorreu um erro ao criar o canal.\n\`${err}\``)
@@ -107,81 +110,84 @@ module.exports = {
 
         async function DeleteChannel() {
 
-            if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
-
             if (!CanalAtual)
                 return message.reply(`${e.Deny} | Você não tem nenhum canal privado aberto.`)
 
-            return message.reply(`${e.QuestionMark} | Você tem certeza em deletar o seu canal privado? Tudo salvo nele será apagado.`).then(msg => {
-                sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-                msg.react('✅').catch(() => { }) // Check
-                msg.react('❌').catch(() => { }) // X
+            const msg = await message.reply(`${e.QuestionMark} | Você tem certeza em deletar o seu canal privado? Tudo salvo nele será apagado.`)
 
-                const filter = (reaction, user) => { return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id }
+            msg.react('✅').catch(() => { }) // Check
+            msg.react('❌').catch(() => { }) // X
 
-                msg.awaitReactions({ filter, max: 1, time: 15000, errors: ['time'] }).then(collected => {
-                    const reaction = collected.first()
+            return msg.awaitReactions({
+                filter: (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+                max: 1,
+                time: 15000,
+                errors: ['time']
+            }).then(collected => {
+                const reaction = collected.first()
 
-                    if (reaction.emoji.name === '✅') {
-                        sdb.delete(`Request.${message.author.id}`)
-                        sdb.set(`Users.${message.author.id}.PrivateChannel`, false)
-                        CanalServer.delete().then(() => {
-                            return message.reply(`${e.Check} | O canal foi deletado com sucesso!`).catch(() => { })
-                        }).catch(err => {
-                            return message.channel.send(`${e.Deny} | Não foi possível deletar o canal.\n\`${err}\``)
-                        })
+                if (reaction.emoji.name === '✅') {
 
-                    } else {
-                        sdb.delete(`Request.${message.author.id}`)
-                        msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
-                    }
+                    Database.delete(message.author.id, 'PrivateChannel.Channel')
+                    CanalServer.delete().then(() => {
+                        return message.reply(`${e.Check} | O canal foi deletado com sucesso!`).catch(() => { })
+                    }).catch(err => {
+                        return message.channel.send(`${e.Deny} | Não foi possível deletar o canal.\n\`${err}\``)
+                    })
 
-                }).catch(() => {
-                    sdb.delete(`Request.${message.author.id}`)
-                    msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`).catch(() => { })
-                })
+                }
 
-            }).catch(err => {
-                Error(message, err)
-                message.channel.send(`${e.SaphireCry} | Ocorreu um erro durante o processo. Por favor, reporte o ocorrido usando \`${prefix}bug\`\n\`${err}\``)
-            })
+                return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+            }).catch(() => msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`).catch(() => { }))
 
         }
 
         async function AddFriend() {
 
-            if (!await message.guild.channels.cache.get(CanalAtual))
+            if (!CanalServer)
                 return message.reply(`${e.Deny} | Você não tem nenhum canal privado.`)
 
-            if (sdb.get(`Users.${message.author.id}.PrivateChannel.Users`) >= 5)
-                return message.reply(`${e.Deny} | O número limite de participantes neste canal é de 5 membros (fora o criador).`)
+            if (DataUsers.length >= 5)
+                return message.reply(`${e.Deny} | O número limite de participantes neste canal é de 5 membros (fora o criador e administradores do servidor).`)
 
             if (!user)
                 return message.reply(`${e.Deny} | Você precisa me dizer quem você quer adicionar no canal.`)
 
-            if (sdb.get(`Users.${message.author.id}.PrivateChannel.${user.id}`))
+            if (DataUsers.includes(user.id))
                 return message.reply(`${e.Deny} | Este usuário já está no seu canal privado.`)
 
-            sdb.set(`Users.${message.author.id}.PrivateChannel.${user.id}`, true)
-            sdb.add(`Users.${message.author.id}.PrivateChannel.Users`, 1)
-            CanalServer.permissionOverwrites.create(user, { SEND_MESSAGES: true, VIEW_CHANNEL: true, ATTACH_FILES: true, EMBED_LINKS: true, MANAGE_MESSAGES: true })
-            CanalServer.send(`${user}, você foi adicionado ao canal privado de ${message.author}.`)
+            await Database.User.updateOne(
+                { id: message.author.id },
+                { $push: { 'PrivateChannel.Users': user.id } }
+            )
+
+            CanalServer.permissionOverwrites.create(user, {
+                SEND_MESSAGES: true,
+                VIEW_CHANNEL: true,
+                ATTACH_FILES: true,
+                EMBED_LINKS: true,
+                MANAGE_MESSAGES: true
+            })
+            CanalServer.send(`${user}, você foi adicionado ao canal privado de ${message.author}.`).catch(() => { })
             return message.reply(`${e.Check} | ${user} foi adicionado ao seu canal privado. Para remover, use \`${prefix}privatechannel remove @user\``)
         }
 
         async function RemoveFriend() {
 
-            if (!await message.guild.channels.cache.get(CanalAtual))
+            if (!CanalServer)
                 return message.reply(`${e.Deny} | Você não tem nenhum canal privado.`)
 
             if (!user)
                 return message.reply(`${e.Deny} | Você precisa me dizer quem você quer remover do canal.`)
 
-            if (!sdb.get(`Users.${message.author.id}.PrivateChannel.${user.id}`))
+            if (!DataUsers.includes(user.id))
                 return message.reply(`${e.Deny} | Este usuário não está no seu canal privado.`)
 
-            sdb.delete(`Users.${message.author.id}.PrivateChannel.${user.id}`)
-            sdb.subtract(`Users.${message.author.id}.PrivateChannel.Users`, 1)
+            await Database.User.updateOne(
+                { id: message.author.id },
+                { $pull: { 'PrivateChannel.Users': user.id } }
+            )
+
             CanalServer.permissionOverwrites.delete(user)
             return message.reply(`${e.Check} | ${user} foi removido do seu canal privado.`)
 
@@ -189,7 +195,7 @@ module.exports = {
 
         async function RemoveAll() {
 
-            if (!await message.guild.channels.cache.get(CanalAtual))
+            if (!CanalServer)
                 return message.reply(`${e.Deny} | Você não tem nenhum canal privado.`)
 
             let users = CanalServer.members
@@ -207,11 +213,14 @@ module.exports = {
         }
 
         async function PrivateChannelInfo() {
+
+            let color = await Colors(message.author.id)
+
             return message.reply(
                 {
                     embeds: [
                         new MessageEmbed()
-                            .setColor(Colors(message.member))
+                            .setColor(color)
                             .setTitle(`${e.VipStar} Canal Privado`)
                             .setDescription('Este comando te permite criar um canal só pra você')
                             .addFields(

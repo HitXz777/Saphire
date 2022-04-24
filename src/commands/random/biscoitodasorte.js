@@ -1,4 +1,4 @@
-const { f } = require('../../../database/frases.json')
+const { f } = require('../../../JSON/frases.json')
 
 module.exports = {
     name: 'biscoitodasorte',
@@ -8,7 +8,7 @@ module.exports = {
     usage: '<biscoitodasorte>',
     description: 'Quer tentar a sorte hoje?',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let BiscMessage = f.BiscoitoDaSorte[Math.floor(Math.random() * f.BiscoitoDaSorte.length)]
         message.channel.send(`🥠 | ${BiscMessage}`)

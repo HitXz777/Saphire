@@ -1,5 +1,5 @@
 const { create } = require("sourcebin")
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: "bin",
@@ -11,7 +11,7 @@ module.exports = {
     description: "Faça uma cópia online de algum texto",
     usage: '[Texto que deseja copiar]',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const content = args.join(" ")
         if (!content) return message.reply({ content: `${e.NezukoDance} | Diga algo para que eu possa criar uma cópia.`, })

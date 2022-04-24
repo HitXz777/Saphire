@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const fromNow = require('fromnow');
 const translate = require('@iamtraction/google-translate')
 
@@ -6,13 +6,11 @@ module.exports = {
     name: 'tempodevida',
     aliases: ['quantovivi', 'idade', 'dias', 'tempovivido', 'date'],
     category: 'util',
-    
-    
     emoji: '⏲️',
     usage: '<dias> [anos]',
     description: 'Quanto tempo eu vivi?',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.QuestionMark} | Você precisa dizer sua data de aniversário.`)
         if (args[3]) return message.reply(`${e.SaphireWhat} | Nada além da sua data de aniversário.`)

@@ -1,6 +1,6 @@
 const convert = require("parse-ms"),
-    { e } = require('../../../database/emojis.json'),
-    Error = require('../../../Routes/functions/errors')
+    { e } = require('../../../JSON/emojis.json'),
+    Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
     name: 'spotify',
@@ -11,7 +11,7 @@ module.exports = {
     usage: '<spotify> [@user]',
     description: 'Veja o que os outros estão escutando',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.mentions.repliedUser || message.member,
             avatar = user.user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
@@ -19,10 +19,10 @@ module.exports = {
             status,
             AlreadySendedArray = []
 
-        if (user.presence.activities.length === 1) status = user.presence.activities[0]
-        if (user.presence.activities.length > 1) status = user.presence.activities[1]
+        if (user.presence?.activities?.length === 1) status = user.presence?.activities[0]
+        if (user.presence?.activities?.length > 1) status = user.presence?.activities[1]
 
-        if (user.presence.activities.length === 0 || status.name !== "Spotify" && status.type !== "LISTENING")
+        if (!status || user.presence?.activities?.length === 0 || status.name !== "Spotify" && status.type !== "LISTENING")
             return message.reply(`${e.Deny} | Essa pessoa não está ouvindo nada no Spotify ou não vinculou o Spotify com o Discord`)
 
         if (status !== null && status.type === "LISTENING" && status.name === "Spotify" && status.assets !== null) {
@@ -62,12 +62,11 @@ module.exports = {
             msg.react('📨').catch(() => { }) // Troca
 
             let Collector = msg.createReactionCollector({
-                filter: (reaction, u) => reaction.emoji.name === '📨' && u.id === user.id,
+                filter: (reaction, u) => reaction.emoji.name === '📨' && u.id !== client.user.id,
                 idle: 30000
             })
 
             Collector.on('collect', (reaction, user) => {
-                if (user.id === client.user.id) return
 
                 if (AlreadySendedArray.includes(user.id)) return
 
@@ -83,7 +82,6 @@ module.exports = {
             })
 
             Collector.on('end', () => {
-                AlreadySendedArray = []
                 embed.setColor('RED').setFooter('Sessao expirada por: Tempo de interação execido')
                 return msg.edit({ embeds: [embed] }).catch(() => { })
             })

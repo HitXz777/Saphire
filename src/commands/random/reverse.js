@@ -1,4 +1,5 @@
-const { e } = require('../../../database/emojis.json')
+
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'reverse',
@@ -8,7 +9,7 @@ module.exports = {
     usage: '<reverse> <text>',
     description: 'Inverta os textos',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let text = args.join(" ")
 
@@ -20,10 +21,6 @@ module.exports = {
 
         let reverse = text.split("").reverse().join("")
 
-        try {
-            return message.reply(reverse)
-        } catch (err) {
-            return message.channel.send(`${e.Warn} | Aconteceu algum erro...\n\`${err}\``)
-        }
+        return message.reply(`${reverse}\n~ Por: *${message.author.tag}*`)
     }
 }

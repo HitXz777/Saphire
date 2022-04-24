@@ -1,10 +1,9 @@
 const
-    { e } = require('../../../database/emojis.json'),
-    { config } = require('../../../database/config.json'),
-    Vip = require('../../../Routes/functions/vip'),
-    Error = require('../../../Routes/functions/errors')
+    { e } = require('../../../JSON/emojis.json'),
+    { config } = require('../../../JSON/config.json'),
+    Vip = require('../../../modules/functions/public/vip'),
+    Error = require('../../../modules/functions/config/errors')
 
-// #246FE0 - Azul Saphire
 module.exports = {
     name: 'cargovip',
     aliases: ['viprole'],
@@ -14,18 +13,18 @@ module.exports = {
     usage: '<cargovip>',
     description: 'Receba o cargo vip no servidor central',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
             return message.reply(`${e.Deny} | Este é um comando do meu servidor. Você pode entrar clicando no link:\n${config.ServerLink}`)
 
-        const RoleID = '903099828945428502',
-            Role = await message.guild.roles.cache.find(role => role.id === RoleID)
+        const Role = await message.guild.roles.cache.find(role => role.id === '903099828945428502'),
+            vip = await Vip(message.author.id)
 
-        if (!Vip(message.author.id))
+        if (!vip)
             return message.reply(`${e.Deny} | Você não é vip.`)
 
-        if (message.member.roles.cache.has(RoleID))
+        if (message.member.roles.cache.has('903099828945428502'))
             return message.reply(`${e.Info} | Você já possui o cargo vip.`)
 
         if (!Role)

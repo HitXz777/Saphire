@@ -1,5 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-const { f } = require("../../../database/frases.json")
+const { e } = require('../../../JSON/emojis.json')
+const { f } = require("../../../JSON/frases.json")
 
 module.exports = {
     name: '8ball',
@@ -11,7 +11,7 @@ module.exports = {
     usage: '<random> <pergunta>',
     description: 'Pergunta que eu respondo',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let respostas = f['8Ball'][Math.floor(Math.random() * f['8Ball'].length)]
         let pergunta = args.join(" ")

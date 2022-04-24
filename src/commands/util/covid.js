@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 const axios = require("axios")
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
     usage: '<covid [SiglaDoPais] (Br/Usa/Pt/Ar)>',
     description: 'Contagem da Covid-19 Mundial',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const baseUrl = "https://corona.lmao.ninja/v2"
         let url, response, corona

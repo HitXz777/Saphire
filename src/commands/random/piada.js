@@ -1,4 +1,4 @@
-const { f } = require('../../../database/frases.json')
+const { f } = require('../../../JSON/frases.json')
 
 module.exports = {
     name: 'piada',
@@ -8,7 +8,7 @@ module.exports = {
     usage: '<piada>',
     description: 'Vai uma piadinha aí?',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = f.Piadas[Math.floor(Math.random() * f.Piadas.length)]
         return message.reply(rand)

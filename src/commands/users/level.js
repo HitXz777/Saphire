@@ -1,9 +1,8 @@
 const
-    { BgLevel, DatabaseObj } = require('../../../Routes/functions/database'),
-    { e, config } = DatabaseObj,
+    { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database'),
     simplydjs = require('simply-djs'),
-    Error = require('../../../Routes/functions/errors'),
-    color = require('../../../Routes/functions/colors'),
+    Error = require('../../../modules/functions/config/errors'),
+    Colors = require('../../../modules/functions/plugins/colors'),
     ms = require("parse-ms")
 
 module.exports = {
@@ -15,29 +14,36 @@ module.exports = {
     usage: '<level> [info]',
     description: 'Confira seu nível ou o de alguém',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return LevelInfo()
+        if (['acess', 'bgacess'].includes(args[0]?.toLowerCase())) return bgAcess()
 
-        let u = message.mentions.users.first() || await client.users.cache.get(args[0]) || message.mentions.repliedUser || message.author,
-            user = await client.users.cache.get(u.id),
-            level = sdb.get(`Users.${user.id}.Level`) || 0,
-            exp = sdb.get(`Users.${user.id}.Xp`) || 0,
-            xpNeeded = level * 550,
+        let user = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.find(data => data.username?.toLowerCase() === args.join(' ')?.toLowerCase() || data.tag?.toLowerCase() === args[0]?.toLowerCase() || data.discriminator === args[0] || data.id === args[0]) || message.author,
+            userData = await Database.User.findOne({ id: user.id }, 'Walls Timeouts Level Xp'),
+            BgLevel = Database.BgLevel
+
+        if (!userData) return message.reply(`${e.Database} | DATABASE | O usuário **${user?.tag || 'Indefinido'}** *\`${user?.id || '0'}\`* não foi encontrado.`)
+
+        if (user.bot) return message.reply(`${e.Deny} | Bots não possuem experiência.`)
+
+        let level = userData.Level || 0,
+            exp = userData.Xp || 0,
+            xpNeeded = level * 275,
+            usersAllData = await Database.User.find({}, 'id Xp Level'),
             rank = (() => {
 
-                let users = Object.keys(sdb.get('Users') || {}),
-                    UsersArray = []
+                let UsersArray = []
 
-                return users.length > 0
+                return usersAllData.length > 0
                     ? (() => {
 
-                        for (const id of users) {
-                            let Exp = sdb.get(`Users.${id}.Xp`) || 0,
-                                Level = sdb.get(`Users.${id}.Level`) || 0
+                        for (const data of usersAllData) {
+                            let Exp = data.Xp || 0,
+                                Level = data.Level || 0
 
                             if (Exp > 0)
-                                UsersArray.push({ id: id, level: Level })
+                                UsersArray.push({ id: data.id, level: Level })
                         }
 
                         if (!UsersArray.length) return 0
@@ -51,84 +57,79 @@ module.exports = {
 
             })(),
             LevelWallpapers = BgLevel.get('LevelWallpapers'),
-            TimeDB = sdb.get(`Users.${message.author.id}.Timeouts.LevelImage`) || 0
+            TimeDB = userData.Timeouts?.LevelImage || 0,
+            Timing = ms(5000 - (Date.now() - TimeDB))
 
-        if (user.bot) return message.reply(`${e.Deny} | Bots não possuem experiência.`)
-
-        let Timing = ms(5000 - (Date.now() - TimeDB))
-        if (TimeDB !== null && 5000 - (Date.now() - TimeDB) > 0)
+        if (client.Timeout(5000, TimeDB))
             return message.reply(`⏱️ | Calminha coisa linda! \`${Timing.seconds}s\``)
 
-        if (['set', 'wall', 'wallpaper', 'fundo', 'bg', 'background', 'capa'].includes(args[0]?.toLowerCase())) {
+        if (['set', 'wall', 'wallpaper', 'fundo', 'bg', 'background', 'capa'].includes(args[0]?.toLowerCase())) return setNewWallpaper()
+        if (['reset', 'excluir', 'off', 'tirar', 'delete', 'del', 'bg0'].includes(args[0]?.toLowerCase())) resetWallpaper()
+        if (!args[0] || user) return SendLevel()
 
-            let Cooldown = sdb.get(`Users.${message.author.id}.Timeouts.LevelTrade`) || 0,
+        return message.reply(`${e.Deny} | Não sabe usar o level? Use \`${prefix}level info\``)
+
+        async function resetWallpaper() {
+            if (!userData.Walls?.Set)
+                return message.reply(`${e.Info} | Seu background já é o padrão.`)
+
+            Database.delete(message.author.id, 'Walls.Set')
+            return message.reply(`${e.Check} | Background removido com sucesso!`)
+        }
+
+        async function setNewWallpaper() {
+
+            let Cooldown = userData.Timeouts?.LevelTrade || 0,
                 Time = ms(180000 - (Date.now() - Cooldown)),
+                wallSetted = userData.Walls?.Set,
+                Client = await Database.Client.findOne({ id: client.user.id }, 'BackgroundAcess') || [],
                 minutos = Time.minutes > 0 ? `${Time.minutes} minutos e` : '',
                 option = args[1]?.toLowerCase()
 
-            if (Cooldown !== null && 180000 - (Date.now() - Cooldown) > 0)
+            if (client.Timeout(180000, Cooldown))
                 return message.reply(`⏱️ | Espere mais **${minutos} ${Time.seconds} segundos** para trocar de wallpaper`)
 
             if (!option)
                 return message.reply(`${e.Info} | Selecione o background dizendo o **código** dele. Você pode ver seus backgrounds usando \`${prefix}slot bg\``)
 
-            try {
-                if (!Object.keys(LevelWallpapers).includes(option))
-                    return message.reply(`${e.Deny} | Esse background não existe.`)
-            } catch (err) { Error(message, err) }
+            if (!Object.keys(LevelWallpapers || {}).includes(option))
+                return message.reply(`${e.Deny} | Esse background não existe.`)
 
             if (option === 'bg0') {
-                if (!sdb.get(`Users.${message.author.id}.Slot.Walls.Set`))
+                if (!wallSetted)
                     return message.reply(`${e.Info} | Este fundo já é o seu atual.`)
 
-                sdb.delete(`Users.${message.author.id}.Slot.Walls.Set`)
+                Database.delete(message.author.id, 'Walls.Set')
                 return SendLevel()
             }
 
-            if (sdb.get(`Users.${message.author.id}.Slot.Walls.Set`) === BgLevel.get(`LevelWallpapers.${option}`))
+            if (wallSetted === BgLevel.get(`LevelWallpapers.${option}`))
                 return message.reply(`${e.Info} | Este fundo já é o seu atual.`)
 
-            if (!sdb.get(`Client.BackgroundAcess.${message.author.id}`))
-                if (!sdb.get(`Users.${message.author.id}.Slot.Walls.Bg.${option}`))
-                    return message.reply(`${e.Deny} | Você não tem esse background. Que tal comprar ele usando \`${prefix}buy bg ${option}\`?`)
+            if (!Client.BackgroundAcess?.includes(message.author.id) && !userData.Walls?.Bg?.includes(option))
+                return message.reply(`${e.Deny} | Você não tem esse background. Que tal comprar ele usando \`${prefix}buy bg ${option}\`?`)
 
-            sdb.set(`Users.${message.author.id}.Slot.Walls.Set`, BgLevel.get(`LevelWallpapers.${option}.Image`))
-            sdb.set(`Users.${user.id}.Timeouts.LevelTrade`, Date.now())
+            Database.updateUserData(message.author.id, 'Walls.Set', BgLevel.get(`LevelWallpapers.${option}.Image`))
+            Database.updateUserData(message.author.id, 'Timeouts.LevelTrade', Date.now())
             return SendLevel()
 
         }
-
-        if (['bgset', 'setbg'].includes(args[0]?.toLowerCase()) && sdb.get(`Client.BackgroundAcess.${message.author.id}`)) {
-            if (!args[1])
-                return message.reply(`${e.Deny} | Sem \`args[1]\``)
-            sdb.set(`Users.${message.author.id}.Slot.Walls.Set`, args[1])
-            return SendLevel()
-        }
-
-        if (['reset', 'excluir', 'off', 'tirar', 'delete', 'del', 'bg0'].includes(args[0]?.toLowerCase())) {
-            if (!sdb.get(`Users.${user.id}.Slot.Walls.Set`))
-                return message.reply(`${e.Info} | Seu background já é o padrão.`)
-
-            sdb.delete(`Users.${message.author.id}.Slot.Walls.Set`)
-            return message.reply(`${e.Check} | Background removido com sucesso!`)
-        }
-
-        if (!args[0] || user) return SendLevel()
-
-        return message.reply(`${e.Deny} | Não sabe usar o level? Use \`${prefix}level info\``)
 
         async function SendLevel() {
+            const msg = await message.reply(`${e.Loading} | Carregando...`)
+
+            let reData = await Database.User.findOne({ id: user.id }, 'Walls.Set')
+
             try {
-                const msg = await message.reply(`${e.Loading} | Carregando...`)
-                sdb.set(`Users.${message.author.id}.Timeouts.LevelImage`, Date.now())
+                Database.updateUserData(message.author.id, 'Timeouts.LevelImage', Date.now())
 
                 await simplydjs.rankCard(client, message, {
                     member: user,
-                    level: level,
-                    currentXP: exp,
-                    neededXP: xpNeeded,
-                    rank: rank,
-                    background: sdb.get(`Users.${user.id}.Slot.Walls.Set`) || LevelWallpapers.bg0.Image || null
+                    level: level || 0,
+                    currentXP: exp || 0,
+                    neededXP: xpNeeded || 0,
+                    rank: rank || 0,
+                    background: reData.Walls?.Set || LevelWallpapers?.bg0?.Image || null
                 }).then(() => msg.delete(() => { })).catch(() => { })
 
                 return
@@ -140,7 +141,7 @@ module.exports = {
             return message.reply({
                 embeds: [
                     new MessageEmbed()
-                        .setColor(color(message.member))
+                        .setColor(client.blue)
                         .setTitle(`${e.RedStar} Sistema de Level Personalizado`)
                         .setDescription('Você pode mudar o fundo do seu level.')
                         .addFields(
@@ -164,5 +165,30 @@ module.exports = {
                 ]
             })
         }
+
+        async function bgAcess() {
+
+            let clientData = await Database.Client.findOne({ id: client.user.id }, 'Moderadores BackgroundAcess'),
+                adms = clientData.Moderadores || []
+
+            if (!adms.includes(message.author.id)) return message.reply(`${e.Admin} | Comando exclusivo aos Administradores do Sistema de Level.`)
+
+            let bgacess = clientData.BackgroundAcess
+
+            if (!bgacess || bgacess.length === 0) return message.reply(`${e.Info} | Não há ninguém na lista de acesso livro aos wallpapers`)
+
+            let format = bgacess.map(data => `${client.users.cache.get(data)?.tag} - \`${data}\``).join('\n')
+
+            return message.reply({
+                embeds: [
+                    new MessageEmbed()
+                        .setColor(client.blue)
+                        .setTitle(`${e.ModShield} Background Free Acess`)
+                        .setDescription(`${format}`)
+                ]
+            })
+
+        }
+
     }
 }

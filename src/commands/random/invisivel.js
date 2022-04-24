@@ -8,5 +8,5 @@ module.exports = {
     category: 'random',
     description: 'Caracteres invisíveis',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => { return message.reply('⠀⠀⠀⠀⠀⠀⠀⠀') }
+    run: async (client, message, args, prefix, MessageEmbed, Database) => { return message.reply('⠀⠀⠀⠀⠀⠀⠀⠀') }
 }

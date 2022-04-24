@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'patnezuko',
@@ -9,7 +9,5 @@ module.exports = {
     usage: '<patnezuko>',
     description: 'Carinho na Nezuko-chan',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
-        return message.reply(e.PatNezuko)
-    }
+    run: async (client, message, args, prefix, MessageEmbed, Database) => message.reply(e.PatNezuko)
 }

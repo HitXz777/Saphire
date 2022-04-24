@@ -1,5 +1,5 @@
-const { e } = require('../../../database/emojis.json')
-const { f } = require('../../../database/frases.json')
+const { e } = require('../../../JSON/emojis.json')
+const { f } = require('../../../JSON/frases.json')
 
 module.exports = {
     name: 'cancelar',
@@ -11,7 +11,7 @@ module.exports = {
     usage: '<cancel> <@user>',
     description: 'Cancele os outros',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let cancel = f.Cancelamentos[Math.floor(Math.random() * f.Cancelamentos.length)]
         let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0])

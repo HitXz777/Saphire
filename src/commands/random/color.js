@@ -1,6 +1,5 @@
-const { c } = require('../../../database/hex.json')
-const { e } = require('../../../database/emojis.json')
-const { N } = require('../../../database/nomes.json')
+const { c } = require('../../../JSON/hex.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'color',
@@ -12,11 +11,11 @@ module.exports = {
     usage: '<color> <ColorName>/<#hex>',
     description: `Cores em #HEX. Use \`cor\` para mais informações.`,
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const embed = new MessageEmbed().setFooter(`${prefix}cor #hex`)
-
-        const NoArgsEmbed = new MessageEmbed().setColor('#246FE0').setTitle(`${e.Info} Tabelinha de Cores #HEX`).addField('🎨 Cores Disponiveis', 'Preto\n Azul\n Ciano\n Verde\n Vermelho\n Rosa\n Roxo\n Laranja\n Amarelo\n Branco').addField('Comando', `\`${prefix}cor <cor>\` Códigos #hex\n\`${prefix}cor <#hex>\` A cor da #hex`).setFooter(`Ideia do comando: ${N.Makol}`)
+        const N = Database.Names
+        const NoArgsEmbed = new MessageEmbed().setColor('#246FE0').setTitle(`${e.Info} Tabelinha de Cores #HEX`).addField('🎨 Cores Disponiveis', 'Preto\n Azul\n Ciano\n Verde\n Vermelho\n Rosa\n Roxo\n Laranja\n Amarelo\n Branco').addField('Comando', `\`${prefix}cor <cor>\` Códigos #hex\n\`${prefix}cor <#hex>\` A cor da #hex`).setFooter(`Ideia do comando: ${client.users.cache.get(N.Makol)?.tag || 'Indefnido'}`)
 
         let HexColors = ''
 

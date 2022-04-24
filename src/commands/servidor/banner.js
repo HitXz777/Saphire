@@ -1,4 +1,4 @@
-const { e } = require('../../../database/emojis.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'banner',
@@ -8,9 +8,9 @@ module.exports = {
     usage: '<banner>',
     description: 'Veja o banner do servidor (se tiver)',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let banner = message.guild.bannerURL({ format: 'jpeg', size: 1024 })
+        let banner = message.guild.bannerURL({ format: 'gif', size: 1024, dynamic: true })
 
         const BannerEmbed = new MessageEmbed()
             .setColor('#246FE0')

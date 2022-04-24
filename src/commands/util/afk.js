@@ -1,9 +1,7 @@
 const
-    { e } = require('../../../database/emojis.json'),
-    { f } = require('../../../database/frases.json'),
-    { ServerDb } = require('../../../Routes/functions/database'),
-    Error = require('../../../Routes/functions/errors'),
-    Data = require('../../../Routes/functions/data')
+    { e } = require('../../../JSON/emojis.json'),
+    Data = require('../../../modules/functions/plugins/data'),
+    { MessageButton, MessageActionRow } = require('discord.js')
 
 module.exports = {
     name: 'afk',
@@ -14,68 +12,127 @@ module.exports = {
     usage: '<afk> <motivo>',
     description: 'Com este comando, eu aviso pra todos que chamarem você que você está offline',
 
-    run: async (client, message, args, prefix, db, MessageEmbed, request, sdb) => {
+    run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (request) return message.reply(`${e.Deny} | ${f.Request}${sdb.get(`Request.${message.author.id}`)}`)
+        let Motivo = args.join(" ") || 'Sem recado definido.'
 
-        let Motivo = args.join(" ") || 'Sem recado definido.',
-            Emojis = ['✅', '🌎', '❓', '❌'],
-            BlockWords = ['undefined', 'false', 'null', 'nan']
+        if (Motivo.length > 1000) return message.reply(`${e.Deny} | O seu motivo não pode passar de 1000 caracteres.`)
 
-        if (Motivo.length > 700) return message.reply(`${e.Deny} | O seu motivo não pode passar de 500 caracteres.`)
+        for (const word of ['@everyone', '@here'])
+            if (Motivo.includes(word))
+                return message.channel.send(`${e.Deny} | ${message.author}, o seu recado contém palavras que são proibidas neste comando.`)
 
-        for (const word of BlockWords)
-            if (Motivo.toLowerCase() === word)
-                return message.channel.send(`${e.Deny} | ${message.author}, somente a palavra **${word}** é proibida neste comando. Escreva algo mais.`)
-
-        const AfkInfoEmbed = new MessageEmbed()
+        let AfkInfoEmbed = new MessageEmbed()
             .setColor('#246FE0')
             .setTitle(`${e.Planet} Afk Global System`)
             .setDescription('Utilize este comando para avisar que você está offline.')
-            .addField(`${e.Info} | Emojis de Ativação`, `✅ | Ative o AFK somente no servidor\n🌎 | Ative o AFK em todos os servidores\n❓ | Esta paginazinha de Ajuda\n❌ | Cancele o comando`)
-            .addField(`${e.Warn} | Atenção!`, `1. \`Modo Global\` Será desativado quando você mandar mensagem em qualquer servidor que eu esteja.\n2. \`Ativação sem mensagem\` Eu direi que você está offline, porém, sem recado algum.`)
+            .addFields(
+                {
+                    name: '🏠 Servidor',
+                    value: 'Avisarei apenas neste servidor que você está offline.'
+                },
+                {
+                    name: '🌎 Global',
+                    value: 'Avisarei em todos os servidores que você está offline.'
+                },
+                {
+                    name: '❌ Cancelar',
+                    value: 'Cancela o comando.'
+                },
+                {
+                    name: `${e.Warn} | Atenção!`,
+                    value: '> 1. O \`Modo Global\` é desativado quando você mandar uma mensagem em qualquer servidor comigo.\n> 2. O \`Modo Servidor\` será desativado apenas se você mandar mensagem no servidor em que o sistema foi ativado.\n> 3. O \`Modo Global\` sobre põe o modo local.'
+                }
+            ),
+            validate = false,
+            buttons = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId('inGuild')
+                        .setLabel('Servidor')
+                        .setEmoji('🏠')
+                        .setStyle('SUCCESS')
+                )
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId('global')
+                        .setLabel('Global')
+                        .setEmoji('🌎')
+                        .setStyle('SUCCESS')
+                )
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId('help')
+                        .setLabel('Painel de ajuda')
+                        .setEmoji('❓')
+                        .setStyle('PRIMARY')
+                )
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId('cancel')
+                        .setLabel('Cancelar')
+                        .setEmoji('❌')
+                        .setStyle('DANGER')
+                ),
+            msg = await message.reply({
+                content: `${e.Loading} | AFK Global System - Escolha um opção...`,
+                components: [buttons]
+            }),
+            collector = msg.createMessageComponentCollector({
+                filter: (interaction) => interaction.user.id === message.author.id,
+                time: 15000,
+                erros: ['time']
+            })
 
-        const msg = await message.reply(`${e.Planet} | AFK Global System`)
-        sdb.set(`Request.${message.author.id}`, `${msg.url}`)
-
-        for (const emoji of Emojis) msg.react(emoji).catch(() => { })
-
-        const collector = msg.createReactionCollector({
-            filter: (reaction, user) => Emojis.includes(reaction.emoji.name) && user.id === message.author.id,
-            max: 1,
-            time: 15000
-        })
-
-        collector.on('collect', (reaction, user) => {
-
-            switch (reaction.emoji.name) {
-                case '❌':
+                .on('collect', async (interaction) => {
+                    validate = true
                     collector.stop()
-                    break;
-                case '✅':
-                    ServerDb.set(`Servers.${message.guild.id}.AfkSystem.${message.author.id}`, `\`${Data()}\`\n🗒️ | ${Motivo}`)
-                    sdb.delete(`Request.${message.author.id}`)
-                    message.reply(`${e.Check} | Pode deixar! Vou avisar a todos nesse servidor que te chamarem que você está offline. ${e.SaphireFeliz}`)
-                    break;
-                case '🌎':
-                    sdb.set(`Users.${message.author.id}.AfkSystem`, `\`${Data()}\`\n🗒️ | ${Motivo}`)
-                    sdb.delete(`Request.${message.author.id}`)
-                    message.reply(`${e.Planet} | Deixa comigo! Vou avisar em todos os servidores que você está offline. ${e.Menhera}`)
-                    break;
-                case '❓':
-                    sdb.delete(`Request.${message.author.id}`)
-                    message.reply({ embeds: [AfkInfoEmbed] })
-                    break;
-                default:
-                    collector.stop()
-                    break;
-            }
 
-        })
+                    if (interaction.customId === 'cancel')
+                        return msg.edit({ content: `${e.Deny} | Comando cancelado.` }).catch(() => { })
 
-        collector.on('end', () => {
-            sdb.delete(`Request.${message.author.id}`)
-            msg.delete().catch(() => { })
-        })
+                    if (interaction.customId === 'inGuild') {
+
+                        await Database.Guild.updateOne(
+                            { id: message.guild.id },
+                            {
+                                $push: {
+                                    AfkSystem: {
+                                        MemberId: message.author.id,
+                                        Message: `\`${Data()}\`\n🗒️ | ${Motivo}`
+                                    }
+                                }
+                            },
+                            { upsert: true }
+                        )
+
+                        return msg.edit({ content: `${e.Check} | Pode deixar! Vou avisar a todos nesse servidor que você está offline. ${e.SaphireFeliz}` }).catch(() => { })
+                    }
+
+                    if (interaction.customId === 'global') {
+
+                        await Database.User.updateOne(
+                            { id: message.author.id },
+                            { AfkSystem: `\`${Data()}\`\n🗒️ | ${Motivo}` },
+                            { upsert: true }
+                        )
+
+                        return msg.edit({ content: `${e.Planet} | Deixa comigo! Vou avisar em todos os servidores que você está offline. ${e.Menhera}` }).catch(() => { })
+                    }
+
+                    if (interaction.customId === 'help')
+                        return msg.edit({ content: 'Aqui estão as informações', embeds: [AfkInfoEmbed] }).catch(() => { })
+
+                    return message.reply(`${e.Deny} | Comando de registro inválido.`)
+
+                })
+
+                .on('end', () => {
+
+                    if (!validate) msg.edit({ content: `${e.Deny} | Comando cancelado` }).catch(() => { })
+                    return msg.edit({ components: [] }).catch(() => { })
+                })
+
+        return
     }
 }
