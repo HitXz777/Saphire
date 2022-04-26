@@ -1,4 +1,3 @@
-
 const { Util } = require('discord.js')
 const { e } = require('../../../JSON/emojis.json')
 
