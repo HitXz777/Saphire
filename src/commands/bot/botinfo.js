@@ -35,7 +35,7 @@ module.exports = {
           Comandos          :  ${client.commands.size}
           Atalhos           :  ${client.aliases.size}
           Comandos Usados   :  ${clientData?.ComandosUsados || 0}
-          Comandos In Data  :  ${InDataCommands}
+          Comandos In Data  :  ${InDataCommands + 1}
         `,
       embed = new MessageEmbed()
         .setColor('#2f3136')
