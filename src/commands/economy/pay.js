@@ -40,7 +40,11 @@ module.exports = {
         let payCache = quantia
         Database.subtract(message.author.id, quantia)
 
-        let msg = await message.reply(`${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*`),
+        let informationMessage = quantia >= 1000
+            ? `${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*\n> *${e.Taxa} Pagamentos acima de 1000 ${moeda} sofrem uma taxa do 5%.*`
+            : `${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*`  
+
+        let msg = await message.reply(informationMessage),
             emojis = ['✅', '❌'],
             control = [],
             validate = false
