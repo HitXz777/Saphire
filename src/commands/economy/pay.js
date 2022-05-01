@@ -42,7 +42,7 @@ module.exports = {
 
         let informationMessage = quantia >= 1000
             ? `${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*\n> *${e.Taxa} Pagamentos acima de 1000 ${moeda} sofrem uma taxa do 5%.*`
-            : `${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*`  
+            : `${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*`
 
         let msg = await message.reply(informationMessage),
             emojis = ['✅', '❌'],
