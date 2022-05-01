@@ -37,42 +37,42 @@ module.exports = {
             translate(`${anime.synopsis.replace(/<[^>]*>/g, '').split('\n')[0]}`, { to: pt }).then(res => {
 
                 let Nome = `${anime.titles.english ? anime.titles.english : search}`
-                if (Nome === 'null') { Nome = 'Sem resposta' }
+                if (!Nome) Nome = 'Sem resposta'
 
                 let Status = `${anime.showType}`
-                if (Status === 'movie') { Status = 'Filme' }
+                if (Status === 'movie') Status = 'Filme'
 
                 let Sinopse = `${res.text}`
-                if (Sinopse.length > 1000) { Sinopse = 'A sinopse ultrapassou o limite de **1000 caracteres**' }
-                if (Sinopse === 'null') { Sinopse = 'Sem resposta' }
+                if (Sinopse.length > 1000) Sinopse = 'A sinopse ultrapassou o limite de **1000 caracteres**'
+                if (Sinopse === 'null') Sinopse = 'Sem resposta'
 
                 let NomeJapones = `${anime.titles.romaji}`
-                if (NomeJapones === 'null') { NomeJapones = 'Sem resposta' }
+                if (NomeJapones === 'null') NomeJapones = 'Sem resposta'
 
                 let IdadeRating = `${anime.ageRating}`
-                if (IdadeRating === 'G') { IdadeRating = 'Livre' }
-                if (IdadeRating === 'PG') { IdadeRating = '+10' }
-                if (IdadeRating === 'PG-13') { IdadeRating = '+15' }
-                if (IdadeRating === 'R') { IdadeRating = '+18' }
-                if (IdadeRating === 'null') { IdadeRating = 'Sem resposta' }
+                if (IdadeRating === 'G') IdadeRating = 'Livre'
+                if (IdadeRating === 'PG') IdadeRating = '+10'
+                if (IdadeRating === 'PG-13') IdadeRating = '+15'
+                if (IdadeRating === 'R') IdadeRating = '+18'
+                if (IdadeRating === 'null') IdadeRating = 'Sem resposta'
 
                 let NSFW = `${anime.nsfw ? 'Sim' : 'Não'}`
-                if (NSFW === 'null') { NSFW = 'Sem resposta' }
+                if (NSFW === 'null') NSFW = 'Sem resposta'
 
                 let Nota = `${anime.averageRating}`
-                if (Nota === 'null') { Nota = 'Sem resposta' }
+                if (Nota === 'null') Nota = 'Sem resposta'
 
                 let AnimeRanking = `${anime.ratingRank}`
-                if (AnimeRanking === 'null') { AnimeRanking = 'Sem resposta' }
+                if (AnimeRanking === 'null') AnimeRanking = 'Sem resposta'
 
                 let AnimePop = `${anime.popularityRank}`
-                if (AnimePop === 'null') { AnimePop = 'Sem resposta' }
+                if (AnimePop === 'null') AnimePop = 'Sem resposta'
 
                 let Epsodios = `${anime.episodeCount ? anime.episodeCount : 'N/A'}`
-                if (Epsodios === 'null') { Epsodios = 'Sem resposta' }
+                if (Epsodios === 'null') Epsodios = 'Sem resposta'
 
                 let Lancamento = `${anime.startDate}`
-                if (Lancamento) { Lancamento = `${new Date(Lancamento).toLocaleDateString("pt-br")}` }
+                if (Lancamento) Lancamento = `${new Date(Lancamento).toLocaleDateString("pt-br")}`
 
                 let Termino = `${anime.endDate ? anime.endDate : "Ainda no ar"}`
                 if (Termino === "Ainda no ar") {
