@@ -2,28 +2,52 @@ module.exports = {
     name: 'forca',
     aliases: ['hangman'],
     category: 'games',
+    ClientPermissions: ['MANAGE_MESSAGES'],
     emoji: '😵',
     usage: '<forca> <info>',
     description: 'Joguinho clássico da forca',
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let words = Database.Frases.get('f.Mix'),
-            control = { wordArray: getWord(), verified: false, endedCollector: true, resend: 0 },
-            word = control.wordArray.join('')
+        let e = Database.Emojis
 
+        if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return forcaInfo()
+
+        let control = { verified: false, endedCollector: true, blocked: false, resend: 0, authorWord: 0 },
+            word = getWord()
+
+        if (control.blocked) return
         control.trass = formatWord(word)
 
         let wordFormated = control.trass.join(''),
-            status = 0, msg, embed, lettersUsed = [],
-            e = Database.Emojis
+            status = 0, msg, embed, lettersUsed = []
 
         return init()
 
         function getWord() {
-            let word = words[Math.floor(Math.random() * words.length)].toLowerCase()
+
+            let words = Database.Frases.get('f.Mix'),
+                word = words[Math.floor(Math.random() * words.length)].toLowerCase()
+
+            if (args[0]) {
+                word = args[0]
+
+                if (word.length < 3 || word.length > 15) {
+                    control.blocked = true
+                    return message.reply(`${e.Deny} | Apenas palavras entre **3~15 caracteres** são aceitas.`)
+                }
+
+                if (!/^[a-z]+$/i.test(word)) {
+                    control.blocked = true
+                    return message.reply(`${e.Deny} | Apenas palavras com caracteres de A-Z são permitidos.\n> *Acentos e caracteres não alfabéticos não são permitidos.*`)
+                }
+
+                control.authorWord = message.author.id
+                message.delete()
+            }
+
             if (!/^[a-z]+$/i.test(word)) return getWord()
-            return word.split('')
+            return word.split('').join('')
         }
 
         function formatWord(word) {
@@ -34,11 +58,13 @@ module.exports = {
 
         async function init() {
 
+            if (control.blocked) return
+
             let clientData = await Database.Client.findOne({ id: client.user.id }, 'ForcaChannels'),
                 channelsBlocked = clientData.ForcaChannels || []
 
             if (channelsBlocked.includes(message.channel.id))
-                return message.reply(`${e.Deny} | Já tem uma forca rolando nesse chat.`)
+                return message.channel.send(`${e.Deny} | Já tem uma forca rolando nesse chat.`)
             registerChannel()
 
             embed = new MessageEmbed()
@@ -46,7 +72,7 @@ module.exports = {
                 .setTitle(`${e.duvida} Forca Game - ${status}/7`)
                 .setDescription(`\`\`\`txt\n${wordFormated}\n\`\`\``)
 
-            msg = await message.reply({ content: `${e.Info} | Essa palavra possui **${word.length} letras.**`, embeds: [embed] })
+            msg = await message.channel.send({ content: `${e.Info} | Essa palavra possui **${word.length} letras.**${control.authorWord === message.author.id ? `\n✏️ | Essa palavra foi enviada por ${message.author}. *(Claro, ele/a não participa dessa rodada)*` : ''}`, embeds: [embed] })
 
             let collector = message.channel.createMessageCollector({
                 filter: m => true,
@@ -54,6 +80,8 @@ module.exports = {
             })
 
                 .on('collect', async Message => {
+
+                    if (control.authorWord === Message.author.id) return
 
                     let validate = /^[a-z]+$/i,
                         content = Message.content?.toLowerCase()
@@ -173,6 +201,30 @@ module.exports = {
 
             wordFormated = control.trass.join('')
             return wordFormated
+        }
+
+        function forcaInfo() {
+            return message.reply({
+                embeds: [
+                    new MessageEmbed()
+                        .setColor(client.blue)
+                        .setTitle(`${e.duvida} Forca Game Info`)
+                        .addFields(
+                            {
+                                name: `${e.QuestionMark} Como mandar uma palavra?`,
+                                value: `Você pode começar um jogo com qualquer palavra utilizando \`${prefix}forca SuaPalavra\`\n> *Lembrando: Palavras com acentos e caracteres não alfabéticos não são aceitos aqui. Apenas letras de A~Z*`
+                            },
+                            {
+                                name: `${e.Check} Comece um jogo`,
+                                value: `Use apenas \`${prefix}forca\``
+                            },
+                            {
+                                name: `${e.Info} Informações`,
+                                value: `Fale apenas uma letra por vez para sua letra ser validada. As regras são as mesma do jogo da forca que todos conhecem.\nApenas 1 jogo por canal é válido.`
+                            }
+                        )
+                ]
+            })
         }
 
     }
