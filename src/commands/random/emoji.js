@@ -28,4 +28,3 @@ module.exports = {
         return message.reply(`${e.Deny} | Emoji inválido.`)
     }
 }
-
