@@ -10,5 +10,5 @@ module.exports = (client) => {
       } else { continue }
     }
   })
-  console.log('Events Handler | OK!')
+  console.log('Event Handler | OK!')
 }

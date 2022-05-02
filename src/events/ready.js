@@ -1,15 +1,13 @@
 const
     { DatabaseObj: { e, config } } = require('../../modules/functions/plugins/database'),
-    TopGlobalRanking = require('../../modules/functions/update/TopGlobalRanking'),
     client = require('../../index'),
     Data = require('../../modules/functions/plugins/data'),
-    ReminderSystem = require('../../modules/functions/update/remindersystem'),
-    GiveawaySystem = require('../../modules/functions/update/giveawaysystem'),
     Database = require('../../modules/classes/Database'),
-    boostReward = require('../../modules/functions/server/boostReward'),
-    RaffleSystem = require('../../modules/functions/update/rifasystem')
+    init = require('../../modules/functions/plugins/initSystems')
 
 client.on("ready", async () => {
+
+    console.log('Event Ready | OK!')
 
     await Database.MongoConnect()
 
@@ -43,17 +41,11 @@ client.on("ready", async () => {
     client.user.setActivity(`${ActivityRandom}`, { type: 'WATCHING' })
     client.user.setStatus('idle')
 
-    console.log('Event Ready | OK!')
     const msg = await client.channels.cache.get(config.LogChannelId)?.send(`⏱️ Initial Ping: \`${client.ws.ping}ms\`\n${e.Check} Login: \`${Data()}\``)
 
-    setTimeout(() => msg.delete().catch(() => { }), 3000)
-    setInterval(() => TopGlobalRanking(), 3600000)
+    init()
+    console.log('Inicialização concluída com sucesso!')
 
-    setInterval(() => {
-        ReminderSystem()
-        GiveawaySystem()
-        RaffleSystem()
-    }, 3000)
-
-    setInterval(() => boostReward(), 60000)
+    setTimeout(() => msg?.delete().catch(() => { }), 3000)
+    return
 })

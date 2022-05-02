@@ -14,5 +14,4 @@ client.on('channelCreate', async (channel) => {
         return channel.send(`First! ${e.Nagatoro}`).catch(() => { })
 
     return
-
 })
