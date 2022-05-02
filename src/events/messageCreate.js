@@ -90,7 +90,7 @@ client.on('messageCreate', async message => {
     if (cmdBlocked)
         return message.reply(`${e.BongoScript} | Este comando foi bloqueado por algum Bug/Erro ou pelos meus administradores.\n> Quer fazer algúm reporte? Use o comando \`${prefix}bug\`\n> Motivo do bloqueio: ${cmdBlocked?.error || 'Motivo não informado.'}`)
 
-    let commandBlock = guild?.CommandBlocks?.filter(data => data.cmd === command?.name)
+    let commandBlock = guild?.CommandBlocks?.filter(data => data.cmd === command?.name) || []
     if (commandBlock.length > 1) {
 
         if (commandBlock.some(data => data.all))

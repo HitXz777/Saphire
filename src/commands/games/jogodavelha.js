@@ -388,6 +388,7 @@ module.exports = {
         function subtractMoney() {
             Database.subtract(message.author.id, amount)
             Database.subtract(user.id, amount)
+            return
         }
 
         async function addMoney(isDraw, winnerId) {
@@ -397,9 +398,10 @@ module.exports = {
                 Database.add(user.id, amount)
             } else {
                 Database.add(winnerId, amount * 2)
-                Database.PushTransaction(winnerId, `${e.gain} Ganhou ${amount} Safiras em um *Jogo da Velha Bet* contra ${client.users.cache.get(user.id)?.tag}`)
+                Database.PushTransaction(winnerId, `${e.gain} Ganhou ${amount} Safiras em um *Jogo da Velha Bet* contra ${client.users.cache.get(winnerId === message.author.id ? message.author.id : user.id)?.tag}`)
                 Database.PushTransaction(winnerId === message.author.id ? user.id : message.author.id, `${e.loss} Perdeu ${amount} Safiras em um *Jogo da Velha Bet* contra ${client.users.cache.get(user.id)?.tag}`)
             }
+            return
         }
 
     }
