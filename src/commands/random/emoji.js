@@ -14,14 +14,17 @@ module.exports = {
 
         if (!args[0]) return message.reply(`${e.Info} | Usa com algum emoji`)
 
-        const parsedEmoji = Util.parseEmoji(args[0])
+        const parsedEmoji = Util.parseEmoji(args[0]),
+            emoji = {
+                id: parsedEmoji.id || null,
+                animated: parsedEmoji.animated ? ".gif" : ".png"
+            }
 
-        if (parsedEmoji.id) {
+        if (emoji.id) {
 
-            if (isNaN(parsedEmoji.id))
-                return message.reply(`${e.Deny} | Não foi possível analizar o ID original do emoji soliciado.`)
+            console.log(parsedEmoji.id)
 
-            const url = `https://cdn.discordapp.com/emojis/${parsedEmoji.id + parsedEmoji.animated ? ".gif" : ".png"}`
+            const url = `https://cdn.discordapp.com/emojis/${emoji.id}${emoji.animated}`
             return message.channel.send(`${url}`)
         }
 
