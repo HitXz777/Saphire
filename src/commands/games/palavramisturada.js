@@ -1,7 +1,7 @@
 
 let { e } = require("../../../JSON/emojis.json"),
     Moeda = require('../../../modules/functions/public/moeda'),
-    IsMod = require('../../../modules/functions/config/ismod')
+    IsMod = require('../../../modules/functions/plugins/ismod')
 
 module.exports = {
     name: "palavramisturada",

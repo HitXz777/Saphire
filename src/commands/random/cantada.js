@@ -1,7 +1,7 @@
 const
   { DatabaseObj: { e } } = require('../../../modules/functions/plugins/database'),
   PassCode = require('../../../modules/functions/plugins/PassCode'),
-  IsMod = require('../../../modules/functions/config/ismod'),
+  IsMod = require('../../../modules/functions/plugins/ismod'),
   ark = require('ark.db')
 
 module.exports = {

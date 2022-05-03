@@ -1,5 +1,5 @@
 const { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
-const isMod = require('../../../modules/functions/config/ismod')
+const isMod = require('../../../modules/functions/plugins/ismod')
 
 module.exports = {
     name: 'blacklist',

@@ -1,5 +1,5 @@
 const { e } = require('../../../JSON/emojis.json'),
-    IsMod = require('../../../modules/functions/config/ismod')
+    IsMod = require('../../../modules/functions/plugins/ismod')
 
 module.exports = {
     name: 'mod',
