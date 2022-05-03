@@ -192,6 +192,8 @@ module.exports = {
                             components: []
                         }).catch(() => { })
 
+                    if (interaction.user.id === message.author.id && customId === 'accept') return
+
                     return collector.stop()
                 })
 
@@ -243,7 +245,7 @@ module.exports = {
 
         function setTicTacToePlace(customId, buttonIndex, userId, emoji, playingNow) {
 
-            let button = buttons[buttonIndex]?.components.find(data => data.custom_id === customId)  
+            let button = buttons[buttonIndex]?.components.find(data => data.custom_id === customId)
             button.disabled = true
             button.emoji = emoji
             button.style = userId === message.author.id ? 'SUCCESS' : 'PRIMARY'
