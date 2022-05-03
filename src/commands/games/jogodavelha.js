@@ -187,10 +187,7 @@ module.exports = {
                         return startGame(isBet, amount, collector)
 
                     if (customId === 'deny')
-                        msg.edit({
-                            content: `${e.Deny} | Pedido cancelado.`,
-                            components: []
-                        }).catch(() => { })
+                        return collector.stop()
 
                     if (interaction.user.id === message.author.id && customId === 'accept') return
 
