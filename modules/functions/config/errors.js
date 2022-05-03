@@ -17,13 +17,16 @@ async function Error(message, err) {
      * !err - No error
      * 10008 - Unknown Message
      * 500 - Internal Server Error
-     * 50013 - I just forget what is this...
+     * 50013 - DiscordAPIError: Missing Permissions
      */
 
     if (err?.code === 50035) // 50035 - Invalid Form Body - Unknown message
         return message?.channel?.send(`${e.Warn} | A mensagem de origem foi deletada ou o Discord não forneceu todos os dados.`)
 
-    if (!message || !err || [10008, 500, 50013].includes(err.code) || !message.guild || !message.channel)
+    if (err?.code === 50013)
+        return message?.channel?.send(`${e.Warn} | Eu não tenho permissão suficiente para prosseguir com este comando.`)
+
+    if (!message || !err || [10008, 500].includes(err.code) || !message.guild || !message.channel)
         return
 
     /**
@@ -69,7 +72,7 @@ async function Error(message, err) {
 
     async function Block() {
 
-        let commandsAtDatabase = await Database.Client.findOne({ id: client.user.id }, 'ComandosBloqueados'),   
+        let commandsAtDatabase = await Database.Client.findOne({ id: client.user.id }, 'ComandosBloqueados'),
             data = commandsAtDatabase?.ComandosBloqueados || []
 
         let command = client.commands.get(cmd) || client.commands.get(client.aliases.get(cmd))
