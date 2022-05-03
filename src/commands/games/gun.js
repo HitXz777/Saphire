@@ -21,7 +21,7 @@ module.exports = {
             go: '**GO!** | ATACAR!!!',
             ended1: `🏆 | ${opponent} ganhou!`,
             ended2: `🏆 | ${message.author} ganhou!`,
-        };
+        }
 
         const componentsArray = [
             {
