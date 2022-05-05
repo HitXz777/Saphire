@@ -125,7 +125,6 @@
         "gain": "<:gain:940427140447502407>",
         "loss": "<:loss:940427139478618174>",
         "PlanetServer": "🌐",
-        "ticketRifa": "<:ticketRifa:941684832780570645>",
         "Coin": "<:safira:936285753162481664>",
         "antlink": "<:blockinvite:942475862543040592>",
         "boxes": "<:boxes:935500704985010196>",
@@ -134,6 +133,7 @@
         "SaphireRich": "<:saphire_rica:937100858489983049>",
         "yay": "<:gtcYay:911450655942647861>",
         "bug": "<:bug:947349132002074624>",
-        "duvida": "<:saphire_duvida:937479654061801523>"
+        "duvida": "<:saphire_duvida:937479654061801523>",
+        "ticketRifa": "🎟️"
     }
 }

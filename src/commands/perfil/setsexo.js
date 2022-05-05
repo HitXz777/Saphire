@@ -1,5 +1,5 @@
-const { e } = require('../../../JSON/emojis.json')
-const Colors = require('../../../modules/functions/plugins/colors')
+const { e } = require('../../../JSON/emojis.json'),
+    { MessageSelectMenu, MessageActionRow } = require('discord.js')
 
 module.exports = {
     name: 'setsexo',
@@ -12,110 +12,90 @@ module.exports = {
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Sexo')
-        let sexo = data.Perfil?.Sexo,
-            color = await Colors(message.author.id)
+        let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Sexo'),
+            sexo = data.Perfil?.Sexo,
+            emojis = ['♂️', '♀️', '🏳️‍🌈', '*️⃣', '🚁', '❌'],
+            valuesToProfile = {
+                man: '♂️ Homem',
+                woman: '♀️ Mulher',
+                LGBT: '🏳️‍🌈 LGBTQIA+',
+                indefinido: '*️⃣ Indefinido',
+                helicopter: '🚁 Helicóptero de Guerra',
+            },
+            labels = [
+                { label: 'Homen', emoji: emojis[0], value: 'man', defined: valuesToProfile.man },
+                { label: 'Mulher', emoji: emojis[1], value: 'woman', defined: valuesToProfile.woman },
+                { label: 'LGBTQIA+', emoji: emojis[2], value: 'lgbt', defined: valuesToProfile.LGBT },
+                { label: 'Indefinido', emoji: emojis[3], value: 'indefinido', defined: valuesToProfile.indefinido },
+                { label: 'Helicóptero de Guerra', emoji: emojis[4], value: 'helicopter', defined: valuesToProfile.helicopter },
+            ],
+            setted = false,
+            options = []
 
-        const embed = new MessageEmbed()
-            .setColor(color)
-            .setTitle('Escolha seu sexo')
-            .setDescription('♂️ Homem\n♀️ Mulher\n🏳️‍🌈 LGBTQIA+\n*️⃣ Indefinido\n🚁 Helicóptero de Guerra')
+        for (let value of labels) {
+            if (value.defined === sexo) continue
 
-        return message.reply({ embeds: [embed] }).then(msg => {
+            options.push({ label: value.label, emoji: value.emoji, value: value.value })
+        }
 
-            msg.react('❌').catch(() => { }) // Cancel
-            if (sexo == "♂️ Homem") {
-                msg.react('♀️').catch(() => { }) // Mulher
-                msg.react('🏳️‍🌈').catch(() => { }) // LGBTQIA+
-                msg.react('*️⃣').catch(() => { }) // Indefinido
-                msg.react('🚁').catch(() => { }) // Helicóptero
-            } else if (sexo == "♀️ Mulher") {
-                msg.react('♂️').catch(() => { }) // Homem
-                msg.react('🏳️‍🌈').catch(() => { }) // LGBTQIA+
-                msg.react('*️⃣').catch(() => { }) // Indefinido
-                msg.react('🚁').catch(() => { }) // Helicóptero
-            } else if (sexo == "🏳️‍🌈 LGBTQIA+") {
-                msg.react('♂️').catch(() => { }) // Homem
-                msg.react('♀️').catch(() => { }) // Mulher
-                msg.react('*️⃣').catch(() => { }) // Indefinido
-                msg.react('🚁').catch(() => { }) // Helicóptero
-            } else if (sexo == "*️⃣ Indefinido") {
-                msg.react('♂️').catch(() => { }) // Homem
-                msg.react('♀️').catch(() => { }) // Mulher
-                msg.react('🏳️‍🌈').catch(() => { }) // LGBTQIA+
-                msg.react('🚁').catch(() => { }) // Helicóptero
-            } else if (sexo == "🚁 Helicóptero de Guerra") {
-                msg.react('♂️').catch(() => { }) // Homem
-                msg.react('♀️').catch(() => { }) // Mulher
-                msg.react('🏳️‍🌈').catch(() => { }) // LGBTQIA+
-                msg.react('*️⃣').catch(() => { }) // Indefinido
-            } else if (sexo == null) {
-                msg.react('♂️').catch(() => { }) // Homem
-                msg.react('♀️').catch(() => { }) // Mulher
-                msg.react('🏳️‍🌈').catch(() => { }) // LGBTQIA+
-                msg.react('*️⃣').catch(() => { }) // Indefinido
-                msg.react('🚁').catch(() => { }) // Helicóptero
-            }
+        const setGenerPainel = new MessageActionRow()
+            .addComponents(new MessageSelectMenu()
+                .setCustomId('setSexo')
+                .setPlaceholder('Selecionar meu sexo') // Mensagem estampada
+                .addOptions([
+                    options,
+                    {
+                        label: 'Cancelar mudança de sexo',
+                        emoji: emojis[5],
+                        value: 'cancel'
+                    }
+                ])
+            )
 
-            const filter = (reaction, user) => { return ['❌', '♂️', '♀️', '🏳️‍🌈', '*️⃣', '🚁'].includes(reaction.emoji.name) && user.id === message.author.id }
-            msg.awaitReactions({ filter, max: 1, time: 20000, errors: ['time'] }).then(collected => {
-                const reaction = collected.first()
+        let msg = await message.reply({
+            content: `${e.Loading} | Escolha seu sexo.`,
+            components: [setGenerPainel]
+        })
 
-                switch (reaction.emoji.name) {
-                    case '♂️': Homem(); break;
-                    case '♀️': Mulher(); break;
-                    case '🏳️‍🌈': LGBT(); break;
-                    case '*️⃣': Indefinido(); break;
-                    case '🚁': Helicoptero(); break;
-                    case '❌': Cancel(); break;
-                    default: message.channel.send(`${e.Deny} | Aconteceu algo que não era para acontecer. Use o comando novamente.`); break;
+        return msg.createMessageComponentCollector({
+            filter: (interaction) => interaction.customId === 'setSexo' && interaction.user.id === message.author.id,
+            idle: 60000,
+            max: 1
+        })
+            .on('collect', async interaction => {
+                interaction.deferUpdate().catch(() => { })
+                setted = true
+
+                switch (interaction.values[0]) {
+                    case 'man': defineGener('♂️ Homem'); break;
+                    case 'woman': defineGener('♀️ Mulher'); break;
+                    case 'lgbt': defineGener('🏳️‍🌈 LGBTQIA+'); break;
+                    case 'indefinido': defineGener('*️⃣ Indefinido'); break;
+                    case 'helicopter': defineGener('🚁 Helicóptero de Guerra'); break;
+                    case 'cancel': defineGener('canceled'); break;
+                    default:
+                        msg.edit({
+                            content: `${e.Warn} | Comando não reconhecido dentre as opções. Por favor, tente novamente.`,
+                            components: []
+                        }).catch(() => { })
+                        break;
                 }
+                return
+            })
+            .on('end', () => {
+                if (setted) return
 
-            }).catch(() => {
-
-                msg.edit({ embeds: [embed.setColor('RED').setDescription(`${e.Deny} | Tempo expirado`)] }).catch(() => { })
+                return msg.edit({ content: `${e.Deny} | Comando cancelado.`, components: [] })
             })
 
-            function Homem() {
+        function defineGener(setSelected) {
 
-                embed.setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('♂️ Homem')
-                Database.updateUserData(message.author.id, 'Perfil.Sexo', "♂️ Homem")
-                msg.edit({ embeds: [embed] }).catch(() => { })
-            }
+            if (setSelected === 'canceled')
+                return msg.edit({ content: `${e.Deny} | Comando cancelado.` })
 
-            function Mulher() {
+            Database.updateUserData(message.author.id, 'Perfil.Sexo', setSelected)
+            return msg.edit({ content: `${e.Check} | Sexo "${setSelected}" definido com sucesso!`, components: [] }).catch(() => { })
+        }
 
-                embed.setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('♀️ Mulher')
-                Database.updateUserData(message.author.id, 'Perfil.Sexo', "♀️ Mulher")
-                msg.edit({ embeds: [embed] }).catch(() => { })
-            }
-
-            function LGBT() {
-
-                embed.setColor('GREEN').setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('🏳️‍🌈 LGBTQIA+')
-                Database.updateUserData(message.author.id, 'Perfil.Sexo', "🏳️‍🌈 LGBTQIA+")
-                msg.edit({ embeds: [embed] }).catch(() => { })
-            }
-
-            function Indefinido() {
-
-                embed.setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('*️⃣ Indefinido')
-                Database.updateUserData(message.author.id, 'Perfil.Sexo', "*️⃣ Indefinido")
-                msg.edit({ embeds: [embed] }).catch(() => { })
-            }
-
-            function Helicoptero() {
-
-                embed.setColor('GREEN').setTitle(`${e.Check} Sexo definido com sucesso!`).setDescription('🚁 Helicóptero de Guerra')
-                Database.updateUserData(message.author.id, 'Perfil.Sexo', "🚁 Helicóptero de Guerra")
-                msg.edit({ embeds: [embed] }).catch(() => { })
-            }
-
-            function Cancel() {
-
-                embed.setColor('RED').setTitle(`${e.Deny} Request Cancelada!`).setDescription('O sexo não foi alterado')
-                return msg.edit({ embeds: [embed] }).catch(() => { })
-            }
-        })
     }
 }
