@@ -10,14 +10,20 @@ module.exports = {
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let banner = message.guild.bannerURL({ format: 'gif', size: 1024, dynamic: true })
+        return message.reply(`${e.Deny} |  Comando temporáriamente fechado.`)
 
-        const BannerEmbed = new MessageEmbed()
-            .setColor('#246FE0')
-            .setDescription(`${e.Download} [Baixar](${banner}) banner do servidor`  )
-            .setImage(`${banner}`)
+        let banner = message.guild.banner
 
-        banner ? message.channel.send({ embeds: [BannerEmbed] }) : message.reply(`${e.SaphireObs} | Este servidor não possui um banner.`)
+        return banner
+            ? message.channel.send({
+                embeds: [
+                    new MessageEmbed()
+                        .setColor('#246FE0')
+                        .setDescription(`${e.Download} [Baixar](${banner}) banner do servidor`)
+                        .setImage(`${banner}`)
+                ]
+            })
+            : message.reply(`${e.SaphireObs} | Este servidor não possui um banner.`)
 
     }
 }
