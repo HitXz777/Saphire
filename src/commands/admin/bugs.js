@@ -21,7 +21,7 @@ module.exports = {
                 .setColor(client.blue)
                 .setTitle(`${e.Gear} Lista de Bugs`)
                 .setDescription(`${BugsMapped}`)
-                .setFooter(`${bugs.length || 0} Bugs`)
+                .setFooter({ text: `${bugs.length || 0} Bugs` })
 
         return message.channel.send({ embeds: [Embed] })
     }

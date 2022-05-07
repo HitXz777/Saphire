@@ -13,7 +13,7 @@ module.exports = {
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        if (!args[0]) return message.reply({ embeds: [new MessageEmbed().setColor('#246FE0').setTitle('📋 Comandos Exclusivos de Delete (OWNER)').setDescription('Com este comando, o meu criador torna possível a opção de Deletar qualquer item de qualquer pessoa.').addField('Comando', '`' + prefix + 'del Item @user`').setFooter(`${prefix}itens`)] })
+        if (!args[0]) return message.reply({ embeds: [new MessageEmbed().setColor('#246FE0').setTitle('📋 Comandos Exclusivos de Delete (OWNER)').setDescription('Com este comando, o meu criador torna possível a opção de Deletar qualquer item de qualquer pessoa.').addField('Comando', '`' + prefix + 'del Item @user`').setFooter({ text: `${prefix}itens` })] })
 
         let user = message.mentions.users.first() || message.mentions.repliedUser || await client.users.cache.get(args[1])
         if (!user) return message.reply(`${e.Deny} | Não achei ninguém.`)

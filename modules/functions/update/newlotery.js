@@ -69,7 +69,7 @@ async function NewLoteryGiveaway(message) {
             .setColor('GREEN')
             .setTitle(`💸 | Loteria ${client.user.username}`)
             .setDescription(`🎉 Vencedor*(a)*: ${tag.tag}\n:id: *\`${TicketPremiado}\`*\n💸 Prêmio: ${Prize} ${await Moeda(message)}\n${tag.username} comprou 🎫 ${TicketsComprados} Tickets e tinha ${parseInt(((TicketsComprados / LoteriaUsers?.length) * 100) || 0).toFixed(2)}% de chance de ganhar`)
-            .setFooter(`${TicketsCompradosAoTodo} Tickets foram comprados nesta loteria.`)
+            .setFooter({ text: `${TicketsCompradosAoTodo} Tickets foram comprados nesta loteria.` })
 
         setTimeout(() => { NewTicketAwarded(msg, tag, WinEmbed) }, 4500)
     }

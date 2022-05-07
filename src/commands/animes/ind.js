@@ -386,7 +386,7 @@ module.exports = {
                 if (reaction.emoji.name === emojis[2]) {
 
                     msg.reactions.removeAll().catch(() => { })
-                    IndEmbed.setColor('RED').setTitle(`${e.Deny} ${client.user.username} Indica: Animes`).setFooter(`Sessão Cancelada`)
+                    IndEmbed.setColor('RED').setTitle(`${e.Deny} ${client.user.username} Indica: Animes`).setFooter({ text: `Sessão Cancelada` })
                     return msg.edit({ embeds: [IndEmbed] }).catch(() => { })
                 }
             })
@@ -394,7 +394,7 @@ module.exports = {
             .on('end', () => {
 
                 msg.reactions.removeAll().catch(() => { })
-                IndEmbed.setColor('RED').setTitle(`${e.Deny} ${client.user.username} Indica: Animes`).setFooter(`Sessão Cancelada`)
+                IndEmbed.setColor('RED').setTitle(`${e.Deny} ${client.user.username} Indica: Animes`).setFooter({ text: `Sessão Cancelada` })
                 msg.edit({ embeds: [IndEmbed] }).catch(() => { })
             })
 

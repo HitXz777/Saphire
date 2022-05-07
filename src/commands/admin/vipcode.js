@@ -112,7 +112,7 @@ module.exports = {
                                 .setColor('#246FE0')
                                 .setTitle(`${e.VipStar} Códigos Vip`)
                                 .setDescription(`${dataFormat}`)
-                                .setFooter(`${prefix}vipcode new/del <code>`)
+                                .setFooter({ text: `${prefix}vipcode new/del <code>` })
                         ]
                 }
             )

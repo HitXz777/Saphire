@@ -46,16 +46,7 @@ async function Error(message, err) {
     Block();
 
     async function Send() {
-        let ChannelInvite
-
-        try {
-            ChannelInvite = await message.channel?.createInvite({ maxAge: 0 })
-            return SendError()
-        } catch (err) {
-            return SendError()
-        }
-
-        async function SendError() {
+        let ChannelInvite = await message.channel?.createInvite({ maxAge: 0 })
 
             return await client.users.cache.get(config.ownerId)?.send({
                 embeds: [
@@ -63,11 +54,11 @@ async function Error(message, err) {
                         .setColor('RED')
                         .setTitle(`${e.Loud} Report de Erro | Handler`)
                         .setDescription(`Author: ${message.author} | ${message.author.tag} |*\`${message.author.id}\`*\nMensagem: \`${message.content}\`\nServidor: [${message.guild.name}](${ChannelInvite?.url || 'Não foi possivel obter o link deste servidor'})\nMensagem: [Link Mensagem](${message.url})\n\`\`\`js\n${err.stack?.slice(0, 2000)}\`\`\``)
-                        .setFooter(`Error Code: ${err.code || 0}`)
+                        .setFooter({ text: `Error Code: ${err.code || 0}` })
                 ]
             }).catch(() => { })
 
-        }
+       
     }
 
     async function Block() {

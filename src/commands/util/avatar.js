@@ -48,7 +48,7 @@ module.exports = {
 
                         if (DmUser.includes(u.id)) return
 
-                        u.send({ embeds: [embed.setFooter(`Foto enviada de: ${message.guild.name}`)] }).catch(() => {
+                        u.send({ embeds: [embed.setFooter({ text: `Foto enviada de: ${message.guild.name}` })] }).catch(() => {
                             return message.channel.send(`${e.Deny} | ${u}, sua DM está fechada. Verifique suas configurações e tente novamente.`)
                         })
                         DmUser.push(u.id)
@@ -68,7 +68,7 @@ module.exports = {
                         return message.delete().catch(err => message.channel.send(`${e.Warn} | Ocorreu um erro ao excluir a mensagem de origem.\n\`${err}\``))
                     }
 
-                    return msg.edit({ embeds: [embed.setColor('RED').setFooter('Tempo expirado.')] }).catch(() => { })
+                    return msg.edit({ embeds: [embed.setColor('RED').setFooter({ text: 'Tempo expirado.' })] }).catch(() => { })
 
                 })
 

@@ -102,7 +102,7 @@ async function start(MessageId, Guild) {
                             value: `🔗 [Link do Sorteio](${MessageLink}) | 🆔 *\`${MessageId}\`*`
                         }
                     )
-                    .setFooter('Este sorteio será deletado em 24 horas')
+                    .setFooter({ text: 'Este sorteio será deletado em 24 horas' })
             ]
 
         }).catch(() => Database.deleteGiveaway(MessageId))
