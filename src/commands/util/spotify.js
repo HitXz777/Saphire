@@ -40,7 +40,7 @@ module.exports = {
                 time = `${minutes}:${seconds}`,
                 embed = new MessageEmbed()
                     .setColor(0x1ED768)
-                    .setAuthor(`${user.user.username} está escutando...`, avatar)
+                    .setAuthor({ name: `${user.user.username} está escutando...`, iconURL: avatar })
                     .setDescription(`**Nome:**\n[${name}](${url})`)
                     .setThumbnail(image)
                     .addField("Duração", time, true)
@@ -49,14 +49,14 @@ module.exports = {
                     .addField("Resumo", `${artist} - ${name}\n📨 Receba a música no seu privado`, false),
                 embed2 = new MessageEmbed()
                     .setColor(0x1ED768)
-                    .setAuthor(`${user.user.username} ouviu essa música`, avatar)
+                    .setAuthor({ name: `${user.user.username} ouviu essa música`, iconURL: avatar })
                     .setDescription(`**Nome:**\n[${name}](${url})`)
                     .setThumbnail(image)
                     .addField("Duração", time, true)
                     .addField("Artista", artist, false)
                     .addField("Album", album, true)
                     .addField("Resumo", `${artist} - ${name}`, false)
-                    .setFooter('Spotify e Discord fazendo seu dia melhor', fotospot),
+                    .setFooter({ text: 'Spotify e Discord fazendo seu dia melhor', iconURL: fotospot }),
                 msg = await message.reply({ embeds: [embed] })
 
             msg.react('📨').catch(() => { }) // Troca
@@ -82,7 +82,7 @@ module.exports = {
             })
 
             Collector.on('end', () => {
-                embed.setColor('RED').setFooter('Sessao expirada por: Tempo de interação execido')
+                embed.setColor('RED').setFooter({ text: 'Sessao expirada por: Tempo de interação execido' })
                 return msg.edit({ embeds: [embed] }).catch(() => { })
             })
         }

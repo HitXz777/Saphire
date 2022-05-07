@@ -18,7 +18,7 @@ module.exports = {
             embeds: [
                 new MessageEmbed()
                     .setColor('#246FE0')
-                    .setAuthor(`${user.user.username}`, avatar)
+                    .setAuthor({ name: `${user.user.username}`, iconURL: avatar })
                     .setDescription(`📇 \`${user.user.tag}\``)
             ]
         })

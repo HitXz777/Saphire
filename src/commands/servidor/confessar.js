@@ -34,11 +34,11 @@ module.exports = {
                             value: `\`${prefix}confessar off\``
                         }
                     )
-                    .setFooter(`A ${client.user.username} não se responsabiliza por quaisquer mensagem enviada atráves deste comando.`)
+                    .setFooter({ text: `A ${client.user.username} não se responsabiliza por quaisquer mensagem enviada atráves deste comando.` })
             ]
         })
 
-        message.delete().catch(() => { return message.channel.send(`${e.Deny} | Houve um erro na execução deste comando. Verifique se eu tenho a permissão **GERENCIAR MENSAGENS** ativada.\n\`${err}\``) })
+        message.delete().catch(() => message.channel.send(`${e.Deny} | Houve um erro na execução deste comando. Verifique se eu tenho a permissão **GERENCIAR MENSAGENS** ativada.\n\`${err}\``))
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Timeouts.Confess'),
             dataGuild = await Database.Guild.findOne({ id: message.guild.id }, 'ConfessChannel'),
@@ -65,7 +65,7 @@ module.exports = {
         const ConfessEmbed = new MessageEmbed()
             .setColor('#246FE0')
             .setDescription(`📝 ${Mensagem}`)
-            .setFooter(`${prefix}confessar`)
+            .setFooter({ text: `${prefix}confessar` })
 
         try {
 

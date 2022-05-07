@@ -46,7 +46,7 @@ module.exports = {
                 .setColor(color)
                 .setDescription(`${e.Reference} Nome: [${wallpaper.Name}](${wallpaper.Image})\n${e.BagMoney2} Preço: ${price}\n${e.PepeRich} Comissão: ${parseInt(wallpaper.Price * 0.02)?.toFixed(0)} ${moeda}\n🖌️ Designer: ${client.users.cache.get(wallpaper.Designer)?.tag || "Anonymous"}\n${e.Commands} Code: ${key}\n${e.boxes} Estoque: ${limite}`)
                 .setImage(wallpaper.Image)
-                .setFooter(`Compre: ${prefix}buy bg ${key} | Wallpapers totais: ${amount}`)
+                .setFooter({ text: `Compre: ${prefix}buy bg ${key} | Wallpapers totais: ${amount}` })
 
             let buttons = new MessageActionRow()
                 .addComponents(
@@ -142,7 +142,7 @@ module.exports = {
                         WallPaperEmbed.setColor(color)
                             .setDescription(`${e.Reference} Nome: [${wallpaper.Name}](${wallpaper.Image})\n${e.BagMoney2} Preço: ${price}\n${e.PepeRich} Comissão: ${parseInt(wallpaper.Price * 0.02)?.toFixed(0)} ${moeda}\n🖌️ Designer: ${client.users.cache.get(wallpaper.Designer)?.tag || "Anonymous"}\n${e.Commands} Code: ${key}\n${e.boxes} Estoque: ${limite}`)
                             .setImage(wallpaper.Image)
-                            .setFooter(`Compre: ${prefix}buy bg ${key} | Wallpapers totais: ${amount} | 💳 Compra rápida`)
+                            .setFooter({ text: `Compre: ${prefix}buy bg ${key} | Wallpapers totais: ${amount} | 💳 Compra rápida` })
 
                         return msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { })
                     }
@@ -151,7 +151,7 @@ module.exports = {
                 })
 
                 .on('end', () => {
-                    WallPaperEmbed.setColor('RED').setFooter('Sessão expirada')
+                    WallPaperEmbed.setColor('RED').setFooter({ text: 'Sessão expirada' })
                     msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [WallPaperEmbed], components: [] })
                 })
 

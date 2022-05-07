@@ -56,7 +56,7 @@ module.exports = {
             .setColor('GREEN')
             .setThumbnail('https://imgur.com/k5NKfe8.gif')
             .setTitle(`${message.member.displayName} iniciou uma nova aposta`)
-            .setFooter(`Limite máximo: ${LimitUsers} participantes`)
+            .setFooter({ text: `Limite máximo: ${LimitUsers} participantes` })
 
         return Money >= quantia
             ? (() => {
@@ -344,18 +344,18 @@ module.exports = {
 
                 Database.add(winner, prize)
                 Database.PushTransaction(winner, `${e.gain} Ganhou ${prize} Safiras em uma *bet party*`)
-                msg.edit({ embeds: [embed.setColor(client.red).setTitle(':tada: Bet Party | Cancelada').setFooter(`Ganhador: ${userUsername} | Area ${areaChoosen}`)], components: [] }).catch(() => { })
+                msg.edit({ embeds: [embed.setColor(client.red).setTitle(':tada: Bet Party | Cancelada').setFooter({ text: `Ganhador: ${userUsername} | Area ${areaChoosen}` })], components: [] }).catch(() => { })
                 return message.channel.send(`**:tada: Bet Party** | A **Area ${areaChoosen}** foi sorteada e o ganhador foi ${message.guild.members.cache.get(winner)}. Prêmio: **${prize} ${moeda}**`)
 
                 function nobodyInBetParty() {
                     Database.add(message.author.id, prize)
-                    msg.edit({ embeds: [embed.setColor(client.red).setTitle(':tada: Bet Party | Cancelada').setFooter(`A area sorteada (${areaChoosen}) não tinha ninguém.`)], components: [] }).catch(() => { })
+                    msg.edit({ embeds: [embed.setColor(client.red).setTitle(':tada: Bet Party | Cancelada').setFooter({ text: `A area sorteada (${areaChoosen}) não tinha ninguém.` })], components: [] }).catch(() => { })
                     return message.channel.send(`**:tada: Bet Party** | A **Area ${areaChoosen}** não tinha ninguém, então o prêmio de **${prize} ${moeda}** foi para ${message.author}.`)
                 }
 
                 function nobody() {
                     Database.add(message.author.id, prize)
-                    msg.edit({ embeds: [embed.setColor(client.red).setTitle(':tada: Bet Party | Cancelada').setFooter('Ninguém participou da Bet Party')], components: [] }).catch(() => { })
+                    msg.edit({ embeds: [embed.setColor(client.red).setTitle(':tada: Bet Party | Cancelada').setFooter({ text: 'Ninguém participou da Bet Party' })], components: [] }).catch(() => { })
                     return message.channel.send(`**:tada: Bet Party** | Ninguém participou dessa rodada.`)
                 }
 

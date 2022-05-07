@@ -23,7 +23,7 @@ module.exports = {
             let BitUserFarm = userData?.Perfil.Bits,
                 BitUser = userData?.Perfil.Bitcoins || 0,
                 avatar = user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
-                BitEmbed = new MessageEmbed().setColor('#FF8C00').setAuthor(`${user.username}`, avatar).addField('BitCoins', `${e.BitCoin} ${BitUser}`, true).addField('BitFarm', `${e.BitCoin} \`${BitUserFarm}/1000\``, true)
+                BitEmbed = new MessageEmbed().setColor('#FF8C00').setAuthor({ name: user.username, iconURL: avatar }).addField('BitCoins', `${e.BitCoin} ${BitUser}`, true).addField('BitFarm', `${e.BitCoin} \`${BitUserFarm}/1000\``, true)
 
             return message.reply({ embeds: [BitEmbed] })
         }
@@ -38,7 +38,7 @@ module.exports = {
 
             const BitEmbed = new MessageEmbed()
                 .setColor('#FF8C00')
-                .setAuthor(`${message.author.username}`, message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }))
+                .setAuthor({ name: message.author.username, iconURL: message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 })})
                 .addField('BitCoins', `${e.BitCoin} ${BitCoins || 0}`, true)
                 .addField('BitFarm', `${e.BitCoin} \`${Bits}/1000\``, true)
 

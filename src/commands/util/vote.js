@@ -14,20 +14,20 @@ module.exports = {
         const Conteudo = args.join(' ')
         if (!Conteudo) return message.reply(`${e.Deny} | Você precisa me dizer o que vai ser votado.`)
         if (Conteudo.length > 1000 || Conteudo.length < 6) return message.reply(`${e.Deny} | Você precisa fornecer uma mensagem que contenha pelo menos **6~1000 caracteres.**`)
-        let avatar = message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 })
+        let avatar = message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }) || null
 
         const msg = await message.channel.send(
             {
                 embeds: [new MessageEmbed()
                     .setColor(client.blue)
                     .setDescription(Conteudo)
-                    .setAuthor(`${message.author.username} abriu uma votação`, avatar || null)
+                    .setAuthor({ name: `${message.author.username} abriu uma votação`, iconURL: avatar })
                 ]
             }
         )
 
         msg.react(`${e.Upvote}`).catch(err => message.channel.send(`${e.Deny} | Erro ao reagir a mensagem: \`${err}\``))
-        msg.react(`${e.DownVote}`).catch(err => message.channel.send(`${e.Deny} | Erro ao reagir a mensagem: \`${err}\``))
+        return msg.react(`${e.DownVote}`).catch(err => message.channel.send(`${e.Deny} | Erro ao reagir a mensagem: \`${err}\``))
 
     }
 }

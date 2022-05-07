@@ -29,7 +29,7 @@ module.exports = {
                     .addField('Comando de Ativação', '`' + prefix + 'reportchannel #Canal`')
                     .addField('Comando de Desativação', '`' + prefix + 'reportchannel off`')
                     .addField('Comando de Reporte', `\`${prefix}report [@user(opicional)] o motivo do seu report\``)
-                    .setFooter(`A ${client.user.username} não se responsabiliza pelo conteúdo enviado atráves deste sistema.`)
+                    .setFooter({ text: `A ${client.user.username} não se responsabiliza pelo conteúdo enviado atráves deste sistema.` })
             ]
         })
 

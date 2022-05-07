@@ -46,7 +46,7 @@ module.exports = {
                                     value: `\`${prefix}lockdown off\``
                                 }
                             )
-                            .setFooter('Canais já trancados são imunes ao \'lockdown off\', fique tranquilo. Não abrirei eles.')
+                            .setFooter({ text: 'Canais já trancados são imunes ao \'lockdown off\', fique tranquilo. Não abrirei eles.' })
                     ]
                 }
             )
@@ -71,7 +71,7 @@ module.exports = {
                         : arrayControl.push(channel.id)
                 }
 
-        })
+            })
 
             if (arrayControl.length > 0)
                 await Database.Guild.updateOne(

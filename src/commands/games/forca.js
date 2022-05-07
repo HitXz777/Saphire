@@ -99,7 +99,7 @@ module.exports = {
                         embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)
                             .setColor(client.green)
                             .setDescription(`${Message.author} acertou a palavra!\`\`\`txt\n${wordFormated}\n\`\`\``)
-                            .setFooter(`Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}`)
+                            .setFooter({ text: `Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}` })
 
                         Database.addItem(Message.author.id, 'ForcaCount', 1)
                         control.endedCollector = false
@@ -117,7 +117,7 @@ module.exports = {
                             embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)
                                 .setColor(client.red)
                                 .setDescription(`Ninguém acertou a palavra **${word}**\`\`\`txt\n${wordFormated}\n\`\`\``)
-                                .setFooter(`Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}`)
+                                .setFooter({ text: `Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}` })
                             msg.delete(() => { })
                             return Message.channel.send({ content: `${e.Deny} | Forca cancelada.`, embeds: [embed] }).catch(() => { })
                         }
@@ -127,7 +127,7 @@ module.exports = {
                             embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)
                                 .setColor(client.green)
                                 .setDescription(`${Message.author} acertou a palavra!\`\`\`txt\n${wordFormated}\n\`\`\``)
-                                .setFooter(`Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}`)
+                                .setFooter({ text: `Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}` })
 
                             Database.addItem(Message.author.id, 'ForcaCount', 1)
                             control.endedCollector = false
@@ -138,7 +138,7 @@ module.exports = {
 
                             embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)
                                 .setDescription(`\`\`\`txt\n${wordFormated}\n\`\`\``)
-                                .setFooter(`Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}`)
+                                .setFooter({ text: `Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}` })
 
                             return msg.edit({ embeds: [embed] }).catch(() => { })
                         }
@@ -151,7 +151,7 @@ module.exports = {
                         embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)
                             .setColor(client.red)
                             .setDescription(`Ninguém acertou a palavra **${word}**\`\`\`txt\n${wordFormated}\n\`\`\``)
-                            .setFooter(`Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}`)
+                            .setFooter({ text: `Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}` })
 
                         return msg.edit({ embeds: [embed] }).catch(() => { })
                     }

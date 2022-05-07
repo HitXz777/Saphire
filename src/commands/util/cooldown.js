@@ -114,7 +114,7 @@ module.exports = {
                             value: TLikes || `\`Você não deveria ver essa mensagem... Usa "${prefix}bug", por favor?\``
                         },
                     )
-                    .setFooter(`${prefix}cd Saphire`)
+                    .setFooter({ text: `${prefix}cd Saphire` })
             ]
         }).catch(() => { })
 

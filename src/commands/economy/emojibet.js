@@ -36,7 +36,7 @@ module.exports = {
                                     value: 'Você pega de volta 50% do valor apostado.'
                                 }
                             )
-                            .setFooter('Comando baseado na bot Loritta.')
+                            .setFooter({ text: 'Comando baseado na bot Loritta.' })
                     ]
                 }
             )

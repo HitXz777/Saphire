@@ -852,7 +852,7 @@ module.exports = {
                             .setColor(color)
                             .setTitle(`👑 Top 10 Clans`)
                             .setDescription(`O clan é baseado nas doações\n \n${rank}`)
-                            .setFooter(`Meu Clan: ${MyClanRank}/${Clans.length || 0}`)
+                            .setFooter({ text: `Meu Clan: ${MyClanRank}/${Clans.length || 0}` })
                     ]
                 }
             )

@@ -27,7 +27,7 @@ module.exports = {
                 .addField(`${e.CoroaDourada} Premium Stage`, `Tem interesse em desbloquear comandos únicos? Use \`${prefix}premium\` e descubra mais.`)
                 .addField('⭐ Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
                 .addField(`📄 Documentação`, `https://saphire.gitbook.io/saphire/\n*obs: A documentação da Saphire está incompleta.*`)
-                .setFooter('Este painel se fechará após 1 minuto de inatividade'),         
+                .setFooter({ text: 'Este painel se fechará após 1 minuto de inatividade' }),         
                 // .addField(`${e.TopGG} Top.gg`, `[Votar](${config.TopGGLink}/vote) na ${client.user.username}.`),
             painel = new MessageActionRow()
                 .addComponents(new MessageSelectMenu()

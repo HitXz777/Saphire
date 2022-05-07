@@ -41,9 +41,9 @@ module.exports = {
 
         const IdeiaEmbed = new MessageEmbed()
             .setColor('#246FE0')
-            .setAuthor(`${message.author.tag} enviou uma ideia`, message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }))
+            .setAuthor({ name: `${message.author.tag} enviou uma ideia`, iconURL: message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }) })
             .setDescription(`${content || 'Algo deu errado aqui...'}`)
-            .setFooter(`${prefix}ideia`)
+            .setFooter({ text: `${prefix}ideia` })
             .setTimestamp()
 
         let messageSended = await channel.send({ embeds: [IdeiaEmbed] }).catch(err => {

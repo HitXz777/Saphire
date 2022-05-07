@@ -257,7 +257,7 @@ module.exports = {
                                     value: 'Todos os comandos podem ser usados fora do canal privado. O sistema de busca da Saphire vai detectar o seu canal (se houver um)\n \nAdministradores são imunes ao bloqueio e terão acesso ao seu canal, porém, os canais da categoria VIP são silenciados e os administradores irão ignora-los..'
                                 }
                             )
-                            .setFooter(`${client.user.username} Vip System`)
+                            .setFooter({ text: `${client.user.username} Vip System` })
                     ]
                 }
             )

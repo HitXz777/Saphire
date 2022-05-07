@@ -25,7 +25,7 @@ module.exports = {
             .setColor('#246FE0')
             .setDescription(`${message.author} está dando carinho em você ${user}`)
             .setImage(rand)
-            .setFooter('🔁 retribuir')
+            .setFooter({ text: '🔁 retribuir' })
 
         return message.reply({ embeds: [embed] }).then(msg => {
 
@@ -38,13 +38,13 @@ module.exports = {
 
                 if (reaction.emoji.name === '🔁') {
 
-                    const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`${message.author} e ${user} estão se acariciando`).setFooter(`${message.author.id}/${user.id}`).setImage(g.Carinho[Math.floor(Math.random() * g.Carinho.length)])
+                    const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`${message.author} e ${user} estão se acariciando`).setImage(g.Carinho[Math.floor(Math.random() * g.Carinho.length)])
                     msg.edit({ embeds: [TradeEmbed] }).catch(() => { })
                 }
 
             }).catch(() => {
 
-                embed.setColor('RED').setFooter(`${message.author.id}/${user.id}`)
+                embed.setColor('RED')
                 msg.edit({ embeds: [embed] }).catch(() => { })
             })
         })

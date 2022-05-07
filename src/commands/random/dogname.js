@@ -17,7 +17,7 @@ module.exports = {
                     .setTitle(`${e.Doguinho} Nome pro cachorrinho`)
                     .setDescription('Use este comando para dar um nome para seu cachorrinho/a!')
                     .addField('Comando', `\`${prefix}dogname NomeDoCachorro\``)
-                    .setFooter('O nome deve ser único')
+                    .setFooter({text:'O nome deve ser único'})
             ]
         })
 

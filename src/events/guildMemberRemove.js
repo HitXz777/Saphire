@@ -45,7 +45,7 @@ client.on('guildMemberRemove', async (member) => {
                 { name: '📝 Razão', value: `${reason || 'Sem motivo informado'}` },
                 { name: '📅 Data', value: `${Data()}` }
             )
-            .setFooter(`${member.guild.name}`, member.guild.iconURL({ dynamic: true }))
+            .setFooter({ text: member.guild.name, iconURL: member.guild.iconURL({ dynamic: true }) })
 
         return channel ? channel.send({ embeds: [embed] }).catch(() => { }) : null
     }

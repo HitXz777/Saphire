@@ -4,8 +4,8 @@ module.exports = {
     name: 'dono',
     aliases: ['owner', 'lider'],
     category: 'util',
-    
-    
+
+
     emoji: `${e.Info}`,
     usage: '<dono>',
     description: 'Veja o dono do servidor',
@@ -17,7 +17,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor('#246FE0')
-            .setAuthor(`${message.guild.name}`)
+            .setAuthor({ name: message.guild.name })
             .setDescription(`${e.OwnerCrow} Dono/a: <@${owner}>\n:id: \`${owner}\``)
 
         if (avatar) { embed.setThumbnail(avatar) }

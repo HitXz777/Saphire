@@ -161,7 +161,7 @@ module.exports = {
                                     value: `${['bloquearcomando', 'commandblock', 'nocomands', 'cmdblock', 'nocommand', 'blockcomand', 'blockcommand', 'lockcommand', 'nocomand'].map(a => `\`${a}\``).join(', ')}`
                                 }
                             )
-                            .setFooter(`${client.user.username}'s Server Security Control`)
+                            .setFooter({ text: `${client.user.username}'s Server Security Control` })
                     ]
                 }
             )
@@ -234,7 +234,7 @@ module.exports = {
                                 value: `${finishFormat}`
                             }
                         )
-                        .setFooter(`Os sub-comandos deste comando está em ${prefix}blockcommands info`)
+                        .setFooter({ text: `Os sub-comandos deste comando está em ${prefix}blockcommands info` })
                 ]
             })
 

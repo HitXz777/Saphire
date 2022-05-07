@@ -105,7 +105,7 @@ module.exports = {
                         .setTitle(`${e.MoneyWithWings} ${client.user.username} Pagamentos`)
                         .setDescription(`${e.SaphireObs} Com o comando \`${prefix}pay\`, você pode transferir dinheiro para qualquer pessoa.`)
                         .addField(`${e.Gear} Comando`, `\`${prefix}pay <@user/Id> <quantia>\``)
-                        .setFooter(`obs: Pagamentos acima de 1000 safiras terá uma taxa de 2%`)
+                        .setFooter({ text: `obs: Pagamentos acima de 1000 safiras terá uma taxa de 2%` })
                 ]
             })
         }

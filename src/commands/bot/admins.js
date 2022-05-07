@@ -23,7 +23,7 @@ module.exports = {
                     .setColor('#FF0000')
                     .setTitle(`${e.Admin} Lista de Administradores | Saphire's Team`)
                     .setDescription(`${admins.map(adminId => `**${client.users.cache.get(adminId)?.tag || 'Não encontrei este usuário'}**\n\`${adminId}\``).join('\n')}`)
-                    .setFooter(`${prefix}adm local`)
+                    .setFooter({ text: `${prefix}adm local` })
             ]
         })
 

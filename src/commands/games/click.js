@@ -160,7 +160,7 @@ module.exports = {
                         .setColor(client.blue)
                         .setTitle('👉 Clique Game')
                         .setDescription(`O jogo é simples! Quem clicar primeiro na opção verde ganha 1 ponto.\n \n1. Por padrão, o número de pontos é definido em 5.\n2. Para mudar, use \`${prefix}click @user <QuantidadeDePontos>\` *(max: 20 | min: 1)*`)
-                        .setFooter(`${client.user.username}'s Games`)
+                        .setFooter({ text: `${client.user.username}'s Games` })
                 ]
             })
         }

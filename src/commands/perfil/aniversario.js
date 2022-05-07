@@ -20,7 +20,7 @@ module.exports = {
                     .setDescription('Defina sua data de aniversário no seu perfil atráves deste comando.')
                     .addField(`${e.On} Ative`, `\`${prefix}setniver 15/03/2007\``)
                     .addField(`${e.Off} Desative`, `\`${prefix}setniver delete\``)
-                    .setFooter('Siga o formato, ok? Idade limite: 80 Anos')
+                    .setFooter({ text: 'Siga o formato, ok? Idade limite: 80 Anos' })
             ]
         })
 

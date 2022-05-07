@@ -16,7 +16,7 @@ module.exports = {
 
         const Embed = new MessageEmbed()
             .setColor('#4295fb')
-            .setAuthor('Google Tradutor', googlepng)
+            .setAuthor({ name: 'Google Tradutor', iconURL: googlepng })
 
         let language = args[0]
         let text = message.channel.messages.cache.get(message.reference?.messageId)?.content || args.slice(1).join(" ")

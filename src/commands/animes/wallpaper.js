@@ -154,7 +154,7 @@ module.exports = {
                     msg.reactions.removeAll().catch(() => { });
 
                     WallPaperEmbed.setColor('RED')
-                        .setFooter(`Sessão expirada | Wallpapers por: ${client.users.cache.get(N.Gowther)?.tag || 'Indefnido'}`)
+                        .setFooter({ text: `Sessão expirada | Wallpapers por: ${client.users.cache.get(N.Gowther)?.tag || 'Indefnido'}` })
                     return msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { })
                 })
         }

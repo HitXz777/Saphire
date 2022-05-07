@@ -112,7 +112,7 @@ module.exports = {
                     { name: '📝 Razão', value: `${reason || 'Sem motivo informado'}` },
                     { name: '📅 Data', value: `${Data()}` }
                 )
-                .setFooter(`${message.guild.name}`, message.guild.iconURL({ dynamic: true }))
+                .setFooter({ text: `${message.guild.name}`, iconURL: message.guild.iconURL({ dynamic: true }) })
 
             x ? embed.setTitle(`🛰️ | Global System Notification | Forceban`) : embed.setTitle(`🛰️ | Global System Notification | Banimento`)
             x ? embed.setThumbnail(ban?.displayAvatarURL({ dynamic: true })) : embed.setThumbnail(ban.user.displayAvatarURL({ dynamic: true }))

@@ -28,7 +28,7 @@ module.exports = {
                 .addField(`${e.SaphireObs} Como jogar?`, `Quando alguém mandar um bingo no chat, basta você digitar o **NÚMERO** que você acha que é.`)
                 .addField(`${e.SaphireObs} Como iniciar um bingo?`, `Use o comando \`${prefix}bingo [quantia/all]\`. É só isso mesmo.`)
                 .addField(`:tada: Bingo Party`, `Use o comando \`${prefix}bingo party\` e junte dinheiro com todos para um super bingo!`)
-                .setFooter('*Bingo Party: Prêmios maiores que 2000 tem um taxa de 4%')
+                .setFooter({ text: '*Bingo Party: Prêmios maiores que 2000 tem um taxa de 4%' })
 
         if (!args[0]) return message.reply({ embeds: [BingoEmbed] })
 
@@ -63,7 +63,7 @@ module.exports = {
         collector.on('collect', async winner => {
 
             Bingo.setTitle(`${message.author.username} fez um Bingo.`)
-                .setDescription(`🏆 ${quantia} ${moeda}\n${e.OwnerCrow} ${winner.author} Acertou o número: ${Number}`).setFooter('Concluído')
+                .setDescription(`🏆 ${quantia} ${moeda}\n${e.OwnerCrow} ${winner.author} Acertou o número: ${Number}`).setFooter({ text: 'Concluído' })
 
             msg.edit({ embeds: [Bingo] }).catch(() => { })
             Database.add(winner.id, quantia)
@@ -80,7 +80,7 @@ module.exports = {
 
             if (toCancel) return
 
-            Bingo.setColor('RED').setTitle(`${message.author.username} fez um Bingo.`).setDescription(`🏆 ${quantia} ${moeda}\n${e.Deny} Ninguém acertou o número: ${Number}`).setFooter('Concluído')
+            Bingo.setColor('RED').setTitle(`${message.author.username} fez um Bingo.`).setDescription(`🏆 ${quantia} ${moeda}\n${e.Deny} Ninguém acertou o número: ${Number}`).setFooter({ text: 'Concluído' })
             msg.edit({ embeds: [Bingo] }).catch(() => { })
             Database.add(message.author.id, quantia)
             Database.PushTransaction(message.author.id, `${e.gain} Recebeu ${quantia || 0} Safiras jogando no bingo`)

@@ -5,7 +5,7 @@ module.exports = {
     name: 'clima',
     aliases: ['weather', 'tempo'],
     category: 'util',
-    
+
     ClientPermissions: ['EMBED_LINKS'],
     emoji: `🌥️`,
     usage: '<clima> <SiglaDaCidade/Pais> | <Nome da Cidade>',
@@ -47,10 +47,10 @@ module.exports = {
                 .addField("Fuzo", `GMT ${location.timezone}`, true)
                 .addField("Temperatura", `${current.temperature}° Graus`, true)
                 .addField("Observação TimeTemp", current.observationtime, true)
-                .setFooter('Isso aqui não é previsão do tempo')
+                .setFooter({ text: 'Isso aqui não é previsão do tempo' })
                 .setTimestamp()
 
-            return message.reply({ embeds: [embed] }).catch(err => { return message.channel.send(`${e.Warn} | Houve um erro no meu processamento.\n\`${err}\``)})
+            return message.reply({ embeds: [embed] }).catch(err => { return message.channel.send(`${e.Warn} | Houve um erro no meu processamento.\n\`${err}\``) })
         })
     }
 }

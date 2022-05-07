@@ -35,7 +35,7 @@ client.on('guildBanRemove', async ban => {
             { name: '📝 Razão', value: `${reason || 'Sem motivo informado'}` },
             { name: '📅 Data', value: `${Data()}` }
         )
-        .setFooter(`${ban.guild.name}`, ban.guild.iconURL({ dynamic: true }))
+        .setFooter({ text: ban.guild.name, iconURL: ban.guild.iconURL({ dynamic: true }) })
 
     channel ? channel.send({ embeds: [embed] }).catch(() => { }) : ''
 })

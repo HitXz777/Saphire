@@ -23,7 +23,7 @@ module.exports = {
             .setColor('#246FE0')
             .setDescription(`${e.BlueHeart} | ${message.author} está beijando ${user}`)
             .setImage(rand)
-            .setFooter('🔁 retribuir')
+            .setFooter({ text: '🔁 retribuir' })
 
         const msg = await message.reply({ embeds: [embed] })
 
@@ -36,11 +36,11 @@ module.exports = {
             errors: ['time']
         }).then(() => {
 
-            const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`${e.BlueHeart} ${user} retribuiu o beijo de ${message.author} ${e.BlueHeart}`).setFooter(`${message.author.id}/${user.id}`).setImage(g.Beijar[Math.floor(Math.random() * g.Beijar.length)])
+            const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`${e.BlueHeart} ${user} retribuiu o beijo de ${message.author} ${e.BlueHeart}`).setImage(g.Beijar[Math.floor(Math.random() * g.Beijar.length)])
             return msg.edit({ embeds: [TradeEmbed] }).catch(() => { })
 
         }).catch(() => {
-            embed.setColor('RED').setFooter(`${message.author.id}/${user.id}`)
+            embed.setColor('RED')
             return msg.edit({ embeds: [embed] }).catch(() => { })
         })
 

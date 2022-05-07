@@ -29,7 +29,7 @@ module.exports = {
             .setColor('#246FE0')
             .setDescription(`${e.GunRight} | ${message.author} está dando socos em você ${user}`)
             .setImage(rand)
-            .setFooter('🔁 retribuir')
+            .setFooter({ text: '🔁 retribuir' })
 
         return message.reply({ embeds: [embed] }).then(msg => {
             
@@ -42,13 +42,13 @@ module.exports = {
 
                 if (reaction.emoji.name === '🔁') {
                     
-                    const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`${message.author} e ${user} estão trocando socos!`).setFooter(`${message.author.id}/${user.id}`).setImage(g.Soco[Math.floor(Math.random() * g.Soco.length)])
+                    const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`${message.author} e ${user} estão trocando socos!`).setImage(g.Soco[Math.floor(Math.random() * g.Soco.length)])
                     msg.edit({ embeds: [TradeEmbed] }).catch(() => { })
                 }
 
             }).catch(() => {
                 
-                embed.setColor('RED').setDescription(`${e.Deny} | ${message.author} deu socos em ${user} e ele(a) saiu correndo.`).setFooter(`${message.author.id}/${user.id}`)
+                embed.setColor('RED').setDescription(`${e.Deny} | ${message.author} deu socos em ${user} e ele(a) saiu correndo.`)
                 msg.edit({ embeds: [embed] }).catch(() => { })
             })
         })

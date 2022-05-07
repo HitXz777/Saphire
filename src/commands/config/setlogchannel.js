@@ -35,7 +35,7 @@ module.exports = {
                     .addField(`${e.QuestionMark} O que eu não envio no Sistema GSN?`, `\`${prefix}welcomechannel\` - Novos Membros\n\`${prefix}leavechannel\`- Membros que sairem \nMensagens Apagadas/Editadas\nCargos/Canais editados`)
                     .addField(`${e.Gear} Comandos`, `\`${prefix}logs on/off <#channel>\` Ative/Desative o Sistema GSN\n\`${prefix}logs create\` Deixa que eu crio um canal pro Sistema GSN`)
                     .addField(`${e.Reference} Canal Atual`, ChannelAtual ? `${ChannelAtual} \`${ChannelAtual.id}\`` : 'N/A')
-                    .setFooter('Permissão necessária: "Ver o registro de auditoria | Adicionar reações | Gerenciar Canais"')
+                    .setFooter({ text: 'Permissão necessária: "Ver o registro de auditoria | Adicionar reações | Gerenciar Canais"' })
             ]
         })
 

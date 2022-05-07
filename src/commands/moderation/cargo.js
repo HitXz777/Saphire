@@ -475,7 +475,7 @@ module.exports = {
                                     }
                                 ]
                             )
-                            .setFooter('Esse comando levou 5 horas para ser feito')
+                            .setFooter({ text: 'Esse comando levou 5 horas para ser feito' })
                     ]
             })
         }

@@ -25,10 +25,10 @@ module.exports = {
             .setColor('#246FE0')
             .setDescription(`❤️ | ${message.author} te ama ${user}`)
             .setImage(rand)
-            .setFooter('❤️ retribuir')
+            .setFooter({ text: '❤️ retribuir' })
 
         return message.reply({ embeds: [embed] }).then(msg => {
-            
+
             msg.react('❤️').catch(() => { }) // Check
 
             const filter = (reaction, u) => { return ['❤️'].includes(reaction.emoji.name) && u.id === user.id }
@@ -37,14 +37,14 @@ module.exports = {
                 const reaction = collected.first()
 
                 if (reaction.emoji.name === '❤️') {
-                    
-                    const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`❤️ ${user} também te ama ${message.author} ❤️`).setFooter(`${message.author.id}/${user.id}`).setImage(g.TeAmo[Math.floor(Math.random() * g.TeAmo.length)])
+
+                    const TradeEmbed = new MessageEmbed().setColor('RED').setDescription(`❤️ ${user} também te ama ${message.author} ❤️`).setImage(g.TeAmo[Math.floor(Math.random() * g.TeAmo.length)])
                     msg.edit({ embeds: [TradeEmbed] }).catch(() => { })
                 }
 
             }).catch(() => {
-                
-                embed.setColor('RED').setFooter(`${message.author.id}/${user.id}`)
+
+                embed.setColor('RED')
                 msg.edit({ embeds: [embed] }).catch(() => { })
             })
         })

@@ -25,7 +25,7 @@ module.exports = {
                     .setDescription(`Seja muito bem vindo a Roleta ${client.user.username}!\n \n${e.Info} **O que é a Roleta ${client.user.username}?**\n- A Roleta é um simples jogo onde você ganha ou perde dinheiro.\n \nA Roleta consiste em uma variavel de sorte, onde depende de um resultado aleatório para você ganhar.`)
                     .addField(`${e.SaphireObs} Como jogar`, `Digite \`${prefix}roleta <Valor>\` ou \`${prefix}roleta all\` para jogar todo seu dinheiro.\nProntinho, é só isso.`)
                     .addField(`${e.Info} Informações adicionais`, '**1.** Todo o dinheiro perdido não vai a lugar nenhum\n**2.** O resultado de vitória é de 20%, derrota é de 40% e empate 40%\n**3. Resultado**\nVitória: Recebe de **0 a 35%** do valor apostado\nEmpate: Recebe de volta o dinheiro apostado\nDerrota: O dinheiro apostado sumirá para sempre.')
-                    .setFooter(`A ${client.user.username} não se responsabiliza por dinheiro perdido.`)
+                    .setFooter({ text: `A ${client.user.username} não se responsabiliza por dinheiro perdido.` })
             ]
         })
 

@@ -12,7 +12,7 @@ module.exports = {
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let user = message.mentions.users.first() || client.users.cache.find(data => data.username?.toLowerCase() === args.join(' ')?.toLowerCase() || data.tag?.toLowerCase() === args[0]?.toLowerCase() || data.discriminator === args[0] || data.id === args[0])|| message.author,
+        let user = message.mentions.users.first() || client.users.cache.find(data => data.username?.toLowerCase() === args.join(' ')?.toLowerCase() || data.tag?.toLowerCase() === args[0]?.toLowerCase() || data.discriminator === args[0] || data.id === args[0]) || message.author,
             data = await Database.User.findOne({ id: user.id }, 'Slot Perfil Color Walls')
 
         if (!data) return message.reply(`${e.Database} | DATABASE | Nenhum dado encontrado.`)
@@ -145,11 +145,11 @@ module.exports = {
                 embeds: [
                     new MessageEmbed()
                         .setColor(color)
-                        .setAuthor(`Inventário de ${user.username}`, avatar)
+                        .setAuthor({ name: `Inventário de ${user.username}`, iconURL: avatar })
                         .setDescription(`Aqui é onde ficam guardados todos os ${user.id === message.author.id ? 'seus itens' : `itens de ${user.username}`}`)
                         .addField('Itens Comprados', `${nada}${skip}${cartas}${dogname}`)
                         .addField('Itens Obtidos', `${nada2}${cores}${title}`)
-                        .setFooter(`${prefix}buy | ${prefix}slot bg`)
+                        .setFooter({ text: `${prefix}buy | ${prefix}slot bg` })
                 ]
             })
         }

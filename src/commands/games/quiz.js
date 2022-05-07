@@ -66,7 +66,7 @@ module.exports = {
                                     value: `O tempo normal das perguntas é de 30 segundos, speed mode é 5 segundos.`
                                 }
                             )
-                            .setFooter(`${quizData?.length || 0} perguntas ativas`)
+                            .setFooter({ text: `${quizData?.length || 0} perguntas ativas` })
                     ]
                 }
             )

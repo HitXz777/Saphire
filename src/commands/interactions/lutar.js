@@ -43,7 +43,7 @@ module.exports = {
 
             }).catch(() => {
                 
-                embed.setColor('RED').setFooter(`${message.author.id}/${user.id}`)
+                embed.setColor('RED')
                 msg.edit({ embeds: [embed] }).catch(() => { })
             })
         })

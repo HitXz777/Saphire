@@ -23,7 +23,7 @@ module.exports = {
                     .setTitle('💸 Sistema de cobrança')
                     .setDescription('Cobre as pessoas que te devem ou apenas peça dinheiro, você que sabe.')
                     .addField('Comando', `\`${prefix}cobrar @user quantia\``)
-                    .setFooter(`A ${client.user.username} não se responsabiliza por dinheiro perdido ou mal usado.`)
+                    .setFooter({ text: `A ${client.user.username} não se responsabiliza por dinheiro perdido ou mal usado.` })
             ]
         })
 

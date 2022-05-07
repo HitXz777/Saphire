@@ -25,7 +25,7 @@ module.exports = {
                     value: `\`${prefix}first off\``
                 }
             )
-            .setFooter('Permissão necessária: Administrador')
+            .setFooter({ text: 'Permissão necessária: Administrador' })
 
         let turn = args[0],
             data = await Database.Guild.findOne({ id: message.guild.id }, 'FirstSystem'),

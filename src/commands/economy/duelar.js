@@ -22,7 +22,7 @@ module.exports = {
                 .setTitle(`⚔️ Duelo ${client.user.username} Arena`)
                 .setDescription(`O Duelo é um dos comandos da Classe Arena, onde você disputa com outros membros do servidor por alguma recompensa.\nCom o Duelo, você aposta uma quantia em ${moeda}, e o vencedor que tiver mais sorte ganha.`)
                 .addField(`${e.SaphireObs} Comando`, `\`${prefix}duelar <@user/id> <quantia>\``)
-                .setFooter(`A ${client.user.username} não se responsabiliza por dinheiro perdido.`)
+                .setFooter({ text: `A ${client.user.username} não se responsabiliza por dinheiro perdido.` })
 
         if (!args[0]) return message.reply({ embeds: [NoArgsEmbed] })
 

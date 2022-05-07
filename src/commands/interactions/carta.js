@@ -59,7 +59,7 @@ module.exports = {
                 new MessageEmbed()
                     .setColor(client.blue)
                     .addField(`📨 Mensagem`, `> ${Mensagem}`)
-                    .setFooter(`A ${client.user.username} não se responsabiliza pelo conteúdo presente nesta mensagem.`)
+                    .setFooter({ text: `A ${client.user.username} não se responsabiliza pelo conteúdo presente nesta mensagem.` })
             ]
         }).catch((err) => {
 

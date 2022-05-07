@@ -5,7 +5,7 @@ module.exports = {
     name: 'color',
     aliases: ['cor', 'hex', 'cores', 'codhex'],
     category: 'random',
-    
+
     ClientPermissions: ['EMBED_LINKS'],
     emoji: '🎨',
     usage: '<color> <ColorName>/<#hex>',
@@ -13,9 +13,9 @@ module.exports = {
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        const embed = new MessageEmbed().setFooter(`${prefix}cor #hex`)
+        const embed = new MessageEmbed().setFooter({ text: `${prefix}cor #hex` })
         const N = Database.Names
-        const NoArgsEmbed = new MessageEmbed().setColor('#246FE0').setTitle(`${e.Info} Tabelinha de Cores #HEX`).addField('🎨 Cores Disponiveis', 'Preto\n Azul\n Ciano\n Verde\n Vermelho\n Rosa\n Roxo\n Laranja\n Amarelo\n Branco').addField('Comando', `\`${prefix}cor <cor>\` Códigos #hex\n\`${prefix}cor <#hex>\` A cor da #hex`).setFooter(`Ideia do comando: ${client.users.cache.get(N.Makol)?.tag || 'Indefnido'}`)
+        const NoArgsEmbed = new MessageEmbed().setColor('#246FE0').setTitle(`${e.Info} Tabelinha de Cores #HEX`).addField('🎨 Cores Disponiveis', 'Preto\n Azul\n Ciano\n Verde\n Vermelho\n Rosa\n Roxo\n Laranja\n Amarelo\n Branco').addField('Comando', `\`${prefix}cor <cor>\` Códigos #hex\n\`${prefix}cor <#hex>\` A cor da #hex`).setFooter({ text: `Ideia do comando: ${client.users.cache.get(N.Makol)?.tag || 'Indefnido'}` })
 
         let HexColors = ''
 

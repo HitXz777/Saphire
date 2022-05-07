@@ -28,7 +28,7 @@ module.exports = {
                         .setTitle(`${e.Gear} Reporte bugs/erros`)
                         .setDescription('Com este comando, você reporta bugs/erros direto pro meu criador. Assim tudo é resolvido de maneira rápida! *(Links são permitidos)*')
                         .addField('Comando exemplo', `\`${prefix}bug Quando eu uso "comando x" tal bug acontece\``)
-                        .setFooter('Quaisquer abuso deste comando não será tolerado.')
+                        .setFooter({ text: 'Quaisquer abuso deste comando não será tolerado.' })
                 ]
             })
 

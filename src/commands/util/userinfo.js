@@ -221,9 +221,9 @@ module.exports = {
                 memberData.premiumSince = member.premiumSinceTimestamp ? `\n<a:boost:937713593187704903> Booster há: \`${client.formatTimestamp(member.premiumSinceTimestamp)}\`` : ''
                 memberData.roles = member.roles.cache.filter(r => r.name !== '@everyone').map(r => `\`${r.name}\``).join(', ') || '\`Nenhum cargo\`'
                 memberData.permissions = (() => {
-                    
+
                     if (user.id === message.guild.ownerId) return `${user.username} é o dono*(a)* do servidor. Possui todas as permissões.`
-                    
+
                     return member.permissions.toArray().map(perm => `\`${config.Perms[perm]}\``).join(', ')
                 })()
             }
@@ -355,7 +355,7 @@ module.exports = {
                                 value: `${e.Gear} Comando: ${['userinfo', 'ui', 'search', 'localize'].map(a => `\`${a}\``).join(', ')}\n🔍 Busca: ${['encontrar', 'find', 'localizar', 'search', 'procurar', 'p', 's', 'localize'].map(a => `\`${a}\``).join(', ')}`
                             }
                         )
-                        .setFooter('Hiper Commands Saphire')
+                        .setFooter({ text: 'Hiper Commands Saphire' })
                 ]
             })
         }

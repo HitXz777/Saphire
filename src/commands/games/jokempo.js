@@ -371,7 +371,7 @@ module.exports = {
                                     value: '\`jkp\`, \`jokenpo\`'
                                 },
                             )
-                            .setFooter(`${client.user.username}'s Games`)
+                            .setFooter({ text: `${client.user.username}'s Games` })
                     ]
                 }
             )
@@ -440,7 +440,7 @@ module.exports = {
             if (quantia <= 0) return message.reply(`${e.Deny} | Nada de valor menor ou igual a 0, ok?`)
 
             let moeda = await Moeda(message)
-            
+
             if (data.authorBalance <= 0)
                 return message.reply(`${e.Deny} | Você não possui dinheiro pra apostar não... Olha seu saldo que tristeza: **${data.authorBalance} ${moeda}**`)
 

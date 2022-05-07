@@ -354,7 +354,7 @@ module.exports = {
                     .on('end', () => {
 
                         if (validate) return
-                        embed.setColor('RED').setFooter('Comando cancelado')
+                        embed.setColor('RED').setFooter({ text: 'Comando cancelado' })
                         return msg.edit({ embeds: [embed] }).catch(() => { })
                     })
 

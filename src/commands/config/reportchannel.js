@@ -27,7 +27,7 @@ module.exports = {
                     .addField(`${e.QuestionMark} Como funciona?`, 'Simples! o membro só precisa escrever `' + prefix + 'report blá blá blá` e o report será encaminhado para o canal definido. As mensagens serão deletadas na hora do envio, tornando o report anônimo e seguro, os únicos que verão o report, serão as pessoas que tem permissão para ver o canal definido.')
                     .addField('Comando de Ativação', '`' + prefix + 'setreportchannel #Canal`')
                     .addField('Comando de Desativação', '`' + prefix + 'setreportchannel off`')
-                    .setFooter(`A ${client.user.username} não se responsabiliza pelo conteúdo enviado atráves deste sistema.`)
+                    .setFooter({ text: `A ${client.user.username} não se responsabiliza pelo conteúdo enviado atráves deste sistema.` })
             ]
         })
 

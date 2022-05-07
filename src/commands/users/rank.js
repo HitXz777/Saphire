@@ -117,7 +117,7 @@ module.exports = {
                         .addField('⭕ Ranking Global Jogo da Velha', `\`${prefix}rank ttt [local]\`\n\`${prefix}rank ttt [invertido]\``)
                         .addField('🛡️ Ranking Clans', `\`${prefix}rank clan\``)
                         .addField('🔍 In Locale Search', `\`${prefix}rank <classe> [posição/@user/id]\` ou \`${prefix}rank <classe> [me]\``)
-                        .setFooter('[] - Argumento opcional')
+                        .setFooter({ text: '[] - Argumento opcional' })
                 ],
                 components: [rankingSelectMenu]
             }).catch(() => { }),
@@ -194,7 +194,7 @@ module.exports = {
                         .addField('⭕ Ranking Global Jogo da Velha', `\`${prefix}rank ttt [local]\`\n\`${prefix}rank ttt [invertido]\``)
                         .addField('🛡️ Ranking Clans', `\`${prefix}rank clan\``)
                         .addField('🔍 In Locale Search', `\`${prefix}rank <classe> [posição/@user/id]\` ou \`${prefix}rank <classe> [me]\``)
-                        .setFooter('[] - Argumento opcional')
+                        .setFooter({ text: '[] - Argumento opcional' })
                 ]
             }).catch(() => { })
         }
@@ -315,7 +315,7 @@ module.exports = {
                 .setColor('YELLOW')
                 .setTitle(`👑 Ranking - Global Experience`)
                 .setDescription(`${RankMapped}`)
-                .setFooter(`Seu ranking: ${myrank} | Rank Base: XP`)
+                .setFooter({ text: `Seu ranking: ${myrank} | Rank Base: XP` })
 
             if (['local', 'server'].includes(args[1]?.toLowerCase())) return InServerLocalRanking()
 
@@ -336,7 +336,7 @@ module.exports = {
                     .setColor('YELLOW')
                     .setTitle(`👑 Ranking - ${message.guild.name}`)
                     .setDescription(`${RankMapped}`)
-                    .setFooter(`Seu ranking: ${myrank} | Rank Base: XP`)
+                    .setFooter({ text: `Seu ranking: ${myrank} | Rank Base: XP` })
 
                 return msg.edit({
                     content: `${e.Check} | Ranking local carregado com sucesso!`,
@@ -399,7 +399,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Money`)
                             .setDescription(`O ranking abaixo representa todo seu dinheiro.\n \n${rank}`)
-                            .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: Saldo`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Saldo` })
                     ]
                 }).catch(() => { })
 
@@ -413,7 +413,7 @@ module.exports = {
                     .setColor('YELLOW')
                     .setTitle(`👑 Ranking - ${message.guild.name}`)
                     .setDescription(`${RankMapped}`)
-                    .setFooter(`Seu ranking: ${myrank} | Rank Base: Saldo`)
+                    .setFooter({ text: `Seu ranking: ${myrank} | Rank Base: Saldo` })
 
                 return msg.edit({
                     content: `${e.Check} | Ranking carregado com sucesso!`,
@@ -464,7 +464,7 @@ module.exports = {
                 .setColor('YELLOW')
                 .setTitle(`👑 Ranking - Global Likes`)
                 .setDescription(`${RankMapped}`)
-                .setFooter(`Seu ranking: ${myrank} | Rank Base: Likes`)
+                .setFooter({ text: `Seu ranking: ${myrank} | Rank Base: Likes` })
 
             if (['local', 'server'].includes(args[1]?.toLowerCase())) return InServerLocalRanking()
             return !isNaN(args[1]) || ['me', 'eu'].includes(args[1]?.toLowerCase()) || user
@@ -484,7 +484,7 @@ module.exports = {
                     .setColor('YELLOW')
                     .setTitle(`👑 Ranking - ${message.guild.name}`)
                     .setDescription(`${RankMapped}`)
-                    .setFooter(`Seu ranking: ${myrank} | Rank Base: Likes`)
+                    .setFooter({ text: `Seu ranking: ${myrank} | Rank Base: Likes` })
 
                 return msg.edit({
                     content: `${e.Check} | Ranking carregado com sucesso!`,
@@ -541,7 +541,7 @@ module.exports = {
                 .setColor('YELLOW')
                 .setTitle(`👑 Ranking - Global Money Reverse`)
                 .setDescription(`O ranking abaixo representa a todo o dinheiro negativo.\n \n${rank}`)
-                .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: Carteira Negativada`)
+                .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Carteira Negativada` })
 
             if (['local', 'server'].includes(args[1]?.toLowerCase())) return InServerLocalRanking()
             return !isNaN(args[1]) || ['me', 'eu'].includes(args[1]?.toLowerCase()) || user
@@ -564,7 +564,7 @@ module.exports = {
                     .setColor('YELLOW')
                     .setTitle(`👑 Ranking - ${message.guild.name}`)
                     .setDescription(`${RankMapped}`)
-                    .setFooter(`Seu ranking: ${myrank} | Rank Base: Carteira Negativada`)
+                    .setFooter({ text: `Seu ranking: ${myrank} | Rank Base: Carteira Negativada` })
 
                 return msg.edit({
                     content: `${e.Check} | Ranking carregado com sucesso!`,
@@ -617,7 +617,7 @@ module.exports = {
                             .setColor(color)
                             .setTitle(`👑 Top 10 Clans`)
                             .setDescription(`O clan é baseado nas doações\n \n${rank}`)
-                            .setFooter(`Meu Clan: ${MyClanRank}`)
+                            .setFooter({ text: `Meu Clan: ${MyClanRank}` })
                     ]
                 }
             ).catch(() => { })
@@ -660,7 +660,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Mix Game`)
                             .setDescription(`Esse ranking é gerado na base da contagem do comando mix.\n \n${rank}`)
-                            .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: MixGlobalCount`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: MixGlobalCount` })
                     ]
                 }).catch(() => { })
 
@@ -677,7 +677,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking Mix - ${message.guild.name}`)
                             .setDescription(`${RankMapped}`)
-                            .setFooter(`Seu ranking: ${myrank}`)
+                            .setFooter({ text: `Seu ranking: ${myrank}` })
                     ]
                 }).catch(() => { })
 
@@ -738,7 +738,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Quiz Game`)
                             .setDescription(`Esse ranking é gerado na base da contagem do jogo quiz.\n \n${rank}`)
-                            .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: QuizGlobalCount`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: QuizGlobalCount` })
                     ]
                 }).catch(() => { })
 
@@ -755,7 +755,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking Quiz - ${message.guild.name}`)
                             .setDescription(`${RankMapped}`)
-                            .setFooter(`Seu ranking: ${myrank}`)
+                            .setFooter({ text: `Seu ranking: ${myrank}` })
                     ]
                 }).catch(() => { })
 
@@ -819,7 +819,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Jokempo Game`)
                             .setDescription(`Esse ranking é gerado na base da contagem do jogo jokempo.\n \n${rank}`)
-                            .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: Vitórias no Game Jokempo`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Vitórias no Game Jokempo` })
                     ]
                 }).catch(() => { })
 
@@ -836,7 +836,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking Jokempo - ${message.guild.name}`)
                             .setDescription(`${RankMapped}`)
-                            .setFooter(`Seu ranking: ${myrank}`)
+                            .setFooter({ text: `Seu ranking: ${myrank}` })
                     ]
                 }).catch(() => { })
 
@@ -898,7 +898,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Jokempo Game | Invertido`)
                             .setDescription(`Esse ranking é gerado na base da contagem do jogo jokempo.\n \n${rank}`)
-                            .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: Derrotas no Game Jokempo`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Derrotas no Game Jokempo` })
                     ]
                 }).catch(() => { })
 
@@ -915,7 +915,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking Jokempo Invertido - ${message.guild.name}`)
                             .setDescription(`${RankMapped}`)
-                            .setFooter(`Seu ranking: ${myrank}`)
+                            .setFooter({ text: `Seu ranking: ${myrank}` })
                     ]
                 })
 
@@ -981,7 +981,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Tic Tac Toe Game ${invert ? '| Invertido' : ''}`)
                             .setDescription(`Esse ranking é gerado na base da contagem do jogo da velha.\n \n${rank}`)
-                            .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: Vitórias no Game Jogo da Velha`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Vitórias no Game Jogo da Velha` })
                     ]
                 }).catch(() => { })
 
@@ -998,7 +998,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking Jogo da Velha - ${message.guild.name}`)
                             .setDescription(`${RankMapped}`)
-                            .setFooter(`Seu ranking: ${myrank}`)
+                            .setFooter({ text: `Seu ranking: ${myrank}` })
                     ]
                 }).catch(() => { })
 
@@ -1060,7 +1060,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle('👑 Ranking - Global Memory Game')
                             .setDescription(`Esse ranking é gerado na contagem de vitórias do Memory Game.\n \n${rank}`)
-                            .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: Vitórias no Game Memory`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Vitórias no Game Memory` })
                     ]
                 }).catch(() => { })
 
@@ -1077,7 +1077,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking Game Memory - ${message.guild.name}`)
                             .setDescription(`${RankMapped}`)
-                            .setFooter(`Seu ranking: ${myrank}`)
+                            .setFooter({ text: `Seu ranking: ${myrank}` })
                     ]
                 }).catch(() => { })
 
@@ -1139,7 +1139,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Hangman Game`)
                             .setDescription(`Esse ranking é gerado na contagem de vitórias do Hangman Game.\n \n${rank}`)
-                            .setFooter(`Seu ranking: ${AuthorRank} | Rank Base: Vitórias no Game Forca`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Vitórias no Game Forca` })
                     ]
                 }).catch(() => { })
 
@@ -1156,7 +1156,7 @@ module.exports = {
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking Game Hangman - ${message.guild.name}`)
                             .setDescription(`${RankMapped}`)
-                            .setFooter(`Seu ranking: ${myrank}`)
+                            .setFooter({ text: `Seu ranking: ${myrank}` })
                     ]
                 }).catch(() => { })
 

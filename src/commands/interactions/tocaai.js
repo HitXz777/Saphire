@@ -36,7 +36,7 @@ module.exports = {
 
                 if (reaction.emoji.name === '✅') {
                     
-                    const TradeEmbed = new MessageEmbed().setColor('RED').setFooter(`${message.author.id}/${user.id}`).setImage(g.Tocaai[Math.floor(Math.random() * g.Tocaai.length)])
+                    const TradeEmbed = new MessageEmbed().setColor('RED').setImage(g.Tocaai[Math.floor(Math.random() * g.Tocaai.length)])
                     msg.edit({ content: `${user} 🤝 ${message.author}`, embeds: [TradeEmbed] }).catch(() => { })
                 }
 

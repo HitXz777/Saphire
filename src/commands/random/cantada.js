@@ -389,7 +389,7 @@ module.exports = {
         })
 
         collector.on('end', () => {
-          CantadasEmbed.setColor('RED').setFooter(`Tempo expirado | ${prefix}cantada send`)
+          CantadasEmbed.setColor('RED').setFooter({ text: `Tempo expirado | ${prefix}cantada send` })
           return msg.edit({ embeds: [CantadasEmbed] }).catch(() => { })
         })
 

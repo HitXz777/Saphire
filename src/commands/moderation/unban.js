@@ -74,7 +74,7 @@ module.exports = {
                         { name: '📅 Data', value: `${Data()}` }
                     )
                     .setThumbnail(param.displayAvatarURL({ dynamic: true }))
-                    .setFooter(`${message.guild.name}`, message.guild.iconURL({ dynamic: true }))
+                    .setFooter({ text: message.guild.name, iconURL: message.guild.iconURL({ dynamic: true }) })
                 ]
             }).then(Message => {
                 return message.channel.send({

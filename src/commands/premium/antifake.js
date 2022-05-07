@@ -67,7 +67,7 @@ module.exports = {
                                 value: `\`${prefix}antifake off\``
                             }
                         )
-                        .setFooter('Permissão necessária: Expulsar Membros')
+                        .setFooter({ text: 'Permissão necessária: Expulsar Membros' })
                 ]
             })
 

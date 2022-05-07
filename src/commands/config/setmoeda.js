@@ -36,7 +36,7 @@ module.exports = {
                             value: `\`${prefix}setmoeda reset\``
                         }
                     )
-                    .setFooter('Não pode ter espaços no nome da moeda')
+                    .setFooter({ text: 'Não pode ter espaços no nome da moeda' })
             ]
         })
 

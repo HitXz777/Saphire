@@ -104,7 +104,7 @@ module.exports = {
                         inline: true
                     }
                 )
-                .setFooter(`Giveaway ID: ${msg?.id}`)
+                .setFooter({ text: `Giveaway ID: ${msg?.id}` })
 
             if (!msg?.id)
                 return message.reply(`${e.Deny} | Falha ao obter o ID da mensagem do sorteio. Verifique se eu realmente tenho permissão para enviar mensagem no canal de sorteios.`)
@@ -524,7 +524,7 @@ module.exports = {
                                         value: `\`${prefix}giveaway list\` ou \`${prefix}giveaway info <IdDoSorteio>\``
                                     }
                                 )
-                                .setFooter(`Este comando faz parte da: ${client.user.username} Hiper Commmands`)
+                                .setFooter({ text: `Este comando faz parte da: ${client.user.username} Hiper Commmands` })
                         ]
                     })
                 })()

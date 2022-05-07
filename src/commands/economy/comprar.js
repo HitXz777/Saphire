@@ -52,7 +52,7 @@ module.exports = {
                         value: `\`${prefix}comprar bg <code>\`\n\`${prefix}levelwallpapers\``
                     }
                 )
-                .setFooter(`${prefix}buy | ${prefix}vender | ${prefix}slot`),
+                .setFooter({ text: `${prefix}buy | ${prefix}vender | ${prefix}slot` }),
             itens = new MessageEmbed()
                 .setColor(color)
                 .setTitle('📋 Itens e suas funções')
@@ -132,7 +132,7 @@ module.exports = {
                 })
 
             coletor.on('end', async () => {
-                LojaEmbed.setColor('RED').setFooter(`Sessão encerrada | ${message.author.id}`)
+                LojaEmbed.setColor('RED').setFooter({ text: `Sessão encerrada | ${message.author.id}` })
 
                 return msg.edit({ components: [] }).catch(() => { })
             })
@@ -161,8 +161,8 @@ module.exports = {
                     case 'Close': msg.edit({ components: [] }).catch(() => { }); break;
                     default: msg.edit({ components: [PainelLoja] }).catch(() => { }); break;
                 }
-                
-                return 
+
+                return
             })
 
         }
@@ -237,7 +237,7 @@ module.exports = {
 
             let data = await Database.User.findOne({ id: message.author.id }, 'Slot.Skip Balance')
             let x = data.Slot?.Skip || 0
-           
+
             return x >= 10
                 ? message.reply(`${e.Deny} | Você já atingiu o limite de Quiz Skip.`)
                 : data.Balance >= (10 - x) * 50

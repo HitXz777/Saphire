@@ -33,7 +33,7 @@ module.exports = {
       embeds: [
         new MessageEmbed()
           .setColor(color)
-          .setAuthor(`${message.author.username} chamou ${user.user.username} de baka`, avatar)
+          .setAuthor({ name: `${message.author.username} chamou ${user.user.username} de baka`, iconURL: avatar })
           .setImage(rand)
       ]
     })

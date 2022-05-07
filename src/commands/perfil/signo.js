@@ -14,7 +14,7 @@ module.exports = {
             .setColor('#9266CC')
             .setTitle('Diga qual é seu signo.')
             .setDescription(`♈ Áries\n♉ Touro\n♊ Gêmeos\n♋ Câncer\n♌ Leão\n♍ Virgem\n♎ Libra\n♏ Escorpião\n♐ Sagitário\n♑ Capricórnio\n♒ Aquário\n♓ Peixes\n${e.Deny} Cancelar`)
-            .setFooter('Responda em 15 segundos')
+            .setFooter({ text: 'Responda em 15 segundos' })
 
         const msg = await message.reply({ embeds: [embed] }).catch(() => { }),
             collector = message.channel.createMessageCollector({ filter: m => m.author.id === message.author.id, max: 1, time: 15000 })
