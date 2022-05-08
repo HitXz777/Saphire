@@ -11,9 +11,8 @@ module.exports = {
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        const msg = await message.reply(`${e.Loading} | Obtendo os dados necessários...`)
-
-        let data = await Database.User.findOne({ id: message.author.id })
+        const msg = await message.reply(`${e.Loading} | Obtendo os dados necessários...`),
+            data = await Database.User.findOne({ id: message.author.id })
 
         if (!data)
             return message.channel.send(`${e.Deny} | Nenhum dado foi encontrado no meu banco de dados referente ao seu ID. Por favor, tente novamente.`).catch(() => { })
@@ -134,19 +133,7 @@ module.exports = {
                         .addFields(
                             {
                                 name: 'Info Database - Basic Stage',
-                                value: `
-                                Database's Location Document ID - \`${authorData._id}\`
-                                Clan - \`${authorData.Clan.replace('`', '')}\`
-                                Vip Status - \`Permanent: ${authorData.Vip.Permanent} | Actived: ${authorData.Vip.Validate}\`
-                                Likes - \`${authorData.Likes}\`
-                                Experience - \`${authorData.Xp}\`
-                                Level - \`${authorData.Level}\`
-                                Transactions Count - \`${authorData.Transactions}\`
-                                Balance - \`${authorData.Balance} Safiras\`
-                                Afk System - \`${authorData.AfkSystem}\`
-                                Custom Embed Color - \`Permission: ${authorData.Color.Perm} | Hex Code: ${authorData.Color.Set}\`
-                                Donate Receipt Channel - \`${authorData.Cache.ComprovanteOpen}\`
-                                `
+                                value: `Database's Location Document ID - \`${authorData._id}\`\nClan - \`${authorData.Clan.replace('`', '')}\`\nVip Status - \`Permanent: ${authorData.Vip.Permanent} | Actived: ${authorData.Vip.Validate}\`\nLikes - \`${authorData.Likes}\`\nExperience - \`${authorData.Xp}\`\nLevel - \`${authorData.Level}\`\nTransactions Count - \`${authorData.Transactions}\`\nBalance - \`${authorData.Balance} Safiras\`\nAfk System - \`${authorData.AfkSystem}\`\nCustom Embed Color - \`Permission: ${authorData.Color.Perm} | Hex Code: ${authorData.Color.Set}\`\nDonate Receipt Channel - \`${authorData.Cache.ComprovanteOpen}\``
                             }
                         )
                         .setFooter({ text: `${message.author.username}'s Data`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
@@ -168,15 +155,7 @@ module.exports = {
                         .addFields(
                             {
                                 name: 'Info Database - Gaming Count',
-                                value: `
-                                Mix Count - \`${authorData.MixCount}\`
-                                Quiz Count - \`${authorData.QuizCount}\`
-                                Tic Tac Toe Count - \`${authorData.TicTacToeCount}\`
-                                Competitive Memory Count - \`${authorData.CompetitiveMemoryCount}\`
-                                Hangman Count - \`${authorData.ForcaCount}\`
-                                Daily Count - \`${authorData.DailyCount}\`
-                                Jokempo Count - \`${authorData.Jokempo.Wins} Victory x Defeat ${authorData.Jokempo.Loses}\`
-                                `
+                                value: `Mix Count - \`${authorData.MixCount}\`Quiz Count - \`${authorData.QuizCount}\`Tic Tac Toe Count - \`${authorData.TicTacToeCount}\`Competitive Memory Count - \`${authorData.CompetitiveMemoryCount}\`Hangman Count - \`${authorData.ForcaCount}\`Daily Count - \`${authorData.DailyCount}\`Jokempo Count - \`${authorData.Jokempo.Wins} Victory x Defeat ${authorData.Jokempo.Loses}\``
                             }
                         )
                         .setFooter({ text: `${message.author.username}'s Data`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
