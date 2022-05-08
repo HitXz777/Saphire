@@ -20,7 +20,6 @@ module.exports = {
 
         let authorData = {
             _id: data?._id,
-            id: data?.id,
             Clan: data?.Clan || 'Nenhum',
             Likes: data?.Likes || 0,
             Xp: data?.Xp || 0,
@@ -34,25 +33,6 @@ module.exports = {
             CompetitiveMemoryCount: data?.CompetitiveMemoryCount || 0,
             ForcaCount: data?.ForcaCount || 0,
             DailyCount: data?.DailyCount || 0,
-            Timeouts: {
-                Bug: data?.Timeouts?.Bug || 0,
-                Daily: data?.Timeouts?.Daily || 0,
-                Cu: data?.Timeouts?.Cu || 0,
-                Roleta: data?.Timeouts?.Roleta || 0,
-                Esmola: data?.Timeouts?.Esmola || 0,
-                Work: data?.Timeouts?.Work || 0,
-                ImagesCooldown: data?.Timeouts?.ImagesCooldown || 0,
-                ServerIdeia: data?.Timeouts?.ServerIdeia || 0,
-                Letter: data?.Timeouts?.Letter || 0,
-                Confess: data?.Timeouts?.Confess || 0,
-                Loteria: data?.Timeouts?.Loteria || 0,
-                LevelTrade: data?.Timeouts?.LevelTrade || 0,
-                LevelImage: data?.Timeouts?.LevelImage || 0,
-                Cantada: data?.Timeouts?.Cantada || 0,
-                Bitcoin: data?.Timeouts?.Bitcoin || 0,
-                Porquinho: data?.Timeouts?.Porquinho || 0,
-                Rep: data?.Timeouts?.Rep || 0,
-            },
             Cache: {
                 ComprovanteOpen: data?.Cache?.ComprovanteOpen ? 'Aberto' : 'Fechado'
             },
@@ -89,18 +69,20 @@ module.exports = {
             .on('collect', async interaction => {
                 interaction.deferUpdate().catch(() => { })
 
-                return {
-                    'baseData': initalPage(),
-                    'basicData': basicData()
-                }[interaction.values[0]] || noDataFound()
+                switch (interaction.values[0]) {
+                    case 'baseData': initalPage(); break
+                    case 'basicData': basicData(); break
+                    default: noDataFound(); break
+                }
 
                 return
+
             })
             .on('end', () => msg.edit({ content: `${e.Deny} | Comando cancelado.`, components: [] }))
 
         function initalPage() {
             return msg.edit({
-                content: 'Base One',
+                content: 'Base: Discord Basic Information',
                 embeds: [
                     new MessageEmbed()
                         .setColor(client.blue)
@@ -121,11 +103,12 @@ module.exports = {
 
         function noDataFound() {
             return msg.edit({
-                content: 'No Data',
+                content: 'Base: No Data',
                 embeds: [
                     new MessageEmbed()
                         .setColor(client.blue)
-                        .setTitle('Nenhum dado encontrado nesta categoria')
+                        .setTitle('No data found!')
+                        .setDescription('Nenhum dado foi encontrado nesta categoria. Use mais comandos e invista no seu perfil para adquirir mais dados.')
                         .setFooter({ text: `${message.author.username}'s Data`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
 
                 ],
@@ -137,37 +120,42 @@ module.exports = {
 
             const basicData = {
                 idObject: authorData._id,
-                Clan: author
+                Clan: authorData.Clan,
+                Likes: authorData.Likes,
+                Xp: authorData.Xp,
+                Level: authorData.Level,
+                Transactions: authorData.Transactions,
+                Balance: authorData.Balance,
+                AfkSystem: authorData.AfkSystem,
+                MixCount: authorData.MixCount,
+                QuizCount: authorData.QuizCount,
+                TicTacToeCount: authorData.TicTacToeCount,
+                CompetitiveMemoryCount: authorData.CompetitiveMemoryCount,
+                ForcaCount: authorData.ForcaCount,
+                DailyCount: authorData.DailyCount,
             }
 
             return msg.edit({
-                content: 'No Data',
+                content: 'Base: Basic Saphire\'s Database Information',
                 embeds: [
                     new MessageEmbed()
                         .setColor(client.blue)
-                        .setTitle('Nenhum dado encontrado nesta categoria')
+                        .setTitle('Dados Básicos')
+                        .setDescription(`Aqui estão todos os seus dados básicos presentes na Saphire's Database.\n*Todos os outros dados se encontram nos comandos \`${prefix}perfil\` & \`${prefix}slot\`*`)
+                        .addFields(
+                            {
+                                name: 'Info Database - Basic Stage',
+                                value: `
+                                Database's Location Document ID - \`${basicData.idObject}\`\n
+                                
+                                `
+                            }
+                        )
                         .setFooter({ text: `${message.author.username}'s Data`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
 
                 ],
                 components: [typesComponents]
             }).catch(() => { })
-        }
-
-        function getStarsCount() {
-
-            let stars = [
-                Um = data?.Perfil?.Estrela?.Um ? 1 : false,
-                Dois = data?.Perfil?.Estrela?.Dois ? 2 : false,
-                Tres = data?.Perfil?.Estrela?.Tres ? 3 : false,
-                Quatro = data?.Perfil?.Estrela?.Quatro ? 4 : false,
-                Cinco = data?.Perfil?.Estrela?.Cinco ? 5 : false,
-                Seis = data?.Perfil?.Estrela?.Seis ? 6 : false
-            ]
-
-            for (let i = 0; i < 6; i++)
-                if (stars[i] > 0) return stars[i]
-
-            return 0
         }
 
     }
