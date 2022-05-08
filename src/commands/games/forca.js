@@ -87,7 +87,7 @@ module.exports = {
                         content = Message.content?.toLowerCase()
 
                     control.resend++
-                    if (control.resend >= 10) refreshMessage()
+                    if (control.resend >= 7) refreshMessage()
 
                     if (!validate.test(content)) return
                     if (lettersUsed.includes(content)) return
