@@ -13,7 +13,7 @@ module.exports = {
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Sexo')
-        
+
         if (!data) {
             Database.registerUser(message.author)
             return message.reply(`${e.Menhera} | Opa! Você não tinha nenhuma informação no banco de dados. Acabei de registrar você. Pode usar o comando de novo.`)
@@ -47,7 +47,7 @@ module.exports = {
         const setGenerPainel = new MessageActionRow()
             .addComponents(new MessageSelectMenu()
                 .setCustomId('setSexo')
-                .setPlaceholder('Selecionar meu sexo') // Mensagem estampada
+                .setPlaceholder('Selecionar meu sexo')
                 .addOptions([
                     options,
                     {

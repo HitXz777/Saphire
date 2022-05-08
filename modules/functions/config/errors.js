@@ -19,10 +19,7 @@ async function Error(message, err) {
      * 500 - Internal Server Error
      * 50013 - DiscordAPIError: Missing Permissions
      */
-
-    if (err?.code === 50035) // 50035 - Invalid Form Body - Unknown message
-        return message?.channel?.send(`${e.Warn} | A mensagem de origem foi deletada ou o Discord não forneceu todos os dados.`)
-
+    
     if (err?.code === 50013)
         return message?.channel?.send(`${e.Warn} | Eu não tenho permissão suficiente para prosseguir com este comando.`)
 

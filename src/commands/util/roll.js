@@ -2,7 +2,7 @@ const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'roll',
-    aliases: ['dado', 'dados', 'rolls'],
+    aliases: ['dado', 'rolls'],
     category: 'util',
     emoji: '🎲',
     usage: '<roll> <número>',
