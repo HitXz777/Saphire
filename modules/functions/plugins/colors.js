@@ -4,9 +4,12 @@ async function Colors(userId) {
 
     if (!userId) return '#246FE0'
 
-    let user = await Database.User.findOne({ id: userId }, 'Color'),
-        perm = user?.Color?.Perm,
-        set = user?.Color?.Set
+    let user = await Database.User.findOne({ id: userId }, 'Color')
+    
+    if (!user || !user?.Color) return '#246FE0'
+    
+    let perm = user.Color?.Perm,
+        set = user.Color?.Set
 
     if (!perm || !set) return '#246FE0'
 

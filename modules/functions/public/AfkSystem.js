@@ -8,7 +8,7 @@ const { e } = require('../../../JSON/emojis.json'),
 
 async function AfkSystem(message) {
 
-    if (!message.guild) return
+    if (!message || !message.guild) return
 
     let memberUser = message.mentions.users.first() || message.mentions.repliedUser,
         guildData = await Database.Guild.findOne({ id: message.guild.id }, 'AfkSystem'),

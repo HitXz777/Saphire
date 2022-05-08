@@ -1,6 +1,5 @@
 const { Message, MessageEmbed } = require('discord.js'),
     { e } = require('../../../JSON/emojis.json'),
-    Moeda = require('../public/moeda'),
     NewLoteryGiveaway = require('../update/newlotery'),
     ms = require('parse-ms'),
     Vip = require('../public/vip'),
@@ -13,8 +12,14 @@ const { Message, MessageEmbed } = require('discord.js'),
 
 async function BuyingAway(message, prefix, args, money, color, moeda) {
 
-    let user = await Database.User.findOne({ id: message.author.id }, 'Color Perfil Slot Balance'),
-        vip = await Vip(`${message.author.id}`),
+    let user = await Database.User.findOne({ id: message.author.id }, 'Color Perfil Slot Balance')
+
+    if (!user) {
+        Database.registerUser(message.author)
+        return message.reply(`${e.Menhera} | Opa! Você não tinha nenhuma informação no banco de dados. Acabei de registrar você. Pode usar o comando de novo.`)
+    }
+
+    let vip = await Vip(`${message.author.id}`),
         reg = /^\d+$/
 
     if (['bg', 'wall', 'wallpapers', 'fundo', 'capa'].includes(args[0]?.toLowerCase())) return BuyBackground()
