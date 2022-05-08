@@ -150,12 +150,12 @@ module.exports = {
                 embeds: [
                     new MessageEmbed()
                         .setColor(client.blue)
-                        .setTitle(`${client.user.username}\'s Database Information - (Beta)`)
+                        .setTitle(`${client.user.username}\'s Database Information | Gaming - (Beta)`)
                         .setDescription(`Aqui estão todos os seus dados dos jogos na ${client.user.username}'s Database.`)
                         .addFields(
                             {
                                 name: 'Info Database - Gaming Count',
-                                value: `Mix Count - \`${authorData.MixCount}\`Quiz Count - \`${authorData.QuizCount}\`Tic Tac Toe Count - \`${authorData.TicTacToeCount}\`Competitive Memory Count - \`${authorData.CompetitiveMemoryCount}\`Hangman Count - \`${authorData.ForcaCount}\`Daily Count - \`${authorData.DailyCount}\`Jokempo Count - \`${authorData.Jokempo.Wins} Victory x Defeat ${authorData.Jokempo.Loses}\``
+                                value: `Mix Count - \`${authorData.MixCount}\`\nQuiz Count - \`${authorData.QuizCount}\`\nTic Tac Toe Count - \`${authorData.TicTacToeCount}\`\nCompetitive Memory Count - \`${authorData.CompetitiveMemoryCount}\`\nHangman Count - \`${authorData.ForcaCount}\`\nDaily Count - \`${authorData.DailyCount}\`\nJokempo Count - \`${authorData.Jokempo.Wins} Victory x Defeat ${authorData.Jokempo.Loses}\``
                             }
                         )
                         .setFooter({ text: `${message.author.username}'s Data`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })

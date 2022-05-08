@@ -104,7 +104,7 @@ module.exports = {
 
         async function startZepellin() {
 
-            let resultToTimeout = [15000, 20000, 30000, 40000, 25000, 50000, 60000, 45000][Math.floor(Math.random() * 4)],
+            let resultToTimeout = [10000, 6000, 15000, 20000, 30000, 40000, 25000, 50000, 60000, 45000, 70000, 80000, 90000, 75000, 85000, 95000, 100000, 110000, 120000][Math.floor(Math.random() * 4)],
                 timeResult = Math.floor(Math.random() * resultToTimeout) + 1700
 
             let msg = await message.reply({
