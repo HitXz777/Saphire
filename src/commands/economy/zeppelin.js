@@ -31,6 +31,7 @@ module.exports = {
             ballon = '🎈',
             boom = '💥',
             dotSequence = '',
+            retired = false,
             valueMultiplication = 1.0,
             button = [
                 {
@@ -144,6 +145,8 @@ module.exports = {
                 interaction.deferUpdate().catch(() => { })
 
                 clearInterval(interval)
+                retired = true
+                explode(msg)
                 removeChannelFromDatabase()
                 collector.stop()
                 msg.edit({ components: [] }).catch(() => { })
@@ -151,6 +154,8 @@ module.exports = {
             })
 
             setTimeout(() => {
+                if (retired) return
+                
                 collector.stop()
                 clearInterval(interval)
                 explode(msg)
@@ -164,13 +169,16 @@ module.exports = {
                 components: []
             }).catch(() => { })
 
-            totalPrice('Zeppelin.loseTotalMoney', value)
+            if (!retired) {
+                totalPrice('Zeppelin.loseTotalMoney', value)
 
-            Database.PushTransaction(
-                message.author.id,
-                `${e.loss} Perdeu ${value} Safiras jogando *Zeppelin*`
-            )
-            return message.channel.send(`${e.Deny} | Não foi dessa vez ${message.author}. O balão explodiu e você perdeu o dinheiro apostado`)
+                Database.PushTransaction(
+                    message.author.id,
+                    `${e.loss} Perdeu ${value} Safiras jogando *Zeppelin*`
+                )
+
+                return message.channel.send(`${e.Deny} | Não foi dessa vez ${message.author}. O balão explodiu e você perdeu o dinheiro apostado`)
+            }
         }
 
         function win() {
