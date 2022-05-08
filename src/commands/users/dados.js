@@ -1,5 +1,5 @@
 const { e } = require('../../../JSON/emojis.json'),
-    { MessageSelectMenu, MessageActionRow } = require('discord.js')
+    { MessageSelectMenu, MessageActionRow, Collector } = require('discord.js')
 
 module.exports = {
     name: 'dados',
@@ -20,13 +20,13 @@ module.exports = {
 
         let authorData = {
             _id: data?._id,
-            Clan: data?.Clan || 'Nenhum',
+            Clan: data?.Clan || 'Clan do not exist',
             Likes: data?.Likes || 0,
             Xp: data?.Xp || 0,
             Level: data?.Level || 0,
             Transactions: data?.Transactions?.length || 0,
             Balance: data?.Balance || 0,
-            AfkSystem: data?.AfkSystem ? 'Ativado' : 'Desativado',
+            AfkSystem: data?.AfkSystem ? 'Actived' : 'Disabled',
             MixCount: data?.MixCount || 0,
             QuizCount: data?.QuizCount || 0,
             TicTacToeCount: data?.TicTacToeCount || 0,
@@ -34,15 +34,15 @@ module.exports = {
             ForcaCount: data?.ForcaCount || 0,
             DailyCount: data?.DailyCount || 0,
             Cache: {
-                ComprovanteOpen: data?.Cache?.ComprovanteOpen ? 'Aberto' : 'Fechado'
+                ComprovanteOpen: data?.Cache?.ComprovanteOpen ? 'Open' : 'Closed'
             },
             Color: {
-                Perm: data?.Color?.Perm ? 'Obtem permissão de cores personalizadas' : 'Não possui permissão de cores personalizadas',
-                Set: data?.Color?.Set ? data.Color.Set : '#246FE0 - Padrão'
+                Perm: data?.Color?.Perm ? 'Yes' : 'No',
+                Set: data?.Color?.Set ? data.Color.Set : 'Default'
             },
             Vip: {
-                Permanent: data?.Vip?.Permanent ? 'Sim' : 'Não',
-                Validate: client.Timeout(data?.Vip?.TimeRemaing, data?.Vip?.DateNow) ? 'Sim' : 'Não',
+                Permanent: data?.Vip?.Permanent ? 'Yes' : 'No',
+                Validate: client.Timeout(data?.Vip?.TimeRemaing, data?.Vip?.DateNow) ? 'Yes' : 'No',
             },
             Jokempo: {
                 Wins: data?.Jokempo?.Wins || 0,
@@ -56,13 +56,15 @@ module.exports = {
                 .setPlaceholder('Escolher categoria de dados')
                 .addOptions([
                     { label: 'Dados Base', value: 'baseData' },
-                    { label: 'Dados Basicos', value: 'basicData' }
+                    { label: 'Dados Basicos', value: 'basicData' },
+                    { label: 'Pontuação de Jogos', value: 'gamingCountingData' },
+                    { label: 'Encerrar', value: 'close' }
                 ])
             )
 
         initalPage()
 
-        return msg.createMessageComponentCollector({
+        const collector = msg.createMessageComponentCollector({
             filter: (interaction) => interaction.customId === 'data' && interaction.user.id === message.author.id,
             idle: 60000
         })
@@ -72,6 +74,8 @@ module.exports = {
                 switch (interaction.values[0]) {
                     case 'baseData': initalPage(); break
                     case 'basicData': basicData(); break
+                    case 'gamingCountingData': gamingCountingData(); break
+                    case 'close': collector.stop(); break
                     default: noDataFound(); break
                 }
 
@@ -80,18 +84,20 @@ module.exports = {
             })
             .on('end', () => msg.edit({ content: `${e.Deny} | Comando cancelado.`, components: [] }))
 
+        return
+
         function initalPage() {
             return msg.edit({
                 content: 'Base: Discord Basic Information',
                 embeds: [
                     new MessageEmbed()
                         .setColor(client.blue)
-                        .setTitle('Dados Base')
+                        .setTitle('Dados Base - (Beta)')
                         .setDescription('Esses são seus dados base do Discord, que por sua vez, todos tem acesso a eles.')
                         .addFields(
                             {
                                 name: 'Identidade',
-                                value: `Tag: ${message.author.tag}\nID: ${message.author.id}`
+                                value: `Tag: \`${message.author.tag}\`\nID: \`${message.author.id}\``
                             }
                         )
                         .setFooter({ text: `${message.author.username}'s  Data`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
@@ -107,7 +113,7 @@ module.exports = {
                 embeds: [
                     new MessageEmbed()
                         .setColor(client.blue)
-                        .setTitle('No data found!')
+                        .setTitle('No data found! - (Beta)')
                         .setDescription('Nenhum dado foi encontrado nesta categoria. Use mais comandos e invista no seu perfil para adquirir mais dados.')
                         .setFooter({ text: `${message.author.username}'s Data`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
 
@@ -118,36 +124,28 @@ module.exports = {
 
         function basicData() {
 
-            const basicData = {
-                idObject: authorData._id,
-                Clan: authorData.Clan,
-                Likes: authorData.Likes,
-                Xp: authorData.Xp,
-                Level: authorData.Level,
-                Transactions: authorData.Transactions,
-                Balance: authorData.Balance,
-                AfkSystem: authorData.AfkSystem,
-                MixCount: authorData.MixCount,
-                QuizCount: authorData.QuizCount,
-                TicTacToeCount: authorData.TicTacToeCount,
-                CompetitiveMemoryCount: authorData.CompetitiveMemoryCount,
-                ForcaCount: authorData.ForcaCount,
-                DailyCount: authorData.DailyCount,
-            }
-
             return msg.edit({
-                content: 'Base: Basic Saphire\'s Database Information',
+                content: `Base: Basic ${client.user.username}\'s Database Information`,
                 embeds: [
                     new MessageEmbed()
                         .setColor(client.blue)
-                        .setTitle('Dados Básicos')
-                        .setDescription(`Aqui estão todos os seus dados básicos presentes na Saphire's Database.\n*Todos os outros dados se encontram nos comandos \`${prefix}perfil\` & \`${prefix}slot\`*`)
+                        .setTitle('Dados Básicos - (Beta)')
+                        .setDescription(`Aqui estão todos os seus dados básicos presentes na ${client.user.username}'s Database.\n*Todos os outros dados se encontram nos comandos \`${prefix}perfil\` & \`${prefix}slot\`*`)
                         .addFields(
                             {
                                 name: 'Info Database - Basic Stage',
                                 value: `
-                                Database's Location Document ID - \`${basicData.idObject}\`\n
-                                
+                                Database's Location Document ID - \`${authorData._id}\`
+                                Clan - \`${authorData.Clan.replace('`', '')}\`
+                                Vip Status - \`Permanent: ${authorData.Vip.Permanent} | Actived: ${authorData.Vip.Validate}\`
+                                Likes - \`${authorData.Likes}\`
+                                Experience - \`${authorData.Xp}\`
+                                Level - \`${authorData.Level}\`
+                                Transactions Count - \`${authorData.Transactions}\`
+                                Balance - \`${authorData.Balance} Safiras\`
+                                Afk System - \`${authorData.AfkSystem}\`
+                                Custom Embed Color - \`Permission: ${authorData.Color.Perm} | Hex Code: ${authorData.Color.Set}\`
+                                Donate Receipt Channel - \`${authorData.Cache.ComprovanteOpen}\`
                                 `
                             }
                         )
@@ -155,8 +153,37 @@ module.exports = {
 
                 ],
                 components: [typesComponents]
-            }).catch(() => { })
+            })
         }
 
+        function gamingCountingData() {
+
+            return msg.edit({
+                content: `Base: Basic ${client.user.username}\'s Database Information`,
+                embeds: [
+                    new MessageEmbed()
+                        .setColor(client.blue)
+                        .setTitle(`${client.user.username}\'s Database Information - (Beta)`)
+                        .setDescription(`Aqui estão todos os seus dados dos jogos na ${client.user.username}'s Database.`)
+                        .addFields(
+                            {
+                                name: 'Info Database - Gaming Count',
+                                value: `
+                                Mix Count - \`${authorData.MixCount}\`
+                                Quiz Count - \`${authorData.QuizCount}\`
+                                Tic Tac Toe Count - \`${authorData.TicTacToeCount}\`
+                                Competitive Memory Count - \`${authorData.CompetitiveMemoryCount}\`
+                                Hangman Count - \`${authorData.ForcaCount}\`
+                                Daily Count - \`${authorData.DailyCount}\`
+                                Jokempo Count - \`${authorData.Jokempo.Wins} Victory x Defeat ${authorData.Jokempo.Loses}\`
+                                `
+                            }
+                        )
+                        .setFooter({ text: `${message.author.username}'s Data`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+
+                ],
+                components: [typesComponents]
+            })
+        }
     }
 }
