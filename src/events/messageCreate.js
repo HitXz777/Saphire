@@ -115,7 +115,7 @@ client.on('messageCreate', async message => {
     if (command.owner && message.author.id !== config.ownerId)
         return message.reply(`${e.OwnerCrow} | Este é um comando restrito da classe: Owner/Desenvolvedor`)
 
-    if (command.admin && !clientData?.Administradores.includes(message.author.id))
+    if (command.admin && (!clientData?.Administradores.includes(message.author.id) && message.author.id !== config.ownerId))
         return message.reply(`${e.Admin} | Este é um comando restrito da classe: Saphire's Team Administrator`)
 
     if (command.category === 'economy' && clientData?.Blacklist?.Economy?.some(data => data.id === message.author.id))

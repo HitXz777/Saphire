@@ -14,6 +14,11 @@ module.exports = model("Client", new Schema({
     BlockedUsers: Array,
     PremiumServers: Array,
     QuizChannels: Array,
+    Zeppelin: {
+        Channels: Array,
+        winTotalMoney: Number,
+        loseTotalMoney: Number
+    },
     ForcaChannels: Array,
     Rebooting: {
         ON: Boolean,

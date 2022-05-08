@@ -23,7 +23,8 @@ client.on("ready", async () => {
                 BingoChannels: 1,
                 QuizChannels: 1,
                 ForcaChannels: 1,
-                Rebooting: 1
+                Rebooting: 1,
+                ['Zeppelin.Channels']: 1
             }
         })
 
