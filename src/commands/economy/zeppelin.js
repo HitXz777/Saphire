@@ -182,7 +182,7 @@ module.exports = {
                 `${e.gain} Ganhou ${moneyResult?.toFixed(0)} Safiras jogando *Zeppelin*`
             )
 
-            totalPrice('Zeppelin.winTotalMoney', moneyResult - value)
+            totalPrice('Zeppelin.winTotalMoney', (moneyResult - value)?.toFixed(0))
             return message.channel.send(`${e.Check} | Parabéns ${message.author}! Você ganhou um montante de ${moneyResult?.toFixed(0)} ${moeda} retirando a aposta em ${valueMultiplication?.toFixed(1)}. Lembrando que o resultado é o valor da aposta vezes o número do zeppelin.`)
         }
 
