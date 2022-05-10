@@ -291,7 +291,7 @@ module.exports = {
                             .addFields(
                                 {
                                     name: '🆕 Novidades',
-                                    value: `**${prefix}zeppelin** - Novo comando de apostas.\n**${prefix}dados** - Consulte seus dados diretamente do banco de dados`
+                                    value: `**${prefix}zeppelin** - Novo comando de apostas\n**${prefix}dados** - Consulte seus dados diretamente do banco de dados\n**${prefix}banner** - Faixa dos membros Nitro`
                                 },
                                 {
                                     name: '⛔ Remoção',
