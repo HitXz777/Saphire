@@ -1,5 +1,4 @@
 const { e } = require('../../../JSON/emojis.json')
-const ms = require('parse-ms')
 
 module.exports = {
     name: 'avatar',
