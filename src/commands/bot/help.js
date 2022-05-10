@@ -286,20 +286,20 @@ module.exports = {
                     embeds: [
                         new MessageEmbed()
                             .setColor(client.blue)
-                            .setTitle(`⭐ Notas da Atualização`)
+                            .setTitle(`⭐ Notas da Última Atualização`)
                             .setDescription(`Aqui ficam informações da última atualização que eu recebi. Caso queria ver as atualizações antigas, acesse [meu servidor](${config.ServerLink}).`)
                             .addFields(
                                 {
                                     name: '🆕 Novidades',
-                                    value: `**${prefix}daily** - Rework para um sistema novo de prêmios diários.`
+                                    value: `**${prefix}zeppelin** - Novo comando de apostas.\n**${prefix}dados** - Consulte seus dados diretamente do banco de dados`
                                 },
                                 {
                                     name: '⛔ Remoção',
-                                    value: `\`${prefix}semanal\` - \`${prefix}mensal\``
+                                    value: '*Nada foi removido*'
                                 },
                                 {
                                     name: `${e.bug} Bugs`,
-                                    value: `QUIZ COMMAND - Logical Skip End - ${e.Check} Fixed | \`Last Bug Found: 03/03/2022\``
+                                    value: `QUIZ COMMAND - Logical Skip End - ${e.Check} Fixed | \`Bug Found At: 03/03/2022\`\nLEVEL COMMAND - Infinity Loading - ${e.Check} Fixed | \`Bug Found At: 09/05/2022\``
                                 }
                             )
                     ],
