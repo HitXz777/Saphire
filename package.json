@@ -38,7 +38,7 @@
     "mongoose": "^6.3.1",
     "ms": "^2.1.3",
     "parse-ms": "^2.1.0",
-    "simply-djs": "^2.0.97",
+    "simply-djs": "2.0.99",
     "sourcebin": "^4.3.5",
     "weather-js": "^2.0.0",
     "yuri-canvas": "^4.0.6"
