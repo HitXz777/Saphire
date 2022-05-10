@@ -2,7 +2,6 @@ const
     { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database'),
     simplydjs = require('simply-djs'),
     Error = require('../../../modules/functions/config/errors'),
-    Colors = require('../../../modules/functions/plugins/colors'),
     ms = require("parse-ms")
 
 module.exports = {
