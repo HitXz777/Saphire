@@ -102,9 +102,6 @@ module.exports = {
             if (!message.guild.channels.cache.has(NewChannel.id))
                 return message.reply(`${e.Deny} | Canal inválido!`)
 
-            if (NewChannel.deleted)
-                return message.reply(`${e.Deny} | Este canal foi deletado. Que tal tentar um que existe no servidor?`)
-
             if (message.guild.channels.cache.has(NewChannel.id)) {
 
                 const msg = await message.reply(`${e.QuestionMark} | Deseja configurar o canal ${NewChannel} como Canal de Confissões?`)

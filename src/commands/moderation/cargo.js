@@ -91,7 +91,6 @@ module.exports = {
         function DeleteRole() {
 
             if (!Role) return message.channel.send(`${e.Info} | @Marque, diga o ID ou o nome do cargo para que eu possa deletar.`)
-            if (Role.deleted) return message.reply(`${e.Info} | Este cargo já foi deletado.`)
             if (!Role.editable) return message.reply(`${e.Deny} | Eu não tenho permissão para gerenciar este cargo.`)
 
             if (message.author.id !== message.guild.ownerId) {
@@ -140,7 +139,6 @@ module.exports = {
         function EditRole() {
 
             if (!Role) return message.reply(`${e.Deny} | Forneça um @cargo.`)
-            if (Role.deleted) return message.reply(`${e.Info} | Este cargo foi deletado.`)
             if (!Role.editable) return message.reply(`${e.Deny} | Eu não tenho permissão para gerenciar este cargo.`)
 
             if (message.author.id !== message.guild.ownerId) {
@@ -355,7 +353,6 @@ module.exports = {
         function AddRole() {
 
             if (!Role) return message.channel.send(`${e.Info} | @Marque, diga o ID ou o nome do cargo para que eu possa adiciona-lo.`)
-            if (Role.deleted) return message.reply(`${e.Info} | Este cargo foi deletado.`)
             if (!Role.editable) return message.reply(`${e.Deny} | Eu não tenho permissão para gerenciar este cargo.`)
 
             if (message.author.id !== message.guild.ownerId) {
@@ -381,7 +378,6 @@ module.exports = {
         function RemoveRole() {
 
             if (!Role) return message.channel.send(`${e.Info} | @Marque, diga o ID ou o nome do cargo para que eu possa remove-lo.`)
-            if (Role.deleted) return message.reply(`${e.Info} | Este cargo foi deletado.`)
             if (!Role.editable) return message.reply(`${e.Deny} | Eu não tenho permissão para gerenciar este cargo.`)
 
             if (message.author.id !== message.guild.ownerId) {

@@ -1,6 +1,6 @@
 const
     { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database'),
-    simplydjs = require('simply-djs'),
+    { rankCard } = require('simply-djs'),
     Error = require('../../../modules/functions/config/errors'),
     ms = require("parse-ms")
 
@@ -122,14 +122,15 @@ module.exports = {
             try {
                 Database.updateUserData(message.author.id, 'Timeouts.LevelImage', Date.now())
 
-                await simplydjs.rankCard(client, message, {
-                    member: user,
-                    level: level || 0,
-                    currentXP: exp || 0,
-                    neededXP: xpNeeded || 0,
-                    rank: rank || 0,
-                    background: reData.Walls?.Set || LevelWallpapers?.bg0?.Image || null
-                }).then(() => msg.delete(() => { })).catch(() => { })
+                await rankCard(client, message, {
+                    member: user, // String
+                    level: level || 0, // Number
+                    currentXP: exp || 0, // Number
+                    neededXP: xpNeeded || 0, // Number
+                    rank: rank || 0, // Number
+                    slash: false, // It isn't a slash command
+                    background: reData.Walls?.Set || LevelWallpapers?.bg0?.Image || null // Image URL from Discord Chats || It's work perfectly
+                }).then(() => { msg.delete().catch(() => { }) }).catch(err => { ErrorHandler(err) })
 
                 return
 
