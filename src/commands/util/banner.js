@@ -67,9 +67,8 @@ module.exports = {
                     .then(res => res.json())
                     .then(user => {
                         if (user.code == 50035) return false
+                        if (!user.banner) return false
                         if (user.banner) Data = createBannerURL(user.id, user.banner, format, size, dynamic)
-                        if (!user.banner && user.banner_color) Data = user.banner_color
-                        if (!user.banner && !user.banner_color) return false
                     })
 
             } catch (err) { }
