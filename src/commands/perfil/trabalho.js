@@ -13,7 +13,7 @@ module.exports = {
         let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Trabalho'),
             Job = data.Perfil?.Trabalho
 
-        if (!args[0]) return message.channel.send(`${e.SaphireObs} | Escolha uma profissão pro ser perfil. Você pode usar o comando assim: \`${prefix}job Bombeiro\``)
+        if (!args[0]) return message.channel.send(`${e.SaphireObs} | Escolha uma profissão para o seu perfil. Você pode usar o comando assim: \`${prefix}job Bombeiro\``)
 
         let NewJob = args.join(' ') || 'Indefinido'
 

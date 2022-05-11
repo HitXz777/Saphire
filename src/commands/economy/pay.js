@@ -1,5 +1,5 @@
-const { e } = require('../../../JSON/emojis.json')
-const Moeda = require('../../../modules/functions/public/moeda')
+const { e } = require('../../../JSON/emojis.json'),
+    Moeda = require('../../../modules/functions/public/moeda')
 
 module.exports = {
     name: 'pay',
@@ -40,14 +40,8 @@ module.exports = {
         let payCache = quantia
         Database.subtract(message.author.id, quantia)
 
-        let informationMessage = quantia >= 1000
-            ? `${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*\n> *${e.Taxa} Pagamentos acima de 1000 ${moeda} sofrem uma taxa do 5%.*`
-            : `${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*`
-
-        let msg = await message.reply(informationMessage),
-            emojis = ['✅', '❌'],
-            control = [],
-            validate = false
+        let msg = await message.reply(`${e.Loading} | Transferir **${payCache} ${moeda}** de ${message.author} para ${user}?\n> *obs: Os dois lados devem confirmar o pagamento.*${quantia >= 1000 ? `\n> *${e.Taxa} Pagamentos acima de 1000 ${moeda} sofrem uma taxa do 5%.*` : ''}`),
+            emojis = ['✅', '❌'], control = [], validate = false
 
         for (let i of emojis) msg.react(i).catch(() => { })
 
