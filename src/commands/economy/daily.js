@@ -33,15 +33,16 @@ module.exports = {
             prize = dailyPrizes[count],
             over30 = { day: count, money: parseInt(Math.floor(Math.random() * 10000)), xp: parseInt(Math.floor(Math.random() * 10000)) },
             isVip = await Vip(message.author.id),
-            moeda = await Moeda(message),
-            money = prize.money,
-            xp = prize.xp
+            moeda = await Moeda(message)
 
         if (count > 30) {
             if (over30.money < 1000) over30.money = 1000
             if (over30.xp < 500) over30.xp = 500
             prize = over30
         }
+
+        let money = prize.money,
+            xp = prize.xp
 
         if (message.guild.id === config.guildId) {
             let moneyBonus = bonusCalculate(money, 0.5)
