@@ -25,31 +25,35 @@ module.exports = {
             banner = await get(user.id, 2048, "png", true),
             embeds = [
                 {
-                    embed: new MessageEmbed()
-                        .setColor(client.blue)
-                        .setDescription(`${e.Download} [Clique aqui](${userAvatarURL}) para baixar o avatar original de ${user.tag}`)
-                        .setImage(userAvatarImage),
+                    embed: {
+                        color: client.blue,
+                        description: `${e.Download} [Clique aqui](${userAvatarURL}) para baixar o avatar original de ${user.tag}`,
+                        image: { url: userAvatarImage }
+                    },
                     type: 'original'
-                },
-                {
-                    embeed: new MessageEmbed()
-                        .setColor(client.blue)
-                        .setDescription(`${e.Download} [Clique aqui](${memberAvatarURL}) para baixar o avatar no servidor de ${member.user.tag}`)
-                        .setImage(memberAvatarImage),
-                    type: 'guild'
-                },
-                {
-                    embed: new MessageEmbed()
-                        .setColor(client.blue)
-                        .setDescription(`${e.Download} [Clique aqui](${banner}) para baixar o banner de ${member.user.tag}`)
-                        .setImage(banner),
-                    type: 'banner'
                 }
             ],
             atualEmbed = 0, DmUserGuild = [], DmUserOriginal = [], DmUserBanner = []
 
-        if (userAvatarImage === memberAvatarImage)
-            memberAvatarImage = null
+        if (userAvatarImage !== memberAvatarImage)
+            embeds.push({
+                embed: {
+                    color: client.blue,
+                    description: `${e.Download} [Clique aqui](${memberAvatarURL}) para baixar o avatar no servidor de ${member.user.tag}`,
+                    image: { url: memberAvatarImage }
+                },
+                type: 'guild'
+            })
+
+        if (banner)
+            embeds.push({
+                embed: {
+                    color: client.blue,
+                    description: `${e.Download} [Clique aqui](${banner}) para baixar o banner de ${member.user.tag}`,
+                    image: { url: banner }
+                },
+                type: 'banner'
+            })
 
         const buttonsWithArrows = [
             {
@@ -115,9 +119,9 @@ module.exports = {
             }
         ]
 
-        let msg = memberAvatarURL || banner
-            ? await message.reply({ embeds: [embeds[0].embed], components: buttonsWithArrows })
-            : await message.reply({ embeds: [embeds[0].embed], components: buttonsWithoutArrows })
+        const buttons = embeds.length > 1 ? buttonsWithArrows : buttonsWithoutArrows
+
+        let msg = await message.reply({ embeds: [embeds[0].embed], components: buttons })
 
         return msg.createMessageComponentCollector({
             filter: int => true,
@@ -131,30 +135,26 @@ module.exports = {
 
                 if (intId === 'rightArrow' && intUser.id === message.author.id) {
                     atualEmbed++
-                    if (!memberAvatarImage && atualEmbed === 1) atualEmbed = 2
-                    if (atualEmbed === 3) atualEmbed = 0
+                    if (!embeds[atualEmbed]) atualEmbed = 0
 
                     return msg.edit({ embeds: [embeds[atualEmbed].embed] }).catch(() => { })
                 }
 
                 if (intId === 'leftArrow' && intUser.id === message.author.id) {
                     atualEmbed--
-                    if (!memberAvatarImage && atualEmbed === 1) atualEmbed = 0
-                    if (atualEmbed === -1) atualEmbed = 2
+                    if (!embeds[atualEmbed]) atualEmbed = embeds.length - 1
 
                     return msg.edit({ embeds: [embeds[atualEmbed].embed] }).catch(() => { })
                 }
 
-                if (intId === 'blueHeart')
-                    return NewLike(intUser)
+                if (intId === 'blueHeart') return NewLike(intUser)
 
                 if (intId === 'x' && [message.author.id, user.id].includes(intUser.id)) {
                     message.delete().catch(() => { })
                     return msg.delete().catch(() => { })
                 }
 
-                if (intId === 'letter')
-                    return sendLetter(intUser)
+                if (intId === 'letter') return sendLetter(intUser)
 
                 return
             })
@@ -169,7 +169,11 @@ module.exports = {
             if (DmUserGuild.includes(u.id) && embedType === 'guild') return
             if (DmUserOriginal.includes(u.id) && embedType === 'original') return
 
-            u.send({ embeds: [embeds[atualEmbed].embed.setFooter({ text: `Foto enviada de: ${message.guild.name}` })], components: [] }).catch(() => {
+            u.send({
+                content: `Foto enviada de: ${message.guild.name}`,
+                embeds: [embeds[atualEmbed].embed],
+                components: []
+            }).catch(() => {
                 return message.channel.send(`${e.Deny} | ${u}, sua DM está fechada. Verifique suas configurações e tente novamente.`)
             })
 
