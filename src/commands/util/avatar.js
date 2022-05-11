@@ -22,11 +22,11 @@ module.exports = {
             embeds = [
                 new MessageEmbed()
                     .setColor('#246FE0')
-                    .setDescription(`${e.Download} [Clique aqui](${userAvatarURL}) para baixar o avatar de ${user.tag}`)
+                    .setDescription(`${e.Download} [Clique aqui](${userAvatarURL}) para baixar o avatar original de ${user.tag}`)
                     .setImage(userAvatarImage),
                 new MessageEmbed()
                     .setColor('#246FE0')
-                    .setDescription(`${e.Download} [Clique aqui](${memberAvatarURL}) para baixar o avatar de ${user.tag}`)
+                    .setDescription(`${e.Download} [Clique aqui](${memberAvatarURL}) para baixar o avatar no servidor de ${user.tag}`)
                     .setImage(memberAvatarImage)
             ],
             atualEmbed = 0, DmUser = []

@@ -80,7 +80,7 @@ module.exports = {
                             },
                             {
                                 name: '🔍 Dados Zepplin',
-                                value: `Total de dinheiro ganho: ${zeppelin.Zeppelin.winTotalMoney || 0} ${moeda}\nTotal de dinheiro perdido: ${zeppelin.Zeppelin.loseTotalMoney || 0} ${moeda}`
+                                value: `Total de dinheiro ganho: ${zeppelin.Zeppelin.winTotalMoney?.toFixed(0) || 0} ${moeda}\nTotal de dinheiro perdido: ${zeppelin.Zeppelin.loseTotalMoney?.toFixed(0) || 0} ${moeda}`
                             }
                         )
                         .setFooter({ text: `${client.user.username}'s Bet Games` })
