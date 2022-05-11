@@ -5,8 +5,6 @@ module.exports = {
     name: '8ball',
     aliases: ['pergunta', 'pgt'],
     category: 'random',
-    
-    
     emoji: '🎱',
     usage: '<random> <pergunta>',
     description: 'Pergunta que eu respondo',
@@ -19,7 +17,7 @@ module.exports = {
         if (!pergunta.endsWith('?')) return message.reply(`${e.QuestionMark} | Certeza que isso é uma pergunta?`)
 
         return message.reply(`Humm...`).then(msg => {
-            setTimeout(() => { msg.edit(`:8ball: | ${respostas}`).catch(() => { }) }, 2000)
+            setTimeout(() => msg.edit(`:8ball: | ${respostas}`).catch(() => { }), 2000)
         })
     }
 }
