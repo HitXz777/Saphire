@@ -17,13 +17,16 @@ module.exports = {
         let user = message.guild.members.cache.get(args[0]) || message.mentions.members.first() || message.mentions.repliedUser,
             emojis = ['✅', '❌'],
             member = message.guild.members.cache.get(user?.id)
-            whoIs = message.author.id === user?.id ? 'Você' : user?.user?.username || user?.username
+        whoIs = message.author.id === user?.id ? 'Você' : user?.user?.username || user?.username
 
         if (!member)
             return message.reply(`${e.Deny} | Você deve me dizer o tempo do castigo/mute **e** o usuário a ser mutado.\n${e.Info} | Exemplo: \`${prefix}mute @user 1h 10m\` *(d, h, m - Dias, Horas, Minutos)*`)
 
         if (member.id === message.author.id)
             return message.reply(`${e.Deny} | Você não pode mutar você mesmo, não é?`)
+
+        if (member.isCommunicationDisabled())
+            return message.reply(`${e.Deny} | ${member.displayName} já está mutado.`)
 
         if (!member.moderatable)
             return message.reply(`${e.Deny} | Ops... ${whoIs} tem muito poder...`)
