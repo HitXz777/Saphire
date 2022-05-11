@@ -5,7 +5,7 @@ const { e } = require('../../../JSON/emojis.json'),
 
 module.exports = {
     name: 'avatar',
-    aliases: ['foto', 'pfp', 'pic', 'icon', 'icone'],
+    aliases: ['foto', 'pfp', 'pic', 'icon', 'icone', 'faixa', 'bn', 'banner'],
     category: 'util',
     ClientPermissions: ['EMBED_LINKS', 'ADD_REACTIONS'],
     emoji: '📷',
