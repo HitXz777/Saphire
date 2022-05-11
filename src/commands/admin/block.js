@@ -13,7 +13,8 @@ module.exports = {
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.Client.findOne({ id: client.user.id }, 'BlockedUsers'),
-            bloqueados = data.BlockedUsers || []
+            bloqueados = data.BlockedUsers || [],
+            emojis = ['✅', '❌']
 
         if (['remove', 'del', 'tirar', 'off'].includes(args[0]?.toLowerCase())) {
 
@@ -27,7 +28,7 @@ module.exports = {
                 { $pull: { BlockedUsers: args[1] } }
             )
 
-            return message.react('✅').catch(() => { message.reply(`${e.Check} | Ok`) })
+            return message.react(emojis[0]).catch(() => { message.reply(`${e.Check} | Ok`) })
         }
 
         let id = args[0]
@@ -41,52 +42,23 @@ module.exports = {
         if (!user) {
 
             const msg = await message.reply(`${e.Deny} | Eu não achei este usuário em nenhum servidor, deseja forçar o block?`)
-            msg.react('✅').catch(() => { })
-            msg.react('❌').catch(() => { })
+            for (let i of emojis) msg.react(i).catch(() => { })
 
             return msg.awaitReactions({
-                filter: (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
                 max: 1,
                 time: 15000,
                 errors: ['time']
             }).then(async collected => {
                 const reaction = collected.first()
 
-                if (reaction.emoji.name === '✅') {
+                if (reaction.emoji.name === emojis[0]) {
 
                     await Database.Client.updateOne(
                         { id: client.user.id },
                         { $push: { BlockedUsers: id } }
                     )
 
-                    return msg.edit(`${e.Check} | Bloqueio do usuário *\`${id}\`* efetuado sucesso!`).catch(() => { })
-                }
-
-                return msg.edit(`${e.Deny} | Request abortada.`).catch(() => { })
-
-
-            }).catch(() => msg.edit(`${e.Deny} | Request abortada. | Tempo expirado.`).catch(() => { }))
-
-        } else {
-
-            const msg = await message.reply(`${e.QuestionMark} | Deseja bloquear este usuário dos meus comandos inter-servidor?`)
-            msg.react('✅').catch(() => { })
-            msg.react('❌').catch(() => { })
-
-            return msg.awaitReactions({
-                filter: (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
-                max: 1,
-                time: 15000,
-                errors: ['time']
-            }).then(async collected => {
-                const reaction = collected.first()
-
-                if (reaction.emoji.name === '✅') {
-
-                    await Database.Client.updateOne(
-                        { id: client.user.id },
-                        { $push: { BlockedUsers: id } }
-                    )
                     return msg.edit(`${e.Check} | Bloqueio do usuário *\`${id}\`* efetuado sucesso!`).catch(() => { })
                 }
 
@@ -96,6 +68,33 @@ module.exports = {
             }).catch(() => msg.edit(`${e.Deny} | Request abortada. | Tempo expirado.`).catch(() => { }))
 
         }
+
+        const msg = await message.reply(`${e.QuestionMark} | Deseja bloquear este usuário dos meus comandos inter-servidor?`)
+        for (let i of emojis) msg.react(i).catch(() => { })
+
+        return msg.awaitReactions({
+            filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+            max: 1,
+            time: 15000,
+            errors: ['time']
+        }).then(async collected => {
+            const reaction = collected.first()
+
+            if (reaction.emoji.name === emojis[0]) {
+
+                await Database.Client.updateOne(
+                    { id: client.user.id },
+                    { $push: { BlockedUsers: id } }
+                )
+                return msg.edit(`${e.Check} | Bloqueio do usuário *\`${id}\`* efetuado sucesso!`).catch(() => { })
+            }
+
+            return msg.edit(`${e.Deny} | Request abortada.`).catch(() => { })
+
+
+        }).catch(() => msg.edit(`${e.Deny} | Request abortada. | Tempo expirado.`).catch(() => { }))
+
+
 
     }
 }

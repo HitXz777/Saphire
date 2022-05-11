@@ -25,7 +25,9 @@ module.exports = {
             RequestControl,
             reg = /^[A-Za-z0-9áàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ' ]+$/i,
             control = 0,
-            moeda = await Moeda(message)
+            moeda = await Moeda(message),
+            emojis = ['✅', '❌'],
+            optionsEmojis = ['◀️', '▶️', '❌']
 
         Clans.forEach(clan => keys.push(clan.id))
 
@@ -155,18 +157,17 @@ module.exports = {
 
             const msg = await message.channel.send(`${e.QuestionMark} | ${user}, você está sendo convidado por ${message.author.tag} para entrar no clan **${AtualClan}**.\nVocê aceita o convite?`)
 
-            msg.react('✅').catch(() => { })
-            msg.react('❌').catch(() => { })
+            for (let i of emojis) msg.react(i).catch(() => { })
 
             const collector = msg.createReactionCollector({
-                filter: (reaction, u) => ['✅', '❌'].includes(reaction.emoji.name) && u.id === user.id,
+                filter: (reaction, u) => emojis.includes(reaction.emoji.name) && u.id === user.id,
                 time: 30000,
                 errors: ['time']
             });
 
             collector.on('collect', (reaction) => {
 
-                reaction.emoji.name === '✅'
+                reaction.emoji.name === emojis[0]
                     ? (async () => {
 
                         await Database.Clan.updateOne(
@@ -213,18 +214,17 @@ module.exports = {
 
             const msg = await message.reply(`${e.QuestionMark} | **Clan: ${AtualClan}** | Você confirma a expulsão do membro **${User.tag}**?`)
 
-            msg.react('✅').catch(() => { })
-            msg.react('❌').catch(() => { })
+            for (let i of emojis) msg.react(i).catch(() => { })
 
             const collector = msg.createReactionCollector({
-                filter: (reaction, u) => ['✅', '❌'].includes(reaction.emoji.name) && u.id === message.author.id,
+                filter: (reaction, u) => emojis.includes(reaction.emoji.name) && u.id === message.author.id,
                 time: 30000,
                 errors: ['time']
             });
 
             collector.on('collect', async (reaction, u) => {
 
-                if (reaction.emoji.name === '✅') {
+                if (reaction.emoji.name === emojis[0]) {
 
                     await Database.Clan.updateOne(
                         { id: key },
@@ -239,7 +239,7 @@ module.exports = {
 
                 }
 
-                if (reaction.emoji.name === '❌')
+                if (reaction.emoji.name === emojis[1])
                     return collector.stop()
 
             });
@@ -317,30 +317,30 @@ module.exports = {
             let msg = await message.reply({ embeds: [embeds[0]] })
 
             if (embeds.length > 1)
-                for (const emoji of ['◀️', '▶️', '❌'])
+                for (const emoji of optionsEmojis)
                     msg.react(emoji).catch(() => { })
 
             let collector = msg.createReactionCollector({
-                filter: (reaction, user) => ['◀️', '▶️', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+                filter: (reaction, user) => optionsEmojis.includes(reaction.emoji.name) && user.id === message.author.id,
                 idle: 30000,
                 errors: ['idle']
             })
 
                 .on('collect', (reaction) => {
 
-                    if (reaction.emoji.name === '◀️') {
+                    if (reaction.emoji.name === optionsEmojis[0]) {
                         control--
                         embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control++
 
                     }
 
-                    if (reaction.emoji.name === '▶️') {
+                    if (reaction.emoji.name === optionsEmojis[1]) {
                         control++
                         embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control--
 
                     }
 
-                    if (reaction.emoji.name === '❌')
+                    if (reaction.emoji.name === optionsEmojis[2])
                         return collector.stop()
 
                 })
@@ -398,28 +398,28 @@ module.exports = {
             const msg = await message.reply({ embeds: [embeds[0]] })
 
             if (embeds.length > 1)
-                for (const emoji of ['◀️', '▶️', '❌'])
+                for (const emoji of optionsEmojis)
                     msg.react(emoji).catch(() => { })
 
             const collector = msg.createReactionCollector({
-                filter: (reaction, user) => ['◀️', '▶️', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+                filter: (reaction, user) => optionsEmojis.includes(reaction.emoji.name) && user.id === message.author.id,
                 idle: 30000,
                 errors: ['idle']
             });
 
             collector.on('collect', (reaction) => {
 
-                if (reaction.emoji.name === '◀️') {
+                if (reaction.emoji.name === optionsEmojis[0]) {
                     control--
                     embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control++
                 }
 
-                if (reaction.emoji.name === '▶️') {
+                if (reaction.emoji.name === optionsEmojis[1]) {
                     control++
                     embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control--
                 }
 
-                if (reaction.emoji.name === '❌') {
+                if (reaction.emoji.name === optionsEmojis[2]) {
                     collector.stop()
                 }
 
@@ -496,18 +496,17 @@ module.exports = {
 
             const msg = await message.reply(`${e.QuestionMark} | Você confirma deletar o clan **${AtualClan}**?`)
 
-            msg.react('✅').catch(() => { })
-            msg.react('❌').catch(() => { })
+            for (let i of emojis) msg.react(i).catch(() => { })
 
             const collector = msg.createReactionCollector({
-                filter: (reaction, u) => ['✅', '❌'].includes(reaction.emoji.name) && u.id === message.author.id,
+                filter: (reaction, u) => emojis.includes(reaction.emoji.name) && u.id === message.author.id,
                 time: 30000,
                 errors: ['time']
             });
 
             collector.on('collect', (reaction, u) => {
 
-                return reaction.emoji.name === '✅' ? deleteClan() : Denied()
+                return reaction.emoji.name === emojis[0] ? deleteClan() : Denied()
 
                 async function deleteClan() {
 
@@ -640,11 +639,10 @@ module.exports = {
 
             const msg = await message.reply(`${e.QuestionMark} | Você confirma sair do clan **${AtualClan}**?`)
 
-            msg.react('✅').catch(() => { })
-            msg.react('❌').catch(() => { })
+            for (let i of emojis) msg.react(i).catch(() => { })
 
             const collector = msg.createReactionCollector({
-                filter: (reaction, u) => ['✅', '❌'].includes(reaction.emoji.name) && u.id === message.author.id,
+                filter: (reaction, u) => emojis.includes(reaction.emoji.name) && u.id === message.author.id,
                 time: 30000,
                 errors: ['time']
             });
@@ -652,7 +650,7 @@ module.exports = {
             collector.on('collect', async (reaction) => {
 
                 RequestControl = true
-                if (reaction.emoji.name === '✅') {
+                if (reaction.emoji.name === emojis[0]) {
 
                     await Database.Clan.updateOne(
                         { id: key },
@@ -669,7 +667,7 @@ module.exports = {
                     return collector.stop()
                 }
 
-                if (reaction.emoji.name === '❌') {
+                if (reaction.emoji.name === emojis[1]) {
                     msg.edit(`${e.Deny} | Pedido recusado.`).catch(() => { })
                     return collector.stop()
                 }
@@ -701,18 +699,17 @@ module.exports = {
 
             const msg = await message.reply(`${e.QuestionMark} | Você confirma transferir a posso do clan **${AtualClan}** para **${user.user.tag}**?`)
 
-            msg.react('✅').catch(() => { })
-            msg.react('❌').catch(() => { })
+            for (let i of emojis) msg.react(i).catch(() => { })
 
             const collector = msg.createReactionCollector({
-                filter: (reaction, u) => ['✅', '❌'].includes(reaction.emoji.name) && u.id === message.author.id,
+                filter: (reaction, u) => emojis.includes(reaction.emoji.name) && u.id === message.author.id,
                 time: 30000,
                 errors: ['time']
             });
 
             collector.on('collect', async (reaction) => {
 
-                if (reaction.emoji.name === '✅') {
+                if (reaction.emoji.name === emojis[0]) {
 
                     await Database.Clan.updateOne({ id: key }, { Owner: user.id })
                     RequestControl = true
@@ -734,11 +731,12 @@ module.exports = {
 
                 }
 
-                if (reaction.emoji.name === '❌') {
+                if (reaction.emoji.name === emojis[1]) {
                     msg.edit(`${e.Deny} | Pedido recusado.`)
                     return collector.stop()
                 }
 
+                return
             });
 
             collector.on('end', () => {
@@ -783,11 +781,10 @@ module.exports = {
 
             const msg = await message.reply(`${e.QuestionMark} | Você confirma trocar o nome do clan de **${AtualClan}** para **${NewName}**?`)
 
-            msg.react('✅').catch(() => { })
-            msg.react('❌').catch(() => { })
+            for (let i of emojis) msg.react(i).catch(() => { })
 
             const collector = msg.createReactionCollector({
-                filter: (reaction, u) => ['✅', '❌'].includes(reaction.emoji.name) && u.id === message.author.id,
+                filter: (reaction, u) => emojis.includes(reaction.emoji.name) && u.id === message.author.id,
                 time: 30000,
                 errors: ['time']
             })
@@ -795,7 +792,7 @@ module.exports = {
                 .on('collect', async (reaction) => {
 
                     RequestControl = true
-                    if (reaction.emoji.name === '✅') {
+                    if (reaction.emoji.name === emojis[0]) {
 
                         for (const id of Members)
                             Database.updateUserData(id, 'Clan', NewName)
@@ -813,7 +810,7 @@ module.exports = {
 
                     }
 
-                    if (reaction.emoji.name === '❌') {
+                    if (reaction.emoji.name === emojis[1]) {
                         msg.edit(`${e.Deny} | Pedido recusado.`)
                         return collector.stop()
                     }
@@ -902,21 +899,21 @@ module.exports = {
                 msg = await message.reply({ embeds: [embeds[0]] })
 
             if (embeds.length > 1)
-                for (const emoji of ['◀️', '▶️', '❌'])
+                for (const emoji of optionsEmojis)
                     msg.react(emoji).catch(() => { })
 
             let collector = msg.createReactionCollector({
-                filter: (reaction, user) => ['◀️', '▶️', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+                filter: (reaction, user) => optionsEmojis.includes(reaction.emoji.name) && user.id === message.author.id,
                 idle: 30000,
                 errors: ['idle']
             })
 
             collector.on('collect', (reaction, user) => {
 
-                if (reaction.emoji.name === '❌')
+                if (reaction.emoji.name === optionsEmojis[2])
                     return collector.stop()
 
-                return reaction.emoji.name === '◀️'
+                return reaction.emoji.name === optionsEmojis[0]
                     ? (() => {
 
                         control--
@@ -948,17 +945,16 @@ module.exports = {
 
             const msg = await message.reply(`${e.QuestionMark} | Você realmente deseja excluir todo o histórico do seu clan?`),
                 collector = msg.createReactionCollector({
-                    filter: (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
+                    filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
                     time: 30000,
                     errors: ['time']
                 })
 
-            for (const emoji of ['✅', '❌'])
-                msg.react(emoji).catch(() => { })
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
             collector.on('collect', async (reaction) => {
 
-                return reaction.emoji.name === '✅'
+                return reaction.emoji.name === emojis[0]
                     ? (async () => {
                         await Database.Clan.updateOne(
                             { id: key },

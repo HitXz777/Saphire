@@ -143,7 +143,7 @@ module.exports = {
             if (!Emoji) return message.reply(`${e.Info} | Faltou o nome do emoji.`)
 
             let emoji = emojis.get(`e.${Emoji}`)
-            emoji ? message.reply(`${emoji}`) : message.reply(`${e.Deny} | Emoji não encontrado.`)
+            return emoji ? message.reply(`${emoji}`) : message.reply(`${e.Deny} | Emoji não encontrado.`)
         }
 
         function DeleteEmoji(Name) {
