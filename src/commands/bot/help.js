@@ -167,7 +167,7 @@ module.exports = {
                             value: 'Close',
                         },
                     ])
-                );
+                )
 
         if (args[0]) return HelpWithArgs(args[0])
 
