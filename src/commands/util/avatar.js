@@ -1,4 +1,7 @@
-const { e } = require('../../../JSON/emojis.json')
+const { e } = require('../../../JSON/emojis.json'),
+    fetch = require("node-fetch"),
+    allowedFormats = ["webp", "png", "jpg", "jpeg", "gif"],
+    allowedSizes = Array.from({ length: 9 }, (e, i) => 2 ** (i + 4))
 
 module.exports = {
     name: 'avatar',
@@ -19,17 +22,34 @@ module.exports = {
             userAvatarImage = user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
             memberAvatarImage = member.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
             Emojis = ['⬅️', '📨', '🗑️', '💙', '➡️'],
+            banner = await get(user.id, 2048, "png", true),
             embeds = [
-                new MessageEmbed()
-                    .setColor('#246FE0')
-                    .setDescription(`${e.Download} [Clique aqui](${userAvatarURL}) para baixar o avatar original de ${user.tag}`)
-                    .setImage(userAvatarImage),
-                new MessageEmbed()
-                    .setColor('#246FE0')
-                    .setDescription(`${e.Download} [Clique aqui](${memberAvatarURL}) para baixar o avatar no servidor de ${user.tag}`)
-                    .setImage(memberAvatarImage)
+                {
+                    embed: new MessageEmbed()
+                        .setColor(client.blue)
+                        .setDescription(`${e.Download} [Clique aqui](${userAvatarURL}) para baixar o avatar original de ${user.tag}`)
+                        .setImage(userAvatarImage),
+                    type: 'original'
+                },
+                {
+                    embeed: new MessageEmbed()
+                        .setColor(client.blue)
+                        .setDescription(`${e.Download} [Clique aqui](${memberAvatarURL}) para baixar o avatar no servidor de ${member.user.tag}`)
+                        .setImage(memberAvatarImage),
+                    type: 'guild'
+                },
+                {
+                    embed: new MessageEmbed()
+                        .setColor(client.blue)
+                        .setDescription(`${e.Download} [Clique aqui](${banner}) para baixar o banner de ${member.user.tag}`)
+                        .setImage(banner),
+                    type: 'banner'
+                }
             ],
-            atualEmbed = 0, DmUser = []
+            atualEmbed = 0, DmUserGuild = [], DmUserOriginal = [], DmUserBanner = []
+
+        if (userAvatarImage === memberAvatarImage)
+            memberAvatarImage = null
 
         const buttonsWithArrows = [
             {
@@ -95,9 +115,9 @@ module.exports = {
             }
         ]
 
-        let msg = memberAvatarURL
-            ? await message.reply({ embeds: [embeds[0]], components: buttonsWithArrows })
-            : await message.reply({ embeds: [embeds[0]], components: buttonsWithoutArrows })
+        let msg = memberAvatarURL || banner
+            ? await message.reply({ embeds: [embeds[0].embed], components: buttonsWithArrows })
+            : await message.reply({ embeds: [embeds[0].embed], components: buttonsWithoutArrows })
 
         return msg.createMessageComponentCollector({
             filter: int => true,
@@ -109,10 +129,20 @@ module.exports = {
                 let intId = interaction.customId,
                     intUser = interaction.user
 
-                if (['leftArrow', 'rightArrow'].includes(intId) && intUser.id === message.author.id) {
-                    atualEmbed = atualEmbed === 0 ? 1 : 0
+                if (intId === 'rightArrow' && intUser.id === message.author.id) {
+                    atualEmbed++
+                    if (!memberAvatarImage && atualEmbed === 1) atualEmbed = 2
+                    if (atualEmbed === 3) atualEmbed = 0
 
-                    return msg.edit({ embeds: [embeds[atualEmbed]] }).catch(() => { })
+                    return msg.edit({ embeds: [embeds[atualEmbed].embed] }).catch(() => { })
+                }
+
+                if (intId === 'leftArrow' && intUser.id === message.author.id) {
+                    atualEmbed--
+                    if (!memberAvatarImage && atualEmbed === 1) atualEmbed = 0
+                    if (atualEmbed === -1) atualEmbed = 2
+
+                    return msg.edit({ embeds: [embeds[atualEmbed].embed] }).catch(() => { })
                 }
 
                 if (intId === 'blueHeart')
@@ -132,13 +162,30 @@ module.exports = {
 
         function sendLetter(u) {
 
-            if (DmUser.includes(u.id)) return
+            let embedType = embeds[atualEmbed].type,
+                replaceWord = 'a foto'
 
-            u.send({ embeds: [embeds[atualEmbed].setFooter({ text: `Foto enviada de: ${message.guild.name}` })], components: [] }).catch(() => {
+            if (DmUserBanner.includes(u.id) && embedType === 'banner') return
+            if (DmUserGuild.includes(u.id) && embedType === 'guild') return
+            if (DmUserOriginal.includes(u.id) && embedType === 'original') return
+
+            u.send({ embeds: [embeds[atualEmbed].embed.setFooter({ text: `Foto enviada de: ${message.guild.name}` })], components: [] }).catch(() => {
                 return message.channel.send(`${e.Deny} | ${u}, sua DM está fechada. Verifique suas configurações e tente novamente.`)
             })
-            DmUser.push(u.id)
-            return message.channel.send(`${e.Check} | ${u} solicitou a foto de ${user.username} para sua DM.`)
+
+            if (embedType === 'banner') {
+                DmUserBanner.push(u.id)
+                replaceWord = 'o banner'
+            }
+
+            if (embedType === 'guild') {
+                DmUserGuild.push(u.id)
+                replaceWord = 'a foto personalizada no servidor'
+            }
+
+            if (embedType === 'original') DmUserOriginal.push(u.id)
+
+            return message.channel.send(`${e.Check} | ${u} solicitou ${replaceWord} de ${user.username} para sua DM.`)
 
         }
 
@@ -170,5 +217,38 @@ module.exports = {
             return message.channel.send(`${e.Check} | ${Author} deu um like para ${user.tag}.`)
         }
 
+        async function createBannerURL(userId, banner, format = "webp", size = "1024", dynamic) {
+            if (dynamic) format = banner.startsWith("a_") ? "gif" : format
+            if (!banner) return false
+            return `https://cdn.discordapp.com/banners/${userId}/${banner}.${format}${parseInt(size) ? `?size=${parseInt(size)}` : ''}`
+        }
+
+        async function get(userId, size, format, dynamic) {
+
+            if (format && !allowedFormats.includes(format)) return false
+            if (size && (!allowedSizes.includes(parseInt(size)) || isNaN(parseInt(size)))) return false
+            if (dynamic && typeof dynamic !== "boolean") return false
+            let Data = ""
+
+            try {
+
+                await fetch(`https://discord.com/api/v9/users/${userId}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bot ${process.env.DISCORD_CLIENT_BOT_TOKEN}` }
+                })
+                    .then(res => res.json())
+                    .then(user => {
+                        if (user.code == 50035) return false
+                        if (!user.banner) return false
+                        if (user.banner) Data = createBannerURL(user.id, user.banner, format, size, dynamic)
+                    })
+
+            } catch (err) {
+                return false
+            }
+
+            if (!Data) return false
+            return Data
+        }
     }
 }
