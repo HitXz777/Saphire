@@ -27,8 +27,9 @@ async function BuyingAway(message, prefix, args, money, color, moeda) {
     if (['cor', 'cores', 'color', 'colors'].includes(args[0]?.toLowerCase())) return BuyItem('Color', 'Perm', 'Permissão de Cor', 180000)
     if (['rifa', 'rifaticket'].includes(args[0]?.toLowerCase())) return newRifaTicket()
 
-    if (['carta', 'cartas', 'letter', 'letters'].includes(args[0]?.toLowerCase())) return Consumivel('Slot', 'Cartas', 'cartas', parseInt(args[1]), 50, 2)
-    if (['skip', 'skips', 'jump', 'pular'].includes(args[0]?.toLowerCase())) return Consumivel('Slot', 'Skip', 'Quiz Skip', parseInt(args[1]), 10, 50)
+    if (['carta', 'cartas', 'letter', 'letters'].includes(args[0]?.toLowerCase())) return Consumivel('Slot', 'Cartas', 'cartas', parseInt(args[1]), 50, 2, '📨')
+    if (['skip', 'skips', 'jump', 'pular'].includes(args[0]?.toLowerCase())) return Consumivel('Slot', 'Skip', 'Quiz Skip', parseInt(args[1]), 10, 50, '⏩')
+    if (['rasp', 'rp', 'raspa', 'raspadinhas', 'raspadinha'].includes(args[0]?.toLowerCase())) return Consumivel('Slot', 'Raspadinhas', 'Raspadinhas', parseInt(args[1]), 50, 100, e.raspadinha)
     if (['tickets', 'ticket'].includes(args[0]?.toLowerCase())) return BuyTickets()
 
     if (['estrela1'].includes(args[0]?.toLowerCase())) return Estrela1()
@@ -200,18 +201,18 @@ async function BuyingAway(message, prefix, args, money, color, moeda) {
         }
     }
 
-    function Consumivel(Rota1, NomeTec, NomeUser, quantia, Limit, Price) {
+    function Consumivel(Rota1, NomeTec, NomeUser, quantia, Limit, Price, Emoji) {
 
         let Consumiveis = user[Rota1][NomeTec] || 0
 
-        if (Consumiveis >= Limit) return message.reply(`${e.Deny} | Você já atingiu o seu limite de ${NomeUser}.`)
+        if (Consumiveis >= Limit) return message.reply(`${e.Deny} | Você já atingiu o seu limite de ${Emoji} ${NomeUser}.`)
         if (isNaN(quantia)) return message.reply(`${e.Deny} | **${quantia}** | Não é um número.`)
         if (!quantia) return message.reply(`${e.QuestionMark} | Quantas ${NomeUser} você quer comprar? \`${prefix}buy ${NomeUser} quantidade\``)
         if (money <= 0) return message.reply(`${e.Deny} | ${message.author}, você não possui dinheiro na carteira.`)
         let q = quantia * Price
         let check = quantia + Consumiveis
 
-        if (q > money) return message.reply(`${e.PandaProfit} | Você precisa ter pelo menos ${q} ${moeda} na carteira para comprar ${quantia} ${NomeUser}.`)
+        if (q > money) return message.reply(`${e.PandaProfit} | Você precisa ter pelo menos ${q} ${moeda} na carteira para comprar +${quantia} ${NomeUser}.`)
 
         return check >= Limit ? Complete() : BuyItens()
 
@@ -224,7 +225,7 @@ async function BuyingAway(message, prefix, args, money, color, moeda) {
                 message.author.id,
                 `${e.loss} Gastou ${quantia * Price} Safiras na loja.`
             )
-            return message.channel.send(`${e.Check} | ${message.author} comprou ${quantia} ${NomeUser} ficando com um total de ${Consumiveis + quantia} ${NomeUser}.\n${e.PandaProfit} | -${q} ${moeda}`)
+            return message.channel.send(`${e.Check} | ${message.author} comprou ${quantia} ${Emoji} ${NomeUser} ficando com um total de ${Emoji} ${Consumiveis + quantia} ${NomeUser}.\n${e.PandaProfit} | -${q} ${moeda}`)
         }
 
         async function Complete() {

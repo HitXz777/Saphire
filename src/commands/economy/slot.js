@@ -21,13 +21,14 @@ module.exports = {
             color = await Colors(user.id),
             Cartas = data.Slot?.Cartas,
             Dogname = data.Slot?.Dogname,
+            raspadinhas = data.Slot?.Raspadinhas > 0 ? `${e.raspadinha} ${data.Slot?.Raspadinhas} Raspadinhas` : '',
             title = data.Perfil.TitlePerm ? "\n🔰 Título" : '',
             cartas = Cartas ? `\n💌 Cartas: ${Cartas}` : '',
             dogname = Dogname ? `\n${e.Doguinho} ${Dogname}` : '',
             cores = data.Color?.Perm ? '\n🎨 Cores' : '',
             skip = data.Slot?.Skip > 0 ? `⏩ Quiz Skip: ${data.Slot?.Skip}` : '',
             nada2 = !cores && !title ? 'Não há nada aqui' : '',
-            nada = !cartas && !skip && !dogname ? 'Não há nada aqui' : ''
+            nada = !cartas && !skip && !dogname && !raspadinhas ? 'Não há nada aqui' : ''
 
         if (['bg', 'wallpaper', 'w', 'fundo', 'level'].includes(args[0]?.toLowerCase()))
             return SlotBackgrouds()
@@ -147,7 +148,7 @@ module.exports = {
                         .setColor(color)
                         .setAuthor({ name: `Inventário de ${user.username}`, iconURL: avatar })
                         .setDescription(`Aqui é onde ficam guardados todos os ${user.id === message.author.id ? 'seus itens' : `itens de ${user.username}`}`)
-                        .addField('Itens Comprados', `${nada}${skip}${cartas}${dogname}`)
+                        .addField('Itens Comprados', `${nada}${skip}${raspadinhas}${cartas}${dogname}`)
                         .addField('Itens Obtidos', `${nada2}${cores}${title}`)
                         .setFooter({ text: `${prefix}buy | ${prefix}slot bg` })
                 ]

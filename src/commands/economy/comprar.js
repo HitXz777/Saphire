@@ -19,8 +19,8 @@ module.exports = {
             user = await Database.User.findOne({ id: message.author.id }),
             lotery = await Database.Lotery.findOne({ id: client.user.id }),
             color = user?.Color?.Set || client.blue,
-            loteryPrize = lotery.Prize || 0,
-            money = user.Balance || 0
+            loteryPrize = lotery?.Prize || 0,
+            money = user?.Balance || 0
 
         if (args[0]) return BuyingAway(message, prefix, args, money, color, moeda)
 
@@ -36,8 +36,8 @@ module.exports = {
                         value: `💌 \`Carta de Amor\` 100 ${moeda}`
                     },
                     {
-                        name: 'Loteria',
-                        value: `🎫 \`Ticket Loteria\` 10 ${moeda}\nPrêmio Atual: ${loteryPrize > 0 ? parseInt(loteryPrize)?.toFixed(0) : 0} ${moeda}`
+                        name: 'Sorte',
+                        value: `🎫 \`Ticket Loteria\` 10 ${moeda} | Montante: (${loteryPrize > 0 ? parseInt(loteryPrize)?.toFixed(0) : 0})\n${e.raspadinha} \`Raspadinha\` 100 ${moeda}`
                     },
                     {
                         name: 'Perfil',
@@ -57,7 +57,7 @@ module.exports = {
                 .setColor(color)
                 .setTitle('📋 Itens e suas funções')
                 .setDescription('Todos os dados de todos os itens aqui em baixo')
-                .addField('Itens Consumiveis', `Itens consumiveis são aqueles que são gastos a cada vez que é usado\n \n🎫 \`Ticket\` Aposte na loteria \`${prefix}buy ticket\`\n⏩ \`Skip\` Use para pular perguntas no quiz.\n💌 \`Cartas\` Use para conquistar alguém`)
+                .addField('Itens Consumiveis', `Itens consumiveis são aqueles que são gastos a cada vez que é usado\n \n🎫 \`Ticket\` Aposte na loteria \`${prefix}buy ticket\`\n${e.raspadinha} \`Raspadinha\` Vale jogo na \`${prefix}raspadinha\`\n⏩ \`Skip\` Use para pular perguntas no quiz.\n💌 \`Cartas\` Use para conquistar alguém`)
                 .addField('Perfil', 'Itens de perfil são aqueles que melhora seu perfil\n \n⭐ `Estrela` Estrelas no perfil')
                 .addField('Permissões', `Permissões libera comandos bloqueados\n \n🔰 \`Título\` Mude o título no perfil \`${prefix}titulo <Novo Título>\`\n🎨 \`Cores\` Mude as cores das suas mensagens \`${prefix}setcolor <#CódigoHex>\``)
 
@@ -80,7 +80,7 @@ module.exports = {
                     },
                     {
                         label: 'Restaurar Dívida',
-                        description: `Restaurar a dívida da carteira.`,
+                        description: `Restaurar a dívida da carteira`,
                         emoji: `${e.MoneyWings || '💸'}`,
                         value: 'Dívida',
                     },
@@ -232,7 +232,6 @@ module.exports = {
                 return message.channel.send(`${e.Check} | ${message.author} comprou a permissão 🔰 \`Título\`.\n${e.PandaProfit} | -10000 ${moeda}`)
             }
         }
-
         async function buySkips() {
 
             let data = await Database.User.findOne({ id: message.author.id }, 'Slot.Skip Balance')

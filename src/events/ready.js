@@ -24,6 +24,7 @@ client.on("ready", async () => {
                 QuizChannels: 1,
                 ForcaChannels: 1,
                 Rebooting: 1,
+                ['Raspadinhas.Channels']: 1,
                 ['Zeppelin.Channels']: 1
             }
         })

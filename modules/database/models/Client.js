@@ -14,6 +14,11 @@ module.exports = model("Client", new Schema({
     BlockedUsers: Array,
     PremiumServers: Array,
     QuizChannels: Array,
+    Raspadinhas: {
+        Channels: Array,
+        Bought: Number,
+        totalPrize: Number
+    },
     Zeppelin: {
         Channels: Array,
         winTotalMoney: Number,

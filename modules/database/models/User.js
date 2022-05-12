@@ -74,7 +74,8 @@ module.exports = model("User", new Schema({
         TitlePerm: String,
         Cartas: Number,
         Dogname: String,
-        Skip: Number
+        Skip: Number,
+        Raspadinhas: Number
     },
     Walls: {
         Bg: Array,
