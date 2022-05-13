@@ -192,7 +192,7 @@ module.exports = {
                 addTotalPrize(winPrize)
             }
 
-            let finalText = winPrize === 0
+            let finalText = winPrize <= 0
                 ? `🦤 | Você encontrou um sequência de dodos e perdeu 1000 ${moeda}`
                 : `${e.Check} | Você ganhou **${winPrize} ${moeda}** achando 3 ${emoji}`
 

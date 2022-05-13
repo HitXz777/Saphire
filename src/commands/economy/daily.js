@@ -143,7 +143,7 @@ module.exports = {
             if (count === 0)
                 return message.reply(`${e.Info} | Você não tem nenhum dia consecutivo contabilizado.`)
 
-            return message.reply(`${e.Info} | Atualmente, você está no **${authorData?.DailyCount || 0}º** dia consecutivo.`)
+                return message.reply(`${e.Info} | Atualmente, você resgatou **${count - 1}** prêmios diários consecutivos.`)
         }
 
     }
