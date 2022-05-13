@@ -20,7 +20,7 @@ module.exports = {
         let userAvatarURL = user.avatarURL({ dynamic: true, format: "png", size: 1024 }),
             memberAvatarURL = member?.avatarURL({ dynamic: true, format: "png", size: 1024 }),
             userAvatarImage = user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
-            memberAvatarImage = member.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
+            memberAvatarImage = member?.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
             Emojis = ['⬅️', '📨', '🗑️', '💙', '➡️'],
             banner = await get(user.id, 2048, "png", true),
             embeds = [
@@ -35,11 +35,11 @@ module.exports = {
             ],
             atualEmbed = 0, DmUserGuild = [], DmUserOriginal = [], DmUserBanner = []
 
-        if (userAvatarImage !== memberAvatarImage)
+        if (memberAvatarImage && userAvatarImage !== memberAvatarImage)
             embeds.push({
                 embed: {
                     color: client.blue,
-                    description: `${e.Download} [Clique aqui](${memberAvatarURL}) para baixar o avatar no servidor de ${member.user.tag}`,
+                    description: `${e.Download} [Clique aqui](${memberAvatarURL}) para baixar o avatar no servidor de ${member?.user?.tag || 'NomeDesconhecido'}`,
                     image: { url: memberAvatarImage }
                 },
                 type: 'guild'
@@ -49,7 +49,8 @@ module.exports = {
             embeds.push({
                 embed: {
                     color: client.blue,
-                    description: `${e.Download} [Clique aqui](${banner}) para baixar o banner de ${member.user.tag}`,
+                    description: `${e.Download} [Clique aqui](${banner}) para baixar o banner de ${member?.user?.tag || 'NomeDesconhecido'
+                }`,
                     image: { url: banner }
                 },
                 type: 'banner'
