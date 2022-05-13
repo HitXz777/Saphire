@@ -1,4 +1,5 @@
-const { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
+const { config } = require('../../../JSON/config.json'),
+    { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'prefix',
