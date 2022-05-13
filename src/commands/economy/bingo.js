@@ -13,8 +13,8 @@ module.exports = {
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Balance'),
-            clientData = await Database.Client.findOne({ id: client.user.id }, 'BingoChannels'),
-            canaisAtivos = clientData?.BingoChannels || [],
+            clientData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Bingo'),
+            canaisAtivos = clientData?.GameChannels?.Bingo || [],
             money = parseInt(authorData?.Balance) || 0,
             moeda = await Moeda(message)
 
@@ -276,7 +276,7 @@ module.exports = {
         async function finishBingo() {
             await Database.Client.updateOne(
                 { id: client.user.id },
-                { $pull: { BingoChannels: message.channel.id } }
+                { $pull: { ['GameChannels.Bingo']: message.channel.id } }
             )
             return
         }
@@ -284,7 +284,7 @@ module.exports = {
         async function bingoStarted() {
             await Database.Client.updateOne(
                 { id: client.user.id },
-                { $push: { BingoChannels: message.channel.id } }
+                { $push: { ['GameChannels.Bingo']: message.channel.id } }
             )
             return
         }

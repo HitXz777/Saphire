@@ -4,7 +4,6 @@ module.exports = model("Client", new Schema({
     id: { type: String, unique: true },
     Timeouts: { RestoreDividas: Number },
     ComandosUsados: Number,
-    BingoChannels: Array,
     Moderadores: Array,
     Administradores: Array,
     TopGlobal: Object,
@@ -13,7 +12,15 @@ module.exports = model("Client", new Schema({
     BackgroundAcess: Array,
     BlockedUsers: Array,
     PremiumServers: Array,
-    QuizChannels: Array,
+    GameChannels: {
+        Bingo: Array,
+        Quiz: Array,
+        Forca: Array,
+    },
+    GlobalBet: {
+        Users: Array,
+        totalValue: Number
+    },
     Raspadinhas: {
         Channels: Array,
         Bought: Number,
@@ -24,7 +31,6 @@ module.exports = model("Client", new Schema({
         winTotalMoney: Number,
         loseTotalMoney: Number
     },
-    ForcaChannels: Array,
     Rebooting: {
         ON: Boolean,
         Features: String,

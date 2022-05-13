@@ -20,9 +20,7 @@ client.on("ready", async () => {
         { id: client.user.id },
         {
             $unset: {
-                BingoChannels: 1,
-                QuizChannels: 1,
-                ForcaChannels: 1,
+                GameChannels: 1,
                 Rebooting: 1,
                 ['Raspadinhas.Channels']: 1,
                 ['Zeppelin.Channels']: 1

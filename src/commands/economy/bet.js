@@ -9,7 +9,7 @@ module.exports = {
     category: 'economy',
     ClientPermissions: ['ADD_REACTIONS'],
     emoji: '💵',
-    usage: '<bet> <quantia>',
+    usage: '<bet> <info>',
     description: 'Aposte dinheiro no chat',
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
@@ -26,16 +26,21 @@ module.exports = {
                     .addFields(
                         {
                             name: `${e.On} Simple Bet`,
-                            value: `\`${prefix}bet [quantia] [LimiteDePlayers]\` Aposte uma quantia`
+                            value: `\`${prefix}bet [quantia] [LimiteDePlayers]\` - Aposte uma quantia`
                         },
                         {
                             name: `:tada: Bet Party`,
                             value: `\`${prefix}bet party [quantia] <QuantidadeDeOpções (2~4)>\` - A bet party é um novo jeito de se apostar.`
+                        },
+                        {
+                            name: '🌎 Bet Global - (BETA)',
+                            value: `\`${prefix}bet global\` - Inicie ou aposte com jogadores de qualquer servidor. *(sistema em produção)*`
                         }
                     )
             ]
         })
 
+        if (['global', 'g'].includes(args[0]?.toLowerCase())) return betGlobal()
         if (['party', 'festa', 'p'].includes(args[0]?.toLowerCase())) return betParty()
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Balance Timeouts'),
@@ -362,6 +367,10 @@ module.exports = {
             }
 
             return
+        }
+
+        async function betGlobal() {
+            return message.reply(`${e.Loading} | Este recurso está em construção...`)
         }
 
     }

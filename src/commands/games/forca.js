@@ -60,11 +60,11 @@ module.exports = {
 
             if (control.blocked) return
 
-            let clientData = await Database.Client.findOne({ id: client.user.id }, 'ForcaChannels'),
-                channelsBlocked = clientData.ForcaChannels || []
+            let clientData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Forca'),
+                channelsBlocked = clientData.GameChannels.Forca || []
 
             if (channelsBlocked.includes(message.channel.id))
-                return message.channel.send(`${e.Deny} | Já tem uma forca rolando nesse chat.`)
+                return message.channel.send(`${e.Deny} | Já tem uma forca rolando nesse chat.\n${e.Info} | Se a mensagem for apagada, dentro de 20 segundos esse canal será liberado.`)
             registerChannel()
 
             embed = new MessageEmbed()
@@ -175,14 +175,14 @@ module.exports = {
 
         async function registerChannel(status) {
 
-            status === 'pull'
+            return status === 'pull'
                 ? await Database.Client.updateOne(
                     { id: client.user.id },
-                    { $pull: { ForcaChannels: message.channel.id } }
+                    { $pull: { ['GameChannels.Forca']: message.channel.id } }
                 )
                 : await Database.Client.updateOne(
                     { id: client.user.id },
-                    { $push: { ForcaChannels: message.channel.id } }
+                    { $push: { ['GameChannels.Forca']: message.channel.id } }
                 )
         }
 

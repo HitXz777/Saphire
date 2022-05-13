@@ -82,8 +82,8 @@ module.exports = {
 
             if (isJumped) return start(question, answer)
 
-            let clientData = await Database.Client.findOne({ id: client.user.id }, 'QuizChannels'),
-                channelsBlockToInit = clientData.QuizChannels || []
+            let clientData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Quiz'),
+                channelsBlockToInit = clientData?.GameChannels?.Quiz || []
 
             if (!channelsBlockToInit || channelsBlockToInit.includes(message.channel.id))
                 return message.reply(`${e.Deny} | Já tem um quiz rolando nesse chat.`).then(m => setTimeout(() => m.delete().catch(() => { }), 2500))
@@ -234,7 +234,7 @@ module.exports = {
         async function registerChannel(channelId) {
             await Database.Client.updateOne(
                 { id: client.user.id },
-                { $push: { QuizChannels: channelId } }
+                { $push: { ['GameChannels.Quiz']: channelId } }
             )
             return
         }
@@ -242,7 +242,7 @@ module.exports = {
         async function pullChannel(channelId) {
             await Database.Client.updateOne(
                 { id: client.user.id },
-                { $pull: { QuizChannels: channelId } }
+                { $pull: { ['GameChannels.Quiz']: channelId } }
             )
             return
         }
@@ -284,7 +284,7 @@ module.exports = {
 
             await Database.Client.updateOne(
                 { id: client.user.id },
-                { $unset: { QuizChannels: 1 } }
+                { $unset: { ['GameChannels.Quiz']: 1 } }
             )
 
             return message.reply(`${e.Check} | Todos os canais registrados no quiz foram deletados da minha database.`)
