@@ -216,7 +216,7 @@ module.exports = {
 
             gameMode
                 ? msg.edit({
-                    content: `${e.Loading} | **Memory Game** | Tente achar os pares de emojis iguais.\n${e.Info} | Clique nos botões com calma para não estragar o jogo.${limited === 'time' ? '\n⏱️ | Tempo corrido ativado.' : ''}${gameMode === 'competitive' ? `\n📝 | ${message.author.username}: ${gameData.author} x ${gameData.user} ${user.user.username}` : ''}${user ? `\n${gameMode === 'coop' ? '🤝 | Modo cooperação' : '⚔️ | Modo competitivo'} ativado.\n👉 | <@${playingNow}> é sua vez.` : ''}`,
+                    content: `${e.Loading} | **Memory Game** | Tente achar os pares de emojis iguais.\n${e.Info} | Clique nos botões com calma para não estragar o jogo.${limited === 'time' ? '\n⏱️ | Tempo corrido ativado.' : ''}${gameMode === 'competitive' ? `\n📝 | ${message.author} ${gameData.author} x ${gameData.user} ${user}` : ''}${user ? `\n${gameMode === 'coop' ? '🤝 | Modo cooperação' : '⚔️ | Modo competitivo'} ativado.\n👉 | <@${playingNow}> é sua vez.` : ''}`,
                     components: buttons
                 }).catch(() => { })
                 : msg.edit({ components: buttons }).catch(() => { })
@@ -241,7 +241,7 @@ module.exports = {
                     ? (() => {
                         playingNow = playingNow === message.author.id ? user?.id : message.author.id
                         msg.edit({
-                            content: `${e.Loading} | **Memory Game** | Tente achar os pares de emojis iguais.\n${e.Info} | Clique nos botões com calma para não estragar o jogo.${limited === 'time' ? '\n⏱️ | Tempo corrido ativado.' : ''}${gameMode === 'competitive' ? `\n📝 | ${message.author.username}: ${gameData.author} Pontos\n📝 | ${user.user.username}: ${gameData.user} Pontos` : ''}${user ? `\n${gameMode === 'coop' ? '🤝 | Modo cooperação' : '⚔️ | Modo competitivo'} ativado.\n👉 | <@${playingNow}> é sua vez.` : ''}`,
+                            content: `${e.Loading} | **Memory Game** | Tente achar os pares de emojis iguais.\n${e.Info} | Clique nos botões com calma para não estragar o jogo.${limited === 'time' ? '\n⏱️ | Tempo corrido ativado.' : ''}${gameMode === 'competitive' ? `\n📝 | ${message.author} ${gameData.author} x ${gameData.user} ${user}` : ''}${user ? `\n${gameMode === 'coop' ? '🤝 | Modo cooperação' : '⚔️ | Modo competitivo'} ativado.\n👉 | <@${playingNow}> é sua vez.` : ''}`,
                             components: buttons
                         }).catch(() => { })
                     })()
