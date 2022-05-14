@@ -578,11 +578,11 @@ module.exports = {
 
                 return personal
                     ? bet.userId === message.author.id
-                        ? `~~\`${bet.betId}\`~~`
-                        : `\`${bet.betId}\``
-                    : bet.userId === message.author.id
                         ? `\`${bet.betId}\``
                         : `~~\`${bet.betId}\`~~`
+                    : bet.userId === message.author.id
+                        ? `~~\`${bet.betId}\`~~`
+                        : `\`${bet.betId}\``
             }
 
             for (let i = 0; i < dataArray.length; i += 10) {
