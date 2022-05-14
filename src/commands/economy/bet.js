@@ -1,7 +1,8 @@
 const { e } = require('../../../JSON/emojis.json'),
     Moeda = require('../../../modules/functions/public/moeda'),
     Colors = require('../../../modules/functions/plugins/colors'),
-    { MessageButton, MessageActionRow } = require('discord.js')
+    { MessageButton, MessageActionRow } = require('discord.js'),
+    passCode = require('../../../modules/functions/plugins/PassCode')
 
 module.exports = {
     name: 'bet',
@@ -17,29 +18,7 @@ module.exports = {
         let moeda = await Moeda(message),
             color = await Colors(message.author.id)
 
-        if (!args[0] || ['info', 'ajuda', 'help']?.includes(args[0]?.toLowerCase())) return message.reply({
-            embeds: [
-                new MessageEmbed()
-                    .setColor(color)
-                    .setTitle('💵 Comando Aposta')
-                    .setDescription(`Você pode apostar ${moeda} com todos no chat.`)
-                    .addFields(
-                        {
-                            name: `${e.On} Simple Bet`,
-                            value: `\`${prefix}bet [quantia] [LimiteDePlayers]\` - Aposte uma quantia`
-                        },
-                        {
-                            name: `:tada: Bet Party`,
-                            value: `\`${prefix}bet party [quantia] <QuantidadeDeOpções (2~4)>\` - A bet party é um novo jeito de se apostar.`
-                        },
-                        {
-                            name: '🌎 Bet Global - (BETA)',
-                            value: `\`${prefix}bet global\` - Inicie ou aposte com jogadores de qualquer servidor. *(sistema em produção)*`
-                        }
-                    )
-            ]
-        })
-
+        if (!args[0] || ['info', 'ajuda', 'help']?.includes(args[0]?.toLowerCase())) return betInfo()
         if (['global', 'g'].includes(args[0]?.toLowerCase())) return betGlobal()
         if (['party', 'festa', 'p'].includes(args[0]?.toLowerCase())) return betParty()
 
@@ -55,7 +34,11 @@ module.exports = {
         if (!quantia || !Money || Money < quantia || quantia < 1) return message.reply(`${e.Deny} | Você não tem todo esse dinheiro na carteira.`)
         if (isNaN(LimitUsers) || LimitUsers > 30 || LimitUsers < 2) return message.reply(`${e.Deny} | O limite de participantes deve estar entre 2~30 usuários.`)
 
-        function BetUsersEmbed() { return BetUsers?.length >= 1 ? BetUsers.map(id => `<@${id}>`).join('\n') : 'Ninguém' }
+        function BetUsersEmbed() {
+            return BetUsers?.length >= 1
+                ? BetUsers.map(id => `<@${id}>`).join('\n')
+                : 'Ninguém'
+        }
 
         const BetEmbed = new MessageEmbed()
             .setColor('GREEN')
@@ -370,7 +353,464 @@ module.exports = {
         }
 
         async function betGlobal() {
-            return message.reply(`${e.Loading} | Este recurso está em construção...`)
+            // return message.reply(`${e.Loading} | Este recurso está em construção...`)
+
+            if (!args[1])
+                return message.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(color)
+                            .setTitle('🌎 Bet Global - (BETA)')
+                            .setDescription(`\`${prefix}bet global init <quantia>\` - Injete uma aposta no sistema de apostas globais\n\`${prefix}bet global delete <betId>\` - Delete uma aposta e receba o dinheiro de volta\n\`${prefix}bet global bet\` - Veja todas as apostas globais\n\`${prefix}bet global me\` - Veja todas as suas apostas globais\n\`${prefix}bet global <betId>\` - Aposte contra alguém globalmente`)
+                    ]
+                })
+
+            if (['init', 'iniciar', 'começar', 'start'].includes(args[1]?.toLowerCase())) return injetGlobalBet()
+            if (['bet', 'apostar'].includes(args[1]?.toLowerCase())) return InitGlobalBet()
+            if (['me', 'eu', 'i'].includes(args[1]?.toLowerCase())) return personalGlobalBets()
+            if (['delete', 'del', 'apagar', 'excluir'].includes(args[1]?.toLowerCase())) return deleteBet(args[2])
+
+            if (args[1].length === 5) return valideAndInitGlobalBet(args[1])
+
+            return message.reply(`${e.Deny} | Sub argumento desconhecido. Use \`${prefix}bet info\` para você obter todas as informações.`)
+        }
+
+        async function InitGlobalBet() {
+
+            let data = await Database.Client.findOne({ id: client.user.id }, 'GlobalBet'),
+                bets = data?.GlobalBet?.Bets || []
+
+            if (!bets || bets.length === 0) return message.reply(`${e.Deny} | Nenhuma aposta global foi encontrada.`)
+
+            let embeds = EmbedGenerator(bets),
+                emojis = ['⬅️', '➡️', '❌'],
+                embedControl = 0
+
+            if (!embeds || embeds.length === 0) return message.reply(`${e.Info} | Não tem nenhuma aposta global iniciada. Que tal você iniciar? \`${prefix}bet global init <quantia>\``)
+
+            let msg = await message.reply({ embeds: [embeds[0]] })
+
+            if (embeds.length > 1)
+                for (let i of emojis) msg.react(i).catch(() => { })
+            else return
+
+            let collector = msg.createReactionCollector({
+                filter: (r, u) => emojis.includes(r.emoji.name) && u.id === message.author.id,
+                idle: 40000,
+                errors: ['idle']
+            })
+                .on('collect', (r, u) => {
+
+                    if (r.emoji.name === emojis[0]) {
+                        embedControl--
+                        if (embedControl < 0) embedControl = embeds.length - 1
+                        return msg.edit({ embeds: [embeds[embedControl]] }).catch(() => { })
+                    }
+
+                    if (r.emoji.name === emojis[1]) {
+                        embedControl++
+                        if (embedControl >= embeds.length) embedControl = 0
+                        return msg.edit({ embeds: [embeds[embedControl]] }).catch(() => { })
+                    }
+
+                    if (r.emoji.name === emojis[2])
+                        return collector.stop()
+
+                    return
+                })
+                .on('end', () => {
+                    msg.reactions.removeAll().catch(() => { })
+                    let cancelEmbed = embeds[embedControl]
+                    cancelEmbed.color = client.red
+
+                    return msg.edit({
+                        content: `${e.Deny} | Comando cancelado.`,
+                        embeds: [embeds[embedControl]]
+                    })
+                })
+        }
+
+        async function personalGlobalBets() {
+
+            let data = await Database.Client.findOne({ id: client.user.id }, 'GlobalBet'),
+                allBets = data?.GlobalBet?.Bets || []
+
+            if (!allBets || allBets.length === 0) return message.reply(`${e.Deny} | Nenhuma aposta global foi encontrada.`)
+
+            let bets = allBets.filter(d => d.userId === message.author.id)
+
+            if (!bets || bets.length === 0) return message.reply(`${e.Deny} | Você não possui nenhuma aposta global.`)
+
+            let embeds = EmbedGenerator(bets, true),
+                emojis = ['⬅️', '➡️', '❌'],
+                embedControl = 0
+
+            let msg = await message.reply({ embeds: [embeds[0]] })
+
+            if (embeds.length > 1)
+                for (let i of emojis) msg.react(i).catch(() => { })
+            else return
+
+            let collector = msg.createReactionCollector({
+                filter: (r, u) => emojis.includes(r.emoji.name) && u.id === message.author.id,
+                idle: 40000,
+                errors: ['idle']
+            })
+                .on('collect', (r, u) => {
+
+                    if (r.emoji.name === emojis[0]) {
+                        embedControl--
+                        if (embedControl < 0) embedControl = embeds.length - 1
+                        return msg.edit({ embeds: [embeds[embedControl]] }).catch(() => { })
+                    }
+
+                    if (r.emoji.name === emojis[1]) {
+                        embedControl++
+                        if (embedControl >= embeds.length) embedControl = 0
+                        return msg.edit({ embeds: [embeds[embedControl]] }).catch(() => { })
+                    }
+
+                    if (r.emoji.name === emojis[2])
+                        return collector.stop()
+
+                    return
+                })
+                .on('end', () => {
+                    msg.reactions.removeAll().catch(() => { })
+                    let cancelEmbed = embeds[embedControl]
+                    cancelEmbed.color = client.red
+
+                    return msg.edit({
+                        content: `${e.Deny} | Comando cancelado.`,
+                        embeds: [embeds[embedControl]]
+                    })
+                })
+        }
+
+        async function injetGlobalBet() {
+
+            let value = parseInt(args[2]?.replace(/k/g, '000'))
+            if (!value || isNaN(value)) return message.reply(`${e.Deny} | Você precisar me dizer um valor válido para iniciar uma aposta global. \`${prefix}bet global init <Quantia>\``)
+
+            let data = await Database.User.findOne({ id: message.author.id }, 'Balance')
+            if (!data) return message.reply(`${e.Database} | DATABASE | Tente novamente.`)
+
+            let money = data?.Balance || 0
+
+            if (money <= 0) return message.reply(`${e.Deny} | Você não possui dinheiro para apostar.`)
+            if (value < 200) return message.reply(`${e.Deny} | No Bet Global, o valor mínimo é de 200 ${moeda}.`)
+            if (value > money) return message.reply(`${e.Deny} | Você não possui todo esse dinheiro.`)
+
+            Database.subtract(message.author.id, value)
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                {
+                    $push: {
+                        ['GlobalBet.Bets']: {
+                            betId: passCode(5),
+                            userId: message.author.id,
+                            Value: value
+                        }
+                    },
+                    $inc: { ['GlobalBet.totalValue']: value }
+                }
+            )
+
+            return message.reply(`${e.Check} | Sua aposta de **${value} ${moeda}** foi injetada na Global Bet! Agora basta aguardar até alguém apostar com você!`)
+        }
+
+        async function betInfo() {
+
+            let data = await Database.Client.findOne({ id: client.user.id }, 'GlobalBet.totalValue'),
+                value = parseInt(data?.GlobalBet?.totalValue || 0)?.toFixed(0)
+
+            let msg = await message.reply({
+                embeds: [
+                    new MessageEmbed()
+                        .setColor(color)
+                        .setTitle('💵 Comando Aposta')
+                        .setDescription(`Você pode apostar ${moeda} com todos no chat.`)
+                        .addFields(
+                            {
+                                name: `${e.On} Simple Bet`,
+                                value: `\`${prefix}bet [quantia] [LimiteDePlayers]\` - Aposte uma quantia`
+                            },
+                            {
+                                name: `:tada: Bet Party`,
+                                value: `\`${prefix}bet party [quantia] <QuantidadeDeOpções (2~4)>\` - A bet party é um novo jeito de se apostar.`
+                            },
+                            {
+                                name: '🌎 Bet Global',
+                                value: `Total de apostas injetadas: *${value} ${moeda}*\n\`${prefix}bet global init <quantia>\` - Injete uma aposta no sistema de apostas globais\n\`${prefix}bet global delete <betId>\` - Delete uma aposta e receba o dinheiro de volta\n\`${prefix}bet global bet\` - Veja todas as apostas globais\n\`${prefix}bet global me\` - Veja todas as suas apostas globais\n\`${prefix}bet global <betId>\` - Aposte contra alguém globalmente`
+                            }
+                        )
+                ]
+            }),
+                clicked = false
+
+            msg.react('🌎').catch(() => { })
+
+            return msg.createReactionCollector({
+                filter: (r, u) => message.author.id === u.id && r.emoji.name === '🌎',
+                max: 1,
+                time: 30000,
+                errors: ['time', 'max']
+            })
+                .on('collect', () => {
+
+                    msg.delete().catch(() => { })
+                    return InitGlobalBet()
+                })
+                .on('end', () => {
+                    if (clicked) return
+                    return msg.reactions.removeAll().catch(() => { })
+                })
+        }
+
+        function EmbedGenerator(dataArray, personal = false) {
+
+            let amount = 10,
+                Page = 1,
+                embeds = [],
+                length = dataArray.length / 10 <= 1 ? 1 : parseInt((dataArray.length / 10) + 1)
+
+            function map(bet) {
+
+                return personal
+                    ? bet.userId === message.author.id
+                        ? `~~\`${bet.betId}\`~~`
+                        : `\`${bet.betId}\``
+                    : bet.userId === message.author.id
+                        ? `\`${bet.betId}\``
+                        : `~~\`${bet.betId}\`~~`
+            }
+
+            for (let i = 0; i < dataArray.length; i += 10) {
+
+                let current = dataArray.slice(i, amount),
+                    description = current.map(bet => `🆔 ${map(bet)} | ${bet.Value} ${moeda}`).join('\n'),
+                    PageCount = length > 1 ? ` - ${Page}/${length}` : ''
+
+                if (current.length > 0) {
+
+                    let embed = {
+                        color: client.blue,
+                        title: `🌎  ${client.user.username} Global Bet${PageCount}${personal ? ' | Personal Bets' : ''}`,
+                        description: `${description}`,
+                        footer: {
+                            text: `${dataArray.length} apostas contabilizadas`
+                        },
+                    }
+
+                    !personal
+                        ? embed.fields = [
+                            {
+                                name: `${e.Info} Adicional informativo`,
+                                value: `1. \`${prefix}bet global <IdDaAposta>\` - Comece uma aposta global\n2. Apostas ~~riscadas~~ são as suas apostas\n3. \`${prefix}bet global me\` - Mostra somente suas apostas`
+                            }
+                        ]
+                        : embed.fields = [
+                            {
+                                name: `${e.Info} Adicional informativo`,
+                                value: `\`${prefix}bet global delete <IdDaAposta>\` - Delete uma aposta e receba o dinheiro de volta`
+                            }
+                        ]
+
+                    embeds.push(embed)
+                    Page++
+                    amount += 10
+
+                }
+
+            }
+
+            return embeds;
+        }
+
+        async function valideAndInitGlobalBet(betIdGiven) {
+
+            /**
+             * betObject = {
+             *    betId: passCode(5),
+             *    userId: message.author.id,
+             *    Value: value
+             * }
+             */
+
+            let data = await Database.Client.findOne({ id: client.user.id }, 'GlobalBet'),
+                allBets = data?.GlobalBet?.Bets,
+                authorData = await Database.User.findOne({ id: message.author.id }, 'Balance'),
+                Money = parseInt(authorData?.Balance) || 0
+
+            if (!allBets || allBets.length === 0)
+                return message.reply(`${e.Deny} | Não há nenhuma aposta global aberta no momento.`)
+
+            if (Money <= 0)
+                return message.reply(`${e.Deny} | Você não tem 1 centavo. O que você quer nas apostas globais?`)
+
+            let bet = allBets.find(d => d.betId === betIdGiven)
+
+            let betAuthor = client.users.cache.get(bet.userId)
+
+            if (!betAuthor) {
+                deleteBetFromDatabase(betIdGiven)
+                return message.reply(`${e.Deny} | Eu não achei o criador da aposta **\`${betIdGiven}\`** em lugar nenhum. Foi mal, mas vou deletar essa aposta.`)
+            }
+
+            if (!bet)
+                return message.reply(`${e.Deny} | Não existe nenhuma aposta com o id **"${betIdGiven}**".`)
+
+            if (bet.userId === message.author.id)
+                return message.reply(`${e.Deny} | Você não pode apostar com você mesmo.`)
+
+            if (Money < bet.Value)
+                return message.reply(`${e.Deny} | O valor da aposta \`${betIdGiven}\` é de **${bet.Value} ${moeda}**. E claro, você não tem esse dinheiro.`)
+
+            return confirmGlobalBetExec(bet.betId, bet.Value, betAuthor)
+
+        }
+
+        async function confirmGlobalBetExec(betId, betValue, betAuthor) {
+
+            deleteBetFromDatabase(betId)
+            Database.subtract(message.author.id, betValue)
+
+            let emojis = ['✅', '❌'],
+                msg = await message.reply(`${e.QuestionMark} | Você realmente deseja efetuar essa aposta global no valor de **${betValue} ${moeda}**?`),
+                started = false
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+
+            let collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                erros: ['time']
+            })
+                .on('collect', (reaction) => {
+
+                    if (reaction.emoji.name === emojis[1])
+                        return collector.stop()
+
+                    started = true
+                    return startGlobalBet(msg, betId, betValue, betAuthor)
+                })
+                .on('end', () => {
+                    if (started) return
+                    msg.edit(`${e.Deny} | Aposta global cancelada.`)
+                    return resetBet(betId, betValue, betAuthor.id)
+                })
+            return
+        }
+
+        async function startGlobalBet(msg, betId, betValue, betAuthor) {
+
+            msg.edit(`${e.Check} | Você inicou a aposta global **\`${betId}\`** no valor de **${betValue} ${moeda}**.\n${e.Loading} | Contabilizando, analizando e sorteando...`).catch(() => { })
+
+            let winner = [message.author, betAuthor][Math.floor(Math.random() * 2)]
+
+            return setTimeout(() => {
+
+                msg.edit(`👑 | *${winner.tag} - \`${winner.id}\`* ganhou a aposta global no valor de **${betValue} ${moeda}**.`).catch(() => { })
+                registerTransactions(betValue, winner, winner.id === message.author.id ? betAuthor : message.author)
+            }, 3500)
+        }
+
+        function registerTransactions(betValue, winner, loser) {
+
+            Database.add(winner.id, betValue)
+
+            Database.PushTransaction(
+                winner.id,
+                `${e.gain} Ganhou ${betValue} na aposta global contra ${loser.tag}`
+            )
+
+            Database.PushTransaction(
+                loser.id,
+                `${e.loss} Perdeu ${betValue} na aposta global contra ${winner.tag}`
+            )
+
+            return
+        }
+
+        async function resetBet(betId, betValue, betAuthorId) {
+            Database.add(message.author.id, betValue)
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                {
+                    $push: {
+                        ['GlobalBet.Bets']: {
+                            betId: betId,
+                            userId: betAuthorId,
+                            Value: betValue
+                        }
+                    }
+                }
+            )
+            return
+        }
+
+        async function deleteBetFromDatabase(betId) {
+
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                {
+                    $pull: { ['GlobalBet.Bets']: { betId: betId } }
+                }
+            )
+            return
+        }
+
+        async function deleteBet(betId) {
+
+            if (!betId)
+                return message.reply(`${e.Info} | Com este comando você deletar apostas globais que você fez. Você pode ver todas as suas apostas usando o comando \`${prefix}bet global me\` e depois \`${prefix}bet global delete <idDaAposta>\``)
+
+            if (betId.length !== 5)
+                return message.reply(`${e.Deny} | ID de aposta inválido.`)
+
+            let data = await Database.Client.findOne({ id: client.user.id }, 'GlobalBet.Bets'),
+                allBets = data?.GlobalBet?.Bets || []
+
+            if (!allBets || allBets.length === 0) return message.reply(`${e.Deny} | Não existe nenhuma aposta global no momento.`)
+
+            let bets = allBets.filter(x => x.userId === message.author.id)
+
+            if (!bets || bets.length === 0) return message.reply(`${e.Deny} | Você não possui nenhuma aposta global ativa.`)
+
+            let betToDelete = bets.find(x => x.betId === betId)
+
+            if (!betToDelete) return message.reply(`${e.Deny} | O id **\`${betId}\`** não corresponde a nenhuma aposta global aberta por você.`)
+
+            let emojis = ['✅', '❌'],
+                clicked = false,
+                msg = await message.reply({
+                    content: `${e.QuestionMark} | Você realmente deseja deletar a aposta **\`${betId}\`** no valor de **${betToDelete.Value} ${moeda}**?`
+                })
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+
+            let collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 30000,
+                max: 1,
+                errors: ['time', 'max']
+
+            })
+                .on('collect', (r) => {
+
+                    if (r.emoji.name === emojis[1])
+                        return collector.stop()
+
+                    clicked = true
+                    Database.add(message.author.id, betToDelete.Value)
+                    deleteBetFromDatabase(betToDelete.betId)
+                    return msg.edit(`${e.Check} | A aposta global **\`${betId}\`** no valor de **${betToDelete.Value} ${moeda}** foi deletada com sucesso!`).catch(() => { })
+                })
+                .on('end', () => {
+                    if (clicked) return
+                    return msg.edit(`${e.Deny} | Comando cancelado.`)
+                })
+            return
         }
 
     }

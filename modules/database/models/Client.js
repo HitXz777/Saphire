@@ -18,7 +18,7 @@ module.exports = model("Client", new Schema({
         Forca: Array,
     },
     GlobalBet: {
-        Users: Array,
+        Bets: Array,
         totalValue: Number
     },
     Raspadinhas: {
