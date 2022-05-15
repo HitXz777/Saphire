@@ -82,24 +82,24 @@ module.exports = {
 
             embed
                 .setTitle(`🎉 Sorteios ${message.guild.name}`)
-                .setDescription(`Para entrar no sorteio, reaja em 🎉. Para sair, basta remover a sua reação.`)
+                .setDescription('Entre e saia a hora que quiser. Boa sorte!')
                 .addFields(
                     {
-                        name: `Prêmio`,
+                        name: `${e.Star} Prêmio`,
                         value: `> ${Prize}`
                     },
                     {
-                        name: 'Data de Término',
+                        name: '⏱️ Data de Término',
                         value: `> \`${Data(TimeMs)}\``,
                         inline: true
                     },
                     {
-                        name: 'Patrocinado por:',
+                        name: `${e.ModShield} Patrocinado por`,
                         value: `> ${message.author}`,
                         inline: true
                     },
                     {
-                        name: 'Vencedores',
+                        name: `${e.CoroaDourada} Vencedores`,
                         value: `> ${parseInt(WinnersAmount)}`,
                         inline: true
                     }
@@ -124,18 +124,36 @@ module.exports = {
                 TimeEnding: Data(TimeMs) // Hora que termina o sorteio
             }).save()
 
-            msg.edit({ embeds: [embed] }).catch(async (err) => {
+            let button = [{
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        label: 'Entrar',
+                        custom_id: 'joinGiveaway',
+                        emoji: '🎉',
+                        style: 'SUCCESS'
+                    },
+                    {
+                        type: 2,
+                        label: 'Sair',
+                        custom_id: 'leaveGiveaway',
+                        emoji: e.Leave,
+                        style: 'DANGER'
+                    }
+                ]
+            }]
+
+            msg.edit(
+                {
+                    embeds: [embed],
+                    components: button
+                }
+            ).catch(async (err) => {
                 msg.delete().catch(() => { })
 
                 Database.deleteGiveaway(msg.id)
                 return message.channel.send(`${e.Warn} | Erro ao criar o sorteio.`)
-            })
-
-            msg.react('🎉').catch(async () => {
-                msg.delete().catch(() => { })
-
-                Database.deleteGiveaway(msg.id)
-                return message.channel.send(`${e.Warn} | Erro ao reagir no sorteio.`)
             })
 
             return message.reply(`${e.Check} | Sorteio criado com sucesso!`)

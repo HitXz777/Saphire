@@ -58,9 +58,17 @@ async function start(MessageId, Guild) {
             return
         }
 
+        let message = await Channel.messages.fetch(MessageId),
+            embedToEdit = message.embeds[0]
+
+        embedToEdit.color = client.red
+        embedToEdit.description = null
+        embedToEdit.title += ' | Sorteio encerrado'
+        embedToEdit.footer.text += ` | ${Participantes.length} Participantes`
+        message.edit({ embeds: [embedToEdit], components: [] }).catch(() => { })
+
         if (Participantes.length === 0) {
             Channel.send(`${e.Deny} | Sorteio cancelado por falta de participantes.\n🔗 | Sorteio link: ${sorteio?.MessageLink}`)
-
             Database.deleteGiveaway(MessageId)
             return
         }
@@ -104,7 +112,6 @@ async function start(MessageId, Guild) {
                     )
                     .setFooter({ text: 'Este sorteio será deletado em 24 horas' })
             ]
-
         }).catch(() => Database.deleteGiveaway(MessageId))
 
         if (sorteio) {

@@ -40,9 +40,9 @@ module.exports = {
                         custom_id: 'shoot2',
                         style: 'DANGER',
                         disabled: true,
-                    },
-                ],
-            },
+                    }
+                ]
+            }
         ]
 
         const msg = await message.channel.send({
