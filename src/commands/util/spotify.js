@@ -21,7 +21,7 @@ module.exports = {
 
         if (user.presence?.activities?.length === 1) status = user.presence?.activities[0]
         if (user.presence?.activities?.length > 1) status = user.presence?.activities[1]
-
+        // Spotify command necessita dessa intent para o funcionamento
         if (!status || user.presence?.activities?.length === 0 || status.name !== "Spotify" && status.type !== "LISTENING")
             return message.reply(`${e.Deny} | Essa pessoa não está ouvindo nada no Spotify ou não vinculou o Spotify com o Discord`)
 

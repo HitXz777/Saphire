@@ -6,7 +6,7 @@ const
 
 module.exports = {
     name: 'lembrar',
-    aliases: ['lembrete', 'remind', 'reminder', 'lt', 'rm'],
+    aliases: ['lembrete', 'remind', 'reminder', 'lt', 'rm', 'remember'],
     category: 'util',
     ClientPermissions: ['MANAGE_CHANNELS', 'MANAGE_MESSAGES', 'ADD_REACTIONS'],
     emoji: `${e.ReminderBook}`,
