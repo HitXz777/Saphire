@@ -9,7 +9,7 @@ function Data(DateInMs = 0, Shorted = false, withDateNow = true) {
     let Mes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][date.getMonth()],
         DiaDaSemana = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"][date.getDay()],
         Dia = FormatNumber(date.getDate()),
-        Hora = FormatNumber(date.getHours()),
+        Hora = FormatNumber(date.getHours() + 3),
         Seconds = FormatNumber(date.getSeconds()),
         Minutes = FormatNumber(date.getMinutes()),
         Ano = date.getFullYear()

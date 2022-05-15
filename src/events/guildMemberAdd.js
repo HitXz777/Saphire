@@ -134,7 +134,7 @@ client.on('guildMemberAdd', async (member) => {
 
     async function DelWelcomeSystem() {
 
-        await Guild.updateOne(
+        await Database.Guild.updateOne(
             { id: member.guild.id },
             { $unset: { WelcomeChannel: 1 } }
         )

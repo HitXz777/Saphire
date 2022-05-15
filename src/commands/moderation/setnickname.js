@@ -47,6 +47,9 @@ module.exports = {
         if (message.author.id === message.guild.ownerId) return message.reply(`${e.Deny} | Não posso alterar o nome do dono do servidor.`)
         const member = message.guild.members.cache.get(message.author.id)
 
+        if (!member.manageable)
+            return message.reply(`${e.Deny} | Foi maaal, mas não consigo editar o nickname dessa pessoa ☹`)
+
         return member.setNickname(nick).then(() => {
             return message.reply(`${e.Check} | Prontinho.`)
         }).catch(err => {

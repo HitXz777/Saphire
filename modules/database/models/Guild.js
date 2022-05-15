@@ -16,6 +16,10 @@ module.exports = model("Guild", new Schema({
     CommandBlocks: Array,
     Antifake: Boolean,
     LockdownChannels: Array,
+    Warns: {
+        Users: Object,
+        Config: Object
+    },
     XpSystem: {
         Canal: String,
         Mensagem: String
