@@ -6,7 +6,7 @@ const client = require('../../../index'),
 
 async function GiveawaySystem() {
 
-    let GiveawaysAllData = await Database.Giveaway.find({}, 'MessageID GuildId') || []
+    let GiveawaysAllData = await Database.Giveaway.find({}, 'MessageID GuildId ChannelId Actived TimeToDelete') || []
 
     if (!GiveawaysAllData || GiveawaysAllData.length === 0) return
 
@@ -20,36 +20,47 @@ async function GiveawaySystem() {
             continue
         }
 
-        start(gwData.MessageID, Guild)
-        continue
+        if (gwData.Actived)
+            start(gwData.MessageID, Guild, gwData.ChannelId)
+        else continue
 
+        if (CheckAndDeleteGiveaway(gwData?.TimeToDelete, gwData.MessageID))
+        return
     }
 
     return
 }
 
-async function start(MessageId, Guild) {
+async function start(MessageId, Guild, ChannelId) {
 
-    let sorteio = await Database.Giveaway.findOne({ MessageID: MessageId })
+    let sorteio = await Database.Giveaway.findOne({ MessageID: MessageId }),
+        emoji = sorteio.Emoji || '🎉'
 
     if (!sorteio) {
         Database.deleteGiveaway(MessageId)
         return
     }
 
+    let channel = await Guild.channels.cache.get(ChannelId),
+        message = await channel?.messages.fetch(MessageId),
+        reaction = message?.reactions.cache.get(emoji)
+
+    if (!reaction || !message) {
+        Database.deleteGiveaway(MessageId)
+        return
+    }
+
+    let reactionUsers = await reaction?.users.fetch()
+
     let DateNow = sorteio?.DateNow || null,
         Data = DateNow !== null && sorteio?.TimeMs - (Date.now() - DateNow) > 0,
         WinnersAmount = sorteio?.Winners,
-        Participantes = sorteio?.Participants || 0,
+        Participantes = reactionUsers.filter(u => !u.bot).map(u => u.id) || [],
         Channel = Guild?.channels.cache.get(sorteio?.ChannelId),
         Sponsor = sorteio?.Sponsor,
         Prize = sorteio?.Prize,
         MessageLink = sorteio?.MessageLink,
-        Actived = sorteio?.Actived,
-        timeoutToDelete = sorteio?.TimeToDelete
-
-    if (CheckAndDeleteGiveaway(timeoutToDelete, MessageId))
-        return
+        Actived = sorteio?.Actived
 
     if (!Data && Actived) {
 
@@ -58,8 +69,7 @@ async function start(MessageId, Guild) {
             return
         }
 
-        let message = await Channel.messages.fetch(MessageId),
-            embedToEdit = message.embeds[0]
+        let embedToEdit = message.embeds[0]
 
         embedToEdit.color = client.red
         embedToEdit.description = null
@@ -121,6 +131,7 @@ async function start(MessageId, Guild) {
                 {
                     Actived: false,
                     TimeToDelete: Date.now(),
+                    Participants: Participantes,
                     TimeEnding: data(sorteio?.TimeMs)
                 }
             )

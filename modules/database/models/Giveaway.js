@@ -8,6 +8,7 @@ module.exports = model("Giveaway", new Schema({
     TimeMs: Number,
     DateNow: Number,
     ChannelId: String,
+    Emoji: String,
     Participants: Array,
     Actived: Boolean,
     MessageLink: String,

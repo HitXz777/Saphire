@@ -22,7 +22,7 @@ module.exports = {
         if (['reroll', 'resortear'].includes(args[0]?.toLowerCase())) return Reroll()
         if (['finalizar', 'finish'].includes(args[0]?.toLowerCase())) return FinishGiveaway()
         if (['list', 'all', 'todos', 'lista'].includes(args[0]?.toLowerCase())) return GiveawayList()
-        if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return GiveawayInfo()
+        if (['info', 'help', 'ajuda', 'i', 'h'].includes(args[0]?.toLowerCase())) return GiveawayInfo()
         if (['setchannel', 'config'].includes(args[0]?.toLowerCase())) return ConfigGiveawayChannel()
         if (['reset', 'resetar'].includes(args[0]?.toLowerCase())) return ResetGiveawayTime()
         return NaoSabeUsarOComando()
@@ -80,83 +80,87 @@ module.exports = {
 
             const msg = await Channel.send({ embeds: [embed.setTitle(`${e.Loading} | Construindo sorteio...`)] })
 
-            embed
-                .setTitle(`🎉 Sorteios ${message.guild.name}`)
-                .setDescription('Entre e saia a hora que quiser. Boa sorte!')
-                .addFields(
-                    {
-                        name: `${e.Star} Prêmio`,
-                        value: `> ${Prize}`
-                    },
-                    {
-                        name: '⏱️ Data de Término',
-                        value: `> \`${Data(TimeMs)}\``,
-                        inline: true
-                    },
-                    {
-                        name: `${e.ModShield} Patrocinado por`,
-                        value: `> ${message.author}`,
-                        inline: true
-                    },
-                    {
-                        name: `${e.CoroaDourada} Vencedores`,
-                        value: `> ${parseInt(WinnersAmount)}`,
-                        inline: true
-                    }
-                )
-                .setFooter({ text: `Giveaway ID: ${msg?.id}` })
-
             if (!msg?.id)
                 return message.reply(`${e.Deny} | Falha ao obter o ID da mensagem do sorteio. Verifique se eu realmente tenho permissão para enviar mensagem no canal de sorteios.`)
 
-            new Database.Giveaway({ // new Class Model
-                MessageID: msg.id, // Id da Mensagem
-                GuildId: message.guild.id, // Id do Servidor
-                Prize: Prize, // Prêmio do sorteio
-                Winners: WinnersAmount, // Quantos vencedores
-                TimeMs: TimeMs, // Tempo do Sorteio
-                DateNow: Date.now(), // Agora
-                ChannelId: ChannelId, // Id do Canal
-                Participants: [], // Array pra dar push em quem entra no sorteio
-                Actived: true, // Ativado
-                MessageLink: msg.url, // Link da mensagem
-                Sponsor: message.author.id, // Quem fez o sorteio
-                TimeEnding: Data(TimeMs) // Hora que termina o sorteio
-            }).save()
+            let Message = await message.channel.send(`${e.Loading} | Tudo certo! Última parte agora. Escolha o emoji que você quer para o sorteio. Caso queira o padrão, basta reagir na 🎉`)
+            Message.react('🎉').catch(() => { })
 
-            let button = [{
-                type: 1,
-                components: [
-                    {
-                        type: 2,
-                        label: 'Entrar',
-                        custom_id: 'joinGiveaway',
-                        emoji: '🎉',
-                        style: 'SUCCESS'
-                    },
-                    {
-                        type: 2,
-                        label: 'Sair',
-                        custom_id: 'leaveGiveaway',
-                        emoji: e.Leave,
-                        style: 'DANGER'
-                    }
-                ]
-            }]
-
-            msg.edit(
-                {
-                    embeds: [embed],
-                    components: button
-                }
-            ).catch(async (err) => {
-                msg.delete().catch(() => { })
-
-                Database.deleteGiveaway(msg.id)
-                return message.channel.send(`${e.Warn} | Erro ao criar o sorteio.`)
+            return Message.createReactionCollector({
+                filter: (r, u) => u.id === message.author.id,
+                time: 20000
             })
+                .on('collect', (reaction) => {
 
-            return message.reply(`${e.Check} | Sorteio criado com sucesso!`)
+                    let emoji = reaction.emoji
+
+                    if (emoji.id && !message.guild.emojis.cache.get(emoji.id))
+                        return Message.edit(`${Message.content}\n \n${e.Deny} | Este emoji não pertence a este servidor.`)
+
+                    let emojiData = emoji.id || emoji.name
+
+                    msg.react(emoji).catch(err => {
+                        Database.deleteGiveaway(msg.id)
+                        return message.channel.send(`${e.Warn} | Erro ao reagir no sorteio. | \`${err}\``)
+                    })
+
+                    return registerGiveaway(msg, emoji, emojiData, Message)
+                })
+
+
+            async function registerGiveaway(msg, emoji, emojiData, Message) {
+
+                new Database.Giveaway({ // new Class Model
+                    MessageID: msg.id, // Id da Mensagem
+                    GuildId: message.guild.id, // Id do Servidor
+                    Prize: Prize, // Prêmio do sorteio
+                    Winners: WinnersAmount, // Quantos vencedores
+                    Emoji: emojiData, // Quantos vencedores
+                    TimeMs: TimeMs, // Tempo do Sorteio
+                    DateNow: Date.now(), // Agora
+                    ChannelId: ChannelId, // Id do Canal
+                    Actived: true, // Ativado
+                    MessageLink: msg.url, // Link da mensagem
+                    Sponsor: message.author.id, // Quem fez o sorteio
+                    TimeEnding: Data(TimeMs) // Hora que termina o sorteio
+                }).save()
+
+                embed
+                    .setTitle(`${e.Tada} Sorteios ${message.guild.name}`)
+                    .setDescription(`Para entrar no sorteio, basta reagir no emoji ${emoji}`)
+                    .addFields(
+                        {
+                            name: `${e.Star} Prêmio`,
+                            value: `> ${Prize}`
+                        },
+                        {
+                            name: '⏱️ Data de Término',
+                            value: `> \`${Data(TimeMs)}\``,
+                            inline: true
+                        },
+                        {
+                            name: `${e.ModShield} Patrocinado por`,
+                            value: `> ${message.author}`,
+                            inline: true
+                        },
+                        {
+                            name: `${e.CoroaDourada} Vencedores`,
+                            value: `> ${parseInt(WinnersAmount)}`,
+                            inline: true
+                        }
+                    )
+                    .setFooter({ text: `Giveaway ID: ${msg?.id}` })
+
+                msg.edit({ embeds: [embed] }
+                ).catch(err => {
+                    msg.delete().catch(() => { })
+
+                    Database.deleteGiveaway(msg.id)
+                    return Message.edit(`${e.Warn} | Erro ao criar o sorteio. | \`${err}\``).catch(() => { })
+                })
+
+                return Message.edit(`${e.Check} | Sorteio criado com sucesso! Você pode vê-lo no canal ${msg.channel}`).catch(() => { })
+            }
 
         }
 
@@ -375,132 +379,133 @@ module.exports = {
 
             let MessageId = args[1]
 
-            MessageId ? (async () => {
+            MessageId
+                ? (async () => {
 
-                let sorteio = await Database.Giveaway.findOne({ MessageID: MessageId })
-                if (!sorteio) return message.reply(`${e.Deny} | Id inválido ou sorteio inexistente.`)
+                    let sorteio = await Database.Giveaway.findOne({ MessageID: MessageId })
+                    if (!sorteio) return message.reply(`${e.Deny} | Id inválido ou sorteio inexistente.`)
 
-                let WinnersAmount = sorteio?.Winners,
-                    Participantes = sorteio?.Participants,
-                    Sponsor = sorteio?.Sponsor,
-                    Prize = sorteio?.Prize,
-                    MessageLink = sorteio?.MessageLink,
-                    Actived = sorteio?.Actived,
-                    Vencedores = sorteio?.WinnersGiveaway || [],
-                    VencedoresMapped = Vencedores?.map(winner => {
+                    let WinnersAmount = sorteio?.Winners,
+                        Participantes = sorteio?.Participants || [],
+                        Sponsor = sorteio?.Sponsor,
+                        Prize = sorteio?.Prize,
+                        MessageLink = sorteio?.MessageLink,
+                        Actived = sorteio?.Actived,
+                        Emoji = formatEmoji(sorteio?.Emoji || null),
+                        Vencedores = sorteio?.WinnersGiveaway || [],
+                        VencedoresMapped = Vencedores?.map(winner => {
 
-                        let member = message.guild.members.cache.get(winner)
+                            let member = message.guild.members.cache.get(winner)
 
-                        return member
-                            ? `> ${member.user.tag.replace(/`/g, '')} - \`${member.id}\``
-                            : '> Membro não encontrado'
+                            return member
+                                ? `> ${member.user.tag.replace(/`/g, '')} - \`${member.id}\``
+                                : '> Membro não encontrado'
 
-                    }).join('\n') || '> Ninguém',
-                    description = `> :id: \`${MessageId}\`\n> 👐 Patrocinador*(a)*: ${message.guild.members.cache.get(Sponsor)?.user.tag || 'Não encontrado'}\n> ${e.Star} Prêmio: ${Prize}\n> 👥 Participantes: ${Participantes?.length || 0}\n> ${e.CoroaDourada} Vencedores: ${WinnersAmount}\n> ⏱️ Término: \`${sorteio?.TimeEnding || 'Indefinido'}\`\n> ${Actived ? `${e.Check} Ativado` : `${e.Deny} Desativado`}\n> 🔗 [Sorteio Link](${MessageLink})`,
-                    Emojis = ['⬅️', '➡️', '❌'],
-                    Control = 0,
-                    Embeds = EmbedGenerator(),
-                    msg = await message.reply({ embeds: [Embeds[0]] }),
-                    react = false
+                        }).join('\n') || '> Ninguém',
+                        description = `> :id: \`${MessageId}\`\n> 👐 Patrocinador*(a)*: ${message.guild.members.cache.get(Sponsor)?.user.tag || 'Não encontrado'}\n> ${e.Star} Prêmio: ${Prize}\n> 👥 Participantes: ${Participantes?.length || 0}\n> ${e.CoroaDourada} Vencedores: ${WinnersAmount}\n> ${e.Info} Emoji: ${Emoji}\n> ⏱️ Término: \`${sorteio?.TimeEnding || 'Indefinido'}\`\n> ${Actived ? `${e.Check} Ativado` : `${e.Deny} Desativado`}\n> 🔗 [Sorteio Link](${MessageLink})`,
+                        Emojis = ['⬅️', '➡️', '❌'],
+                        Control = 0,
+                        Embeds = EmbedGenerator(),
+                        msg = await message.reply({ embeds: [Embeds[0]] }),
+                        react = false
 
-                if (Embeds.length === 1)
-                    return
+                    if (Embeds.length === 1)
+                        return
 
-                for (const emoji of Emojis)
-                    msg.react(emoji).catch(() => { })
+                    for (const emoji of Emojis)
+                        msg.react(emoji).catch(() => { })
 
-                const collector = msg.createReactionCollector({
-                    filter: (reaction, user) => Emojis.includes(reaction.emoji.name) && user.id === message.author.id,
-                    idle: 30000
-                })
-
-                    .on('collect', (reaction) => {
-
-                        if (reaction.emoji.name === Emojis[2])
-                            return collector.stop()
-
-                        react = true
-                        return reaction.emoji.name === Emojis[0]
-                            ? (() => {
-
-                                Control--
-                                return Embeds[Control] ? msg.edit({ embeds: [Embeds[Control]] }).catch(() => { }) : Control++
-
-                            })()
-                            : (() => {
-
-                                Control++
-                                return Embeds[Control] ? msg.edit({ embeds: [Embeds[Control]] }).catch(() => { }) : Control--
-
-                            })()
-
+                    const collector = msg.createReactionCollector({
+                        filter: (reaction, user) => Emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                        idle: 30000
                     })
 
-                    .on('end', () => {
-                        if (react) return
-                        return msg.edit({ content: `${e.Deny} | Comando desativado` }).catch(() => { })
+                        .on('collect', (reaction) => {
 
-                    })
+                            if (reaction.emoji.name === Emojis[2])
+                                return collector.stop()
 
-                function EmbedGenerator() {
+                            react = true
+                            return reaction.emoji.name === Emojis[0]
+                                ? (() => {
 
-                    let amount = 10,
-                        Page = 1,
-                        embeds = [],
-                        length = Participantes.length / 10 <= 1 ? 1 : parseInt((Participantes.length / 10) + 1)
+                                    Control--
+                                    return Embeds[Control] ? msg.edit({ embeds: [Embeds[Control]] }).catch(() => { }) : Control++
 
-                    for (let i = 0; i < Participantes.length; i += 10) {
+                                })()
+                                : (() => {
 
-                        let current = Participantes.slice(i, amount),
-                            GiveawayMembersMapped = current.map(Participante => {
+                                    Control++
+                                    return Embeds[Control] ? msg.edit({ embeds: [Embeds[Control]] }).catch(() => { }) : Control--
 
-                                let Member = message.guild.members.cache.get(Participante)
-
-                                return Member ? `> ${Member.user.tag.replace(/`/g, '')} - \`${Member.id}\`` : (async () => {
-
-                                    await Database.Giveaway.updateOne(
-                                        { MessageID: MessageId },
-                                        { $pull: { Participants: Participante } }
-                                    )
-
-                                    return `> ${e.Deny} Usuário deletado`
                                 })()
 
-                            }).join("\n")
+                        })
 
-                        if (current.length > 0) {
+                        .on('end', () => {
+                            if (react) return
+                            return msg.edit({ content: `${e.Deny} | Comando desativado` }).catch(() => { })
 
-                            embeds.push({
-                                color: client.blue,
-                                title: `${e.Tada} Informações do sorteio`,
-                                description: `${description}`,
-                                fields: [
-                                    {
-                                        name: `👥 Participantes ${length > 0 ? `- ${Page}/${length}` : ''}`,
-                                        value: `${GiveawayMembersMapped || '> Nenhum membro entrou neste sorteio'}`
+                        })
+
+                    function EmbedGenerator() {
+
+                        let amount = 10,
+                            Page = 1,
+                            embeds = [],
+                            length = Participantes.length / 10 <= 1 ? 1 : parseInt((Participantes.length / 10) + 1)
+
+                        for (let i = 0; i < Participantes.length; i += 10) {
+
+                            let current = Participantes.slice(i, amount),
+                                GiveawayMembersMapped = current.map(Participante => {
+
+                                    let Member = message.guild.members.cache.get(Participante)
+
+                                    return Member ? `> ${Member.user.tag.replace(/`/g, '')} - \`${Member.id}\`` : (async () => {
+
+                                        await Database.Giveaway.updateOne(
+                                            { MessageID: MessageId },
+                                            { $pull: { Participants: Participante } }
+                                        )
+
+                                        return `> ${e.Deny} Usuário deletado`
+                                    })()
+
+                                }).join("\n")
+
+                            if (current.length > 0) {
+
+                                embeds.push({
+                                    color: client.blue,
+                                    title: `${e.Tada} Informações do sorteio`,
+                                    description: `${description}`,
+                                    fields: [
+                                        {
+                                            name: `👥 Participantes ${length > 0 ? `- ${Page}/${length}` : ''}`,
+                                            value: `${GiveawayMembersMapped || '> Nenhum membro entrou neste sorteio'}`
+                                        },
+                                        {
+                                            name: `${e.OwnerCrow} Vencedores do Sorteios${Vencedores.length > 0 ? `: ${Vencedores.length}/${WinnersAmount}` : ''}`,
+                                            value: `${VencedoresMapped}`
+                                        }
+                                    ],
+                                    footer: {
+                                        text: `${Participantes.length} participantes contabilizados`
                                     },
-                                    {
-                                        name: `${e.OwnerCrow} Vencedores do Sorteios${Vencedores.length > 0 ? `: ${Vencedores.length}/${WinnersAmount}` : ''}`,
-                                        value: `${VencedoresMapped}`
-                                    }
-                                ],
-                                footer: {
-                                    text: `${Participantes.length} participantes contabilizados`
-                                },
-                            })
+                                })
 
-                            Page++
-                            amount += 10
+                                Page++
+                                amount += 10
+
+                            }
 
                         }
 
+                        return embeds;
                     }
 
-                    return embeds;
-                }
-
-            })()
-
+                })()
                 : (() => {
 
                     return message.reply({
@@ -769,6 +774,17 @@ module.exports = {
                         return `${e.Deny} Usuário não encontrado.`
                     })()
             }
+        }
+
+        function formatEmoji(data) {
+
+            if (!data) return '🎉'
+
+            let isId = parseInt(data)
+
+            return isId
+                ? message.guild.emojis.cache.get(data) || '🎉'
+                : data
         }
 
     }
