@@ -1073,10 +1073,6 @@
             "Author": "480588343898537985"
         },
         {
-            "Cantada": "seu pai é astronauta? Pq vc parece um alienígena",
-            "Author": "938108120402628668"
-        },
-        {
             "Cantada": "seu pai é padeiro?porque sua mãe é um sonho",
             "Author": "938108120402628668"
         },
@@ -1275,7 +1271,32 @@
         {
             "Cantada": "Tenho 70 maneiras de te animar. A primeira é um grande abraço. E o resto é 69.",
             "Author": "545189821245685781"
+        },
+        {
+            "Cantada": "Você não é sorvete, mas eu te chuparia todo dia",
+            "Author": "451619591320371213"
+        },
+        {
+            "Cantada": "voce não é arroz de mercado, mas vou te encher de tapa",
+            "Author": "818582524518334476"
+        },
+        {
+            "Cantada": "Você faz aula de canto? ent vamo ali no canto que te dou uma aula",
+            "Author": "818582524518334476"
+        },
+        {
+            "Cantada": "você não é sofá, mas eu sentava em você todo dia",
+            "Author": "818582524518334476"
         }
     ],
-    "Sugest": {}
+    "Sugest": {
+        "chAik": {
+            "Cantada": "é aniversário de alguem? e esses dois balão gigante no seu peito?",
+            "Author": "818582524518334476"
+        },
+        "0bzoe": {
+            "Cantada": "Voce é fazendeiro? Não? Então explica esse pepino na sua calça",
+            "Author": "451619591320371213"
+        }
+    }
 }
