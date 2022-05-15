@@ -22,8 +22,6 @@ module.exports = {
 
         if (emoji.id) {
 
-            console.log(parsedEmoji.id)
-
             const url = `https://cdn.discordapp.com/emojis/${emoji.id}${emoji.animated}`
             return message.channel.send(`${url}`)
         }
