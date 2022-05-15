@@ -15,7 +15,7 @@ const
 
 client.on('messageCreate', async message => {
 
-    if (!message || !message.guild || !message.guild?.id || !message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES) || !message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.VIEW_CHANNEL) || !message.guild.me.permissions.has(Permissions.FLAGS.SEND_MESSAGES) || !message.guild.me.permissions.has(Permissions.FLAGS.VIEW_CHANNEL))
+    if (!message || !message.inGuild() || !message.guild || !message.guild?.id || !message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES) || !message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.VIEW_CHANNEL) || !message.guild.me.permissions.has(Permissions.FLAGS.SEND_MESSAGES) || !message.guild.me.permissions.has(Permissions.FLAGS.VIEW_CHANNEL))
         return
 
     let guild = await Database.Guild.findOne({ id: message.guild.id }, 'Prefix Blockchannels AntLink CommandBlocks'),
