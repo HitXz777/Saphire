@@ -353,7 +353,6 @@ module.exports = {
         }
 
         async function betGlobal() {
-            // return message.reply(`${e.Loading} | Este recurso está em construção...`)
 
             if (!args[1])
                 return message.reply({
@@ -502,6 +501,7 @@ module.exports = {
             if (value > money) return message.reply(`${e.Deny} | Você não possui todo esse dinheiro.`)
 
             Database.subtract(message.author.id, value)
+            Database.PushTransaction(message.author.id, `${e.loss} Injetou ${value} Safiras no *bet global*`)
             await Database.Client.updateOne(
                 { id: client.user.id },
                 {

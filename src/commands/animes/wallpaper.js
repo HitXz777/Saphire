@@ -88,7 +88,7 @@ module.exports = {
                                 },
                                 {
                                     name: `${e.Download} | Quer algum anime na lista?`,
-                                    value: `\`\`\`Nos diga no formulário: ${prefix}sugest\`\`\``
+                                    value: `\`\`\`Peça diretamente ao ${client.users.cache.get(Database.Names.Gowther)?.tag || '"Nome não encontrado"'}\`\`\``
                                 },
                                 {
                                     name: `${e.Check} | Animes Disponíveis`,

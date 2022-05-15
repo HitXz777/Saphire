@@ -21,7 +21,7 @@ module.exports = {
             isClose = clientRifa?.Close
 
         if (['buy', 'comprar', 'b'].includes(args[0]?.toLowerCase())) return newTicket()
-        if (['stats', 'status'].includes(args[0]?.toLowerCase())) return raffleStats()
+        if (['stats', 'status', 's'].includes(args[0]?.toLowerCase())) return raffleStats()
         return message.reply(`${e.Deny} | Sub-comando não reconhecido... Tenta usar \`${prefix}rifa info\``)
 
         async function newTicket() {
