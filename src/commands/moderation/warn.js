@@ -15,11 +15,12 @@ module.exports = {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return warnInfo()
 
-        let member = message.mentions.members.first() || message.guild.members.cache.get(args[0] || message.repliedUser?.id),
+        let member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.guild.members.cache.get(message.mentions.repliedUser?.id),
             fill = args[0]?.startsWith('<') ? args.slice(1).join(" ") : args.slice(0).join(" "),
-            reason = fill || 'Nenhuma razão definida'
+            reason = fill || 'Nenhuma razão definida',
+            warnListControl = {}
 
-        if (['list', 'lista'].includes(args[0]?.toLowerCase())) return warnsList()
+        if (['list', 'lista'].includes(args[0]?.toLowerCase())) return warnsList(member?.id)
         if (['delete', 'del', 'excluir'].includes(args[0]?.toLowerCase())) return deleteWarn()
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return warnInfo()
 
@@ -28,6 +29,18 @@ module.exports = {
 
         if (member.id === message.author.id)
             return message.reply(`${e.Deny} | Qual é? Sério que você quer dar warn em você mesmo?`)
+
+        if (member.id === client.user.id)
+            return message.reply(`${e.Deny} | Você é cheio de gracinhas, né...`)
+
+        if (member.user.bot)
+            return message.reply(`${e.Deny} | Opa, opa, opa! Eu não vou dar warn nos meus amiguinhos bots.`)
+
+        let perms = member.permissions.toArray(),
+            blockedPermissions = ['ADMINISTRATOR', 'KICK_MEMBERS', 'BAN_MEMBERS', 'MODERATE_MEMBERS']
+
+        for (let perm of blockedPermissions)
+            if (perms.includes(perm)) return message.reply(`${e.Deny} | Vish... Não posso efetuar warn em uma pessoa tão forte assim...`)
 
         if (!member.manageable)
             return message.reply(`${e.Deny} | Opa! ${member} é muito forte, posso dar warn nele não...`)
@@ -45,14 +58,14 @@ module.exports = {
             time: 60000,
             max: 1
         })
-            .on('collect', (reaction) => {
+            .on('collect', async (reaction) => {
 
                 if (reaction.emoji.name === emojis[1]) return
 
                 msg.delete().catch(() => { })
 
                 let warnId = passCode(5)
-                registerWarn(member.id, reason, warnId, message.author.id)
+                await registerWarn(member.id, reason, warnId, message.author.id)
                 notify(warnId, member.id)
                 return member.user.send({
                     content: `⚠️ | Você recebeu um aviso no servidor **${message.guild.name}**`,
@@ -145,11 +158,15 @@ module.exports = {
                 }
             )
 
+            return
+
         }
 
-        async function warnsList() {
+        async function warnsList(memberId, msg) {
 
-            if (!member)
+            if (!memberId) return listAllWarns()
+
+            if (!memberId)
                 return message.reply(`${e.Deny} | Mencione um membro para que eu possa pegar os warns. \`${prefix}warn list @member\``)
 
             let data = await Database.Guild.findOne({ id: message.guild.id }, 'Warns.Users')
@@ -157,16 +174,17 @@ module.exports = {
             if (!data?.Warns?.Users)
                 return message.reply(`${e.Deny} | Esse servidor não tem nenhum warn.`)
 
-            let warns = data?.Warns?.Users[member.id],
+            let warns = data?.Warns?.Users[memberId],
                 control = 0
 
             if (!warns || warns.length === 0)
-                return message.reply(`${e.Deny} | ${member.user.username} não tem nenhum warn.`)
+                return message.reply(`${e.Deny} | ${member?.user?.username || '\`NOT FOUND\`'} não tem nenhum warn.`)
 
             let embeds = EmbedGenerator(),
                 emojis = ['⬅️', '➡️', '❌']
 
-            let msg = await message.reply({ embeds: [embeds[control]] })
+            msg = msg ? await msg.edit({ embeds: [embeds[control]] }).catch(() => { })
+                : await message.reply({ embeds: [embeds[control]] }).catch(() => { })
 
             if (!embeds || embeds.length === 1) return
 
@@ -203,6 +221,9 @@ module.exports = {
                     return msg.edit({ embeds: [embed] }).catch(() => { })
                 })
 
+            warnListControl.collector = collector
+            warnListControl.emojis = ['⬅️', '➡️']
+
             return
 
             function EmbedGenerator() {
@@ -215,15 +236,15 @@ module.exports = {
                 for (let i = 0; i < warns.length; i += 5) {
 
                     let current = warns.slice(i, amount),
-                        description = current.map(warn => `🆔 \`${warn.id}\`\n${e.Info} \`${warn.reason}\`\n${e.ModShield} ${message.guild.members.cache.get(warn.author)?.user?.tag || 'Autor não encontrado.'}`).join("\n \n")
+                        description = current.map(warn => `🆔 \`${warn.id}\`\n${e.Info} \`${warn.reason}\`\n${e.ModShield} ${message.guild.members.cache.get(warn.author)?.user?.tag || 'NOT FOUND.'}`).join("\n \n")
 
                     if (current.length > 0) {
 
                         embeds.push({
                             color: client.blue,
                             author: {
-                                name: `${member.user.username} Warn List - ${Page}/${length}`,
-                                icon_url: member.user.displayAvatarURL({ dynamic: true })
+                                name: `${member?.user?.username || 'NOT FOUND'} Warn List - ${Page}/${length}`,
+                                icon_url: member?.user?.displayAvatarURL({ dynamic: true }) || null
                             },
                             description: `${description}`,
                             footer: {
@@ -284,7 +305,7 @@ module.exports = {
                 emojis = ['✅', '❌'],
                 clicked = false
 
-            let msg = await message.reply(`${e.QuestionMark} Você tem certeza em deletar o Warn \`${warn.id}\`?\n${e.Info} Razão: \`${warn.reason}\`\n${e.ModShield} ${author?.user?.tag || 'Não encontrado'} - \`${author?.id || '0'}\`\n👤 ${memberWarn?.user?.tag || 'Não encontrado'} - \`${memberWarn?.id || '0'}\``)
+            let msg = await message.reply(`${e.QuestionMark} Você tem certeza em deletar o Warn \`${warn.id}\`?\n${e.Info} Razão: \`${warn.reason}\`\n${e.ModShield} ${author?.user?.tag || 'NOT FOUND'} - \`${author?.id || '0'}\`\n👤 ${memberWarn?.user?.tag || 'NOT FOUND'} - \`${memberWarn?.id || '0'}\``)
 
             for (let i of emojis) msg.react(i).catch(() => { })
             let collector = msg.createReactionCollector({
@@ -371,7 +392,7 @@ module.exports = {
                                 },
                                 {
                                     name: '2. Veja os warns',
-                                    value: `\`${prefix}warn list @member\``
+                                    value: `\`${prefix}warn list [@member]\``
                                 },
                                 {
                                     name: '3. Delete warns',
@@ -379,7 +400,7 @@ module.exports = {
                                 },
                                 {
                                     name: '🛰️ Global System Notification',
-                                    value: `Este comando está integrado com meu sistema global de notificações. Ative ele usando \`${prefix}gsn\``
+                                    value: `Este comando é integrado ao meu sistema global de notificações. Ative-o usando \`${prefix}gsn on [#channel]\``
                                 }
                             )
                             .setFooter({ text: '[] Opcional | <> Obrigatório' })
@@ -390,13 +411,13 @@ module.exports = {
 
         async function sugestKickOrBan() {
 
-            const { MessageActionRow, MessageSelectMenu } = require('discord.js')
-
-            let painel = new MessageActionRow()
-                .addComponents(new MessageSelectMenu()
-                    .setCustomId('menu')
-                    .setPlaceholder('Escolher uma punição')
-                    .addOptions([
+            const painel = [{
+                type: 1,
+                components: [{
+                    type: 3,
+                    custom_id: 'menu',
+                    placeholder: "Escolher uma punição",
+                    options: [
                         {
                             label: 'Expulsão',
                             description: 'Boa escolha, porém pode voltar.',
@@ -421,12 +442,14 @@ module.exports = {
                             emoji: '🙌',
                             value: 'perdon'
                         }
-                    ])
-                )
+                    ]
+                }
+                ]
+            }]
 
             let msg = await message.reply({
                 content: `${e.QuestionMark} | Eu notei que ${member} possui mais de 3 warns. Quer aplicar uma punição maior?`,
-                components: [painel]
+                components: painel
             }),
                 clicked = false
 
@@ -585,6 +608,189 @@ module.exports = {
                 content: `🙌 | ${message.author} tem um coração generoso e ofereceu seu perdão e todas as punições foram anuladas.`,
                 components: []
             })
+        }
+
+        async function listAllWarns() {
+
+            let data = await Database.Guild.findOne({ id: message.guild.id }, 'Warns.Users'),
+                allWarns = data?.Warns?.Users || {}
+
+            let warns = Object.keys(allWarns || {}),
+                control = 0
+
+            if (!warns || warns.length === 0)
+                return message.reply(`${e.Deny} | Este servidor não tem nenhum warn.`)
+
+            let selectMenus = [],
+                embeds = EmbedGenerator()
+
+            if (!embeds || embeds.length === 0)
+                return message.reply(`${e.Deny} | Este servidor não tem nenhum warn.`)
+
+            let msg = await message.reply({
+                embeds: [embeds[control]],
+                components: [selectMenus[control]]
+            })
+
+            let selectCollector = msg.createMessageComponentCollector({
+                filter: interaction => interaction.user.id === message.author.id && interaction.customId === 'menu',
+                idle: 60000,
+                erros: ['idle']
+            })
+
+            selectCollector.on('collect', async interaction => {
+                interaction.deferUpdate().catch(() => { })
+
+                refreshCollectors(msg)
+
+                let id = interaction.values[0]
+
+                if (id === 'inicial') {
+                    control = 0
+                    return msg.edit({ embeds: [embeds[0]] }).catch(() => { })
+                }
+
+                if (id === 'finish') {
+                    let embed = embeds[control]
+                    embed.color = client.red
+                    embed.footer.text = 'Comando cancelado'
+                    msg.reactions?.removeAll().catch(() => { })
+                    return msg.edit({ embeds: [embed], components: [] }).catch(() => { })
+                }
+
+                return warnsList(id, msg)
+            })
+
+            if (embeds.length === 1) return
+
+            let emojis = ['⏪', '⏩', '❌']
+            for (const emoji of emojis) msg.react(emoji).catch(() => { })
+
+            let reactionCollector = msg.createReactionCollector({
+                filter: (r, u) => emojis.includes(r.emoji.name) && u.id === message.author.id,
+                idle: 60000,
+                erros: ['idle']
+            })
+
+            reactionCollector.on('collect', (reaction) => {
+
+                if (reaction.emoji.name === emojis[2]) {
+                    selectCollector.stop()
+                    return reactionCollector.stop()
+                }
+
+                refreshCollectors()
+
+                if (reaction.emoji.name === emojis[1]) {
+                    control++
+                    if (control >= embeds.length) control = 0
+                    return msg.edit({
+                        embeds: [embeds[control]],
+                        components: [selectMenus[control]]
+                    })
+                }
+
+                if (reaction.emoji.name === emojis[0]) {
+                    control--
+                    if (control < 0) control = embeds.length - 1
+                    return msg.edit({
+                        embeds: [embeds[control]],
+                        components: [selectMenus[control]]
+                    })
+                }
+                return
+            })
+
+            reactionCollector.on('end', () => {
+                let embed = embeds[control]
+                embed.color = client.red
+                embed.footer.text = 'Comando cancelado'
+                msg.reactions.removeAll().catch(() => { })
+                return msg.edit({ embeds: [embed], components: [] }).catch(() => { })
+            })
+
+            function EmbedGenerator() {
+
+                let amount = 5,
+                    Page = 1,
+                    embeds = [],
+                    options = [],
+                    length = warns.length / 5 <= 1 ? 1 : parseInt((warns.length / 5) + 1)
+
+                for (let i = 0; i < warns.length; i += 5) {
+
+                    let current = warns.slice(i, amount),
+                        description = current.map(w => {
+
+                            let member = message.guild.members.cache.get(w)
+
+                            options.push({
+                                label: member?.user?.tag || 'NOT FOUND',
+                                description: w,
+                                emoji: member ? '⚠️' : e.Deny,
+                                value: w,
+                            })
+
+                            return member
+                                ? `👤 ${member} - \`${member?.user?.tag?.replace(/`/, '')}\``
+                                : `${e.Deny} NOT FOUND - \`${w}\``
+
+                        }).join("\n")
+
+                    if (current.length > 0) {
+
+                        embeds.push({
+                            color: client.blue,
+                            title: `Warn List ${message.guild.name} - ${Page}/${length}`,
+                            description: `${description}`,
+                            footer: { text: `${warns.length} pessoas contabilizadas` }
+                        })
+
+                        selectMenus.push({
+                            type: 1,
+                            components: [{
+                                type: 3,
+                                custom_id: 'menu',
+                                placeholder: 'Escolher um usuário',
+                                options: [
+                                    {
+                                        label: 'Página de membros',
+                                        emoji: '📜',
+                                        description: 'Volte a página inicial',
+                                        value: 'inicial',
+                                    },
+                                    options,
+                                    {
+                                        label: 'Cancelar',
+                                        emoji: '❌',
+                                        description: 'Cancele e termine a Warn List',
+                                        value: 'finish',
+                                    }
+                                ]
+                            }]
+                        })
+
+                        Page++
+                        amount += 5
+                        options = []
+                    }
+
+                }
+
+                return embeds;
+            }
+
+        }
+
+        function refreshCollectors(msg) {
+            if (warnListControl.collector) {
+                warnListControl.collector.stop()
+                warnListControl.collector = false
+
+                for (let i of warnListControl.emojis)
+                    msg.reactions.cache.get(i).remove().catch(() => { })
+            }
+            return warnListControl = {}
         }
 
     }
