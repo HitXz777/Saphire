@@ -208,10 +208,11 @@ module.exports = {
             .setThumbnail(user.displayAvatarURL({ dynamic: true }))
 
         let warnData = await Database.Guild.findOne({ id: message.guild.id }, 'Warns.Users'),
-            warns = Object.values(warnData?.Warns?.Users[user.id] || {})
+            warnsFormat = warnData?.Warns?.Users || {},
+            warns = Object.values(warnsFormat[`${user.id}`] || {})
 
-            warns.length > 0 ? Embed.setFooter({ text: `${warns.length} avisos neste servidor` }) : 0
-            // Ideia de warns no perfil de: joãozinho#0001
+        warns.length > 0 ? Embed.setFooter({ text: `${warns.length} avisos neste servidor` }) : 0
+        // Ideia de warns no perfil de: joãozinho#0001
 
         msg.edit({ content: `${e.Info} Algo errado no Família ou Parças? Use \`${prefix}perfil refresh\``, embeds: [Embed] }).catch()
 

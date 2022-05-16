@@ -650,6 +650,9 @@ module.exports = {
 
             let bet = allBets.find(d => d.betId === betIdGiven)
 
+            if (!bet)
+                return message.reply(`${e.Deny} | Essa aposta não existe ou não está mais disponível na tabela global.`)
+
             let betAuthor = client.users.cache.get(bet.userId)
 
             if (!betAuthor) {
