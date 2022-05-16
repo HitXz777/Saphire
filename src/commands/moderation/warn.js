@@ -169,6 +169,8 @@ module.exports = {
             if (!memberId)
                 return message.reply(`${e.Deny} | Mencione um membro para que eu possa pegar os warns. \`${prefix}warn list @member\``)
 
+            let member = message.guild.members.cache.get(memberId)
+
             let data = await Database.Guild.findOne({ id: message.guild.id }, 'Warns.Users')
 
             if (!data?.Warns?.Users)

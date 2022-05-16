@@ -56,7 +56,7 @@ client.on('messageCreate', async message => {
     xp(message)
     AfkSystem(message)
 
-    if (message.content?.toLowerCase() === 'saphire' || message.content.startsWith(`<@`) && message.content.endsWith('>') && message.mentions.has(client.user.id))
+    if (message.content?.toLowerCase() === '@saphire' || message.content?.toLowerCase() === 'saphire' || message.content === `<@${client.user.id}>` || message.content === `<@&${client.user.id}>`)
         message.channel.send(`${e.SaphireHi} | \`${prefix}help\``)
 
     const
