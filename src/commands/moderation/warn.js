@@ -15,7 +15,7 @@ module.exports = {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return warnInfo()
 
-        let member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.guild.members.cache.get(message.mentions.repliedUser?.id),
+        let member = client.getUser(client, message, args, true),
             fill = args[0]?.startsWith('<') ? args.slice(1).join(" ") : args.slice(0).join(" "),
             reason = fill || 'Nenhuma razão definida',
             warnListControl = {}
@@ -277,7 +277,7 @@ module.exports = {
             let warn = {}
 
             if (['all', 'tudo'].includes(warnId?.toLowerCase())) return deleteAllWarn(allWarns)
-
+            if (member || warnId?.length === 18) return deleteWarnMember(allWarns, warnId)
             if (!warnId) return message.reply(`${e.Info} | Forneça um WarnID para o delete. Você pode vê-los usando \`${prefix}warn list @member\``)
 
             let warns = Object.keys(allWarns)
@@ -298,6 +298,49 @@ module.exports = {
 
             return message.reply(`${e.Deny} | ID inválido ou Warn inexistente.`)
 
+        }
+
+        async function deleteWarnMember(allWarns, memberId) {
+
+            let emojis = ['✅', '❌'],
+                clicked = false,
+                warnsArray = Object.entries(allWarns)
+
+            if (!memberId || memberId?.length !== 18) memberId = member?.id
+
+            let warns = warnsArray?.find(data => data[0] === memberId)
+            if (!warns) return message.reply(`${e.Deny} | ${member || `\`${memberId}\``} não possui nenhum warn.`)
+
+            let total = warns[1].length
+
+            let msg = await message.reply(`${e.QuestionMark} | Você tem certeza em deletar todos os warns de ${member || `\`${memberId}\``}? (${total} warns)`)
+            for (let i of emojis) msg.react(i).catch(() => { })
+
+            let collector = msg.createReactionCollector({
+                filter: (r, u) => emojis.includes(r.emoji.name) && u.id === message.author.id,
+                time: 60000,
+                erros: ['time']
+            })
+                .on('collect', async (reaction) => {
+                    if (reaction.emoji.name === emojis[1])
+                        return collector.stop()
+
+                    clicked = true
+                    await Database.Guild.updateOne(
+                        { id: message.guild.id },
+                        {
+                            $unset: { [`Warns.Users.${memberId}`]: 1 }
+                        }
+                    )
+
+                    return msg.edit(`${e.Check} | Todos os **${total} warns** de ${member || `\`${memberId}\``} foram deletados com sucesso!`).catch(() => { })
+                })
+                .on('end', () => {
+                    if (clicked) return
+                    return msg.edit(`${e.Deny} | Member Warn Delete cancelado.`).catch(() => { })
+                })
+
+            return
         }
 
         async function confirmDelete(warn) {
@@ -398,7 +441,7 @@ module.exports = {
                                 },
                                 {
                                     name: '3. Delete warns',
-                                    value: `\`${prefix}warn delete <warnId>\` - Delete warn de um membro\n\`${prefix}warn delete <all>\` - Delete todos os warns`
+                                    value: `\`${prefix}warn delete <warnId>\` - Delete um único warn usando o Warn ID\n\`${prefix}warn delete <all>\` - Delete todos os warns do servidor\n\`${prefix}warn delete <@Member/ID>\` - Delete todos os warns de um membro`
                                 },
                                 {
                                     name: '🛰️ Global System Notification',

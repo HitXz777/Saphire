@@ -107,6 +107,53 @@ class Saphire extends Client {
         }
     }
 
+    getUser(client, message, args, isMember = false) {
+
+        if (!client || !message || !args) return undefined
+
+        return isMember
+            ? message.mentions.members.first()
+            || message.guild.members.cache.get(args[0])
+            || message.guild.members.cache.get(args[1])
+            || message.guild.members.cache.get(message.mentions.repliedUser?.id)
+            || message.guild.members.cache.find(member => {
+                return member.user.username.toLowerCase() == args[0]?.toLowerCase()
+                    || member.user.tag.toLowerCase() == args[0]?.toLowerCase()
+                    || member.displayName?.toLowerCase() == args[0]?.toLowerCase()
+                    || member.user.discriminator === args[0]
+                    || member.user.id === args[0]
+                    || member.user.username.toLowerCase() == args.join(' ')?.toLowerCase()
+                    || member.user.tag.toLowerCase() == args.join(' ')?.toLowerCase()
+                    || member.displayName?.toLowerCase() == args.join(' ')?.toLowerCase()
+                    || member.user.username.toLowerCase() == args[1]?.toLowerCase()
+                    || member.user.tag.toLowerCase() == args[1]?.toLowerCase()
+                    || member.displayName?.toLowerCase() == args[1]?.toLowerCase()
+                    || member.user.id === args[1]
+                    || member.user.discriminator === args[1]
+                    || member.user.username.toLowerCase() == args.slice(1).join(' ')?.toLowerCase()
+                    || member.user.tag.toLowerCase() == args.slice(1).join(' ')?.toLowerCase()
+                    || member.displayName.toLowerCase() == args.slice(1).join(' ')?.toLowerCase()
+                    || member.user.username.toLowerCase().includes(args[0]?.toLowerCase())
+                    || member.displayName?.toLowerCase().includes(args[0]?.toLowerCase())
+                    || member.user.username.toLowerCase().includes(args[1]?.toLowerCase())
+                    || member.displayName?.toLowerCase().includes(args[1]?.toLowerCase())
+            })
+            : message.mentions.users.first()
+            || message.mentions.repliedUser
+            || client.users.cache.find(data => {
+                return data.username?.toLowerCase() === args.join(' ')?.toLowerCase()
+                    || data.username?.toLowerCase() === args.slice(1).join(' ')?.toLowerCase()
+                    || data.tag?.toLowerCase() === args.slice(1).join(' ')?.toLowerCase()
+                    || data.tag?.toLowerCase() === args[0]?.toLowerCase()
+                    || data.discriminator === args[0]
+                    || data.id === args[0]
+                    || data.tag?.toLowerCase() === args[1]?.toLowerCase()
+                    || data.discriminator === args[1]
+                    || data.id === args[1]
+            })
+
+    }
+
 }
 
 module.exports = Saphire
