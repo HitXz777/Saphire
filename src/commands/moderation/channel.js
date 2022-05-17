@@ -44,7 +44,7 @@ module.exports = {
             case 'tópico': case 'topic': case 'topica':
                 canal.isText() ? SetTopic() : message.reply(`${e.Deny} | Canais de voz não possuem tópicos.`)
                 break;
-            case 'create': case 'criar':
+            case 'create': case 'criar': case 'new':
                 CreateChannel()
                 break;
             case 'delete': case 'deletar':
