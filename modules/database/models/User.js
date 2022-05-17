@@ -9,12 +9,18 @@ module.exports = model("User", new Schema({
     Transactions: Array,
     Balance: Number,
     AfkSystem: String,
+    DailyCount: Number,
+
     MixCount: Number,
     QuizCount: Number,
     TicTacToeCount: Number,
     CompetitiveMemoryCount: Number,
     ForcaCount: Number,
-    DailyCount: Number,
+    GamingCount: {
+        FlagCount: Number,
+        // TODO: Adicionar o Flag Gaming no ranking
+        // TODO: Juntar as pontuações de todos os  games dentro deste Object
+    },
     Timeouts: {
         Bug: Number,
         Daily: Number,

@@ -1,0 +1,340 @@
+{
+    "Flags": [
+        {
+            "flag": "🇧🇷",
+            "country": "brasil"
+        },
+        {
+            "flag": "🇮🇶",
+            "country": "iraque"
+        },
+        {
+            "flag": "🇮🇪",
+            "country": "irlanda"
+        },
+        {
+            "flag": "🇮🇸",
+            "country": "islândia"
+        },
+        {
+            "flag": "🇮🇱",
+            "country": "israel"
+        },
+        {
+            "flag": "🇯🇴",
+            "country": "jordânia"
+        },
+        {
+            "flag": "🇱🇻",
+            "country": "letônia"
+        },
+        {
+            "flag": "🇱🇧",
+            "country": "líbano"
+        },
+        {
+            "flag": "🇨🇾",
+            "country": "chipre"
+        },
+        {
+            "flag": "🇦🇷",
+            "country": "argentina"
+        },
+        {
+            "flag": "🇺🇸",
+            "country": "estados unidos"
+        },
+        {
+            "flag": "🇯🇲",
+            "country": "jamaica"
+        },
+        {
+            "flag": "🇰🇷",
+            "country": "coreia do sul"
+        },
+        {
+            "flag": "🇺🇬",
+            "country": "uganda"
+        },
+        {
+            "flag": "🇯🇵",
+            "country": "japão"
+        },
+        {
+            "flag": "🇰🇿",
+            "country": "cazaquistão"
+        },
+        {
+            "flag": "🇩🇪",
+            "country": "alemanha"
+        },
+        {
+            "flag": "🇬🇷",
+            "country": "grécia"
+        },
+        {
+            "flag": "🇪🇦",
+            "country": "espanha"
+        },
+        {
+            "flag": "🇨🇱",
+            "country": "chile"
+        },
+        {
+            "flag": "🇺🇦",
+            "country": "ucrânia"
+        },
+        {
+            "flag": "🇬🇫",
+            "country": "guiana francesa"
+        },
+        {
+            "flag": "🇵🇱",
+            "country": "polonia"
+        },
+        {
+            "flag": "🇨🇦",
+            "country": "canadá"
+        },
+        {
+            "flag": "🇮🇹",
+            "country": "itália"
+        },
+        {
+            "flag": "🇲🇰",
+            "country": "macedônia"
+        },
+        {
+            "flag": "🇧🇪",
+            "country": "bélgica"
+        },
+        {
+            "flag": "🇩🇿",
+            "country": "argélia"
+        },
+        {
+            "flag": "🇿🇦",
+            "country": "áfrica do sul"
+        },
+        {
+            "flag": "🇦🇩",
+            "country": "andorra"
+        },
+        {
+            "flag": "🇦🇴",
+            "country": "angola"
+        },
+        {
+            "flag": "🇦🇫",
+            "country": "afeganistão"
+        },
+        {
+            "flag": "🇦🇱",
+            "country": "albânia"
+        },
+        {
+            "flag": "🇸🇦",
+            "country": "arábia saudita"
+        },
+        {
+            "flag": "🇦🇲",
+            "country": "armênia"
+        },
+        {
+            "flag": "🇦🇺",
+            "country": "austrália"
+        },
+        {
+            "flag": "🇦🇹",
+            "country": "áustria"
+        },
+        {
+            "flag": "🇦🇿",
+            "country": "azerbaijão"
+        },
+        {
+            "flag": "🇧🇸",
+            "country": "bahamas"
+        },
+        {
+            "flag": "🇧🇩",
+            "country": "bangladesh"
+        },
+        {
+            "flag": "🇧🇧",
+            "country": "barbados"
+        },
+        {
+            "flag": "🇧🇿",
+            "country": "belize"
+        },
+        {
+            "flag": "🇧🇯",
+            "country": "benim"
+        },
+        {
+            "flag": "🇧🇾",
+            "country": "bielorrússia"
+        },
+        {
+            "flag": "🇧🇴",
+            "country": "bolívia"
+        },
+        {
+            "flag": "🇧🇼",
+            "country": "botsuana"
+        },
+        {
+            "flag": "🇧🇬",
+            "country": "bulgária"
+        },
+        {
+            "flag": "🇧🇫",
+            "country": "burkina faso"
+        },
+        {
+            "flag": "🇧🇮",
+            "country": "burúndi"
+        },
+        {
+            "flag": "🇧🇹",
+            "country": "butão"
+        },
+        {
+            "flag": "🇨🇻",
+            "country": "cabo verde"
+        },
+        {
+            "flag": "🇰🇭",
+            "country": "camboja"
+        },
+        {
+            "flag": "🇨🇲",
+            "country": "camarões"
+        },
+        {
+            "flag": "🇶🇦",
+            "country": "catar"
+        },
+        {
+            "flag": "🇹🇩",
+            "country": "chade"
+        },
+        {
+            "flag": "🇨🇳",
+            "country": "china"
+        },
+        {
+            "flag": "🇨🇴",
+            "country": "colômbia"
+        },
+        {
+            "flag": "🇨🇮",
+            "country": "costa do marfim"
+        },
+        {
+            "flag": "🇨🇷",
+            "country": "costa rica"
+        },
+        {
+            "flag": "🇭🇷",
+            "country": "croácia"
+        },
+        {
+            "flag": "🇨🇺",
+            "country": "cuba"
+        },
+        {
+            "flag": "🇩🇰",
+            "country": "dinamarca"
+        },
+        {
+            "flag": "🇩🇴",
+            "country": "dominica"
+        },
+        {
+            "flag": "🇪🇬",
+            "country": "egito"
+        },
+        {
+            "flag": "🇦🇪",
+            "country": "emirados árabes"
+        },
+        {
+            "flag": "🇪🇨",
+            "country": "equador"
+        },
+        {
+            "flag": "🇸🇰",
+            "country": "eslováquia"
+        },
+        {
+            "flag": "🇸🇮",
+            "country": "eslovênia"
+        },
+        {
+            "flag": "🇪🇪",
+            "country": "estônia"
+        },
+        {
+            "flag": "🇪🇹",
+            "country": "etiópia"
+        },
+        {
+            "flag": "🇵🇭",
+            "country": "filipinas"
+        },
+        {
+            "flag": "🇫🇮",
+            "country": "finlândia"
+        },
+        {
+            "flag": "🇫🇷",
+            "country": "frança"
+        },
+        {
+            "flag": "🇬🇦",
+            "country": "gabão"
+        },
+        {
+            "flag": "🇬🇲",
+            "country": "gâmbia"
+        },
+        {
+            "flag": "🇬🇭",
+            "country": "gana"
+        },
+        {
+            "flag": "🇬🇪",
+            "country": "geórgia"
+        },
+        {
+            "flag": "🇬🇹",
+            "country": "guatemala"
+        },
+        {
+            "flag": "🇬🇾",
+            "country": "guiana"
+        },
+        {
+            "flag": "🇭🇹",
+            "country": "haiti"
+        },
+        {
+            "flag": "🇭🇳",
+            "country": "honduras"
+        },
+        {
+            "flag": "🇭🇺",
+            "country": "hungria"
+        },
+        {
+            "flag": "🇮🇳",
+            "country": "índia"
+        },
+        {
+            "flag": "🇱🇷",
+            "country": "libéria"
+        }
+    ]
+}

@@ -9,6 +9,7 @@ const client = require('../../index'),
     eData = new Ark.Database('../../JSON/emojis.json'),
     configData = new Ark.Database('../../JSON/config.json'),
     Frases = new Ark.Database('../../JSON/frases.json'),
+    Flags = new Ark.Database('../../JSON/flags.json'),
     Models = require('../database/Models'),
     config = configData.get('config'),
     e = eData.get('e')
@@ -20,6 +21,7 @@ class Database extends Models {
         this.Emojis = e
         this.dbEmoji = eData
         this.Frases = Frases
+        this.Flags = Flags
         this.Names = {
             Rody: "451619591320371213",
             Gowther: "315297741406339083",
@@ -159,6 +161,19 @@ Database.prototype.balance = async (userId) => {
 
     let data = await User.findOne({ id: userId }, 'Balance')
     return data ? parseInt(data.Balance) : 0
+
+}
+
+Database.prototype.addGamingPoint = async (userId, type, value) => {
+
+    if (!userId || !type || isNaN(value)) return
+
+            // TODO: Adicionar o Flag Gaming no ranking
+    await User.updateOne(
+        { id: userId },
+        { $inc: { [`GamingCount.${type}`]: value } },
+        { upsert: true }
+    )
 
 }
 
