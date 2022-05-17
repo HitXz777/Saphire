@@ -397,6 +397,9 @@ module.exports = {
                 Database.add(user.id, amount)
             } else {
                 Database.add(winnerId, amount * 2)
+
+                if (!amount || amount <= 0) return
+
                 Database.PushTransaction(winnerId, `${e.gain} Ganhou ${amount} Safiras em um *Jogo da Velha Bet* contra ${client.users.cache.get(winnerId === message.author.id ? message.author.id : user.id)?.tag}`)
                 Database.PushTransaction(winnerId === message.author.id ? user.id : message.author.id, `${e.loss} Perdeu ${amount} Safiras em um *Jogo da Velha Bet* contra ${client.users.cache.get(user.id)?.tag}`)
             }

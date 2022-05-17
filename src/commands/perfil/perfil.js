@@ -107,7 +107,7 @@ module.exports = {
             HalloweenTitle = clientData.Titles?.Halloween?.includes(user.id)
                 ? `\n🎃 **Halloween 2021**`
                 : '',
-            Titulo = data.Perfil?.Titulo || 'Sem título definido',
+            Titulo = data.Perfil?.Titulo || 'Sem título definido \`${prefix}title\`',
             titulo = data.Perfil?.TitlePerm
                 ? `🔰 ${Titulo}`
                 : `${e.Deny} Não possui título`,
@@ -124,12 +124,12 @@ module.exports = {
             status = data?.Perfil?.Status || `${user.username} não conhece o comando \`${prefix}setstatus\``,
             signo = data?.Perfil?.Signo
                 ? `⠀\n${data?.Perfil?.Signo}`
-                : `⠀\n${e.Deny} Sem signo definido`,
+                : `⠀\n${e.Deny} Sem signo definido \`${prefix}signo\``,
             sexo = data?.Perfil?.Sexo
                 ? `⠀\n${data?.Perfil?.Sexo}`
-                : `⠀\n${e.Deny} Sem gênero definido`,
-            niver = data?.Perfil?.Aniversario ? `⠀\n🎉 ${data?.Perfil?.Aniversario}` : `⠀\n${e.Deny} Sem aniversário definido`,
-            job = data?.Perfil?.Trabalho ? `⠀\n👷 ${data?.Perfil?.Trabalho}` : `⠀\n${e.Deny} Sem profissão definida`,
+                : `⠀\n${e.Deny} Sem gênero definido \`${prefix}sexo\``,
+            niver = data?.Perfil?.Aniversario ? `⠀\n🎉 ${data?.Perfil?.Aniversario}` : `⠀\n${e.Deny} Sem aniversário definido \`${prefix}niver\``,
+            job = data?.Perfil?.Trabalho ? `⠀\n👷 ${data?.Perfil?.Trabalho}` : `⠀\n${e.Deny} Sem profissão definida \`${prefix}job\``,
             Clan = data?.Clan || 'Não possui',
             TopGlobalLevel = clientData.TopGlobal?.Level === user.id ? `\n${e.RedStar} **Top Global Level**` : '',
             TopGlobalLikes = clientData.TopGlobal?.Likes === user.id ? `\n${e.Like} **Top Global Likes**` : '',

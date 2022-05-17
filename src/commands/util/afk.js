@@ -99,7 +99,7 @@ module.exports = {
                                 $push: {
                                     AfkSystem: {
                                         MemberId: message.author.id,
-                                        Message: `\`${Data()}\`\n🗒️ | ${Motivo}`
+                                        Message: `\`${Data(0, true)}\`\n🗒️ | ${Motivo}`
                                     }
                                 }
                             },
