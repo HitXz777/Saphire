@@ -62,6 +62,11 @@ module.exports = {
                             value: 'mix'
                         },
                         {
+                            label: 'Flag Gaming (em breve)',
+                            emoji: '🎌',
+                            value: 'flag'
+                        },
+                        {
                             label: 'Jokenpô',
                             emoji: '✂️',
                             value: 'jokempo'
@@ -114,6 +119,7 @@ module.exports = {
                         .addField('💬 Ranking Global Mix Game', `\`${prefix}rank mix [local]\``)
                         .addField('✂️ Ranking Global Jokempo Game', `\`${prefix}rank Jokempo [local/invertido]\``)
                         .addField('💡 Ranking Global Quiz Game', `\`${prefix}rank quiz [local]\``)
+                        .addField('🎌 Ranking Flag Game', `\`em breve\``)
                         .addField('⭕ Ranking Global Jogo da Velha', `\`${prefix}rank ttt [local]\`\n\`${prefix}rank ttt [invertido]\``)
                         .addField('🛡️ Ranking Clans', `\`${prefix}rank clan\``)
                         .addField('🔍 In Locale Search', `\`${prefix}rank <classe> [posição/@user/id]\` ou \`${prefix}rank <classe> [me]\``)
@@ -148,6 +154,7 @@ module.exports = {
                     case 'memory': memoryGlobalRanking(); break;
                     case 'quiz': quizGlobalRanking(); break;
                     case 'forca': forcaGlobalRanking(); break;
+                    case 'flag': flagGamingRanking(); break;
                     case 'clan': ClanRanking(); break;
                     case 'close': msg.edit({ content: `${e.Deny} | Comando cancelado`, embeds: [], components: [] }); break;
                     default: msg.edit({ content: `${e.Warn} | Estranho... Isso não deveria ter acontecido...`, embeds: [] }).catch(() => { }); break;
@@ -171,6 +178,7 @@ module.exports = {
         if (['quiz'].includes(args[0]?.toLowerCase())) return quizGlobalRanking()
         if (['clan', 'clans'].includes(args[0]?.toLowerCase())) return ClanRanking()
         if (['top', 'global'].includes(args[0]?.toLowerCase())) return TopGlobalRanking()
+        if (['flag', 'brandeiras', 'bandeira', 'falg'].includes(args[0]?.toLowerCase())) return flagGamingRanking()
 
         return msg.edit(`${e.Deny} | ${message.author}, este ranking não existe ou você escreveu errado. Use \`${prefix}rank\` e veja os rankings disponiveis.`).catch(() => { })
 
@@ -178,7 +186,7 @@ module.exports = {
             return msg.edit({
                 content: `${e.Info} | Painel inicial.`,
                 embeds: [
-                    new MessageEmbed()
+                    new MessageEmbed() // TODO: Unificar as 2 embeds principais em 1 única variável
                         .setColor('#246FE0')
                         .setTitle(`🏆 | ${client.user.username} Global Ranking System`)
                         .setDescription('Aqui você pode ver os top 10 em cada classe')
@@ -191,6 +199,7 @@ module.exports = {
                         .addField('💬 Ranking Global Mix Game', `\`${prefix}rank mix [local]\``)
                         .addField('✂️ Ranking Global Jokempo Game', `\`${prefix}rank Jokempo [local/invertido]\``)
                         .addField('💡 Ranking Global Quiz Game', `\`${prefix}rank quiz [local]\``)
+                        .addField('🎌 Ranking Flag Game', `\`em breve\``)
                         .addField('⭕ Ranking Global Jogo da Velha', `\`${prefix}rank ttt [local]\`\n\`${prefix}rank ttt [invertido]\``)
                         .addField('🛡️ Ranking Clans', `\`${prefix}rank clan\``)
                         .addField('🔍 In Locale Search', `\`${prefix}rank <classe> [posição/@user/id]\` ou \`${prefix}rank <classe> [me]\``)
@@ -287,6 +296,11 @@ module.exports = {
                 return msg.edit(`${e.Check} | O ranking global foi atualizado com sucesso!`).catch(() => { })
             }
 
+        }
+
+        async function flagGamingRanking() {
+            return msg.edit('🎌 | Este ranking estará disponível em breve.').catch(() => { })
+            // TODO: Construir o ranking do flag gaming e adiciona-lo no top global com título.
         }
 
         async function RankLevel() {
