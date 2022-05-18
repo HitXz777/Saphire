@@ -539,7 +539,7 @@ module.exports = {
 
             if (embed.fields.length === 1)
                 embed.spliceFields(0, 1, [{ name: '🏆 Pontuação', value: `${ranking || `${e.Deny} RANKING BAD FORMATED`}` }])
-            else embed.addField('🏆 Pontuação', `${ranking || `${e.Deny} RANKING BAD FORMATED`}${data.length > 5 ? `\n+${data.length - 5} players` : ''}`)
+            else embed.addField('🏆 Pontuação', `${ranking || `${e.Deny} RANKING BAD FORMATED`}${data?.length > 5 ? `\n+${data?.length - 5} players` : ''}`)
 
             Database.addGamingPoint(Member.user.id, 'FlagCount', 1)
             return
