@@ -51,9 +51,13 @@ module.exports = {
         }).catch(() => { })
 
         function countdown() {
-            setTimeout(() => { msg.edit({ content: positions.two, components: componentsArray, }).catch(() => { }); }, 1000);
-            setTimeout(() => { msg.edit({ content: positions.one, components: componentsArray, }).catch(() => { }); }, 2000);
-            setTimeout(() => { componentsArray[0].components[0].disabled = false; componentsArray[0].components[1].disabled = false; msg.edit({ content: positions.go, components: componentsArray, }).catch(() => { }); }, 3000);
+            setTimeout(() => msg.edit({ content: positions.two, components: componentsArray }).catch(() => { }), 1000)
+            setTimeout(() => msg.edit({ content: positions.one, components: componentsArray }).catch(() => { }), 2000)
+            setTimeout(() => {
+                componentsArray[0].components[0].disabled = false
+                componentsArray[0].components[1].disabled = false
+                msg.edit({ content: positions.go, components: componentsArray }).catch(() => { })
+            }, 3000);
         }
         countdown();
 
@@ -67,20 +71,16 @@ module.exports = {
         componentsArray[0].components[0].disabled = true;
         componentsArray[0].components[1].disabled = true;
 
-        try {
+        if (button.customId === 'shoot1' && button.user.id == message.author.id)
+            return msg.edit({ content: positions.ended2, components: [] }).catch(() => { })
 
-            if (button.customId === 'shoot1' && button.user.id == message.author.id)
-                return msg.edit({ content: positions.ended2, components: [] }).catch(() => { })
+        if (button.customId === 'shoot2' && button.user.id == opponent.id)
+            return msg.edit({ content: positions.ended1, components: [] }).catch(() => { })
 
-            if (button.customId === 'shoot2' && button.user.id == opponent.id)
-                return msg.edit({ content: positions.ended1, components: [] }).catch(() => { })
+        if (button.customId === 'shoot1' && button.user.id == opponent.id)
+            return msg.edit({ content: `${e.Deny} | ${opponent} clicou errado!`, components: [] }).catch(() => { })
 
-            if (button.customId === 'shoot1' && button.user.id == opponent.id)
-                return msg.edit({ content: `${e.Deny} | ${opponent} clicou errado!`, components: [] }).catch(() => { })
-
-            if (button.customId === 'shoot2' && button.user.id == message.author.id)
-                return msg.edit({ content: `${e.Deny} | ${message.author} clicou errado!`, components: [] }).catch(() => { })
-
-        } catch (err) { }
+        if (button.customId === 'shoot2' && button.user.id == message.author.id)
+            return msg.edit({ content: `${e.Deny} | ${message.author} clicou errado!`, components: [] }).catch(() => { })
     }
 }

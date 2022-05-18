@@ -1,3 +1,5 @@
+const { formatWord, registerChannel } = require('./plugins/gamePlugins')
+
 module.exports = {
     name: 'forca',
     aliases: ['hangman'],
@@ -50,12 +52,6 @@ module.exports = {
             return word.split('').join('')
         }
 
-        function formatWord(word) {
-            let format = ''
-            for (let i of word) i === ' ' ? format += '-' : format += '_'
-            return format.split('')
-        }
-
         async function init() {
 
             if (control.blocked) return
@@ -65,7 +61,7 @@ module.exports = {
 
             if (channelsBlocked.includes(message.channel.id))
                 return message.channel.send(`${e.Deny} | Já tem uma forca rolando nesse chat.\n${e.Info} | Se a mensagem for apagada, dentro de 20 segundos esse canal será liberado.`)
-            registerChannel()
+            registerChannel(0, message.channel.id)
 
             embed = new MessageEmbed()
                 .setColor(client.blue)
@@ -145,7 +141,7 @@ module.exports = {
                     }
                 })
                 .on('end', () => {
-                    registerChannel('pull')
+                    registerChannel('pull', message.channel.id)
 
                     if (control.endedCollector) {
                         embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)
@@ -171,19 +167,6 @@ module.exports = {
             control.resend = 0
             msg.delete().catch(() => { })
             return msg = await message.reply({ content: `${e.Info} | Essa palavra possui **${word.length} letras.**`, embeds: [embed] })
-        }
-
-        async function registerChannel(status) {
-
-            return status === 'pull'
-                ? await Database.Client.updateOne(
-                    { id: client.user.id },
-                    { $pull: { ['GameChannels.Forca']: message.channel.id } }
-                )
-                : await Database.Client.updateOne(
-                    { id: client.user.id },
-                    { $push: { ['GameChannels.Forca']: message.channel.id } }
-                )
         }
 
         function validateLetter(letter) {

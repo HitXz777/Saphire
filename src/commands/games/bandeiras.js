@@ -1,5 +1,6 @@
 const { e } = require('../../../JSON/emojis.json'),
-    IsUrl = require('../../../modules/functions/plugins/isurl')
+    IsUrl = require('../../../modules/functions/plugins/isurl'),
+    { formatString, registerGameChannel, unregisterGameChannel, emoji } = require('./plugins/gamePlugins')
 
 module.exports = {
     name: 'bandeiras',
@@ -392,7 +393,7 @@ module.exports = {
             if (channels.includes(message.channel.id))
                 return message.reply(`${e.Deny} | Já tem um flag game rolando nesse canal. Espere ele terminar para poder iniciar outro, ok?`)
 
-            registerGameChannel()
+            await registerGameChannel(message.channel.id)
 
             const buttons = [
                 {
@@ -449,7 +450,7 @@ module.exports = {
                 .on('end', () => {
                     msg.delete(() => { })
                     if (control.initied) return
-                    unregisterGameChannel()
+                    unregisterGameChannel(message.channel.id)
                 })
         }
 
@@ -502,7 +503,7 @@ module.exports = {
             await generateButtons()
 
             if (Msg)
-                Msg?.delete().catch(() => unregisterGameChannel())
+                Msg?.delete().catch(() => unregisterGameChannel(message.channel.id))
 
             embed
                 .setDescription(`${e.Loading} | Qual é a bandeira?\n${control.atualFlag.flag} - ???`)
@@ -512,7 +513,7 @@ module.exports = {
             let msg = await message.channel.send({
                 embeds: [embed],
                 components: control.buttons
-            }).catch(() => unregisterGameChannel())
+            }).catch(() => unregisterGameChannel(message.channel.id))
 
             msg.createMessageComponentCollector({
                 filter: int => true,
@@ -536,7 +537,7 @@ module.exports = {
 
                     if (winners.length === 0) {
 
-                        unregisterGameChannel()
+                        unregisterGameChannel(message.channel.id)
                         embed
                             .setColor(client.red)
                             .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n🔄 ${control.rounds} Rounds`)
@@ -548,11 +549,11 @@ module.exports = {
                     }
 
                     embed
-                        .setDescription(`${e.Check} | ${winners.length > 1 ? `${winners.length} jogadores acertaram` : '1 jogador acertou'} o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
+                        .setDescription(`${e.Check} | ${winners.length > 1 ? `${winners.slice(0, 4)?.map(u => u.username).join(', ')}${winners.length - 4 > 0 ? ` e mais ${winners.length - 4} jogadores` : ''} acertaram` : `${winners[0].username} acertou`} o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
 
-                    msg.delete().catch(() => unregisterGameChannel())
-                    let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => unregisterGameChannel())
+                    msg.delete().catch(() => unregisterGameChannel(message.channel.id))
+                    let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => unregisterGameChannel(message.channel.id))
 
                     for (let d of winners)
                         addPoint({ username: d.username, id: d.id }, true)
@@ -648,14 +649,14 @@ module.exports = {
             control.rounds++
 
             if (Msg)
-                Msg?.delete().catch(() => unregisterGameChannel())
+                Msg?.delete().catch(() => unregisterGameChannel(message.channel.id))
 
             embed
                 .setDescription(`${e.Loading} | Qual é a bandeira?\n${control.atualFlag.flag} - ???`)
                 .setImage(control.atualFlag.image || null)
                 .setFooter({ text: `Round: ${control.rounds}` })
 
-            let msg = await message.channel.send({ embeds: [embed] }).catch(() => unregisterGameChannel())
+            let msg = await message.channel.send({ embeds: [embed] }).catch(() => unregisterGameChannel(message.channel.id))
 
             return msg.channel.createMessageCollector({
                 filter: m => m.content?.toLowerCase() == control.atualFlag?.country,
@@ -671,11 +672,11 @@ module.exports = {
                         .setDescription(`${e.Check} | ${Message.author} acertou o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
 
-                    msg.delete().catch(() => unregisterGameChannel())
+                    msg.delete().catch(() => unregisterGameChannel(message.channel.id))
                     await randomizeFlags(0)
-                    let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => unregisterGameChannel())
+                    let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => unregisterGameChannel(message.channel.id))
 
-                    await addPoint(Message.user)
+                    await addPoint(Message.author)
                     return setTimeout(async () => {
                         await toDelMessage.delete().catch(() => { })
                         start()
@@ -686,7 +687,7 @@ module.exports = {
 
                     if (control.collected) return control.collected = false
 
-                    unregisterGameChannel()
+                    unregisterGameChannel(message.channel.id)
                     embed
                         .setColor(client.red)
                         .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n🔄 ${control.rounds} Rounds`)
@@ -699,7 +700,7 @@ module.exports = {
 
         function addPoint(User, justAdd = false) {
 
-            let data = control.usersPoints.find(data => data.name === User.username,)
+            let data = control.usersPoints.find(data => data.name === User.username)
 
             data?.name
                 ? data.points++
@@ -737,14 +738,6 @@ module.exports = {
 
         }
 
-        function emoji(i) {
-            return {
-                0: '🥇',
-                1: '🥈',
-                2: '🥉'
-            }[i] || '🏅'
-        }
-
         async function flagPoints() {
 
             let user = client.getUser(client, message, args) || message.author
@@ -756,55 +749,6 @@ module.exports = {
                 format = user.id === message.author.id ? 'Você' : user.username
 
             return message.reply(`${e.Info} | ${format} acertou ${points} bandeiras no Flag Gaming.`)
-        }
-
-        async function registerGameChannel() {
-
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                {
-                    $push: { ['GameChannels.Flags']: message.channel.id }
-                }
-            )
-
-        }
-
-        async function unregisterGameChannel() {
-
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                {
-                    $pull: { ['GameChannels.Flags']: message.channel.id }
-                }
-            )
-
-        }
-
-        function formatString(string) {
-
-            let tras = false
-
-            if (string.includes('-')) {
-                tras = true
-                string = string.replace(/-/g, ' ')
-            }
-
-            let format = string.split(/ +/g),
-                result = ''
-
-            for (let word of format)
-                if (word.length > 2 || word === 'el')
-                    if (tras)
-                        result += word[0].toUpperCase() + word.substring(1) + ' '
-                    else result += word[0].toUpperCase() + word.substring(1) + ' '
-                else result += word + ' '
-
-            if (tras) {
-                result = result.replace(/ /g, '-').slice(0, -1)
-                tras = false
-            }
-
-            return result
         }
 
     }
