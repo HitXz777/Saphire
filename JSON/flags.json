@@ -1,9 +1,9 @@
 {
     "Flags": [
         {
-            "flag": "🇧🇮",
-            "country": "burundi",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976074288169902140/940702c41f7e08610699b6c91fc3fc7a.jpg"
+            "flag": "🇵🇪",
+            "country": "peru",
+            "image": "https://media.discordapp.net/attachments/913429397678198795/976305647027118130/30a39a44c2877bc9a0e780730ba9c36d.jpg"
         },
         {
             "flag": "🇸🇮",
@@ -364,6 +364,11 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976073387296321606/2c4e6b5ac9d608290602f8eb4def2388.jpg"
         },
         {
+            "flag": "🇧🇮",
+            "country": "burundi",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/976074288169902140/940702c41f7e08610699b6c91fc3fc7a.jpg"
+        },
+        {
             "flag": "🇵🇱",
             "country": "polônia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976178447187587122/Flag_of_Poland.svg.png"
@@ -537,11 +542,6 @@
             "flag": "🇵🇾",
             "country": "paraguai",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976232770554691626/225cb517f98ef75bb557885567b82f45.jpg"
-        },
-        {
-            "flag": "🇵🇪",
-            "country": "peru",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976232882785910854/18f23b9e-e890-489e-95e4-b03bcedc44dd.jpg?width=705&height=467"
         },
         {
             "flag": "🇵🇹",
@@ -957,6 +957,11 @@
             "flag": "🇺🇸",
             "country": "estados unidos",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976268881633112084/03af623d4246ea4bffb7c9997928285a.jpg"
+        },
+        {
+            "flag": "🇦🇸",
+            "country": "samoa americana",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/976253891417100329/7dec71b9a799413b8fde4810c31ace41.jpg"
         }
     ]
 }
