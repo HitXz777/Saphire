@@ -139,7 +139,8 @@ module.exports = {
             TopGlobalJokempo = clientData.TopGlobal?.Jokempo === user.id ? `\n✂️ **Top Global Jokempo**` : '',
             TopGlobalTicTacToe = clientData.TopGlobal?.TicTacToe === user.id ? `\n#️⃣ **Top Global TicTacToe**` : '',
             TopGlobalMemory = clientData.TopGlobal?.Memory === user.id ? `\n${e.duvida || '❔'} **Top Global Memory**` : '',
-            TopGlobalForca = clientData.TopGlobal?.Forca === user.id ? `\n😵 **Top Global Forca**` : ''
+            TopGlobalForca = clientData.TopGlobal?.Forca === user.id ? `\n😵 **Top Global Forca**` : '',
+            TopGlobalFlag = clientData.TopGlobal?.Flag === user.id ? `\n🎌 **Top Global Flag Gaming**` : ''
 
         if (Estrela.Um) estrela = `${e.Star}${e.GrayStar}${e.GrayStar}${e.GrayStar}${e.GrayStar}`
         if (Estrela.Dois) estrela = `${e.Star}${e.Star}${e.GrayStar}${e.GrayStar}${e.GrayStar}`
@@ -174,7 +175,7 @@ module.exports = {
         }).join('\n') || 'Nenhum membro na família'
 
         Embed
-            .setDescription(`${vip} **Perfil de ${user.username}**${Developer}${Administrador}${Moderator}${OfficialDesigner}${HalloweenTitle}${BugHunter}${TopGlobalLevel}${TopGlobalLikes}${TopGlobalMoney}${TopGlobalMix}${TopGlobalJokempo}${TopGlobalQuiz}${TopGlobalTicTacToe}${TopGlobalMemory}${TopGlobalForca}\n${estrela}`)
+            .setDescription(`${vip} **Perfil de ${user.username}**${Developer}${Administrador}${Moderator}${OfficialDesigner}${HalloweenTitle}${BugHunter}${TopGlobalLevel}${TopGlobalLikes}${TopGlobalMoney}${TopGlobalMix}${TopGlobalJokempo}${TopGlobalQuiz}${TopGlobalTicTacToe}${TopGlobalMemory}${TopGlobalForca}${TopGlobalFlag}\n${estrela}`)
             .addFields(
                 {
                     name: '👤 Pessoal',

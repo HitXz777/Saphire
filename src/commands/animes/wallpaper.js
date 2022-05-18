@@ -124,32 +124,46 @@ module.exports = {
                     .setImage(wallpaper)
 
             const msg = await message.reply({ embeds: [WallPaperEmbed] }),
-                emojis = ['🔄', '❌']
+                emojis = ['🔄', '📌', '❌'],
+                sended = []
 
             for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
             let TradeWallpaper = msg.createReactionCollector({
-                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && !user.bot,
                 idle: 30000
             })
+                .on('collect', (reaction, user) => {
 
-                .on('collect', (reaction) => {
+                    if (reaction.emoji.name === emojis[1]) {
 
-                    if (reaction.emoji.name === emojis[1]) return TradeWallpaper.stop()
+                        if (sended.includes(wallpaper)) return
+
+                        WallPaperEmbed
+                            .setFooter({ text: `Solicitado por ${user.username}` })
+
+                        sended.push(wallpaper)
+                        return message.channel.send({ embeds: [WallPaperEmbed] })
+                    }
+
+                    if (user.id !== message.author.id) return
+
+                    if (reaction.emoji.name === emojis[2])
+                        return TradeWallpaper.stop()
 
                     if (reaction.emoji.name === emojis[0]) {
 
                         reaction.users.remove(message.author.id).catch(() => { })
-                        let WallTrade = Category[Math.floor(Math.random() * Category.length)]
+                        wallpaper = Category[Math.floor(Math.random() * Category.length)]
 
-                        WallPaperEmbed.setImage(WallTrade)
-                            .setDescription(`${e.Download} | [Baixar](${WallTrade}) wallpaper em qualidade original`)
+                        WallPaperEmbed.setImage(wallpaper)
+                            .setDescription(`${e.Download} | [Baixar](${wallpaper}) wallpaper em qualidade original`)
 
                         return msg.edit({ embeds: [WallPaperEmbed] }).catch(() => { })
                     }
+
                     return
                 })
-
                 .on('end', () => {
                     msg.reactions.removeAll().catch(() => { });
 

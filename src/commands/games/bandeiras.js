@@ -23,7 +23,7 @@ module.exports = {
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return flagInfo()
         if (['points', 'pontos', 'p'].includes(args[0]?.toLowerCase())) return flagPoints()
 
-        let has = flags?.find(data => data.flag == args[0] || data.country == args[0]?.toLowerCase() || data.image === args[0]) || null
+        let has = flags?.find(data => data.flag == args[0] || data.country == args.join(' ')?.toLowerCase() || data.image === args[0]) || null
         if (args[0] && has) return showCoutry(has)
 
         if (args[0]) return message.reply(`${e.Deny} | Sub-comando ou nome do país inválido. Use \`${prefix}flag info\` para mais informações.`)
@@ -150,25 +150,25 @@ module.exports = {
                     country = args.slice(3).join(' ')?.toLowerCase()
 
                 if (!name || !country)
-                    return message.reply(`${e.Info} | \`${prefix}flag edit name <emoji> ou <link da imagem>\``)
+                    return message.reply(`${e.Info} | \`${prefix}flag edit name <emoji> ou <nome> ou <link da imagem>\``)
 
-                if (name.length > 10 && !IsUrl(country) || !country?.includes('https://media.discordapp.net/attachments'))
+                if (name.length > 40 && (!IsUrl(name) || !name?.includes('https://media.discordapp.net/attachments')))
                     return message.reply(`${e.Deny} | O link da imagem não é um link válido. Verique se o formato dele é compátivel com \`https://media.discordapp.net/attachments\``)
 
-                let has = flags?.find(data => data.flag == country || data.image == country)
+                let has = flags?.find(data => data.flag == name || data.image == name || data.country == name)
 
                 if (!has)
                     return message.reply(`${e.Deny} | Esse país não existe no meu banco de dados.`)
 
-                if (name === has.contry)
+                if (country === has.country)
                     return message.reply(`${e.Deny} | Este já é o nome atual deste país.`)
 
-                let alreadyExist = flags.find(data => data.country === name)
+                let alreadyExist = flags.find(data => data.country === country)
 
                 if (alreadyExist)
                     return message.reply(`${e.Deny} | Este nome já foi configurado no país **${alreadyExist.flag || '\`EMOJI NOT FOUND\`'} - ${alreadyExist.country || '\`NAME NOT FOUND\`'}**`)
 
-                let msg = await message.reply(`${e.QuestionMark} | Você confirma editar o nome do país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" no banco de dados do Flag Game?\nAtual Name: ${has.country || '\`NAME NOT FOUND\`'}\nNew Name: ${name}`),
+                let msg = await message.reply(`${e.QuestionMark} | Você confirma editar o nome do país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" no banco de dados do Flag Game?\nAtual Name: ${has.country || '\`NAME NOT FOUND\`'}\nNew Name: ${country}`),
                     emojis = ['✅', '❌'], clicked = false
 
                 for (let i of emojis) msg.react(i).catch(() => { })
@@ -184,11 +184,11 @@ module.exports = {
                             return collector.stop()
 
                         clicked = true
-                        let flagIndex = flags.findIndex(data => data.flag == country || data.image == country)
+                        let flagIndex = flags.findIndex(data => data.flag == name || data.image == name || data.country == name)
 
                         flags.splice(flagIndex, 1)
-                        Database.Flags.set('Flags', [{ flag: has.flag, country: name, image: has.image }, ...flags])
-                        return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" foi editada com sucesso!\nNew Name: ${name}`).catch(() => { })
+                        Database.Flags.set('Flags', [{ flag: has.flag, country: country, image: has.image }, ...flags])
+                        return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" foi editada com sucesso!\nNew Name: ${country}`).catch(() => { })
                     })
                     .on('end', () => {
                         if (clicked) return
@@ -450,7 +450,7 @@ module.exports = {
                             },
                             {
                                 name: '📝 Créditos',
-                                value: `${e.Gear} Código fonte e automatização: ${client.users.cache.get(Database.Names.Rody)?.tag || '\`NOT FOUND\`'}\n${e.bigbrain} Emojis, Países, Bandeiras, Recursos: ${client.users.cache.get(Database.Names.Moana)?.tag || '\`NOT FOUND\`'}\n${e.Stonks} Dicas de funcionalidades: ${client.users.cache.get(Database.Names.Dspofu)?.tag || '\`NOT FOUND\`'}`
+                                value: `${e.Gear} Código fonte e automatização: ${client.users.cache.get(Database.Names.Rody)?.tag || '\`NOT FOUND\`'}\n${e.bigbrain} Emojis, Países, Bandeiras, Recursos: ${client.users.cache.get(Database.Names.Moana)?.tag || '\`NOT FOUND\`'}\n${e.Stonks} Dicas de funcionalidades: ${client.users.cache.get(Database.Names.Dspofu)?.tag || '\`NOT FOUND\`'}\n📈 Ajuda e suporte na adição de novas bandeiras: ${client.users.cache.get('537691734755377152')?.tag || '\`NOT FOUND\`'}` // 537691734755377152 = Lereo#1665
                             }
                         )
                         .setFooter({ text: '<> obrigatório | [] opicional' })
@@ -497,13 +497,13 @@ module.exports = {
                         .setDescription(`${e.Check} | ${Message.author} acertou o país!\n${control.atualFlag.flag} - ${control.atualFlag?.country}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
 
-                    randomizeFlags()
                     msg.delete().catch(() => unregisterGameChannel())
+                    await randomizeFlags()
                     let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => unregisterGameChannel())
 
-                    addPoint(Message.member)
-                    return setTimeout(() => {
-                        toDelMessage.delete().catch(() => unregisterGameChannel())
+                    await addPoint(Message.member)
+                    return setTimeout(async () => {
+                        await toDelMessage.delete().catch(() => { })
                         start()
                     }, 4000)
 
@@ -532,14 +532,14 @@ module.exports = {
                 : control.usersPoints.push({ name: Member.user.username, points: 1 })
 
             let ranking = control.usersPoints
-                .slice(0, 5)
                 .sort((a, b) => b.points - a.points)
+                .slice(0, 5)
                 .map((d, i) => `${emoji(i)} ${d.name} - ${d.points} pontos`)
                 .join('\n')
 
             if (embed.fields.length === 1)
                 embed.spliceFields(0, 1, [{ name: '🏆 Pontuação', value: `${ranking || `${e.Deny} RANKING BAD FORMATED`}` }])
-            else embed.addField('🏆 Pontuação', `${ranking || `${e.Deny} RANKING BAD FORMATED`}`)
+            else embed.addField('🏆 Pontuação', `${ranking || `${e.Deny} RANKING BAD FORMATED`}${data.length > 5 ? `\n+${data.length - 5} players` : ''}`)
 
             Database.addGamingPoint(Member.user.id, 'FlagCount', 1)
             return

@@ -62,7 +62,7 @@ module.exports = {
                             value: 'mix'
                         },
                         {
-                            label: 'Flag Gaming (em breve)',
+                            label: 'Flag Gaming',
                             emoji: '🎌',
                             value: 'flag'
                         },
@@ -119,7 +119,7 @@ module.exports = {
                         .addField('💬 Ranking Global Mix Game', `\`${prefix}rank mix [local]\``)
                         .addField('✂️ Ranking Global Jokempo Game', `\`${prefix}rank Jokempo [local/invertido]\``)
                         .addField('💡 Ranking Global Quiz Game', `\`${prefix}rank quiz [local]\``)
-                        .addField('🎌 Ranking Flag Game', `\`em breve\``)
+                        .addField('🎌 Ranking Flag Game', `\`${prefix}rank flag [local]\``)
                         .addField('⭕ Ranking Global Jogo da Velha', `\`${prefix}rank ttt [local]\`\n\`${prefix}rank ttt [invertido]\``)
                         .addField('🛡️ Ranking Clans', `\`${prefix}rank clan\``)
                         .addField('🔍 In Locale Search', `\`${prefix}rank <classe> [posição/@user/id]\` ou \`${prefix}rank <classe> [me]\``)
@@ -220,6 +220,7 @@ module.exports = {
                     Money: clientData.TopGlobal?.Money,
                     Quiz: clientData.TopGlobal?.Quiz,
                     Mix: clientData.TopGlobal?.Mix,
+                    Flag: clientData.TopGlobal?.Flag,
                     Jokempo: clientData.TopGlobal?.Jokempo,
                     TicTacToe: clientData.TopGlobal?.TicTacToe,
                     Memory: clientData.TopGlobal?.Memory,
@@ -264,6 +265,10 @@ module.exports = {
                                     value: formatUser(TopGlobalData.TicTacToe)
                                 },
                                 {
+                                    name: '🎌 **Top Global Flag Gaming**',
+                                    value: formatUser(TopGlobalData.Flag)
+                                },
+                                {
                                     name: `\n${e.duvida || '❔'} **Top Global Memory**`,
                                     value: formatUser(TopGlobalData.Memory)
                                 },
@@ -299,8 +304,84 @@ module.exports = {
         }
 
         async function flagGamingRanking() {
-            return msg.edit('🎌 | Este ranking estará disponível em breve.').catch(() => { })
-            // TODO: Construir o ranking do flag gaming e adiciona-lo no top global com título.
+
+            let users = await Database.User.find({}, 'id GamingCount.FlagCount'),
+                UsersData = []
+
+            if (!users || users.length === 0)
+                return msg.edit(`${e.Info} | Não há nenhum usuário na minha database por enquanto.`).catch(() => { })
+
+            for (const data of users) {
+
+                if (!data?.GamingCount?.FlagCount) continue
+
+                let FlagCount = data?.GamingCount?.FlagCount || 0
+
+                if (FlagCount > 0)
+                    UsersData.push({ id: data.id, count: FlagCount })
+                else continue
+            }
+
+            if (UsersData.length === 0)
+                return msg.edit(`${e.Info} | Tudo vázio por aqui.`).catch(() => { })
+
+            let Sorted = UsersData.sort((a, b) => b.count - a.count),
+                AuthorRank = Sorted.findIndex(author => author.id === message.author.id) + 1 || "N/A",
+                rank = Sorted.slice(0, 10).map((a, i) => `**${Medals(i)} ${GetUser(a.id)}** - *\`${a.id}\`*\n🎌 ${a.count} acertos\n`).join('\n')
+
+            if (!UsersData.length) rank = 'Não há ninguém no ranking'
+
+            if (['local', 'server'].includes(args[1]?.toLowerCase())) return InServerLocalRanking()
+
+            return !isNaN(args[1]) || ['me', 'eu'].includes(args[1]?.toLowerCase()) || user
+                ? VerifyLocationRanking()
+                : msg.edit({
+                    content: `${e.Check} | Ranking carregado com sucesso!`,
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor('YELLOW')
+                            .setTitle(`👑 Ranking - Global Flag Gaming`)
+                            .setDescription(`Esse ranking é gerado na base Flag Gaming Accepts.\n \n${rank}`)
+                            .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: FlagGamingGlobalAccepts` })
+                    ]
+                }).catch(() => { })
+
+            function InServerLocalRanking() {
+
+                let Rank = Sorted.filter(user => message.guild.members.cache.has(user.id)),
+                    RankMapped = Rank.slice(0, 10).map((a, i) => `**${Medals(i)} ${GetUser(a.id)}** - *\`${a.id}\`*\n🎌 ${a.count || 0} acertos\n`).join('\n'),
+                    myrank = Rank.findIndex(author => author.id === message.author.id) + 1 || "N/A"
+
+                return msg.edit({
+                    content: `${e.Check} | Ranking carregado com sucesso!`,
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor('YELLOW')
+                            .setTitle(`👑 Ranking Flag Gaming - ${message.guild.name}`)
+                            .setDescription(`${RankMapped}`)
+                            .setFooter({ text: `Seu ranking: ${myrank}` })
+                    ]
+                }).catch(() => { })
+
+            }
+
+            function VerifyLocationRanking() {
+
+                let Num = parseInt(args[1])
+
+                if (['me', 'eu'].includes(args[1]?.toLowerCase())) Num = AuthorRank
+
+                if (user) Num = Sorted.findIndex(u => u.id === user.id) + 1 || "N/A"
+
+                if (Num === 0 || !UsersData[Num - 1])
+                    return msg.edit(`${e.Deny} | Ranking não encontrado.`).catch(() => { })
+
+                let InLocaleRanking = UsersData.splice(Num - 1, 1)
+
+                return msg.edit({ content: InLocaleRanking.map(a => `**${Medals(Num - 1)} ${GetUser(a.id)}** - *\`${a.id}\`*\n🎌 ${a.count || 0} acertos`).join('\n') }).catch(() => { })
+
+            }
+
         }
 
         async function RankLevel() {

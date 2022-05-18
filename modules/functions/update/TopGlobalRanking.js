@@ -3,8 +3,8 @@ const client = require('../../../index'),
 
 async function TopGlobalRanking() {
 
-    let Users = await Database.User.find({}, 'id Level Likes Balance QuizCount MixCount Jokempo.Wins TicTacToeCount CompetitiveMemoryCount ForcaCount'),
-        data = { LikesArray: [], balanceArray: [], XpArray: [], quizArray: [], mixArray: [], jokempoArray: [], tictactoeArray: [], memoryArray: [], forcaArray: [] }
+    let Users = await Database.User.find({}, 'id Level Likes Balance QuizCount MixCount Jokempo.Wins TicTacToeCount CompetitiveMemoryCount ForcaCount GamingCount.FlagCount'),
+        data = { LikesArray: [], balanceArray: [], XpArray: [], quizArray: [], mixArray: [], jokempoArray: [], tictactoeArray: [], memoryArray: [], forcaArray: [], flagArray: [] }
 
     if (!Users || Users.length === 0) return
 
@@ -17,6 +17,7 @@ async function TopGlobalRanking() {
             balance = user.Balance || 0,
             quiz = user.QuizCount || 0,
             mix = user.MixCount || 0,
+            flag = user.GamingCount.FlagCount || 0,
             jokempo = user.Jokempo?.Wins || 0,
             tictactoe = user.TicTacToeCount || 0,
             memory = user.CompetitiveMemoryCount || 0,
@@ -49,6 +50,9 @@ async function TopGlobalRanking() {
         if (forca > 0)
             data.forcaArray.push({ id: user.id, amount: forca })
 
+        if (flag > 0)
+            data.flagArray.push({ id: user.id, amount: flag })
+
         continue
     }
 
@@ -64,7 +68,8 @@ async function TopGlobalRanking() {
                 Jokempo: sortData(data.jokempoArray),
                 TicTacToe: sortData(data.tictactoeArray),
                 Memory: sortData(data.memoryArray),
-                Forca: sortData(data.forcaArray)
+                Forca: sortData(data.forcaArray),
+                Flag: sortData(data.flagArray),
             }
         }
     )

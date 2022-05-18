@@ -19,7 +19,7 @@ module.exports = model("Client", new Schema({
         Flags: Array,
     },
     FlagGame: {
-        
+        TopOne: String
     },
     GlobalBet: {
         Bets: Array,

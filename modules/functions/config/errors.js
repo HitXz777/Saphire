@@ -19,7 +19,7 @@ async function Error(message, err) {
      * 500 - Internal Server Error
      * 50013 - DiscordAPIError: Missing Permissions
      */
-    
+
     if (err?.code === 50013)
         return message?.channel?.send(`${e.Warn} | Eu não tenho permissão suficiente para prosseguir com este comando.`)
 
@@ -43,19 +43,30 @@ async function Error(message, err) {
     Block();
 
     async function Send() {
-        let ChannelInvite = await message.channel?.createInvite({ maxAge: 0 })
-
+        let ChannelInvite = await message.channel?.createInvite({ maxAge: 0 }).catch(async () => {
             return await client.users.cache.get(config.ownerId)?.send({
                 embeds: [
                     new MessageEmbed()
                         .setColor('RED')
                         .setTitle(`${e.Loud} Report de Erro | Handler`)
-                        .setDescription(`Author: ${message.author} | ${message.author.tag} |*\`${message.author.id}\`*\nMensagem: \`${message.content}\`\nServidor: [${message.guild.name}](${ChannelInvite?.url || 'Não foi possivel obter o link deste servidor'})\nMensagem: [Link Mensagem](${message.url})\n\`\`\`js\n${err.stack?.slice(0, 2000)}\`\`\``)
+                        .setDescription(`Author: ${message.author} | ${message.author.tag} |*\`${message.author.id}\`*\nMensagem: \`${message.content}\`\nServidor: ${message.guild.name}\nMensagem: [Link Mensagem](${message.url})\n\`\`\`js\n${err.stack?.slice(0, 2000)}\`\`\``)
                         .setFooter({ text: `Error Code: ${err.code || 0}` })
                 ]
             }).catch(() => { })
 
-       
+        })
+
+        return await client.users.cache.get(config.ownerId)?.send({
+            embeds: [
+                new MessageEmbed()
+                    .setColor('RED')
+                    .setTitle(`${e.Loud} Report de Erro | Handler`)
+                    .setDescription(`Author: ${message.author} | ${message.author.tag} |*\`${message.author.id}\`*\nMensagem: \`${message.content}\`\nServidor: [${message.guild.name}](${ChannelInvite?.url || 'Não foi possivel obter o link deste servidor'})\nMensagem: [Link Mensagem](${message.url})\n\`\`\`js\n${err.stack?.slice(0, 2000)}\`\`\``)
+                    .setFooter({ text: `Error Code: ${err.code || 0}` })
+            ]
+        }).catch(() => { })
+
+
     }
 
     async function Block() {
