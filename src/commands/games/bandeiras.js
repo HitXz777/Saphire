@@ -12,7 +12,7 @@ module.exports = {
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let flags = Database.Flags.get('Flags') || [],
-            control = { atualFlag: {}, usersPoints: [], rounds: 0, collected: false, winners: [], alreadyAnswer: [] },
+            control = { atualFlag: {}, usersPoints: [], rounds: 0, collected: false, winners: [], alreadyAnswer: [], wrongAnswers: [] },
             embed = new MessageEmbed()
 
         if (['add', 'adicionar', '+', 'new'].includes(args[0]?.toLowerCase())) return addFlag()
@@ -460,8 +460,6 @@ module.exports = {
                 .setTitle(`🎌 ${client.user.username} Flag Game Options Mode`)
                 .setDescription(`${e.Loading} | Carregando bandeiras e opções... Prepare-se!`)
 
-            randomizeFlags()
-            generateButtons()
             let Msg = await message.channel.send({ embeds: [embed] })
 
             return setTimeout(() => startGameWithButtons(Msg), 4000)
@@ -474,7 +472,7 @@ module.exports = {
                 .setTitle(`🎌 ${client.user.username} Flag Game`)
                 .setDescription(`${e.Loading} | Carregando bandeira... Prepare-se!`)
 
-            randomizeFlags()
+            randomizeFlags(0)
             let Msg = await message.channel.send({ embeds: [embed] })
 
             setTimeout(() => start(Msg), 4000)
@@ -501,10 +499,10 @@ module.exports = {
         async function startGameWithButtons(Msg) {
 
             control.rounds++
+            await generateButtons()
 
             if (Msg)
                 Msg?.delete().catch(() => unregisterGameChannel())
-            generateButtons()
 
             embed
                 .setDescription(`${e.Loading} | Qual é a bandeira?\n${control.atualFlag.flag} - ???`)
@@ -554,7 +552,6 @@ module.exports = {
                         .setImage(null)
 
                     msg.delete().catch(() => unregisterGameChannel())
-                    await randomizeFlags()
                     let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => unregisterGameChannel())
 
                     for (let d of winners)
@@ -562,25 +559,24 @@ module.exports = {
 
                     control.winners = []
                     control.alreadyAnswer = []
+                    control.wrongAnswers = []
                     refreshField()
                     return setTimeout(async () => {
                         await toDelMessage.delete().catch(() => { })
                         startGameWithButtons()
-                    }, 4000)
+                    }, 5000)
                 })
 
         }
 
         function generateButtons() {
 
-            let answersArray = [],
+            for (let i = 0; i < 5; i++)
+                randomizeFlags(i)
+
+            let answersArray = [...control.wrongAnswers, control.atualFlag],
                 buttons = [{ type: 1, components: [] }]
 
-            randomizeFlags(true)
-            randomizeFlags(true)
-            randomizeFlags()
-
-            answersArray.push(control.wrongAnswerOne, control.wrongAnswerTwo, control.atualFlag)
             answersArray.sort(() => Math.random() - Math.random())
 
             for (let flag of answersArray) {
@@ -631,24 +627,18 @@ module.exports = {
             })
         }
 
-        function randomizeFlags(wrongAnswer) {
+        function randomizeFlags(wrongAnswer = 0) {
 
-            if (wrongAnswer) {
+            if (wrongAnswer > 0) {
                 let flag = flags[Math.floor(Math.random() * flags.length)]
 
-                if (flag.country === control.atualFlag.country || flag.country === control?.wrongAnswerOne?.country) return randomizeFlags(true)
-
-                control.wrongAnswerOne
-                    ? control.wrongAnswerTwo = flag
-                    : control.wrongAnswerOne = flag
-
+                if (flag.country === control.atualFlag.country || control.wrongAnswers.some(f => f.country === flag.country)) return randomizeFlags(1)
+                else control.wrongAnswers.push(flag)
                 return
             }
 
             let flag = flags[Math.floor(Math.random() * flags.length)]
-
-            if (flag.country === control.atualFlag.country) return randomizeFlags()
-
+            if (flag.country === control.atualFlag.country) return randomizeFlags(0)
             control.atualFlag = flag
             return
         }
@@ -682,7 +672,7 @@ module.exports = {
                         .setImage(null)
 
                     msg.delete().catch(() => unregisterGameChannel())
-                    await randomizeFlags()
+                    await randomizeFlags(0)
                     let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => unregisterGameChannel())
 
                     await addPoint(Message.user)
