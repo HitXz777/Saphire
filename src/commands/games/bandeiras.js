@@ -555,8 +555,8 @@ module.exports = {
                     msg.delete().catch(() => unregisterGameChannel(message.channel.id))
                     let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => unregisterGameChannel(message.channel.id))
 
-                    for (let d of winners)
-                        addPoint({ username: d.username, id: d.id }, true)
+                    for (let u of winners)
+                        addPoint({ username: u.username, id: u.id }, true)
 
                     control.winners = []
                     control.alreadyAnswer = []
