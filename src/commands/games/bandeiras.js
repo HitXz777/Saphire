@@ -23,6 +23,7 @@ module.exports = {
         if (['start', 'começar', 's', 'init'].includes(args[0]?.toLowerCase())) return chooseGameMode()
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return flagInfo()
         if (['points', 'pontos', 'p'].includes(args[0]?.toLowerCase())) return flagPoints()
+        if (['noimage', 'semimagem', 'noflag'].includes(args[0]?.toLowerCase())) return flagWithoutImage()
 
         let has = flags?.find(data => data.flag == args[0] || data.country == args.join(' ')?.toLowerCase() || data.image === args[0]) || null
         if (args[0] && has) return showCoutry(has)
@@ -497,6 +498,30 @@ module.exports = {
             })
         }
 
+        async function flagWithoutImage() {
+
+            let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
+
+            if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
+                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de Bandeiras.`)
+
+            let arr = []
+
+            for (let f of flags)
+                if (!f.image) arr.push(f)
+
+            if (arr.length === 0)
+                return message.reply(`${e.Check} | Todos os países estão com bandeiras no meu banco de dados.`)
+
+            let format = arr.map(flag => `${flag.flag} \`${formatString(flag.country)}\``).join(' ')
+
+            return message.reply(`${e.Warn} | Estes são os países que estão sem bandeiras.\n> ${format}`).catch(() => {
+
+                let newFormat = format.slice(0, 1500)
+                return message.reply(`${e.Warn} | Estes são os países que estão sem bandeiras.\n> ${newFormat}...`)
+            })
+        }
+
         async function startGameWithButtons(Msg) {
 
             control.rounds++
@@ -616,7 +641,7 @@ module.exports = {
                             },
                             {
                                 name: `${e.Admin} Saphire's Team Administration`,
-                                value: `\`${prefix}flag new\` - Adicione uma nova bandeira\n\`${prefix}flag remove\` - Remova uma bandeira\n\`${prefix}flag edit <emoji/name/image>\` - Edite uma bandeira\n\`${prefix}flag list\` - Lista de todos as bandeiras`
+                                value: `\`${prefix}flag new\` - Adicione uma nova bandeira\n\`${prefix}flag remove\` - Remova uma bandeira\n\`${prefix}flag edit <emoji/name/image>\` - Edite uma bandeira\n\`${prefix}flag list\` - Lista de todos as bandeiras\n\`${prefix}flag noflag\` - Países sem bandeira no banco de dados`
                             },
                             {
                                 name: '📝 Créditos',
