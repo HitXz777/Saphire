@@ -22,11 +22,11 @@ function formatString(string) {
         else result += word + ' '
 
     if (tras) {
-        result = result.replace(/ /g, '-').slice(0, -1)
+        result = result.replace(/ /g, '-')
         tras = false
     }
 
-    return result
+    return result.slice(0, -1)
 }
 
 // Flag Gaming

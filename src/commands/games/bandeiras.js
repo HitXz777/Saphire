@@ -513,7 +513,7 @@ module.exports = {
             if (arr.length === 0)
                 return message.reply(`${e.Check} | Todos os países estão com bandeiras no meu banco de dados.`)
 
-            let format = arr.map(flag => `${flag.flag} \`${formatString(flag.country)}\``).join(' ')
+            let format = arr.map(flag => `${flag.flag} \`${formatString(flag.country)}\``).join(', ')
 
             return message.reply(`${e.Warn} | Estes são os países que estão sem bandeiras.\n> ${format}`).catch(() => {
 
