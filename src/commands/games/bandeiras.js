@@ -12,14 +12,14 @@ module.exports = {
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let flags = Database.Flags.get('Flags') || [],
-            control = { atualFlag: {}, usersPoints: [], rounds: 0, collected: false },
+            control = { atualFlag: {}, usersPoints: [], rounds: 0, collected: false, winners: [], alreadyAnswer: [] },
             embed = new MessageEmbed()
 
         if (['add', 'adicionar', '+', 'new'].includes(args[0]?.toLowerCase())) return addFlag()
         if (['remove', 'del', '-'].includes(args[0]?.toLowerCase())) return removeFlag()
         if (['editar', 'edit'].includes(args[0]?.toLowerCase())) return editFlag()
         if (['list', 'lista', 'all', 'full'].includes(args[0]?.toLowerCase())) return listFlags()
-        if (['start', 'começar', 's', 'init'].includes(args[0]?.toLowerCase())) return startFlagGame()
+        if (['start', 'começar', 's', 'init'].includes(args[0]?.toLowerCase())) return chooseGameMode()
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return flagInfo()
         if (['points', 'pontos', 'p'].includes(args[0]?.toLowerCase())) return flagPoints()
 
@@ -113,9 +113,9 @@ module.exports = {
                 let alreadyExist = flags.find(data => data.image === link)
 
                 if (alreadyExist)
-                    return message.reply(`${e.Deny} | Está imagem já foi configurada no país **${alreadyExist.flag || '\`EMOJI NOT FOUND\`'} - ${alreadyExist.country || '\`NAME NOT FOUND\`'}**`)
+                    return message.reply(`${e.Deny} | Está imagem já foi configurada no país **${alreadyExist.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(alreadyExist.country) || '\`NAME NOT FOUND\`'}**`)
 
-                let msg = await message.reply(`${e.QuestionMark} | Você confirma editar a imagem do país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" no banco de dados do Flag Game?\nAtual Image: ${has.image || '\`IMAGE NOT FOUND\`'}\nNew Image: ${link}`),
+                let msg = await message.reply(`${e.QuestionMark} | Você confirma editar a imagem do país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" no banco de dados do Flag Game?\nAtual Image: ${has.image || '\`IMAGE NOT FOUND\`'}\nNew Image: ${link}`),
                     emojis = ['✅', '❌'], clicked = false
 
                 for (let i of emojis) msg.react(i).catch(() => { })
@@ -135,7 +135,7 @@ module.exports = {
 
                         flags.splice(flagIndex, 1)
                         Database.Flags.set('Flags', [{ flag: has.flag, country: has.country, image: link }, ...flags])
-                        return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" foi editada com sucesso!\nNew Flag: ${link}`).catch(() => { })
+                        return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" foi editada com sucesso!\nNew Flag: ${link}`).catch(() => { })
                     })
                     .on('end', () => {
                         if (clicked) return
@@ -166,9 +166,9 @@ module.exports = {
                 let alreadyExist = flags.find(data => data.country === country)
 
                 if (alreadyExist)
-                    return message.reply(`${e.Deny} | Este nome já foi configurado no país **${alreadyExist.flag || '\`EMOJI NOT FOUND\`'} - ${alreadyExist.country || '\`NAME NOT FOUND\`'}**`)
+                    return message.reply(`${e.Deny} | Este nome já foi configurado no país **${alreadyExist.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(alreadyExist.country) || '\`NAME NOT FOUND\`'}**`)
 
-                let msg = await message.reply(`${e.QuestionMark} | Você confirma editar o nome do país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" no banco de dados do Flag Game?\nAtual Name: ${has.country || '\`NAME NOT FOUND\`'}\nNew Name: ${country}`),
+                let msg = await message.reply(`${e.QuestionMark} | Você confirma editar o nome do país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" no banco de dados do Flag Game?\nAtual Name: ${formatString(has.country) || '\`NAME NOT FOUND\`'}\nNew Name: ${country}`),
                     emojis = ['✅', '❌'], clicked = false
 
                 for (let i of emojis) msg.react(i).catch(() => { })
@@ -188,7 +188,7 @@ module.exports = {
 
                         flags.splice(flagIndex, 1)
                         Database.Flags.set('Flags', [{ flag: has.flag, country: country, image: has.image }, ...flags])
-                        return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" foi editada com sucesso!\nNew Name: ${country}`).catch(() => { })
+                        return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" foi editada com sucesso!\nNew Name: ${formatString(country)}`).catch(() => { })
                     })
                     .on('end', () => {
                         if (clicked) return
@@ -219,9 +219,9 @@ module.exports = {
                 let alreadyExist = flags.find(data => data.flag === emoji)
 
                 if (alreadyExist)
-                    return message.reply(`${e.Deny} | Este emojis já foi configurado no país **${alreadyExist.flag || '\`EMOJI NOT FOUND\`'} - ${alreadyExist.country || '\`NAME NOT FOUND\`'}**`)
+                    return message.reply(`${e.Deny} | Este emojis já foi configurado no país **${alreadyExist.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(alreadyExist.country) || '\`NAME NOT FOUND\`'}**`)
 
-                let msg = await message.reply(`${e.QuestionMark} | Você confirma editar o emoji do país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" no banco de dados do Flag Game?\nAtual Emoji: ${has.flag || '\`NAME NOT FOUND\`'}\nNew Emoji: ${emoji}`),
+                let msg = await message.reply(`${e.QuestionMark} | Você confirma editar o emoji do país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" no banco de dados do Flag Game?\nAtual Emoji: ${has.flag || '\`NAME NOT FOUND\`'}\nNew Emoji: ${emoji}`),
                     emojis = ['✅', '❌'], clicked = false
 
                 for (let i of emojis) msg.react(i).catch(() => { })
@@ -241,7 +241,7 @@ module.exports = {
 
                         flags.splice(flagIndex, 1)
                         Database.Flags.set('Flags', [{ flag: emoji, country: has.country, image: has.image }, ...flags])
-                        return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" foi editada com sucesso!\nNew Emoji: ${emoji}`).catch(() => { })
+                        return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" foi editada com sucesso!\nNew Emoji: ${emoji}`).catch(() => { })
                     })
                     .on('end', () => {
                         if (clicked) return
@@ -272,7 +272,7 @@ module.exports = {
             if (!has)
                 return message.reply(`${e.Deny} | Esse país não existe no meu banco de dados.`)
 
-            let msg = await message.reply(`${e.QuestionMark} | Você confirma remover o país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" do banco de dados do Flag Game?\n${has.image || '\`IMAGE NOT FOUND\`'}`),
+            let msg = await message.reply(`${e.QuestionMark} | Você confirma remover o país "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" do banco de dados do Flag Game?\n${has.image || '\`IMAGE NOT FOUND\`'}`),
                 emojis = ['✅', '❌'], clicked = false
 
             for (let i of emojis) msg.react(i).catch(() => { })
@@ -292,7 +292,7 @@ module.exports = {
 
                     flags.splice(flagIndex, 1)
                     Database.Flags.set('Flags', flags)
-                    return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${has.country || '\`NAME NOT FOUND\`'}**" foi removida com sucesso!\n${has.image || '\`IMAGE NOT FOUND\`'}`).catch(() => { })
+                    return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" foi removida com sucesso!\n${has.image || '\`IMAGE NOT FOUND\`'}`).catch(() => { })
                 })
                 .on('end', () => {
                     if (clicked) return
@@ -360,7 +360,7 @@ module.exports = {
                 for (let i = 0; i < flags.length; i += 15) {
 
                     let current = flags.slice(i, amount),
-                        description = current.map(f => `> ${f.flag} **${f.country}**`).join("\n")
+                        description = current.map(f => `> ${f.flag} **${formatString(f.country)}**`).join("\n")
 
                     if (current.length > 0) {
 
@@ -384,7 +384,7 @@ module.exports = {
             }
         }
 
-        async function startFlagGame() {
+        async function chooseGameMode() {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Flags'),
                 channels = data?.GameChannels?.Flags || []
@@ -393,6 +393,81 @@ module.exports = {
                 return message.reply(`${e.Deny} | Já tem um flag game rolando nesse canal. Espere ele terminar para poder iniciar outro, ok?`)
 
             registerGameChannel()
+
+            const buttons = [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 2,
+                            label: 'Sem opções',
+                            custom_id: 'noOptions',
+                            style: 'PRIMARY'
+                        },
+                        {
+                            type: 2,
+                            label: 'Com opções',
+                            custom_id: 'withOptions',
+                            style: 'PRIMARY'
+                        },
+                        {
+                            type: 2,
+                            label: 'Cancelar',
+                            custom_id: 'cancel',
+                            style: 'DANGER'
+                        }
+                    ]
+                }
+            ]
+
+            let msg = await message.reply({
+                content: `${e.QuestionMark} | Qual modo de jogo você quer iniciar?`,
+                components: buttons
+            })
+
+            let collector = msg.createMessageComponentCollector({
+                filter: int => int.user.id === message.author.id,
+                time: 15000,
+                max: 1,
+                erros: ['time', 'max']
+            })
+                .on('collect', async interaction => {
+
+                    let customId = interaction.customId
+
+                    if (customId === 'cancel')
+                        return collector.stop()
+
+                    control.initied = true
+
+                    if (customId === 'noOptions')
+                        return startFlagGame()
+
+                    if (customId === 'withOptions')
+                        return startGameWithOptions()
+                })
+                .on('end', () => {
+                    msg.delete(() => { })
+                    if (control.initied) return
+                    unregisterGameChannel()
+                })
+        }
+
+        async function startGameWithOptions() {
+
+            embed
+                .setColor(client.blue)
+                .setTitle(`🎌 ${client.user.username} Flag Game Options Mode`)
+                .setDescription(`${e.Loading} | Carregando bandeiras e opções... Prepare-se!`)
+
+            randomizeFlags()
+            generateButtons()
+            let Msg = await message.channel.send({ embeds: [embed] })
+
+            return setTimeout(() => startGameWithButtons(Msg), 4000)
+        }
+
+        async function startFlagGame() {
 
             embed
                 .setColor(client.blue)
@@ -416,11 +491,109 @@ module.exports = {
                     embed
                         .setColor(client.blue)
                         .setTitle(`${e.Database} ${client.user.username} Flag Info Database`)
-                        .setDescription(`**${data.flag || '\`EMOJI NOT FOUND\`'} - ${data.country || '\`NAME NOT FOUND\`'}**`)
+                        .setDescription(`**${data.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(data.country) || '\`NAME NOT FOUND\`'}**`)
                         .setImage(data.image || null)
                         .setFooter({ text: 'Se não apareceu a imagem da bandeira, este país não possui bandeira ou o link é inválido.' })
                 ]
             })
+        }
+
+        async function startGameWithButtons(Msg) {
+
+            control.rounds++
+
+            if (Msg)
+                Msg?.delete().catch(() => unregisterGameChannel())
+            generateButtons()
+
+            embed
+                .setDescription(`${e.Loading} | Qual é a bandeira?\n${control.atualFlag.flag} - ???`)
+                .setImage(control.atualFlag.image || null)
+                .setFooter({ text: `Round: ${control.rounds}` })
+
+            let msg = await message.channel.send({
+                embeds: [embed],
+                components: control.buttons
+            }).catch(() => unregisterGameChannel())
+
+            msg.createMessageComponentCollector({
+                filter: int => true,
+                time: 10000,
+                errors: ['time']
+            })
+                .on('collect', int => {
+                    int.deferUpdate().catch(() => { })
+
+                    if (control.alreadyAnswer?.includes(int.user.id)) return
+                    control.alreadyAnswer.push(int.user.id)
+
+                    if (control.atualFlag.country === int.customId)
+                        control.winners.push({ username: int.user.username, id: int.user.id })
+
+                    return
+                })
+                .on('end', async () => {
+
+                    let winners = control.winners
+
+                    if (winners.length === 0) {
+
+                        unregisterGameChannel()
+                        embed
+                            .setColor(client.red)
+                            .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n🔄 ${control.rounds} Rounds`)
+                            .setFooter({ text: `Flag Game encerrado.` })
+                        msg.delete().catch(() => { })
+
+                        return message.channel.send({ embeds: [embed] }).catch(() => { })
+
+                    }
+
+                    embed
+                        .setDescription(`${e.Check} | ${winners.length > 1 ? `${winners.length} jogadores acertaram` : '1 jogador acertou'} o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
+                        .setImage(null)
+
+                    msg.delete().catch(() => unregisterGameChannel())
+                    await randomizeFlags()
+                    let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => unregisterGameChannel())
+
+                    for (let d of winners)
+                        addPoint({ username: d.username, id: d.id }, true)
+
+                    control.winners = []
+                    control.alreadyAnswer = []
+                    refreshField()
+                    return setTimeout(async () => {
+                        await toDelMessage.delete().catch(() => { })
+                        startGameWithButtons()
+                    }, 4000)
+                })
+
+        }
+
+        function generateButtons() {
+
+            let answersArray = [],
+                buttons = [{ type: 1, components: [] }]
+
+            randomizeFlags(true)
+            randomizeFlags(true)
+            randomizeFlags()
+
+            answersArray.push(control.wrongAnswerOne, control.wrongAnswerTwo, control.atualFlag)
+            answersArray.sort(() => Math.random() - Math.random())
+
+            for (let flag of answersArray) {
+                buttons[0].components.push({
+                    type: 2,
+                    label: formatString(flag.country),
+                    custom_id: flag.country,
+                    style: 'PRIMARY'
+                })
+            }
+
+            control.buttons = buttons
+            return
         }
 
         function flagInfo() {
@@ -458,14 +631,25 @@ module.exports = {
             })
         }
 
-        function randomizeFlags() {
+        function randomizeFlags(wrongAnswer) {
+
+            if (wrongAnswer) {
+                let flag = flags[Math.floor(Math.random() * flags.length)]
+
+                if (flag.country === control.atualFlag.country || flag.country === control?.wrongAnswerOne?.country) return randomizeFlags(true)
+
+                control.wrongAnswerOne
+                    ? control.wrongAnswerTwo = flag
+                    : control.wrongAnswerOne = flag
+
+                return
+            }
 
             let flag = flags[Math.floor(Math.random() * flags.length)]
 
             if (flag.country === control.atualFlag.country) return randomizeFlags()
 
             control.atualFlag = flag
-
             return
         }
 
@@ -494,14 +678,14 @@ module.exports = {
                     control.collected = true
 
                     embed
-                        .setDescription(`${e.Check} | ${Message.author} acertou o país!\n${control.atualFlag.flag} - ${control.atualFlag?.country}\n \n${e.Loading} Próxima bandeira...`)
+                        .setDescription(`${e.Check} | ${Message.author} acertou o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
 
                     msg.delete().catch(() => unregisterGameChannel())
                     await randomizeFlags()
                     let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => unregisterGameChannel())
 
-                    await addPoint(Message.member)
+                    await addPoint(Message.user)
                     return setTimeout(async () => {
                         await toDelMessage.delete().catch(() => { })
                         start()
@@ -515,7 +699,7 @@ module.exports = {
                     unregisterGameChannel()
                     embed
                         .setColor(client.red)
-                        .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${control.atualFlag?.country}\n🔄 ${control.rounds} Rounds`)
+                        .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n🔄 ${control.rounds} Rounds`)
                         .setFooter({ text: `Flag Game encerrado.` })
                     msg.delete().catch(() => { })
 
@@ -523,13 +707,18 @@ module.exports = {
                 })
         }
 
-        function addPoint(Member) {
+        function addPoint(User, justAdd = false) {
 
-            let data = control.usersPoints.find(data => data.name === Member.user.username,)
+            let data = control.usersPoints.find(data => data.name === User.username,)
 
             data?.name
                 ? data.points++
-                : control.usersPoints.push({ name: Member.user.username, points: 1 })
+                : control.usersPoints.push({ name: User.username, points: 1 })
+
+            if (justAdd)
+                Database.addGamingPoint(User.id, 'FlagCount', 1)
+
+            if (justAdd) return
 
             let ranking = control.usersPoints
                 .sort((a, b) => b.points - a.points)
@@ -539,10 +728,23 @@ module.exports = {
 
             if (embed.fields.length === 1)
                 embed.spliceFields(0, 1, [{ name: '🏆 Pontuação', value: `${ranking || `${e.Deny} RANKING BAD FORMATED`}` }])
-            else embed.addField('🏆 Pontuação', `${ranking || `${e.Deny} RANKING BAD FORMATED`}${data?.length > 5 ? `\n+${data?.length - 5} players` : ''}`)
+            else embed.addField('🏆 Pontuação', `${ranking || `${e.Deny} RANKING BAD FORMATED`}${control.usersPoints.length > 5 ? `\n+${control.usersPoints.length - 5} players` : ''}`)
 
-            Database.addGamingPoint(Member.user.id, 'FlagCount', 1)
+            Database.addGamingPoint(User.id, 'FlagCount', 1)
             return
+        }
+
+        function refreshField() {
+            let ranking = control.usersPoints
+                .sort((a, b) => b.points - a.points)
+                .slice(0, 5)
+                .map((d, i) => `${emoji(i)} ${d.name} - ${d.points} pontos`)
+                .join('\n')
+
+            if (embed.fields.length === 1)
+                embed.spliceFields(0, 1, [{ name: '🏆 Pontuação', value: `${ranking || `${e.Deny} RANKING BAD FORMATED`}` }])
+            else embed.addField('🏆 Pontuação', `${ranking || `${e.Deny} RANKING BAD FORMATED`}${control.usersPoints.length > 5 ? `\n+${control.usersPoints.length - 5} players` : ''}`)
+
         }
 
         function emoji(i) {
@@ -586,6 +788,33 @@ module.exports = {
                 }
             )
 
+        }
+
+        function formatString(string) {
+
+            let tras = false
+
+            if (string.includes('-')) {
+                tras = true
+                string = string.replace(/-/g, ' ')
+            }
+
+            let format = string.split(/ +/g),
+                result = ''
+
+            for (let word of format)
+                if (word.length > 2 || word === 'el')
+                    if (tras)
+                        result += word[0].toUpperCase() + word.substring(1) + ' '
+                    else result += word[0].toUpperCase() + word.substring(1) + ' '
+                else result += word + ' '
+
+            if (tras) {
+                result = result.replace(/ /g, '-').slice(0, -1)
+                tras = false
+            }
+
+            return result
         }
 
     }
