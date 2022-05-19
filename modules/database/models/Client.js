@@ -33,7 +33,8 @@ module.exports = model("Client", new Schema({
     Zeppelin: {
         Channels: Array,
         winTotalMoney: Number,
-        loseTotalMoney: Number
+        loseTotalMoney: Number,
+        Explode: Number
     },
     Rebooting: {
         ON: Boolean,

@@ -41,12 +41,13 @@ module.exports = {
                             type: 2,
                             label: 'Retirar',
                             custom_id: 'retire',
-                            style: 'DANGER',
+                            style: 'SUCCESS',
                             disabled: true,
                         }
                     ],
                 },
-            ]
+            ],
+            accepted = false
 
         if (!value || isNaN(value))
             return message.reply(`${e.Deny} | Diga um valor válido para apostar no zeppelin. Lembrando que deve ser um número válido e que você possua na carteira. Você pode consultar quanto você tem utilizando \`${prefix}balance\`.`)
@@ -91,7 +92,9 @@ module.exports = {
         async function confirmBet() {
             registerChannel()
 
-            let msg = await message.reply({ content: `${e.QuestionMark} | Você tem certeza que deseja apostar "${value} ${moeda}" no zeppelin?` }),
+            let msg = await message.reply({
+                content: `${e.QuestionMark} | Você tem certeza que deseja apostar "${value} ${moeda}" no zeppelin?`
+            }),
                 emojis = ['✅', '❌']
 
             for (const emoji of emojis) msg.react(emoji).catch(() => { })
@@ -106,6 +109,7 @@ module.exports = {
                     if (reaction.emoji.name === emojis[0]) {
                         msg.delete()
 
+                        accepted = true
                         Database.subtract(message.author.id, value)
                         return startZeppelin()
                     }
@@ -113,6 +117,7 @@ module.exports = {
                     return collector.stop()
                 })
                 .on('end', () => {
+                    if (accepted) return
                     removeChannelFromDatabase()
                     return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
                 })
@@ -131,12 +136,13 @@ module.exports = {
 
             const collector = msg.createMessageComponentCollector({
                 filter: (int) => int.user.id === message.author.id,
-                time: 60000,
+                time: timeResult,
                 max: 1,
                 errors: ['time', 'max']
             })
 
             let interval = setInterval(() => {
+                if (zeppelin?.Zeppelin?.Explode >= 3) return collector.stop()
                 addDot(msg)
                 msg.edit({ content: `${valueMultiplication?.toFixed(1)} | ${dotSequence}${ballon}` }).catch(() => { })
             }, 1700)
@@ -144,44 +150,43 @@ module.exports = {
             collector.on('collect', interaction => {
                 interaction.deferUpdate().catch(() => { })
 
-                clearInterval(interval)
                 retired = true
                 explode(msg)
-                removeChannelFromDatabase()
-                collector.stop()
-                msg.edit({ components: [] }).catch(() => { })
                 return win()
             })
+                .on('end', () => {
+                    if (retired) return
+                    explode(msg)
+                })
 
-            setTimeout(() => {
-                if (retired) return
-                
-                collector.stop()
+
+            async function explode(msg) {
                 clearInterval(interval)
-                explode(msg)
-            }, timeResult)
-        }
+                removeChannelFromDatabase()
+                collector.stop()
 
-        function explode(msg) {
-            removeChannelFromDatabase()
-            msg.edit({
-                content: `${valueMultiplication?.toFixed(1)} | ${dotSequence}${boom}`,
-                components: []
-            }).catch(() => { })
+                msg.edit({
+                    content: `${valueMultiplication?.toFixed(1)} | ${dotSequence}${boom}`,
+                    components: []
+                }).catch(() => { })
 
-            if (!retired) {
-                totalPrice('Zeppelin.loseTotalMoney', value)
+                if (zeppelin?.Zeppelin?.Explode >= 3)
+                    await Database.Client.updateOne({ id: client.user.id }, { ['Zeppelin.Explode']: 0 }, { upsert: true })
 
-                Database.PushTransaction(
-                    message.author.id,
-                    `${e.loss} Perdeu ${value} Safiras jogando *Zeppelin*`
-                )
+                if (!retired) {
+                    totalPrice('Zeppelin.loseTotalMoney', value)
 
-                return message.channel.send(`${e.Deny} | Não foi dessa vez ${message.author}. O balão explodiu e você perdeu o dinheiro apostado`)
+                    Database.PushTransaction(
+                        message.author.id,
+                        `${e.loss} Perdeu ${value} Safiras jogando *Zeppelin*`
+                    )
+
+                    return message.channel.send(`${e.Deny} | Não foi dessa vez ${message.author}. O balão explodiu e você perdeu o dinheiro apostado`)
+                }
             }
         }
 
-        function win() {
+        async function win() {
 
             let moneyResult = value * valueMultiplication?.toFixed(1)
             Database.add(message.author.id, moneyResult?.toFixed(0))
@@ -191,7 +196,9 @@ module.exports = {
             )
 
             totalPrice('Zeppelin.winTotalMoney', (moneyResult - value)?.toFixed(0))
-            return message.channel.send(`${e.Check} | Parabéns ${message.author}! Você ganhou um montante de ${moneyResult?.toFixed(0)} ${moeda} retirando a aposta em ${valueMultiplication?.toFixed(1)}. Lembrando que o resultado é o valor da aposta vezes o número do zeppelin.`)
+            message.channel.send(`${e.Check} | Parabéns ${message.author}! Você ganhou um montante de ${moneyResult?.toFixed(0)} ${moeda} retirando a aposta em ${valueMultiplication?.toFixed(1)}. Lembrando que o resultado é o valor da aposta vezes o número do zeppelin.`)
+            await Database.Client.updateOne({ id: client.user.id }, { $inc: { ['Zeppelin.Explode']: 1 } })
+            return
         }
 
         async function removeChannelFromDatabase() {
