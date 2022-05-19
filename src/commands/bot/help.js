@@ -291,11 +291,11 @@ module.exports = {
                             .addFields(
                                 {
                                     name: '🆕 Novidades',
-                                    value: `**${prefix}zeppelin** - Novo comando de apostas\n**${prefix}sticker** - Adicione, delete e edite figurinhas no servidor\n**${prefix}banner** - Faixa dos membros Nitro\n**${prefix}avatar** - Um pequeno upgrade\n**${prefix}signo** - Rework para melhor usabilidade\n**${prefix}bet** - Adição do **Global Bet**\n**${prefix}warn** - Sistema Avançado de Warns`
+                                    value: `**${prefix}zeppelin** - Novo comando de apostas\n**${prefix}sticker** - Adicione, delete e edite figurinhas no servidor\n**${prefix}avatar** - Um pequeno upgrade\n**${prefix}signo** - Rework para melhor usabilidade\n**${prefix}bet** - Adição do **Global Bet System**\n**${prefix}warn** - Sistema Avançado de Warns\n**${prefix}flag** - Novo jogo com sistema automático`
                                 },
                                 {
                                     name: '⛔ Remoção',
-                                    value: '*Nada foi removido*'
+                                    value: `**${prefix}banner** - Comando integrado ao \`${prefix}avatar\``
                                 },
                                 {
                                     name: `${e.bug} Bugs`,

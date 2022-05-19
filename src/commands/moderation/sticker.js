@@ -20,14 +20,11 @@ module.exports = {
         if (['edit', 'editar'].includes(args[0]?.toLowerCase())) return editSticker()
         if (['del', 'delete', 'remove', 'excluir'].includes(args[0]?.toLowerCase())) return deleteSticker()
 
-        if (!message.reference?.messageId)
-            return message.reply(`${e.Deny} | Por favor, mencione a mensagem em que o sticker/figurinha está.`)
-
-        let Message = message.channel.messages.cache.get(message.reference.messageId),
+        let Message = message.channel.messages.cache.get(message?.reference?.messageId) || message,
             sticker = Message?.stickers?.first() || null
 
         if (!sticker)
-            return message.reply(`${e.Deny} | Não existe nenhum sticker na mensagem mencionada.`)
+            return message.reply(`${e.Deny} | Não existe nenhum sticker na mensagem. Tenta usar o comando com algúm sticker ou mencione a mensagem com sticker.`)
 
 
         let stickerName = args[0] || sticker.name
