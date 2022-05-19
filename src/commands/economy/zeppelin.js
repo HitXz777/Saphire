@@ -79,7 +79,7 @@ module.exports = {
                                 value: 'O número minímo para você retirar seu dinheiro é **2.0**, se o balão estourar antes disso, meus pesâmes. Você perdeu.'
                             },
                             {
-                                name: '🔍 Dados Zepplin',
+                                name: '🔍 Dados Zeppelin',
                                 value: `Total de dinheiro ganho: ${zeppelin.Zeppelin.winTotalMoney?.toFixed(0) || 0} ${moeda}\nTotal de dinheiro perdido: ${zeppelin.Zeppelin.loseTotalMoney?.toFixed(0) || 0} ${moeda}`
                             }
                         )

@@ -7,7 +7,7 @@ module.exports = {
     ClientPermissions: ['EMBED_LINKS'],
     emoji: `${e.Coin}`,
     usage: '<ocultar> [off]',
-    description: 'Oculte o dinheiro do seu banco para todos',
+    description: 'Oculte o seu dinheiro para todos',
 
     run: async (client, message, args, prefix, MessageEmbed, Database) => {
 
@@ -17,11 +17,11 @@ module.exports = {
         return oculto
             ? (() => {
                 Database.delete(message.author.id, 'Perfil.BalanceOcult')
-                return message.reply(`${e.Check} | O seu banco não está mais ocultado.`)
+                return message.reply(`${e.Check} | O seu dinheiro não está mais ocultado.`)
             })()
             : (() => {
                 Database.updateUserData(message.author.id, 'Perfil.BalanceOcult', true)
-                return message.reply(`${e.Check} | O seu banco está ocultado.`)
+                return message.reply(`${e.Check} | O seu dinheiro está ocultado.`)
             })()
 
 

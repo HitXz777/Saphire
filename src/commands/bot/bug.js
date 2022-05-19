@@ -43,16 +43,17 @@ module.exports = {
 
             Database.SetTimeout(message.author.id, 'Timeouts.Bug')
 
-            let ChannelInvite = await message.channel.createInvite({ maxAge: 0 }).catch((err) => {
-                Error(message, err)
-                ChannelInvite = false
-            }),
-                ReportBugEmbed = new MessageEmbed()
-                    .setColor('RED')
-                    .setTitle('📢 Report de Bug/Erro Recebido')
-                    .addField('Enviado por', `${message.author.tag} (*\`${message.author.id}\`*)`, true)
-                    .addField('Servidor', `${ChannelInvite ? `[${message.guild.name}](${ChannelInvite.url})` : message.guild.name} (*${message.guild.id}*)\nMensagem: [Link](${message.url})`)
-                    .addField('Relatório', mensagem),
+            let ChannelInvite = await message.channel.createInvite({ maxAge: 0 }).catch(err => { }) || null
+            let messageField = ChannelInvite?.url
+                ? `[${message.guild.name}](${ChannelInvite.url})`
+                : message.guild.name
+
+            let ReportBugEmbed = new MessageEmbed()
+                .setColor('RED')
+                .setTitle('📢 Report de Bug/Erro Recebido')
+                .addField('Enviado por', `${message.author.tag} (*\`${message.author.id}\`*)`, true)
+                .addField('Servidor', `${messageField} - *\`${message.guild.id}\`*\nMensagem: [Link](${message.url})`)
+                .addField('Relatório', mensagem),
                 channel = client.channels.cache.get(config.BugsChannelId)
 
             if (!config.BugsChannelId || !channel) return message.reply(`${e.Deny} | Eu não encontrei o canal de envio no meu servidor central.\nPor favor, contacte meu criador --> ${client.users.cache.get(N.Rody)?.tag || 'Indefnido'} <---`)
@@ -62,7 +63,7 @@ module.exports = {
                 return message.reply(`${e.Deny} | Ocorreu um erro no envio da mensagem... Contacte meu criador, por favor. --> **${client.users.cache.get(N.Rody)?.tag || 'Indefnido'}** <--\n\`${err}\``)
             })
 
-            return message.reply(`${e.Check} | Seu reporte foi enviado com sucesso!\nVocê vai receber uma recompensa no banco em breve.`)
+            return message.reply(`${e.Check} | Seu reporte foi enviado com sucesso!\nVocê irá receber uma quantia de Safiras em breve.`)
 
         }
 
