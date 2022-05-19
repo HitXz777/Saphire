@@ -175,7 +175,7 @@ module.exports = {
             collector = msg.createMessageComponentCollector({
                 filtro: (interaction) => interaction.customId === 'menu' && interaction.user.id === message.author.id,
                 idle: 60000
-            });
+            })
 
         collector.on('end', () => msg.edit({ components: [] }).catch(() => { }))
 
