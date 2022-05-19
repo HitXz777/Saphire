@@ -1,6 +1,11 @@
 {
     "Flags": [
         {
+            "flag": "🇸🇰",
+            "country": "eslováquia",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/976483477094563860/unknown.png?width=705&height=470"
+        },
+        {
             "flag": "🇬🇫",
             "country": "guiana francesa",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976471521725923348/unknown.png?width=710&height=473"
@@ -354,10 +359,6 @@
             "flag": "🇦🇫",
             "country": "afeganistão",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976071323518402560/cc48a21210a9ba774c6cdfd19f28eb28.jpg"
-        },
-        {
-            "flag": "🇸🇰",
-            "country": "eslováquia"
         },
         {
             "flag": "🇧🇯",
