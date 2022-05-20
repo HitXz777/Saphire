@@ -533,7 +533,7 @@ module.exports = {
 
                 let collector = msg.channel.createMessageCollector({
                     filter: m => m.author.id === message.author.id,
-                    time: 30000,
+                    time: 60000,
                     erros: ['time']
                 })
                     .on('collect', Message => {
@@ -541,7 +541,6 @@ module.exports = {
                         if (Message.content === 'CANCEL') return collector.stop()
 
                         let alreadyHas = characters?.find(p => p.name.toLowerCase() === Message.content?.toLowerCase()
-                            || p.name.toLowerCase().includes(Message.content?.toLowerCase())
                             || p.image === Message.content) || null
 
                         if (alreadyHas && alreadyHas.name.toLowerCase() === Message.content.toLowerCase())
@@ -604,6 +603,123 @@ module.exports = {
                         }).catch(() => { })
                     })
             }
+
+            async function editImage() {
+
+                let request = args.slice(2).join(' ')
+
+                if (!request)
+                    return message.reply(`${e.Deny} | Forneça o nome ou o link da imagem do personagem que você quer editar a imagem.\n\`${prefix}quiz edit image <Nome do Personagem> ou <Link Do Personagem>\``)
+
+                let has = characters?.find(p => p.name.toLowerCase() === request?.toLowerCase()
+                    || p.name.toLowerCase().includes(request?.toLowerCase())
+                    || p.image === request) || null
+
+                if (!has)
+                    return message.reply(`${e.Deny} | Nenhum personagem foi encontrado com o requisito: \`${request}\``)
+
+                let embed = {
+                    color: client.blue,
+                    title: `${e.Database} Database's Edit Information System`,
+                    description: `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Image\`**`,
+                    image: { url: has.image || null },
+                    footer: { text: 'Quiz Anime Theme Selection' }
+                }
+
+                let msg = await message.reply({
+                    content: `${e.Loading} | Diga no chat o novo link da imagem do personagem. Para cancelar, digite \`CANCEL\``,
+                    embeds: [embed]
+                })
+
+                let collector = msg.channel.createMessageCollector({
+                    filter: m => m.author.id === message.author.id,
+                    time: 60000,
+                    erros: ['time']
+                })
+                    .on('collect', Message => {
+
+                        if (Message.content === 'CANCEL') return collector.stop()
+
+                        if (!Message.content.includes('https://media.discordapp.net/attachments'))
+                            return Message.reply(`${e.Deny} | Verique se o link da imagem segue com esse formato: \`https://media.discordapp.net/attachments\``)
+
+                        let alreadyHas = characters?.find(p => p.image === Message.content) || null
+
+                        if (alreadyHas && alreadyHas.image === Message.content)
+                            return Message.reply(`${e.Deny} | Esta imagem já pertence a este personagem`)
+
+                        if (alreadyHas)
+                            return Message.reply(`${e.Deny} | Esta imagem já pertence ao personagem **\`${formatString(alreadyHas.name) || 'NAME NOT FOUND'}\`**.`)
+
+                        control.collected = true
+
+                        embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Image\`**\nNew Image:`
+                        embed.image.url = Message.content
+
+                        msg.edit({
+                            content: `${e.Loading} | Confirme as informações abaixo caso tudo esteja correto.\n${e.Info} | Se a imagem não apareceu, o link não é válido ou a imagem no canal package foi deletada.`,
+                            embeds: [embed]
+                        }).catch(() => { })
+
+                        let emojis = ['✅', '❌']
+
+                        for (let i of emojis) msg.react(i).catch(() => { })
+
+                        return msg.createReactionCollector({
+                            filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                            time: 60000,
+                            max: 1,
+                            erros: ['time', 'max']
+                        })
+                            .on('collect', (reaction) => {
+
+                                if (reaction.emoji.name === emojis[1]) return
+
+                                control.collectedReaction = true
+
+                                let newSet = characters.filter(data => data.name !== has.name)
+
+                                Database.Characters.set('Characters', [{ name: has.name, image: Message.content }, ...newSet])
+
+                                embed.color = client.green
+                                embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Image\`**`
+                                embed.image.url = null
+
+                                return msg.edit({
+                                    content: `${e.Check} | A imagem do personagem **\`${formatString(has.name)}\`** foi alterada com sucesso.`,
+                                    embeds: [
+                                        embed,
+                                        {
+                                            color: client.blue,
+                                            title: `New Image`,
+                                            image: { url: Message.content }
+                                        },
+                                        {
+                                            color: client.blue,
+                                            title: `Old Image`,
+                                            image: { url: has.image }
+                                        }
+                                    ]
+                                }).catch(() => { })
+
+                            })
+                            .on('end', () => {
+                                if (control.collectedReaction) return
+                                return msg.edit({
+                                    content: `${e.Deny} | Comando cancelado.`,
+                                    embeds: []
+                                }).catch(() => { })
+                            })
+                    })
+                    .on('end', () => {
+                        if (control.collected) return
+                        return msg.edit({
+                            content: `${e.Deny} | Comando cancelado.`,
+                            embeds: []
+                        }).catch(() => { })
+                    })
+            }
+
         }
 
         async function deleteCharacter() {

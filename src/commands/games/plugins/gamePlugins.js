@@ -4,6 +4,8 @@ const Database = require('../../../../modules/classes/Database'),
 // Flag Gaming - Quiz Anime Theme
 function formatString(string) {
 
+    if (typeof string !== 'string') return null
+
     let tras = false
 
     if (string.includes('-')) {
