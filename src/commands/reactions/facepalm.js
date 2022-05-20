@@ -11,7 +11,7 @@ module.exports = {
   usage: '<facepalm> [motivo]',
   description: 'Puts...',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Facepalm[Math.floor(Math.random() * g.Facepalm.length)]

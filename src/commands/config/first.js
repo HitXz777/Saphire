@@ -9,7 +9,7 @@ module.exports = {
     usage: '<first> <on/off>',
     description: 'Eu vou falar first em todos os canais que serem criados.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let embedTurnOnOff = new MessageEmbed()
             .setColor(client.blue)

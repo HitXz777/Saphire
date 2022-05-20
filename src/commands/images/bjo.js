@@ -11,7 +11,7 @@ module.exports = {
     usage: '<bjo> [@user] [@user]',
     description: 'bjo meme',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user1 = message.mentions.users.first()
         if (!user1) return message.reply(`${e.Info} | Tenta assim: \`${prefix}bjo @user1 @user2\``)

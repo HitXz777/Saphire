@@ -9,7 +9,7 @@ module.exports = {
     usage: '<signo>',
     description: 'Defina seu signo no perfil',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Signo'),
             sig = data.Perfil?.Signo || '',

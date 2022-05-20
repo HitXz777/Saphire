@@ -11,7 +11,7 @@ module.exports = {
   usage: '<wow> [motivo]',
   description: 'Sou tímido, sai',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Shy[Math.floor(Math.random() * g.Shy.length)]

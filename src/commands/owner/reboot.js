@@ -11,7 +11,7 @@ module.exports = {
     emoji: `${e.OwnerCrow}`,
     description: 'Permite meu criador relogar todos os comandos ou meu servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['commands', 'comandos'].includes(args[0]?.toLowerCase()))
             return RebootCommands()

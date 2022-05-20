@@ -12,7 +12,7 @@ module.exports = {
     usage: '<welcomechannel> [#channel] | [off]',
     description: 'Selecione um canal para eu avisar todos que chegarem no servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let guildData = await Database.Guild.findOne({ id: message.guild.id }, 'WelcomeChannel LeaveChannel'),
             channel = message.mentions.channels.first() || message.channel,

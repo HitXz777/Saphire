@@ -13,7 +13,7 @@ module.exports = {
     usage: '<changemymind> <texto da foto>',
     description: 'Change my mind meme',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let text = args.join(' ')
         if (!text)

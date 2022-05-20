@@ -14,7 +14,7 @@ module.exports = {
     usage: '<clan> <info>',
     description: 'Saphire\'s Clan System',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let
             Clans = await Database.Clan.find({}) || [],

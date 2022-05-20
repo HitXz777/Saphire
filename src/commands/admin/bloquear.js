@@ -8,7 +8,7 @@ module.exports = {
     usage: '<bloquear> <command>',
     description: 'Permite os administradores da Saphire bloquear qualquer comando',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let Command = args[0],
             Reason = args.slice(1).join(' ') || 'Sem razão definida'

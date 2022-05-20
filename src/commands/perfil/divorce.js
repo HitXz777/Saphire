@@ -10,7 +10,7 @@ module.exports = {
     usage: '<divorce>',
     description: 'Divorcie do seu casamento',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let author = await Database.User.findOne({ id: message.author.id }, 'id Perfil.Marry')
         authorData = {

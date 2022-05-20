@@ -9,7 +9,7 @@ module.exports = {
     usage: '<report> [user] <razão>',
     description: 'Reporte algo ou alguém para a staff do servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         message.delete().catch(() => { })
 

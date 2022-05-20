@@ -14,7 +14,7 @@ module.exports = {
     usage: '<wallpaper>',
     description: `Wallpaper de Animes`,
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let animes = Object.keys(BgWall.get('Wallpapers') || {}).sort().map(anime => `${prefix}w ${anime}`),
             amount = 0,

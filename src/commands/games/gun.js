@@ -8,7 +8,7 @@ module.exports = {
     usage: '<gun> <@user>',
     description: 'Quem atirar primeiro leva',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const opponent = message.mentions.members.first() || message.mentions.repliedUser
         if (!opponent || opponent.id === message.author.id) return message.reply(`${e.Deny} | Mencione um oponente ou use o comando respondendo a mensagem do seu oponente.`)

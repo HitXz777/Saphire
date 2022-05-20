@@ -9,7 +9,7 @@ module.exports = {
     usage: '<vote> <Conteúdo a ser votado>',
     description: 'Abra facilmente uma votação no chat',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const Conteudo = args.join(' ')
         if (!Conteudo) return message.reply(`${e.Deny} | Você precisa me dizer o que vai ser votado.`)

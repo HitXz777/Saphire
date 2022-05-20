@@ -8,7 +8,7 @@ module.exports = {
     usage: '<biscoitodasorte>',
     description: 'Quer tentar a sorte hoje?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let BiscMessage = f.BiscoitoDaSorte[Math.floor(Math.random() * f.BiscoitoDaSorte.length)]
         message.channel.send(`🥠 | ${BiscMessage}`)

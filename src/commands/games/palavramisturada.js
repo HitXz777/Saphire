@@ -11,7 +11,7 @@ module.exports = {
     usage: "<mix> --- palavra",
     description: "Joguinho da palavra misturada",
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let Palavras = Database.Frases.get('f.Mix'),
             palavra,

@@ -10,7 +10,7 @@ module.exports = {
     usage: '<cu>',
     description: 'Você daria seu traseiro por dinheiro?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Timeouts.Cu'),
             moeda = await Moeda(message)

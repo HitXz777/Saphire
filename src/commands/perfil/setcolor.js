@@ -9,7 +9,7 @@ module.exports = {
     usage: '<setcolor> <#CódigoHex>',
     description: 'Defina a cor das suas embeds',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.SaphireObs} | Você pode definir as cores das suas mensagens usando este comando.\nExemplo: \`${prefix}setcolor #00FFFF\` - Se quiser umas cores, use \`${prefix}cor\` que te mando algumas, você também pode pegar qualquer cor usando as configurações do servidor na sessão onde muda as cores dos cargos.\n \nCaso queria deixar ela igual a cor do seu cargo/nome. Basta usar \`${prefix}setcolor off\``)
 

@@ -11,7 +11,7 @@ module.exports = {
     usage: '<bal> [@user]',
     description: 'Confira as finanças',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let MoedaCustom = await Moeda(message)
 

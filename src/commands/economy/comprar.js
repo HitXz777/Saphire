@@ -13,7 +13,7 @@ module.exports = {
     usage: '<buy> [item/quantidade]',
     description: 'Compre itens da Loja Saphire',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let moeda = await Moeda(message),
             user = await Database.User.findOne({ id: message.author.id }),

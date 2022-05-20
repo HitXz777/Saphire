@@ -10,7 +10,7 @@ module.exports = {
     usage: '<Nome do Comando> | <All>',
     description: 'Permite meu criador liberar comandos bloqueados pelo meu sistema',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.Info} | Apenas o nome do comando que deseja desbloquear.\nExemplo: \`${prefix}liberar botinfo\``)
 

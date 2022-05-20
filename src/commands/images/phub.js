@@ -13,7 +13,7 @@ module.exports = {
     usage: '<phub> [@user] <text>',
     description: 'Recomendo não usar',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first()
         if (!user) return message.reply(`${e.Info} | Tenta assim: \`${prefix}phub @user O texto em diante\` *(Limite de 50 caracteres)*`)

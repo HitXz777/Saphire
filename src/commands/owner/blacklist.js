@@ -9,7 +9,7 @@ module.exports = {
     usage: ['[Staff Private] <add/remove> [server/@user/id]'],
     description: 'Membros/Servidores bloqueados do meu sistema',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let clientData = await Database.Client.findOne({ id: client.user.id }, 'Blacklist'),
             data = clientData.Blacklist

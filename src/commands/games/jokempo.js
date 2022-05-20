@@ -10,7 +10,7 @@ module.exports = {
     usage: '<jkp> <info>',
     description: 'Vai um jokempo?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['delete', 'del', 'deletar', 'excluir', 'apagar'].includes(args[0]?.toLowerCase())) return deleteData()
         if (['winrate', 'status', 'stats'].includes(args[0]?.toLowerCase())) return calculateWinrate()

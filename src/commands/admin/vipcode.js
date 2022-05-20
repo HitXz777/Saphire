@@ -11,7 +11,7 @@ module.exports = {
     usage: '<vipcode> <new/del> [code] | <vipcode> <all>',
     description: 'Criação e exclusão de códigos de resgate vip.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['new', 'novo', 'create', 'criar'].includes(args[0]?.toLowerCase())) return NewVipCode()
         if (['del', 'delete', 'excluir', 'apagar'].includes(args[0]?.toLowerCase())) return DelVipCode()

@@ -10,7 +10,7 @@ module.exports = {
     usage: '<id> <@user>',
     description: 'Confira o ID de qualquer um',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.member || message.mentions.repliedUser
 

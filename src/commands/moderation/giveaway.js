@@ -13,7 +13,7 @@ module.exports = {
     usage: '<giveaway> <info>',
     description: 'Fazer sorteios é divertido, né?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const embed = new MessageEmbed().setColor(client.blue)
 

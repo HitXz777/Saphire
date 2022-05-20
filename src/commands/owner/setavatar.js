@@ -8,7 +8,7 @@ module.exports = {
     usage: ' <link>',
     owner: true,
     description: 'Permite meu criador mudar minha foto de perfil.',
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`\`${prefix}setavatar https://www.linkdafoto.com\``)
         let link = args[0]

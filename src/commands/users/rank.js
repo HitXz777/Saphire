@@ -12,7 +12,7 @@ module.exports = {
     usage: '<rank>',
     description: 'Confira os Top 10 Globais',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let msg = await message.reply(`${e.Loading} | Obtendo informações e construindo...`),
             user = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.find(user => user.username?.toLowerCase() == args[1]?.toLowerCase() || user.tag?.toLowerCase() == args[1]?.toLowerCase() || user.id === args[1]),

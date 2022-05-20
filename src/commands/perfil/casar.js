@@ -12,7 +12,7 @@ module.exports = {
     usage: '<casar> <@user>',
     description: 'Casamentos são importantes. Para alguns',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.mentions.repliedUser
         let color = await Colors(message.author.id)

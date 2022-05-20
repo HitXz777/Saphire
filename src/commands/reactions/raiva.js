@@ -11,7 +11,7 @@ module.exports = {
   usage: '<nervoso> [motivo]',
   description: 'To com raiva...',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Raiva[Math.floor(Math.random() * g.Raiva.length)]

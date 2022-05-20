@@ -10,7 +10,7 @@ module.exports = {
     usage: '<tapa> <@user>',
     description: 'Dê um tapa em quem merece',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Tapa[Math.floor(Math.random() * g.Tapa.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

@@ -11,7 +11,7 @@ module.exports = {
   usage: '<atirar> <@user>',
   description: 'Atire em alguém',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     let rand = g.Atirar[Math.floor(Math.random() * g.Atirar.length)],
       user = message.mentions.members.first() || message.mentions.repliedUser

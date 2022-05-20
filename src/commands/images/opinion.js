@@ -13,7 +13,7 @@ module.exports = {
     usage: '<opinion> [@user] [msg]',
     description: 'Opinion meme',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first()
         if (!user) return message.reply(`${e.Info} | Tenta assim: \`${prefix}opinion @user O texto em diante\` *(Limite de 25 caracteres)*`)

@@ -6,7 +6,7 @@ module.exports = {
     usage: '<uptime>',
     description: 'Tempo que eu estou online',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         return message.reply(`⏱️ | ${client.formatTimestamp(Date.now() - client.uptime)}`)
     }

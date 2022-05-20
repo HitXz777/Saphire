@@ -12,7 +12,7 @@ module.exports = {
     usage: '<slowmode> <TEMPO EM SEGUNDOS> [#canal(opicional)]',
     description: 'Ative o slowmode no chat',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let canal = message.mentions.channels.first() || message.channel
 

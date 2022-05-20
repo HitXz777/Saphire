@@ -126,8 +126,7 @@ client.on('messageCreate', async message => {
 
     Database.newCommandRegister(message, data(), client.user.id)
 
-    command.run(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
-    return
+    return command.execute(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
 
 })
 

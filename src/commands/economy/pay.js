@@ -10,7 +10,7 @@ module.exports = {
     usage: '<pay> <user/id> <quantia>',
     description: 'Faça um pagamento rápido!',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return InfoPay()
 

@@ -11,7 +11,7 @@ module.exports = {
     usage: '<lockcommands> <channel>',
     description: 'Tranque meus comandos em canais específicos para que não seja usados. (ADM\'s são imunes)',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel
 

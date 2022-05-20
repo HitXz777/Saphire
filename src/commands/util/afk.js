@@ -12,7 +12,7 @@ module.exports = {
     usage: '<afk> <motivo>',
     description: 'Com este comando, eu aviso pra todos que chamarem você que você está offline',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let Motivo = args.join(" ") || 'Sem recado definido.'
 

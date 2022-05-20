@@ -12,7 +12,7 @@ module.exports = {
     usage: '<logs> [on/off] <#channel>',
     description: 'Canal de referência para o sistema 🛰️ | **Global System Notification**',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel,
             guildData = await Database.Guild.findOne({ id: message.guild.id }, 'LogChannel'),

@@ -8,7 +8,7 @@ module.exports = {
     usage: '<configstats>',
     description: 'Status da configuração do servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let server = client.guilds.cache.get(args[0]) || message.guild
 

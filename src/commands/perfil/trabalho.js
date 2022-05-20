@@ -8,7 +8,7 @@ module.exports = {
     usage: '<job> ~~ Sua profissão',
     description: 'Defina um trabalho no seu perfil',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Trabalho'),
             Job = data.Perfil?.Trabalho

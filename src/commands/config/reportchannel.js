@@ -11,7 +11,7 @@ module.exports = {
     usage: '<reportchannel> [#canal]',
     description: 'Escolhe um canal para receber reports dos membros',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel,
             guildData = await Database.Guild.findOne({ id: message.guild.id }, 'ReportChannel'),

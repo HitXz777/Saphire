@@ -12,7 +12,7 @@ module.exports = {
     usage: '<wanted> [@user]',
     description: 'Wanted meme',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first() || message.mentions.repliedUser || await client.users.cache.get(args[0]) || message.author,
             avatar = user.displayAvatarURL({ format: 'png' }),

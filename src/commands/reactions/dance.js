@@ -11,7 +11,7 @@ module.exports = {
   usage: '<dance> [motivo]',
   description: 'Dançar faz bem pro corpo',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Dance[Math.floor(Math.random() * g.Dance.length)]

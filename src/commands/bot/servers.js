@@ -9,7 +9,7 @@ module.exports = {
     usage: '<servers>',
     description: 'Meus servidores',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const Embed = new MessageEmbed()
             .setColor('#246FE0')

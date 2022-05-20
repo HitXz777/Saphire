@@ -12,7 +12,7 @@ module.exports = {
   usage: '<puff> [motivo]',
   description: 'Deboche... ai ai',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Deboche[Math.floor(Math.random() * g.Deboche.length)]

@@ -8,7 +8,7 @@ module.exports = {
     usage: '<blockcommands> <info>',
     description: 'Bloqueie comandos especificos em canais especificos',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let guildData = await Database.Guild.findOne({ id: message.guild.id }, 'CommandBlocks'),
             blockCommands = guildData.CommandBlocks || [],

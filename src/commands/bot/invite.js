@@ -10,7 +10,7 @@ module.exports = {
     usage: '<invite>',
     description: 'Me convide para seu servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const invite = client.generateInvite(
             {

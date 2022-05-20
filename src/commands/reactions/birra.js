@@ -11,7 +11,7 @@ module.exports = {
   usage: '<birra> [motivo]',
   description: 'Draminha padrão de cada dia',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Birra[Math.floor(Math.random() * g.Birra.length)]

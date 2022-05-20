@@ -8,7 +8,7 @@ module.exports = {
     usage: '<gay> [@user]',
     description: 'Quanto % @user é gay?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let num = Math.floor(Math.random() * 100) + 1,
             user = message.mentions.members.first() || message.member,

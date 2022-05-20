@@ -11,7 +11,7 @@ module.exports = {
     usage: '<sticker> |messageMention| [stickerName]',
     description: 'Adicione figurinhas facilmente no servidor.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let tierGuild = message.guild.premiumTier
         if (tierGuild === 'NONE') return message.reply(`${e.Deny} | O servidor tem que estar pelo menos no nível 1 *(2 boots)* cada liberar está opção.`)

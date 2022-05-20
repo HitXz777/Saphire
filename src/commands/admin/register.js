@@ -9,7 +9,7 @@ module.exports = {
     usage: '<register> <user/guild> <@user/guild>',
     description: 'Registra um usuário ou servidor na minha database',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.Info} | Para registar um usuário na database, diga o \`id, @marque, responda a mensagem\` do usuário.\n${e.Info} | Para registar um servidor, mande uma mensagem no servidor ou diga o ID.\n \n> Comando: \`${prefix}register user/server <id>\``)
 

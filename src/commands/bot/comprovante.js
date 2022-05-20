@@ -9,7 +9,7 @@ module.exports = {
     usage: '<comprovante>',
     description: 'Comprove doações e adquira seu VIP mais bônus',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
             return message.reply(`${e.SaphireObs} | Este é um comando privado do meu servidor de suporte para comprovação de doações. Você fez alguma doação? Simples! Entre no meu servidor e usa o comando \`${prefix}comprovante\`.\nhttps://discord.gg/dDX47fEzb9`)

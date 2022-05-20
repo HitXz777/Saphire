@@ -10,7 +10,7 @@ module.exports = {
     usage: '<nsfw>',
     description: 'Configure um canal para maiores ou menores de idade',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel
 

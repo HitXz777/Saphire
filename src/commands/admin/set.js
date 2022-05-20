@@ -10,7 +10,7 @@ module.exports = {
     usage: '<set> <class> <user> <value>',
     description: 'Permite meus administradores setar valores nos meus sistemas',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = client.users.cache.get(args[1]) || message.mentions.users.first() || message.mentions.repliedUser
 

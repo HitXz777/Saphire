@@ -11,7 +11,7 @@ module.exports = {
     usage: '<lamber> <@user>',
     description: 'Vai um lambidinha?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Lamber[Math.floor(Math.random() * g.Lamber.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

@@ -10,7 +10,7 @@ module.exports = {
     usage: '<ideichannel> [#channel]',
     description: 'Selecione um canal para envio de ideias',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const guildData = await Database.Guild.findOne({ id: message.guild.id }, 'IdeiaChannel'),
             atual = guildData?.IdeiaChannel

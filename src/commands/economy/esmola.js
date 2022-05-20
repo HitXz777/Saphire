@@ -11,7 +11,7 @@ module.exports = {
   usage: '<esmola>',
   description: 'Mendigue dinheiro no chat',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     let autorData = await Database.User.findOne({ id: message.author.id }, 'Timeouts')
 

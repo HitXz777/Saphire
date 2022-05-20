@@ -10,7 +10,7 @@ module.exports = {
     usage: '<ideia> <sua ideia em diante>',
     description: 'Dê suas ideias para o servidor votar',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = await Database.User.findOne({ id: message.author.id }, 'Timeouts.ServerIdeia'),
             Time = user?.Timeouts?.ServerIdeia || 0,

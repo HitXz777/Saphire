@@ -9,7 +9,7 @@ module.exports = {
     usage: '<leave> <GuildID>',
     description: 'Permite meu criador me tirar de qualquer servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.Deny} | Informe o ID do servidor para que eu possa sair.`)
 

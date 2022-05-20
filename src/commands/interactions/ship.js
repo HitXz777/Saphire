@@ -10,7 +10,7 @@ module.exports = {
   usage: '<ship> [@user/@user]',
   description: 'Veja o amor, sinta o amor',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     let user = message.mentions.members.first()
 

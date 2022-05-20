@@ -10,7 +10,7 @@ module.exports = {
     usage: '<disconnect> <@user/id>',
     description: 'Tire alguém da chamada',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0]) || message.member
         if (user.id === message.author.id) return AutoDisconnect()

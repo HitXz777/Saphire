@@ -11,7 +11,7 @@ module.exports = {
   usage: '<wow> [motivo]',
   description: 'Não acredito :o',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Surprise[Math.floor(Math.random() * g.Surprise.length)]

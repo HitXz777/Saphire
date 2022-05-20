@@ -12,7 +12,7 @@ module.exports = {
     usage: '<ban> <@user> [Motivo] | <ban> <list> | <ban> <id>',
     description: 'Banir membros e checagem de bans',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let guildData = await Database.Guild.findOne({ id: message.guild.id }, 'LogChannel'),
             IdChannel = guildData?.LogChannel,

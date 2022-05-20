@@ -12,7 +12,7 @@ module.exports = {
     usage: 'lock <#channel>/<@user>/<@cargo>',
     description: 'Tranque o canal para que ninguém/user fale nele',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel,
             user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0]),

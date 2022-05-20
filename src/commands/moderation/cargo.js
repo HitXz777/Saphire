@@ -14,7 +14,7 @@ module.exports = {
     usage: '<role> <add/remove/edit>... Usa role info aí vai...',
     description: 'Gerencie os cargos do servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let Role = message.mentions.roles.first() || message.guild.roles.cache.get(args[2]) || message.guild.roles.cache.get(args[1]) || message.guild.roles.cache.find(r => r.name == args[1]) || message.guild.roles.cache.find(r => r.name == args[2])
         if (['info', 'help', 'ajuda', 'informações'].includes(args[0]?.toLowerCase()))

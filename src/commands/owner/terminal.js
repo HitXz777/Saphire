@@ -11,7 +11,7 @@ module.exports = {
     usage: '<logs>',
     description: 'Permite meu criador olhar meu terminal',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const msg = await message.reply(`${e.Loading} | Obtendo os dados necessários...`),
             terminal = (await axios.get(`https://discloud.app/status/bot/${client.user.id}/logs`, {

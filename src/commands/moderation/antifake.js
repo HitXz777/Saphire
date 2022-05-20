@@ -10,7 +10,7 @@ module.exports = {
     usage: 'antifake on/off',
     description: 'Ative o sistema de proteção contra fakes',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const guildData = await Database.Guild.findOne({ id: message.guild.id }, 'Antifake'),
             status = guildData?.Antifake

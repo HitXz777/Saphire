@@ -12,7 +12,7 @@ module.exports = {
     usage: '<unban> <id>',
     description: 'Desban membros banidos',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.Info} | Para desbanir um usuário, é necessário o ID dele. Para ver todos os membros banidos do servidor, use \`${prefix}ban list\`, basta copiar o ID e usar \`${prefix}unban ID [...Motivo]\``)
 

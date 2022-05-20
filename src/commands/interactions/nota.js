@@ -7,7 +7,7 @@ module.exports = {
     usage: '<nota> <@user/id>',
     description: 'Quer tal uma avaliação rápida?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[1])
         if (!user) return message.reply(`${e.Info} | @Marca, fale o ID ou responda a mensagem de alguém usando este comando.`)

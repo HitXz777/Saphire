@@ -8,7 +8,7 @@ module.exports = {
     usage: '<dogname> <Nome Do Cahorro(a)>',
     description: 'Escolha um nome pro seu doguinho(a)',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply({
             embeds: [

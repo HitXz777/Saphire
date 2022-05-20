@@ -11,7 +11,7 @@ module.exports = {
   usage: '<happy> [motivo]',
   description: 'Tem coisa melhor do que estar feliz?',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Happy[Math.floor(Math.random() * g.Happy.length)]

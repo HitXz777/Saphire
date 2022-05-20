@@ -12,7 +12,7 @@ module.exports = {
     usage: '<perfil> [@user]',
     description: 'Veja o perfil, seu ou o de alguém',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['refresh', 'reboot', 'restart', 'r', 'att'].includes(args[0]?.toLowerCase())) return refreshProfile()
 

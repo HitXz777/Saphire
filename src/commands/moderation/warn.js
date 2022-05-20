@@ -11,7 +11,7 @@ module.exports = {
     usage: '<warn> <info>',
     description: 'Avise membros por coisas erradas',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return warnInfo()
 

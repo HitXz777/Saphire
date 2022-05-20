@@ -11,7 +11,7 @@ module.exports = {
     usage: '<parças> <1/2/3/4/5> <@user/id>',
     description: 'Junte seus parças no seu perfil',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0]),
             color = await Colors(message.author.id),

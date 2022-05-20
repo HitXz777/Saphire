@@ -11,7 +11,7 @@ module.exports = {
     usage: '<setnickname> <@user>/<NovoNome>',
     description: 'Mude o seu nome ou os dos usuários se tiver cargo',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.guild.members.cache.get(message.mentions.repliedUser?.id) || message.guild.members.cache.find(data => data.displayName?.toLowerCase() === args[0]?.toLowerCase() || data.user.tag?.toLowerCase() === args[0]?.toLowerCase() || data.user.discriminator === args[0] || data.user.id === args[0])
 

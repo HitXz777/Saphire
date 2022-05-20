@@ -13,7 +13,7 @@ module.exports = {
     usage: '<level> [info]',
     description: 'Confira seu nível ou o de alguém',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return LevelInfo()
         if (['acess', 'bgacess'].includes(args[0]?.toLowerCase())) return bgAcess()

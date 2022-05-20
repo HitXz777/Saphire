@@ -12,7 +12,7 @@ module.exports = {
     usage: '<nome do anime>',
     description: 'Pesquisa de Animes',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const e = Database.Emojis
 

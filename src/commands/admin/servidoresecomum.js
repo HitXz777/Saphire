@@ -9,7 +9,7 @@ module.exports = {
     admin: true,
     description: 'Verifica os servidores em comum com um membro',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = client.users.cache.find(data => data.username?.toLowerCase() === args.join(' ')?.toLowerCase() || data.tag?.toLowerCase() === args[0]?.toLowerCase() || data.discriminator === args[0] || data.id === args[0]) || message.mentions.users.first() || message.mentions.repliedUser,
             Guilds = client.guilds.cache,

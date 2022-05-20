@@ -11,7 +11,7 @@ module.exports = {
   usage: '<feet>',
   description: 'Vai um pézinho?',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
 
     let rand = g.Feet[Math.floor(Math.random() * g.Feet.length)]

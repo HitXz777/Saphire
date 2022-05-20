@@ -10,7 +10,7 @@ module.exports = {
     usage: '<bitcoin> | [bitcoin me] | [bitcoin @user]',
     description: 'Bitcoin é uma moeda rara do meu sistema de economia',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.find(data => data.username?.toLowerCase() === args.join(' ')?.toLowerCase() || data.tag?.toLowerCase() === args[0]?.toLowerCase() || data.discriminator === args[0] || data.id === args[0])
 

@@ -9,7 +9,7 @@ module.exports = {
     usage: '<olhar> <@user>',
     description: '👀',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Dedo[Math.floor(Math.random() * g.Dedo.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

@@ -9,5 +9,5 @@ module.exports = {
     usage: '<patnezuko>',
     description: 'Carinho na Nezuko-chan',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => message.reply(e.PatNezuko)
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => message.reply(e.PatNezuko)
 }

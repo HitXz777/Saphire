@@ -13,7 +13,7 @@ module.exports = {
     usage: '<bed> [@user] [@user]',
     description: 'Vai uma caminha?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user1 = message.mentions.users.first()
         if (!user1) return message.reply(`${e.Info} | Tenta assim: \`${prefix}cama @user1 @user2\``)

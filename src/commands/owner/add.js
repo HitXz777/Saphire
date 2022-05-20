@@ -13,7 +13,7 @@ module.exports = {
     usage: '<add> <class> <@user/id> <value>',
     description: 'Permite ao meu criador adicionar qualquer quantia de qualquer item a qualquer usuário',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let u = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.get(args[0]) || client.users.cache.get(args[1])
         let user = client.users.cache.get(u?.id)

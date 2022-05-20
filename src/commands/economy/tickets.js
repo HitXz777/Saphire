@@ -9,7 +9,7 @@ module.exports = {
     usage: '<tickets> [@user/id]',
     description: 'Confira as chances de ganhar na loteria',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const lotery = await Database.Lotery.findOne({ id: client.user.id })
         if (message.author.id === config.ownerId) {

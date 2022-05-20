@@ -6,7 +6,7 @@ module.exports = {
     usage: '<ttt> <@user>',
     description: 'Vai um joguinho da velha?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let emojis = ['❌', '⭕', '➖'],
             e = Database.Emojis,

@@ -9,7 +9,7 @@ module.exports = {
     usage: '<Novo Nome>',
     description: 'Permite meu criador alterar meu nome',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let NewName = args.join(' ')
         if (!NewName) { return message.reply('Forneça um novo nome.') }

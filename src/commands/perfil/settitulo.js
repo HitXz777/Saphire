@@ -9,7 +9,7 @@ module.exports = {
     usage: '<setitulo> <Seu Título>',
     description: 'Escolha um título grandioso',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.TitlePerm Perfil.Titulo'),
             perm = data.Perfil?.TitlePerm,

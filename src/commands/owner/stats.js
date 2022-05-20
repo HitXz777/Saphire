@@ -10,7 +10,7 @@ module.exports = {
     owner: true,
     description: 'Stats Bot',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const msg = await message.reply(`${e.Loading} | Obtendo os dados necessários...`),
             info = (await axios.get(`https://discloud.app/status/bot/${client.user.id}`, {

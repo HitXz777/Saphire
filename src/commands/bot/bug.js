@@ -9,7 +9,7 @@ module.exports = {
     usage: '<bug> <Report um bug>',
     description: 'Report bugs/erros diretamente pro meu criador',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let clientData = await Database.Client.findOne({ id: client.user.id }, 'BlockedUsers'),
             userData = await Database.User.findOne({ id: message.author.id }, 'Timeouts'),

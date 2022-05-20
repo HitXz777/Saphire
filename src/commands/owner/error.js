@@ -10,7 +10,7 @@ module.exports = {
     usage: '<error>',
     description: 'Causa um erro para testar o sistema de segurança',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         return message.reply(a).catch(err => { Error(message, err) })
     }

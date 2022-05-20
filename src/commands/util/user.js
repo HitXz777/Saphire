@@ -9,7 +9,7 @@ module.exports = {
     usage: '<user> <@user>',
     description: 'Veja o nome da conta de alguém',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.member || message.mentions.repliedUser,
             avatar = user.user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 })

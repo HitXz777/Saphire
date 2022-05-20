@@ -11,7 +11,7 @@ module.exports = {
   usage: '<correr> [motivo]',
   description: 'Corre, cooorre',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Correr[Math.floor(Math.random() * g.Correr.length)]

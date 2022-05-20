@@ -8,7 +8,7 @@ module.exports = {
     usage: '<mods>',
     description: 'Moderadores da Saphire',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let clientData = await Database.Client.findOne({ id: client.user.id }, 'Moderadores'),
             mods = clientData?.Moderadores || []

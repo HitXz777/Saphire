@@ -10,7 +10,7 @@ module.exports = {
     usage: '<love> <@user>',
     description: 'O amor é tão lindo',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.TeAmo[Math.floor(Math.random() * g.TeAmo.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

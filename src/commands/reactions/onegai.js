@@ -11,7 +11,7 @@ module.exports = {
   usage: '<onegai> [motivo]',
   description: 'Implorar é prova de humildade',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Onegai[Math.floor(Math.random() * g.Onegai.length)]

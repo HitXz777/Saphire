@@ -12,7 +12,7 @@ module.exports = {
   usage: '<baka> [@user]',
   description: 'Baka baka baka',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     let avatar = message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
       rand = g.Baka[Math.floor(Math.random() * g.Baka.length)],

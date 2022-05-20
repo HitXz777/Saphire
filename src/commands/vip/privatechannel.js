@@ -13,7 +13,7 @@ module.exports = {
     usage: '<privatechannel> [info]',
     description: 'Crie um canal privado só pra você no meu servidor principal',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
             return message.reply(`${e.Deny} | Este é um comando privado do meu servidor principal. Você pode entrar se quiser.\n${config.ServerLink}`)

@@ -12,7 +12,7 @@ module.exports = {
     usage: '<trig> [@user]',
     description: 'Triggeeeeered!',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first() || await message.guild.members.cache.get(args[0]) || message.mentions.repliedUser || message.author
         let avatar = user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 })

@@ -11,7 +11,7 @@ module.exports = {
     usage: '<shrug> [motivo]',
     description: 'Fazer um biquinho fofo',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         
         let rand = g.Shrug[Math.floor(Math.random() * g.Shrug.length)]

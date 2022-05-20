@@ -11,7 +11,7 @@ module.exports = {
   usage: '<olhar> [motivo]',
   description: 'To de olho...',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Olhando[Math.floor(Math.random() * g.Olhando.length)]

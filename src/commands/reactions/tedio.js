@@ -11,7 +11,7 @@ module.exports = {
   usage: '<chateado> [motivo]',
   description: 'Chateadasso/a...',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Chateado[Math.floor(Math.random() * g.Chateado.length)]

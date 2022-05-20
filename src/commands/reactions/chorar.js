@@ -11,7 +11,7 @@ module.exports = {
   usage: '<cry> [motivo]',
   description: 'Chorar as vezes faz bem',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Cry[Math.floor(Math.random() * g.Cry.length)]

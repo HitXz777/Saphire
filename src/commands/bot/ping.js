@@ -8,7 +8,7 @@ module.exports = {
     emoji: '🏓',
     description: 'Ping/Latency do bot',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
         await message.reply(`${e.Loading} Pinging...`).then(msg => {
             msg.edit(`⏱️ Latency Client: ${Math.floor(msg.createdAt - message.createdAt)}ms | Latency Server: ${client.ws.ping}ms`).catch(() => { })
         }).catch(err => {

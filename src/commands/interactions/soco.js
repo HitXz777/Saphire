@@ -11,7 +11,7 @@ module.exports = {
     emoji: `${e.SaphireQ}`,
     usage: '<soco> [@user]',
     description: 'Dê um soco em quem merece',
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Soco[Math.floor(Math.random() * g.Soco.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

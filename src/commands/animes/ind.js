@@ -10,7 +10,7 @@ module.exports = {
     usage: '<ind>',
     description: `Indicações de Animes`,
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let N = Database.Names,
             i = 'Isekai',

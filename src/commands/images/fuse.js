@@ -13,7 +13,7 @@ module.exports = {
     usage: '<fuse> [@user] [@user]',
     description: 'Fusão entre duas imagens',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user1 = message.mentions.users.first()
         if (!user1) return message.reply(`${e.Info} | Tenta assim: \`${prefix}fuse @user1 @user2\``)

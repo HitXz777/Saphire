@@ -11,7 +11,7 @@ module.exports = {
     usage: 'serverlist',
     description: 'Lista de todos os servidores',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const Servers = await client.guilds.cache
 

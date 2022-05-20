@@ -11,7 +11,7 @@ module.exports = {
     usage: '<NovoPrefix> | <reset>',
     description: 'Altere o prefixo ou reset para o padrão.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const prefixembed = new MessageEmbed()
             .setColor('#246FE0')

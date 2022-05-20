@@ -10,7 +10,7 @@ module.exports = {
     usage: '<setstatus> <Seu Novo Status>',
     description: 'Defina seu status no perfil',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.SaphireObs} | Você precisa me dizer qual o seu novo status.`)
 

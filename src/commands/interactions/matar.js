@@ -10,7 +10,7 @@ module.exports = {
     usage: '<matar> <@user>',
     description: 'Huuuum',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Matar[Math.floor(Math.random() * g.Matar.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

@@ -12,7 +12,7 @@ module.exports = {
     emoji: `${e.Info}`,
     description: 'Central de Ajuda',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let SaphireInviteLink = `https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=applications.commands%20bot`,
             PrincipalEmbed = new MessageEmbed()

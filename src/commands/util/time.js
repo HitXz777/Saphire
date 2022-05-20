@@ -10,7 +10,7 @@ module.exports = {
     usage: '<time> <TempoEmNumero>',
     description: 'Conversão de tempo para milisegundo',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0] || args[1])
             return message.reply(`${e.Info} | Forneça uma tempo no formato \`s/m/h/d/y\``)

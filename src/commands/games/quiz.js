@@ -8,7 +8,7 @@ module.exports = {
     usage: 'quiz <info>',
     description: 'Quiz é bem legal, garanto.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rankingControl = [],
             timesSkiped = 0,

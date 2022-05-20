@@ -11,7 +11,7 @@ module.exports = {
     usage: '<setmoeda> [emoji] [NomeDaMoeda]',
     description: 'Configure a moeda do jeito que você quiser',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let guildData = await Database.Guild.findOne({ id: message.guild.id }, 'Moeda')
         let moedaAtual = guildData.Moeda

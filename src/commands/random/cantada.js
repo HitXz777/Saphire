@@ -13,7 +13,7 @@ module.exports = {
   usage: '<cantada>',
   description: 'Veja cantadas muito "boas"',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     let cantadasData = new ark.Database('../../../JSON/cantadas.json'),
       cantadas = cantadasData.get('Cantadas'),

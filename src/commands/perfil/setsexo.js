@@ -10,7 +10,7 @@ module.exports = {
     usage: '<setsexo>',
     description: 'Defina seu sexo no perfil',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.Sexo')
 

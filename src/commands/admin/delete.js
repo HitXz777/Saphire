@@ -11,7 +11,7 @@ module.exports = {
     category: 'owner',
     description: 'Permite meu criador deletar qualquer coisa de qualquer lugar dentro do meu sistema',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply({ embeds: [new MessageEmbed().setColor('#246FE0').setTitle('📋 Comandos Exclusivos de Delete (OWNER)').setDescription('Com este comando, o meu criador torna possível a opção de Deletar qualquer item de qualquer pessoa.').addField('Comando', '`' + prefix + 'del Item @user`').setFooter({ text: `${prefix}itens` })] })
 

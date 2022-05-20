@@ -6,7 +6,7 @@ module.exports = {
     usage: '<gm>',
     description: 'O clássico jogo de memória',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let e = Database.Emojis,
             defaultEmoji = e.duvida || '❔'

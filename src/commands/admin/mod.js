@@ -10,7 +10,7 @@ module.exports = {
     usage: '<mod> <add/remove> <id/@user>',
     description: 'Adiciona ou remove moderadores da Saphire\'s Team',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = client.users.cache.get(args[1]) || message.mentions.users.first() || message.mentions.repliedUser,
             data = await Database.Client.findOne({ id: client.user.id }, 'Blacklist.Users'),

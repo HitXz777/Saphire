@@ -13,7 +13,7 @@ module.exports = {
     usage: '<fire> <@user> [number]',
     description: 'Efeito de queimação',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first() || message.mentions.repliedUser || await client.users.cache.get(args[0]) || message.author
         let avatar = user.displayAvatarURL({ format: 'png' })

@@ -9,7 +9,7 @@ module.exports = {
     usage: '<forca> <info>',
     description: 'Joguinho clássico da forca',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let e = Database.Emojis
 

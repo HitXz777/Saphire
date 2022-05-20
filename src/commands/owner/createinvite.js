@@ -9,7 +9,7 @@ module.exports = {
     usage: '<createinvite> <GuildID>',
     description: 'Permite meu criador criar um convite de qualquer servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.Deny} | Informe o ID do servidor para que eu possa criar o convite.`)
 

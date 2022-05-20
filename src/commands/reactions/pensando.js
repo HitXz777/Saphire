@@ -12,7 +12,7 @@ module.exports = {
   usage: '<pensando> [motivo]',
   description: 'Puts...',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Pensando[Math.floor(Math.random() * g.Pensando.length)]

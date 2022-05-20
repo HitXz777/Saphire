@@ -13,7 +13,7 @@ module.exports = {
     usage: '<bet> <info>',
     description: 'Aposte dinheiro no chat',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let moeda = await Moeda(message),
             color = await Colors(message.author.id)

@@ -11,7 +11,7 @@ module.exports = {
     usage: 'delemoji <emoji> <emoji> <emoji> <emoji>',
     description: 'Delete Emojis do Servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.SaphireHi} | Delete emojis do servidor. Posso deletar vários de uma vez *(Máx 10)*, só mandar seperados com espaços. <EMOJI> <EMOJI> <EMOJI> `)
         if (args[10]) return message.reply(`${e.Deny} | Eu só posso deletar 10 emojis por vez`)

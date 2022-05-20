@@ -9,7 +9,7 @@ module.exports = {
     usage: '<coinflip> <cara/coroa>',
     description: 'Cara ou coroa?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let array = ["cara", "coroa"]
         let rand = array[Math.floor(Math.random() * array.length)]

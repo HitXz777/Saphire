@@ -11,7 +11,7 @@ module.exports = {
     usage: '<autorole> <1/2> <role> | <status> | <1/2> <off>',
     description: 'Selecione um cargo para todos que entrem no servidor.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let role = message.mentions.roles.first(),
             guild = await Database.Guild.findOne({ id: message.guild.id }, 'Autorole'),

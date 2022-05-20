@@ -11,7 +11,7 @@ module.exports = {
     usage: '<explodir> <@user>',
     description: 'Explooooooooosion',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Explodir[Math.floor(Math.random() * g.Explodir.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

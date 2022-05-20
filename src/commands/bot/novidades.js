@@ -10,7 +10,7 @@ module.exports = {
     usage: '<news>',
     description: 'Pegue o cargo de novidades no meu servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
             return message.reply(`${e.Deny} | Este é um comando privado do meu servidor. Se você quiser entrar, só clicar no link. Será muito bem-vindo*(a)*\n \n${config.ServerLink}`)

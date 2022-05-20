@@ -10,7 +10,7 @@ module.exports = {
     usage: '<unlockcommands> <channel>',
     description: 'Destranque meus comandos em canais que foram bloqueados.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel,
             guild = await Database.Guild.findOne({ id: message.guild.id }, 'Blockchannels')

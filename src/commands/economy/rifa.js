@@ -10,7 +10,7 @@ module.exports = {
     usage: '<rifa> <info>',
     description: 'Compre seus números e boa sorte!',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
         
         let moeda = await Moeda(message)
         if (!args[0] || ['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return rifaInfo()

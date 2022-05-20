@@ -11,7 +11,7 @@ module.exports = {
     usage: '<deletar> [@user]',
     description: 'Delete alguém',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.mentions.repliedUser || message.author
         

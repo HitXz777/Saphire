@@ -10,7 +10,7 @@ module.exports = {
     usage: 'emoji <emoji> <emoji> <emoji> <emoji>',
     description: 'Veja os emojis maiores',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.Info} | Usa com algum emoji`)
 

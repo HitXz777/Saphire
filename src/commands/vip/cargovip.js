@@ -13,7 +13,7 @@ module.exports = {
     usage: '<cargovip>',
     description: 'Receba o cargo vip no servidor central',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
             return message.reply(`${e.Deny} | Este é um comando do meu servidor. Você pode entrar clicando no link:\n${config.ServerLink}`)

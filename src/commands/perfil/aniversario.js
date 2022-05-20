@@ -10,7 +10,7 @@ module.exports = {
     usage: '<niver> <dia> <mes> <ano>',
     description: 'Configure seu aniversário no seu perfil',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply({
             embeds: [

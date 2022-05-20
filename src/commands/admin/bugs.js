@@ -9,7 +9,7 @@ module.exports = {
     admin: true,
     description: 'Permite meus administradores ver a lista de comandos bugados',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let clientData = await Database.Client.findOne({ id: client.user.id }, 'ComandosBloqueados')
         let bugs = clientData.ComandosBloqueados || []

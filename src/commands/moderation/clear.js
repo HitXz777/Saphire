@@ -11,7 +11,7 @@ module.exports = {
   usage: '<clear> [@user/bots/images/all] [quantidade]',
   description: 'Limpezinha básica',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     const clearembed = new MessageEmbed()
       .setColor('#246FE0')

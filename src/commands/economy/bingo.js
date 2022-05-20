@@ -10,7 +10,7 @@ module.exports = {
     usage: '<bingo> quantia',
     description: 'Jogar bingo é divertido',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Balance'),
             clientData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Bingo'),

@@ -10,7 +10,7 @@ module.exports = {
     usage: '<pin> (Mencione a mensagem em forma de resposta)',
     description: 'Fixa a mensagem mencionada',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         message.fetchReference(true).then(msg => {
             if (msg.pinned) return message.reply(`📌 | Este mensagem já está fixada.`)

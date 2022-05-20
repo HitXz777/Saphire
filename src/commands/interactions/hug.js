@@ -11,7 +11,7 @@ module.exports = {
     usage: '<hug> <@user>',
     description: 'Abraçar é tããão bom',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Hug[Math.floor(Math.random() * g.Hug.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

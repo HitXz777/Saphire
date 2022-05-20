@@ -10,7 +10,7 @@ module.exports = {
     usage: '<trabalhar>',
     description: 'Trabalhe e ganhe uma quantia em dinheiro',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let vip = await Vip(`${message.author.id}`),
             moeda = await Moeda(message),

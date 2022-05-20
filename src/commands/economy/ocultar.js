@@ -9,7 +9,7 @@ module.exports = {
     usage: '<ocultar> [off]',
     description: 'Oculte o seu dinheiro para todos',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Perfil.BalanceOcult'),
             oculto = data?.Perfil?.BalanceOcult

@@ -12,7 +12,7 @@ module.exports = {
     usage: 'addemoji <emoji> <emoji> <emoji> <emoji>',
     description: 'Adicione Emojis no Servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.reference?.messageId) {
 

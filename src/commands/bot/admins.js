@@ -8,7 +8,7 @@ module.exports = {
     usage: '<admin>',
     description: 'Administradores da Saphire/Servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['servidor', 'local', 'server', 'guild'].includes(args[0]?.toLowerCase())) return localAdminsGuild()
 

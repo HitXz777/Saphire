@@ -11,7 +11,7 @@ module.exports = {
     usage: '<cancel> <@user>',
     description: 'Cancele os outros',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let cancel = f.Cancelamentos[Math.floor(Math.random() * f.Cancelamentos.length)]
         let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0])

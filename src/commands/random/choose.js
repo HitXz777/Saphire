@@ -8,7 +8,7 @@ module.exports = {
     usage: '<escolha> <opções...>',
     description: 'Deixa que eu escolho pra você',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.channel.send(`${e.Info} | Me de opções que eu escolho uma delas.\n> \`${prefix}choose opção1, opção2, opção3\``)
         if (!args[1]) return message.channel.send(`${e.Deny} | Eu preciso de mais de 1 opção pra fazer uma escolha...`)

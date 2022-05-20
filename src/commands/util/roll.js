@@ -8,7 +8,7 @@ module.exports = {
     usage: '<roll> <número>',
     description: 'Role os dados e tente a sorte',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return RollInfo()
         if (['bet', 'apostar'].includes(args[0]?.toLowerCase())) return newBetRoll()

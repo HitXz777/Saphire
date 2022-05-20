@@ -11,7 +11,7 @@ module.exports = {
     usage: '<bg> <bgCode> <Price> <LinkImage> <DesignerId> <Name>',
     description: 'Permite os administradores do Sistema de Level configurar os wallpapers',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let clientData = await Database.Client.findOne({ id: client.user.id }, 'Administradores'),
             adms = clientData?.Administradores || []

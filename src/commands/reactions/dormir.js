@@ -11,7 +11,7 @@ module.exports = {
   usage: '<dormir> [motivo]',
   description: 'Dormir é tão booom',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Dormir[Math.floor(Math.random() * g.Morrer.length)]

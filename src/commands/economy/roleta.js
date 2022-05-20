@@ -11,7 +11,7 @@ module.exports = {
     usage: '<rol> [quantia/all]',
     description: 'Roleta é um jogo que te faz enlouquecer',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let userData = await Database.User.findOne({ id: message.author.id }, 'Balance Timeouts.Roleta'),
             color = await Colors(message.author.id),

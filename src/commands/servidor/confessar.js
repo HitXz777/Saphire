@@ -10,7 +10,7 @@ module.exports = {
     usage: '<confessar> <sua confissão>',
     description: 'Confesse algo para o servidor. É anônimo.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['set', 'on'].includes(args[0]?.toLowerCase())) return SetNewChannel()
         if (['off', 'desligar'].includes(args[0]?.toLowerCase())) return SetOffChannel()

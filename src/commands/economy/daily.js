@@ -13,7 +13,7 @@ module.exports = {
     usage: '<daily>',
     description: 'Pegue uma recompensa diária',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Timeouts DailyCount'),
             dailyTimeout = authorData?.Timeouts?.Daily || 0,

@@ -10,7 +10,7 @@ module.exports = {
     usage: 'serverinfo',
     description: "Informações sobre o servidor",
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let guild = client.guilds.cache.get(args[0]) || message.guild
 

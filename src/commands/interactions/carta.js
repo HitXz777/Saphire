@@ -9,7 +9,7 @@ module.exports = {
     usage: '<carta> <@user/id> <Sua mensagem em diante>',
     description: 'Envie cartas para as pessoas',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Slot.Cartas Timeouts.Letter'),
             cartas = authorData?.Slot?.Cartas || 0,

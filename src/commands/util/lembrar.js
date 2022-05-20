@@ -13,7 +13,7 @@ module.exports = {
     usage: '<lembrete> <info>',
     description: 'Defina lembrete que eu te aviso no tempo definido',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let ReminderMessage = args.slice(0).join(' '),
             ReminderCode = PassCode(7).toUpperCase()

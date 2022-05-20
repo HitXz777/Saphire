@@ -12,7 +12,7 @@ module.exports = {
     emoji: '🔇',
     usage: '<mute> <@user> [Tempo] [Motivo]',
     description: 'Mutar membros do servidor',
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.guild.members.cache.get(args[0]) || message.mentions.members.first() || message.mentions.repliedUser,
             emojis = ['✅', '❌'],

@@ -9,7 +9,7 @@ module.exports = {
     usage: 'zeppelin <info>',
     description: 'Um jogo de aposta na base da sorte.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let zeppelin = await Database.Client.findOne({ id: client.user.id }, 'Zeppelin'),
             moeda = await Moeda(message)

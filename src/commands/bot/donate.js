@@ -9,7 +9,7 @@ module.exports = {
     usage: '<donate>',
     description: 'Quer me dar um dinheirinho?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const LinkObj = {
             Link1RMercadoPago: 'https://mpago.la/2YbvxZd',

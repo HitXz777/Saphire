@@ -8,7 +8,7 @@ module.exports = {
     usage: '<piada>',
     description: 'Vai uma piadinha aí?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = f.Piadas[Math.floor(Math.random() * f.Piadas.length)]
         return message.reply(rand)

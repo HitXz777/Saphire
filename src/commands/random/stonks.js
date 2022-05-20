@@ -8,7 +8,7 @@ module.exports = {
     usage: '<stonks>',
     description: 'Stonks',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
         let list = ['https://imgur.com/jVL0mbR.gif', 'https://imgur.com/TRHBCon.gif']
         let rand = list[Math.floor(Math.random() * list.length)]
         const embed = new MessageEmbed().setColor('#246FE0').setImage(rand)

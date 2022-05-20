@@ -9,7 +9,7 @@ module.exports = {
     usage: '<say> <conteúdo da sua mensagem>',
     description: 'Diga algo no chat atráves de mim',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let clientData = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores'),
             mods = clientData.Moderadores || [],

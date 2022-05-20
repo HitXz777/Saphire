@@ -10,7 +10,7 @@ module.exports = {
     usage: '<dono>',
     description: 'Veja o dono do servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let owner = message.guild.ownerId
         let avatar = message.guild.iconURL({ dynamic: true })

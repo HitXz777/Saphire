@@ -11,7 +11,7 @@ module.exports = {
     usage: '<antlink> <on/off>',
     description: 'Bloqueie todos os tipos de links no servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.Guild.findOne({ id: message.guild.id }, 'AntLink'),
             status = data.AntLink

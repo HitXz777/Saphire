@@ -8,7 +8,7 @@ module.exports = {
     usage: '<click> <@user>',
     description: 'Quem clicar primeiro ganha ponto',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['help', 'ajuda', 'info'].includes(args[0]?.toLowerCase())) return clickCommandInfo()
 

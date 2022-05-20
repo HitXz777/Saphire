@@ -10,7 +10,7 @@ module.exports = {
     usage: '<chutar> <@user>',
     description: 'Chute alguém',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Chutar[Math.floor(Math.random() * g.Chutar.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

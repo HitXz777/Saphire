@@ -10,7 +10,7 @@ module.exports = {
     usage: '<tocaai> <@user>',
     description: 'Cumprimentos sempre são legais',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Tocaai[Math.floor(Math.random() * g.Tocaai.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

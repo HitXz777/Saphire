@@ -10,7 +10,7 @@ module.exports = {
     usage: '<t> <sigla> <texto para traduzir>',
     description: 'Traduza palavras e textos de qualquer língua',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let googlepng = 'https://imgur.com/9kWn6Qp.png'
 

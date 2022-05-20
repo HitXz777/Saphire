@@ -9,7 +9,7 @@ module.exports = {
     usage: 'data',
     description: 'Todos os seus dados presentes no banco de dados',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const msg = await message.reply(`${e.Loading} | Obtendo os dados necessários...`),
             data = await Database.User.findOne({ id: message.author.id })

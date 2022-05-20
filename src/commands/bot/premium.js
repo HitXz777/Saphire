@@ -6,7 +6,7 @@ module.exports = {
     emoji: e.CoroaDourada,
     description: 'Informações sobre o sistema premium',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         return message.reply(
             {

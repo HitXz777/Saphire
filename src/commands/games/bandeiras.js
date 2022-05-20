@@ -10,7 +10,7 @@ module.exports = {
     usage: '<bandeiras> <info>',
     description: 'Adivinhe o país das bandeiras',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let flags = Database.Flags.get('Flags') || [],
             control = { atualFlag: {}, usersPoints: [], rounds: 0, collected: false, winners: [], alreadyAnswer: [], wrongAnswers: [] },

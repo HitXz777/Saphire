@@ -10,7 +10,7 @@ module.exports = {
     usage: '<dias> [anos]',
     description: 'Quanto tempo eu vivi?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) return message.reply(`${e.QuestionMark} | Você precisa dizer sua data de aniversário.`)
         if (args[3]) return message.reply(`${e.SaphireWhat} | Nada além da sua data de aniversário.`)

@@ -8,7 +8,7 @@ module.exports = {
   category: 'bot',
   emoji: `${e.Info}`,
   description: "Estatisticas do bot",
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     const msg = await message.reply(`${e.Loading} | Obtendo dados e construindo embed...`)
 

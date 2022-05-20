@@ -11,7 +11,7 @@ module.exports = {
   usage: '<risada> [motivo]',
   description: 'Rir é o melhor remédio',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Risada[Math.floor(Math.random() * g.Risada.length)]

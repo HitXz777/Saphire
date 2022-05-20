@@ -10,7 +10,7 @@ module.exports = {
     usage: '<serverpremium> <add/remove/list> <serverId>',
     description: 'Comando de ativação de servidores premium',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.Client.findOne({ id: client.user.id }, 'PremiumServers'),
             server = client.guilds.cache.get(args[1]),
@@ -103,7 +103,7 @@ module.exports = {
                     control++
                     return embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control--
                 }
-                retrun
+                return
             })
 
             collector.on('end', () => msg.edit({ content: `${e.Deny} Comando cancelado.` }).catch(() => { }))

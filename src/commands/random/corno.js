@@ -7,7 +7,7 @@ module.exports = {
     usage: '<corno> [@user]',
     description: 'Quanto % @user é corno(a)?',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let num = Math.floor(Math.random() * 100) + 1,
             user = message.mentions.members.first() || message.member,

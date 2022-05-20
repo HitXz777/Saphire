@@ -9,7 +9,7 @@ module.exports = {
     usage: '<random> <pergunta>',
     description: 'Pergunta que eu respondo',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let respostas = f['8Ball'][Math.floor(Math.random() * f['8Ball'].length)]
         let pergunta = args.join(" ")

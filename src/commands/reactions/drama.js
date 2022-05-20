@@ -11,7 +11,7 @@ module.exports = {
   usage: '<drama> [motivo]',
   description: 'Um draminha não faz mal a ninguém',
 
-  run: async (client, message, args, prefix, MessageEmbed, Database) => {
+  execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
     let rand = g.Drama[Math.floor(Math.random() * g.Drama.length)]

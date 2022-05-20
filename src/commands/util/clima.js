@@ -11,7 +11,7 @@ module.exports = {
     usage: '<clima> <SiglaDaCidade/Pais> | <Nome da Cidade>',
     description: 'Veja o tempo da sua cidade',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const noargs = new MessageEmbed()
             .setColor('#246FE0')

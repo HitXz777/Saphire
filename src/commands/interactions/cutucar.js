@@ -11,7 +11,7 @@ module.exports = {
     usage: '<cutucar> <@user>',
     description: 'Cutucar irrita, faz isso não',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Cutucar[Math.floor(Math.random() * g.Cutucar.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

@@ -11,7 +11,7 @@ module.exports = {
     usage: '<spotify> [@user]',
     description: 'Veja o que os outros estão escutando',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.mentions.repliedUser || message.member,
             avatar = user.user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),

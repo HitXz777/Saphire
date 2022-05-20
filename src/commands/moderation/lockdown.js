@@ -7,7 +7,7 @@ module.exports = {
     usage: '<lockdown> <info>',
     description: 'Tranque todos os canais do servidor em caso de emergência.',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let e = Database.Emojis,
             user = message.mentions.members.first()

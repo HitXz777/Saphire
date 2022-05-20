@@ -13,7 +13,7 @@ module.exports = {
     usage: '<levelwallpapers> [all]',
     description: 'Confira os wallpapers de level',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (['servidor', 'server'].includes(args[0]?.toLowerCase()))
             return message.reply(`${e.SaphireHi} | Este é o link do chat onde está armazenado todos os wallpapers do level.\nhttps://discord.gg/FcF8w46EAF`)

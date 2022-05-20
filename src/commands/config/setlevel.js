@@ -11,7 +11,7 @@ module.exports = {
     usage: '<levelchannel> [on/off]',
     description: 'Escolha um canal para eu notificar todos que passam de nível',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel,
             guildData = await Database.Guild.findOne({ id: message.guild.id }, 'XpSystem'),

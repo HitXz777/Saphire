@@ -9,7 +9,7 @@ module.exports = {
     usage: '<raspadinha>',
     description: 'Jogue na raspadinha e tente a sorte grande!',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.User.findOne({ id: message.author.id }, 'Slot.Raspadinhas')
         if (!data) return message.reply(`${e.Database} | DATABASE | Tente novamente por favor.`)

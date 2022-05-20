@@ -10,7 +10,7 @@ module.exports = {
     usage: '<servername> <Novo Nome>',
     description: 'Mude o nome do servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let Name = args.join(' ')
         if (!Name) return message.reply(`${e.Deny} | Escolha um nome para o seu servidor`)

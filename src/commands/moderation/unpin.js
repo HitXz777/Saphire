@@ -10,7 +10,7 @@ module.exports = {
     usage: '<unpin> (Mencione a mensagem para dar um unpin)',
     description: 'Desfixa a mensagem mencionada',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         message.fetchReference(true).then(msg => {
             if (!msg.pinned) return message.reply(`${e.Deny} | Este mensagem não está fixada.`)

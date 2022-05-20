@@ -11,7 +11,7 @@ module.exports = {
     usage: '<cumprimentar> <@user>',
     description: 'Cumprimente alguém',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Cumprimentar[Math.floor(Math.random() * g.Cumprimentar.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

@@ -10,7 +10,7 @@ module.exports = {
     usage: '<block> <ID> | <remove>',
     description: 'Permite meus administradores des/bloquear usuários que abusam do comando bug',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.Client.findOne({ id: client.user.id }, 'BlockedUsers'),
             bloqueados = data.BlockedUsers || [],

@@ -11,7 +11,7 @@ module.exports = {
     usage: '<tapão> [@user]',
     description: 'Tapão',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let user = message.mentions.users.first() || message.mentions.repliedUser || message.author,
             avatar = user.displayAvatarURL({ dynamic: false, format: "png", size: 1024 }),

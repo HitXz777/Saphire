@@ -10,7 +10,7 @@ module.exports = {
     usage: '<lutar> <@user>',
     description: 'Treta, treta',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Lutar[Math.floor(Math.random() * g.Lutar.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

@@ -11,7 +11,7 @@ module.exports = {
     usage: '<color> <ColorName>/<#hex>',
     description: `Cores em #HEX. Use \`cor\` para mais informações.`,
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const embed = new MessageEmbed().setFooter({ text: `${prefix}cor #hex` })
         const N = Database.Names

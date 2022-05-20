@@ -11,7 +11,7 @@ module.exports = {
     usage: '<ascii> <texto>',
     description: 'Transforme textos em ASCII',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!args[0]) { return message.reply(`${e.Deny} | Diga algo para que eu posso transformar em ASCII, algo entre **1~12 Caracteres**.`) }
         if (args.join(' ').length >= 13) { return message.reply(`${e.Deny} | A mensagem não pode ultrapassar **12 caracteres**.`) }

@@ -13,7 +13,7 @@ module.exports = {
     usage: 'hide <#channel>/<user>',
     description: 'Esconda o canal de todos (Exceto de quem tem permissão)',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         
         let channel = message.mentions.channels.first() || message.channel

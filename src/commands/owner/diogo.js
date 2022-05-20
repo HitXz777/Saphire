@@ -8,7 +8,7 @@ module.exports = {
     usage: '<diogo>',
     description: 'Registros de comandos em .JSON',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (!['327332773108908032', '451619591320371213'].includes(message.author.id)) return message.reply(`${e.Deny} | Você não tem acesso a este comando.`)
 

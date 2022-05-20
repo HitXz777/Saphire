@@ -8,7 +8,7 @@ module.exports = {
     usage: '<sugerir>',
     description: 'Sugira algo para que meu criador insira no meu sistema',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
         return message.reply(`${e.SaphireFeliz} | Você pode mandar suas ideias no meu formulário! Aqui está o link: ${config.GoogleForm}`)
     }
 }

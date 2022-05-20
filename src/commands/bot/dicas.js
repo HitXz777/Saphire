@@ -8,7 +8,7 @@ module.exports = {
     usage: '<dicas>',
     description: 'Dicas da Saphire',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let Dicas = Database.Frases.get('f')?.Dicas || []
 

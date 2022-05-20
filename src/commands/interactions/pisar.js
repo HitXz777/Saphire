@@ -10,7 +10,7 @@ module.exports = {
     usage: '<pisar> <@user>',
     description: 'Pisa, pisa, pisa!',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Pisar[Math.floor(Math.random() * g.Pisar.length)],
             user = message.mentions.members.first() || message.mentions.repliedUser

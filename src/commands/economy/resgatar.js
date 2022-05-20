@@ -9,7 +9,7 @@ module.exports = {
     usage: '<resgatar>',
     description: 'Resgate seu dinheiro em cache',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let data = await Database.Client.findOne({ id: client.user.id }, 'VipCodes'),
             codes = data?.VipCodes

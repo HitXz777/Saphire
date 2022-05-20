@@ -8,7 +8,7 @@ module.exports = {
     usage: '<servericon>',
     description: 'Veja o icone do servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let icon = message.guild.iconURL({ dynamic: true })
 

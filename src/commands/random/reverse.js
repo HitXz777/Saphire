@@ -9,7 +9,7 @@ module.exports = {
     usage: '<reverse> <text>',
     description: 'Inverta os textos',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let text = args.join(" ")
 

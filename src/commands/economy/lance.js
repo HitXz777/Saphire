@@ -11,7 +11,7 @@ const { e } = require('../../../JSON/emojis.json'),
     usage: '<lance> <quantia>',
     description: 'Lance dinheiro no chat',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Balance Cache'),
             money = parseInt(authorData.Balance) || 0,

@@ -11,7 +11,7 @@ module.exports = {
     usage: '<pig> [coins/status]',
     description: 'Tente obter toda a grana do porquinho',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Timeouts Balance'),
             clientData = await Database.Client.findOne({ id: client.user.id }, 'Porquinho'),

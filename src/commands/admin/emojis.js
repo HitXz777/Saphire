@@ -12,7 +12,7 @@ module.exports = {
     usage: '<setemoji> <add/remove> <emoji>',
     description: 'Permite meus administradores adicionar ou remover emojis do meu banco de dados',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const owner = message.author.id === config.ownerId,
             e = emojis.get('e')

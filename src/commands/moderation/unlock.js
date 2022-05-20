@@ -11,7 +11,7 @@ module.exports = {
     usage: 'unlock <#channel>/<@user>',
     description: 'Abra o canal para todos/user falarem',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let channel = message.mentions.channels.first() || message.channel,
             user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0]),

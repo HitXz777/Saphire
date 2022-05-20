@@ -8,7 +8,7 @@ module.exports = {
     usage: '<vip>',
     description: 'Informações sobre o vip',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const link1Real = 'https://mpago.la/2YbvxZd'
         const LinkServidor = `${config.ServerLink}`

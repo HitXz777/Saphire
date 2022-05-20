@@ -10,7 +10,7 @@ module.exports = {
     usage: '<eval> <code>',
     description: 'Permite meu criador testar códigos',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let code = args.join(" "),
             result,

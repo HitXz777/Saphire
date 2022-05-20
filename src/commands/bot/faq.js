@@ -9,7 +9,7 @@ module.exports = {
     usage: '<faq>',
     description: 'Obtenha ajuda com a Saphire nas perguntas frequentes',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
         
         const link1Real = 'https://mpago.la/2YbvxZd'
         const LinkServidor = `${config.ServerLink}`

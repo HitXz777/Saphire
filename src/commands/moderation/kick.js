@@ -10,7 +10,7 @@ module.exports = {
     usage: '<kick> <@user> [ID]',
     description: 'Expulse membros do servidor',
 
-    run: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let toSearch = message.guild.members.cache.get(args[0]) || message.mentions.members.first() || message.mentions.repliedUser
         let member = message.guild.members.cache.get(toSearch?.id)

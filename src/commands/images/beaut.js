@@ -10,7 +10,7 @@ module.exports = {
         usage: '<beaut> [@user]',
         description: 'Simplesmente bonito/a',
 
-        run: async (client, message, args, prefix, MessageEmbed, Database) => {
+        execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
                 let user = message.mentions.members.first() || message.member
 
