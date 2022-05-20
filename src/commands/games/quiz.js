@@ -4,6 +4,7 @@ const { e } = require('../../../JSON/emojis.json'),
 
 module.exports = {
     name: 'quiz',
+    aliases: ['q'],
     category: 'games',
     emoji: `${e.QuestionMark}`,
     usage: 'quiz <info>',
@@ -17,9 +18,11 @@ module.exports = {
             fastMode = 25000
 
         if (['status', 'stats', 'st'].includes(args[0]?.toLowerCase())) return quizStatus()
-        if (['reset', 'reboot', 'r', 'del', 'delete'].includes(args[0]?.toLowerCase())) return resetQuizChannels()
+        if (['reset', 'reboot', 'r'].includes(args[0]?.toLowerCase())) return resetQuizChannels()
         if (['add', 'adicionar', 'new', '+'].includes(args[0]?.toLowerCase())) return addCharacter()
+        if (['del', 'deletar', 'remove', '+', 'excluir'].includes(args[0]?.toLowerCase())) return deleteCharacter()
         if (['personagem', 'p', 'character', 'image'].includes(args[0]?.toLowerCase())) return showCharacter()
+        if (['edit', 'editar'].includes(args[0]?.toLowerCase())) return editCharacter()
         if (['list', 'lista', 'all', 'full'].includes(args[0]?.toLowerCase())) return listCharacters()
         return chooseMode()
 
@@ -103,7 +106,9 @@ module.exports = {
 
             let allData = Database.Characters.get('Characters')
 
-            let data = allData?.find(p => p.name === args[1] || p.name === args.join(' ')?.toLowerCase() || p.image === args[0]) || null
+            let data = allData?.find(p => p.name.toLowerCase() === args.join(' ')?.toLowerCase()
+                || p.name.toLowerCase().includes(args[1]?.toLowerCase())
+                || p.image === args[0]) || null
 
             if (!data.image)
                 return message.reply(`${e.Deny} | Os moderadores do *Quiz Anime Theme* ainda não adicionaram esse personagem.`)
@@ -177,7 +182,7 @@ module.exports = {
                     interaction.deferUpdate().catch(() => { })
 
                     let customId = interaction.values[0]
-                    if (customId === 'animeMode') return
+                    if (customId === 'animeMode') return msg.edit(`${e.Warn} | Este comando está em construção.`)
                     if (customId === 'cancel') return collector.stop()
                     if (customId === 'quizInfo') return quizInfo(msg)
 
@@ -448,7 +453,7 @@ module.exports = {
                 return message.reply(`${e.Deny} | Esse personagem já existe no banco de dados.`)
 
             let msg = await message.reply({
-                content: `${e.QuestionMark} | Você confirma adicionar o personagem **\`${name}\`** no banco de dados do **Quiz Anime Theme**?`,
+                content: `${e.QuestionMark} | Você confirma adicionar o personagem **\`${formatString(name)}\`** no banco de dados do **Quiz Anime Theme**?`,
                 embeds: [{
                     color: client.blue,
                     image: { url: image || null },
@@ -476,6 +481,183 @@ module.exports = {
                         embeds: [{
                             color: client.blue,
                             image: { url: image || null },
+                            description: null
+                        }]
+                    }).catch(() => { })
+                })
+                .on('end', () => {
+                    if (clicked) return
+                    return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [] }).catch(() => { })
+                })
+        }
+
+        async function editCharacter() {
+
+            let { Rody, Gowther } = Database.Names
+
+            if (![Rody, Gowther].includes(message.author.id))
+                return message.reply(`${e.Admin} | Apenas os administradores do quiz *Anime Theme* tem o poder de editar personagens.`)
+
+            let characters = Database.Characters.get('Characters') || []
+
+            if (['nome', 'name'].includes(args[1]?.toLowerCase())) return editName()
+            if (['link', 'image', 'imagem', 'foto', 'personagem', 'p'].includes(args[1]?.toLowerCase())) return editImage()
+            return message.reply(`${e.Deny} | Forneça o nome ou o link da imagem para que eu possa buscar um personagem no banco de dados. Logo após, forneça o conteúdo a ser editado.\n\`${prefix}quiz edit <name/image> <Nome/Link>\`\n\`<comando> <editar> <oq editar> <quem editar>\``)
+
+            async function editName() {
+
+                let request = args.slice(2).join(' ')
+
+                if (!request)
+                    return message.reply(`${e.Deny} | Forneça o nome ou o link da imagem do personagem que você quer editar o nome.\n\`${prefix}quiz edit name <Nome do Personagem> ou <Link Do Personagem>\``)
+
+                let has = characters?.find(p => p.name.toLowerCase() === request?.toLowerCase()
+                    || p.name.toLowerCase().includes(request?.toLowerCase())
+                    || p.image === request) || null
+
+                if (!has)
+                    return message.reply(`${e.Deny} | Nenhum personagem foi encontrado com o requisito: \`${request}\``)
+
+                let embed = {
+                    color: client.blue,
+                    title: `${e.Database} Database's Edit Information System`,
+                    description: `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Name\`**`,
+                    image: { url: has.image || null },
+                    footer: { text: 'Quiz Anime Theme Selection' }
+                }
+
+                let msg = await message.reply({
+                    content: `${e.Loading} | Diga no chat o novo nome do personagem. Para cancelar, digite \`CANCEL\``,
+                    embeds: [embed]
+                })
+
+                let collector = msg.channel.createMessageCollector({
+                    filter: m => m.author.id === message.author.id,
+                    time: 30000,
+                    erros: ['time']
+                })
+                    .on('collect', Message => {
+
+                        if (Message.content === 'CANCEL') return collector.stop()
+
+                        let alreadyHas = characters?.find(p => p.name.toLowerCase() === Message.content?.toLowerCase()
+                            || p.name.toLowerCase().includes(Message.content?.toLowerCase())
+                            || p.image === Message.content) || null
+
+                        if (alreadyHas && alreadyHas.name.toLowerCase() === Message.content.toLowerCase())
+                            return Message.reply(`${e.Deny} | Este nome já pertence a este personagem`)
+
+                        if (alreadyHas)
+                            return Message.reply(`${e.Deny} | Este nome já pertence a um personagem no banco de dados.`)
+
+                        control.collected = true
+
+                        embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Name\`**\nNew Name: \`${formatString(Message.content)}\``
+
+                        msg.edit({
+                            content: `${e.Loading} | Confirme as informações abaixo caso tudo esteja correto.`,
+                            embeds: [embed]
+                        }).catch(() => { })
+
+                        let emojis = ['✅', '❌']
+
+                        for (let i of emojis) msg.react(i).catch(() => { })
+
+                        return msg.createReactionCollector({
+                            filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                            time: 60000,
+                            max: 1,
+                            erros: ['time', 'max']
+                        })
+                            .on('collect', (reaction) => {
+
+                                if (reaction.emoji.name === emojis[1]) return
+
+                                control.collectedReaction = true
+
+                                let newSet = characters.filter(data => data.name !== has.name)
+
+                                Database.Characters.set('Characters', [{ name: Message.content, image: has.image }, ...newSet])
+
+                                embed.color = client.green
+                                embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Name\`**\nNew Name: \`${formatString(Message.content)}\``
+
+                                return msg.edit({
+                                    content: `${e.Check} | O nome do personagem **\`${formatString(has.name)}\`** foi alterado para **\`${formatString(Message.content)}\`**`,
+                                    embeds: [embed]
+                                }).catch(() => { })
+
+                            })
+                            .on('end', () => {
+                                if (control.collectedReaction) return
+                                return msg.edit({
+                                    content: `${e.Deny} | Comando cancelado.`,
+                                    embeds: []
+                                }).catch(() => { })
+                            })
+                    })
+                    .on('end', () => {
+                        if (control.collected) return
+                        return msg.edit({
+                            content: `${e.Deny} | Comando cancelado.`,
+                            embeds: []
+                        }).catch(() => { })
+                    })
+            }
+        }
+
+        async function deleteCharacter() {
+
+            let { Rody, Gowther } = Database.Names
+
+            if (![Rody, Gowther].includes(message.author.id))
+                return message.reply(`${e.Admin} | Apenas os administradores do quiz *Anime Theme* tem o poder de deletar personagens.`)
+
+            let characters = Database.Characters.get('Characters') || [],
+                image = args[1],
+                name = args.slice(1).join(' ')?.toLowerCase()
+
+            if (!image)
+                return message.reply(`${e.Deny} | \`${prefix}quiz del <imageLink> <Nome do Personagem>\``)
+
+            let has = characters?.find(p => p.name.toLowerCase() === args.join(' ')?.toLowerCase()
+                || p.name.toLowerCase().includes(args[1]?.toLowerCase())
+                || p.image === args[0]) || null
+
+            if (!has)
+                return message.reply(`${e.Deny} | Esse personagem não existe no banco de dados.`)
+
+            let msg = await message.reply({
+                content: `${e.QuestionMark} | Você confirma deletar o personagem **\`${formatString(has.name)}\`** do banco de dados do **Quiz Anime Theme**?`,
+                embeds: [{
+                    color: client.blue,
+                    image: { url: has.image || null },
+                    description: 'Se a imagem do personagem não aparecer, quer dizer que o link não é compatível.'
+                }]
+            }),
+                emojis = ['✅', '❌'], clicked = false
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+            let collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 60000,
+                max: 1,
+                erros: ['time', 'max']
+            })
+                .on('collect', (r) => {
+
+                    if (r.emoji.name === emojis[1])
+                        return collector.stop()
+
+                    clicked = true
+                    let newSet = characters.filter(data => data.name !== has.name)
+
+                    Database.Characters.set('Characters', [...newSet])
+                    return msg.edit({
+                        content: `${e.Check} | O personagem **\`${formatString(has.name)}\`** foi deletado com sucesso!`,
+                        embeds: [{
+                            color: client.blue,
+                            image: { url: has.image || null },
                             description: null
                         }]
                     }).catch(() => { })

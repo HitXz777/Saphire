@@ -290,10 +290,9 @@ module.exports = {
                         return collector.stop()
 
                     clicked = true
-                    let flagIndex = flags.findIndex(data => data.flag == args1 || data.country == args1 || data.image == args1)
+                    let newSet = flags.filter(data => data.country !== has.country)
 
-                    flags.splice(flagIndex, 1)
-                    Database.Flags.set('Flags', flags)
+                    Database.Flags.set('Flags', [...newSet])
                     return msg.edit(`${e.Check} | A bandeira "**${has.flag || '\`EMOJI NOT FOUND\`'} - ${formatString(has.country) || '\`NAME NOT FOUND\`'}**" foi removida com sucesso!\n${has.image || '\`IMAGE NOT FOUND\`'}`).catch(() => { })
                 })
                 .on('end', () => {
