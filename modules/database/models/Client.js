@@ -4,6 +4,7 @@ module.exports = model("Client", new Schema({
     id: { type: String, unique: true },
     Timeouts: { RestoreDividas: Number },
     ComandosUsados: Number,
+    CommandsCount: Object,
     Moderadores: Array,
     Administradores: Array,
     TopGlobal: Object,

@@ -124,7 +124,7 @@ client.on('messageCreate', async message => {
     limited = rateLimiter.take(message.author.id)
     if (limited) return message.react('⏱️').catch(() => message.reply('⏱️ | Calminha!'))
 
-    Database.newCommandRegister(message, data(), client.user.id)
+    Database.newCommandRegister(message, data(), client.user.id, command.name)
 
     return command.execute(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
 

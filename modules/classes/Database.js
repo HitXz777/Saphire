@@ -26,7 +26,7 @@ class Database extends Models {
             Rody: "451619591320371213",
             Gowther: "315297741406339083",
             Makol: "351903530161799178",
-            Moana:  "737238491842347098",
+            Moana: "737238491842347098",
             Dspofu: "781137239194468403",
             Pepy: "830226550116057149"
         }
@@ -170,7 +170,7 @@ Database.prototype.addGamingPoint = async (userId, type, value) => {
 
     if (!userId || !type || isNaN(value)) return
 
-            // TODO: Adicionar o Flag Gaming no ranking
+    // TODO: Adicionar o Flag Gaming no ranking
     await User.updateOne(
         { id: userId },
         { $inc: { [`GamingCount.${type}`]: value } },
@@ -321,7 +321,7 @@ Database.prototype.registerServer = async (guild, client) => {
     return true
 }
 
-Database.prototype.newCommandRegister = async (message, date, clientId) => {
+Database.prototype.newCommandRegister = async (message, date, clientId, commandName) => {
 
     new LogRegister({
         Author: `${message.author.tag} - ${message.author.id}` || 'Indefinido',
@@ -332,7 +332,12 @@ Database.prototype.newCommandRegister = async (message, date, clientId) => {
 
     await Client.updateOne(
         { id: clientId },
-        { $inc: { ComandosUsados: 1 } },
+        {
+            $inc: {
+                ComandosUsados: 1,
+                [`CommandsCount.${commandName}`]: 1
+            }
+        },
         { upsert: true }
     )
 
