@@ -310,7 +310,7 @@ module.exports = {
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de Bandeiras.`)
 
             if (!flags || flags.length === 0)
-                return message.reply(`${e.Deny} | Não há nenhuma bandeira no meu bando de dados.`)
+                return message.reply(`${e.Deny} | Não há nenhuma bandeira no meu banco de dados.`)
 
             let embeds = EmbedGenerator(),
                 control = 0

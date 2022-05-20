@@ -8,8 +8,6 @@ const client = require('../../index'),
     Ark = require('ark.db'),
     eData = new Ark.Database('../../JSON/emojis.json'),
     configData = new Ark.Database('../../JSON/config.json'),
-    Frases = new Ark.Database('../../JSON/frases.json'),
-    Flags = new Ark.Database('../../JSON/flags.json'),
     Models = require('../database/Models'),
     config = configData.get('config'),
     e = eData.get('e')
@@ -19,9 +17,10 @@ class Database extends Models {
         super()
         this.BgLevel = new Ark.Database('../../JSON/levelwallpapers.json')
         this.Emojis = e
-        this.dbEmoji = eData
-        this.Frases = Frases
-        this.Flags = Flags
+        this.dbEmoji = new Ark.Database('../../JSON/emojis.json')
+        this.Frases = new Ark.Database('../../JSON/frases.json')
+        this.Characters = new Ark.Database('../../src/commands/games/JSON/characters.json')
+        this.Flags = new Ark.Database('../../src/commands/games/JSON/flags.json')
         this.Names = {
             Rody: "451619591320371213",
             Gowther: "315297741406339083",

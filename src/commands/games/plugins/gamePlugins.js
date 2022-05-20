@@ -1,7 +1,7 @@
 const Database = require('../../../../modules/classes/Database'),
     client = require('../../../../index')
 
-// Flag Gaming
+// Flag Gaming - Quiz Anime Theme
 function formatString(string) {
 
     let tras = false

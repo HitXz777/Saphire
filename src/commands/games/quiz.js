@@ -1,5 +1,6 @@
-const { e } = require('../../../JSON/emojis.json')
-const quizData = require('../../../JSON/quiz.json')
+const { e } = require('../../../JSON/emojis.json'),
+    quizData = require('../../../JSON/quiz.json'),
+    { formatString } = require('./plugins/gamePlugins')
 
 module.exports = {
     name: 'quiz',
@@ -12,15 +13,15 @@ module.exports = {
 
         let rankingControl = [],
             timesSkiped = 0,
-            accept = false,
-            skipped = false,
+            control = {},
             fastMode = 25000
 
-        if (!args[0] || ['help', 'info', 'ajuda'].includes(args[0]?.toLowerCase())) return quizInfo()
         if (['status', 'stats', 'st'].includes(args[0]?.toLowerCase())) return quizStatus()
-        if (['start', 'começar', 'init', 's'].includes(args[0]?.toLowerCase())) return init()
         if (['reset', 'reboot', 'r', 'del', 'delete'].includes(args[0]?.toLowerCase())) return resetQuizChannels()
-        return quizInfo()
+        if (['add', 'adicionar', 'new', '+'].includes(args[0]?.toLowerCase())) return addCharacter()
+        if (['personagem', 'p', 'character', 'image'].includes(args[0]?.toLowerCase())) return showCharacter()
+        if (['list', 'lista', 'all', 'full'].includes(args[0]?.toLowerCase())) return listCharacters()
+        return chooseMode()
 
         async function quizStatus() {
 
@@ -33,9 +34,10 @@ module.exports = {
 
         }
 
-        function quizInfo() {
-            return message.reply(
+        function quizInfo(msg) {
+            return msg.edit(
                 {
+                    content: null,
                     embeds: [
                         new MessageEmbed()
                             .setColor(client.blue)
@@ -69,7 +71,7 @@ module.exports = {
                             .setFooter({ text: `${quizData?.length || 0} perguntas ativas` })
                     ]
                 }
-            )
+            ).catch(() => { })
         }
 
         async function init(isJumped) {
@@ -78,7 +80,7 @@ module.exports = {
                 question = query.question,
                 answer = query.answers
 
-            accept = false
+            control.accept = false
 
             if (isJumped) return start(question, answer)
 
@@ -97,9 +99,102 @@ module.exports = {
 
         }
 
+        function showCharacter() {
+
+            let allData = Database.Characters.get('Characters')
+
+            let data = allData?.find(p => p.name === args[1] || p.name === args.join(' ')?.toLowerCase() || p.image === args[0]) || null
+
+            if (!data.image)
+                return message.reply(`${e.Deny} | Os moderadores do *Quiz Anime Theme* ainda não adicionaram esse personagem.`)
+
+            return message.reply({
+                embeds: [{
+                    color: client.blue,
+                    title: `${e.Database} ${client.user.username} Quiz Anime Theme | Show Character`,
+                    description: `**${formatString(data.name) || '\`NAME NOT FOUND\`'}**`,
+                    image: { url: data.image || null },
+                    footer: { text: 'Se nenhuma imagem apareceu, o link é inválido ou a imagem foi deletada.' }
+                }]
+            })
+        }
+
+        async function chooseMode() {
+
+            let selectMenuObject = [{
+                type: 1,
+                components: [{
+                    type: 3,
+                    custom_id: 'menu',
+                    placeholder: 'Escolher um modo de jogo',
+                    options: [
+                        {
+                            label: 'Informações',
+                            emoji: e.Info,
+                            description: 'Painel de informações do comando',
+                            value: 'quizInfo'
+                        },
+                        {
+                            label: 'Padrão',
+                            emoji: e.QuestionMark,
+                            description: 'Modo de jogo clásico',
+                            value: 'normalMode'
+                        },
+                        {
+                            label: 'Padrão Fast',
+                            emoji: '⚡',
+                            description: 'Modo de jogo clásico, porém mais rápido',
+                            value: 'fastMode'
+                        },
+                        {
+                            label: 'Anime Theme (Construindo)',
+                            emoji: e.Hmmm,
+                            description: 'Você conhece personagens de animes?',
+                            value: 'animeMode',
+                            disabled: true
+                        },
+                        {
+                            label: 'Cancelar',
+                            emoji: '❌',
+                            description: 'Cancele este comando.',
+                            value: 'cancel'
+                        }
+                    ]
+                }]
+            }]
+
+            let msg = await message.reply({
+                content: `${e.QuestionMark} | Escolha seu modo de jogo...`,
+                components: selectMenuObject
+            })
+
+            let collector = msg.createMessageComponentCollector({
+                filter: int => int.user.id === message.author.id,
+                time: 60000,
+                erros: ['time', 'max']
+            })
+                .on('collect', interaction => {
+                    interaction.deferUpdate().catch(() => { })
+
+                    let customId = interaction.values[0]
+                    if (customId === 'animeMode') return
+                    if (customId === 'cancel') return collector.stop()
+                    if (customId === 'quizInfo') return quizInfo(msg)
+
+                    msg.delete().catch(() => { })
+                    if (customId === 'normalMode') return init()
+                    if (customId === 'fastMode') {
+                        args[1] = 'fast'
+                        return init()
+                    }
+
+                })
+                .on('end', () => msg.edit({ content: `${e.Deny} | Comando cancelado`, components: [] }))
+        }
+
         async function start(question, answer, MessageToDelete) {
             MessageToDelete?.delete().catch(() => { })
-            skipped = false
+            control.skipped = false
 
             if (!question || !answer) {
                 await pullChannel(message.channel.id)
@@ -121,7 +216,7 @@ module.exports = {
                 .on('collect', async m => {
 
                     if (['skip', 'jump', 'pular'].includes(m.content?.toLowerCase())) {
-                        if (skipped) return
+                        if (control.skipped) return
 
                         if (timesSkiped >= 3)
                             return m.reply(`${e.Deny} | O limite de skips são 3 vezes.`)
@@ -130,7 +225,7 @@ module.exports = {
                     }
 
                     msg.edit(`${e.Check} | **${question}**\n🏆 | ${m.author.tag} acertou essa pergunta.`).catch(() => { })
-                    accept = true
+                    control.accept = true
                     await addPoint(m.author.id)
                     m.reply(`${e.Check} | ${m.author}, acertou a pergunta e venceu essa rodada!`)
                     addAcceptToUser(m.author.id)
@@ -145,9 +240,9 @@ module.exports = {
 
                 .on('end', async () => {
 
-                    if (skipped) return
+                    if (control.skipped) return
 
-                    if (accept)
+                    if (control.accept)
                         return init(true)
 
                     await pullChannel(message.channel.id)
@@ -178,13 +273,13 @@ module.exports = {
             return
 
             async function skip(m) {
-                skipped = true
+                control.skipped = true
 
                 const data = await Database.User.findOne({ id: m.author.id }, 'Slot.Skip'),
                     skips = data?.Slot?.Skip || 0
 
                 if (!data || !skips || skips <= 0) {
-                    skipped = false
+                    control.skipped = false
                     return m.reply(`${e.Deny} | Você não tem *⏩ Quiz Skip* para pular de pergunta. Compre o limite no painel rápido da \`${prefix}loja\` ou use o comando \`${prefix}buy skip <quantia>\``)
                 }
 
@@ -213,7 +308,7 @@ module.exports = {
 
                         })
                         .on('end', () => {
-                            skipped = false
+                            control.skipped = false
                             return skipMsg.delete().catch(() => { })
                         })
 
@@ -237,6 +332,158 @@ module.exports = {
                 { $push: { ['GameChannels.Quiz']: channelId } }
             )
             return
+        }
+
+        async function listCharacters() {
+
+            let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
+
+            if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
+                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de perrsonagem do *Quiz Anime Theme*.`)
+
+            let jsonCharacters = Database.Characters,
+                characters = jsonCharacters.get('Characters')
+
+            if (!characters || characters.length === 0)
+                return message.reply(`${e.Deny} | Não há nenhum personagem no meu banco de dados.`)
+
+            let embeds = EmbedGenerator(),
+                control = 0
+
+            let msg = await message.reply({ embeds: [embeds[0]] })
+            if (embeds.length === 1) return
+            let emojis = ['⬅️', '➡️', '❌']
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+            let collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                idle: 30000,
+                errors: ['idle']
+            })
+                .on('collect', async (reaction) => {
+
+                    if (reaction.emoji.name === emojis[2])
+                        return collector.stop()
+
+                    if (reaction.emoji.name === emojis[0]) {
+                        control--
+                        if (control < 0) control = embeds.length - 1
+                        return msg.edit({ embeds: [embeds[control]] }).catch(() => { })
+                    }
+
+                    if (reaction.emoji.name === emojis[1]) {
+                        control++
+                        if (control >= embeds.length) control = 0
+                        return msg.edit({ embeds: [embeds[control]] }).catch(() => { })
+                    }
+
+                    return
+                })
+                .on('end', () => {
+                    let embed = embeds[control]
+                    embed.color = client.red
+                    embed.footer.text = `${embed.footer.text} | Comando cancelado`
+                    return msg.edit({ embeds: [embed] }).catch(() => { })
+
+                })
+
+            function EmbedGenerator() {
+
+                let amount = 15,
+                    Page = 1,
+                    embeds = [],
+                    length = characters.length / 15 <= 1 ? 1 : parseInt((characters.length / 15) + 1)
+
+                for (let i = 0; i < characters.length; i += 15) {
+
+                    let current = characters.slice(i, amount),
+                        description = current.map(p => `> \`${formatString(p.name)}\``).join("\n"),
+                        pageCount = length > 1 ? ` - ${Page}/${length}` : ''
+
+                    if (current.length > 0) {
+
+                        embeds.push({
+                            color: client.blue,
+                            title: `${e.Database} Database Quiz Anime Theme${pageCount}`,
+                            description: `${description}`,
+                            footer: {
+                                text: `${characters.length} personagens contabilizados`
+                            }
+                        })
+
+                        Page++
+                        amount += 15
+
+                    }
+
+                }
+
+                return embeds
+            }
+        }
+
+        async function addCharacter() {
+
+            let { Rody, Gowther } = Database.Names
+
+            if (![Rody, Gowther].includes(message.author.id))
+                return message.reply(`${e.Admin} | Apenas os administradores do quiz *Anime Theme* tem o poder de adicionar novos personagens.`)
+
+            let characters = Database.Characters.get('Characters') || [],
+                image = args[1],
+                name = args.slice(2).join(' ')?.toLowerCase()
+
+            if (!image)
+                return message.reply(`${e.Info} | \`${prefix}quiz add <imageLink> <Nome do Personagem>\``)
+
+            if (!image || !name)
+                return message.reply(`${e.Deny} | Formato inválido! \`${prefix}quiz add <imageLink> <Nome do Personagem>\``)
+
+            if (!image.includes('https://media.discordapp.net/attachments'))
+                return message.reply(`${e.Deny} | Verique se o link da imagem segue com esse formato: \`https://media.discordapp.net/attachments\``)
+
+            let has = characters?.find(data => data.name === name || data.image == image)
+
+            if (has)
+                return message.reply(`${e.Deny} | Esse personagem já existe no banco de dados.`)
+
+            let msg = await message.reply({
+                content: `${e.QuestionMark} | Você confirma adicionar o personagem **\`${name}\`** no banco de dados do **Quiz Anime Theme**?`,
+                embeds: [{
+                    color: client.blue,
+                    image: { url: image || null },
+                    description: 'Se a imagem do personagem não aparecer, quer dizer que o link não é compatível.'
+                }]
+            }),
+                emojis = ['✅', '❌'], clicked = false
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+            let collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                time: 60000,
+                max: 1,
+                erros: ['time', 'max']
+            })
+                .on('collect', (r) => {
+
+                    if (r.emoji.name === emojis[1])
+                        return collector.stop()
+
+                    clicked = true
+                    Database.Characters.push('Characters', { name: name, image: image })
+                    return msg.edit({
+                        content: `${e.Check} | O personagem **\`${name}\`** foi adicionado com sucesso!`,
+                        embeds: [{
+                            color: client.blue,
+                            image: { url: image || null },
+                            description: null
+                        }]
+                    }).catch(() => { })
+                })
+                .on('end', () => {
+                    if (clicked) return
+                    return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [] }).catch(() => { })
+                })
         }
 
         async function pullChannel(channelId) {
