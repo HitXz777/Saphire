@@ -243,7 +243,7 @@ module.exports = {
                         let _characters = characters.get('Characters')
                         if (_characters.length <= 3) {
                             registerChannelControl('pull', 'Quiz', message.channel.id)
-                            return msg.edit({ content: `${e.Deny} | Não foi possível iniciar o *Quiz Anime Theme* por falta de personagens no banco de dados.` })
+                            return msg.edit({ content: `${e.Deny} | Não foi possível iniciar o *Quiz Anime Theme* por falta de personagens no banco de dados.`, embeds: [] })
                         }
 
                         msg.delete().catch(() => { })
