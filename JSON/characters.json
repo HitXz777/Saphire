@@ -1,0 +1,23 @@
+{
+    "Characters": [
+        {
+            "name": "Naruto Uzumaki",
+            "image": "https://cdn.discordapp.com/attachments/884911404635816006/885595603541827614/wallhaven-769oqe.png",
+            "anime": "Naruto"
+        },
+        {
+            "name": "ouka",
+            "image": "https://media.discordapp.net/attachments/977336446413328464/977337363929923594/unknown.png"
+        },
+        {
+            "name": "eru chitanda",
+            "image": "https://media.discordapp.net/attachments/886383113083707443/886612610873720842/wallhaven-m9l25m.png?width=284&height=484",
+            "anime": "Hyouka"
+        },
+        {
+            "name": "deidara",
+            "image": "https://cdn.discordapp.com/attachments/884911404635816006/885598117670555648/wallhaven-o3dg59.png",
+            "anime": "Naruto"
+        }
+    ]
+}
