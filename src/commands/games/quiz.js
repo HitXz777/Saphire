@@ -153,7 +153,7 @@ module.exports = {
                 || p.name.toLowerCase().split(/ +/g)[2] === args[0]
             ) || null
 
-            if (!data.image)
+            if (!data || !data?.image)
                 return message.reply(`${e.Deny} | Os moderadores do *Quiz Anime Theme* ainda não adicionaram esse personagem.`)
 
             return message.reply({
@@ -1096,7 +1096,7 @@ module.exports = {
                     registerChannelControl('pull', 'Quiz', message.channel.id)
                     control.embed
                         .setColor(client.red)
-                        .setDescription(`${e.Deny} | Ninguém acertou.\n👤 | Personagem: **\`${formatString(control.atualCharacter.name)}\`** from **\`${control.atualCharacter?.anime || 'ANIME NOT FOUND'}\`**\n🔄 | ${control.rounds || 0} Rounds`)
+                      .setDescription(`${e.Deny} | Ninguém acertou.\n👤 | Personagem: **\`${formatString(control.atualCharacter.name)}\`** from **\`${control.atualCharacter?.anime || 'ANIME NOT FOUND'}\`**\n🔄 | ${control.rounds || 0} Rounds`)
                         .setFooter({ text: `Quiz Anime Theme Endded` })
                     msg.delete().catch(() => { })
 
