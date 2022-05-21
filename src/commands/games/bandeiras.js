@@ -390,10 +390,10 @@ module.exports = {
             let data = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Flags'),
                 channels = data?.GameChannels?.Flags || []
 
-            if (channels.includes(message.channel.id))
+            if (channels.includes(message.channel?.id))
                 return message.reply(`${e.Deny} | Já tem um flag game rolando nesse canal. Espere ele terminar para poder iniciar outro, ok?`)
 
-            await registerGameChannel(message.channel.id)
+            await registerGameChannel(message.channel?.id)
 
             const buttons = [
                 {
@@ -450,7 +450,7 @@ module.exports = {
                 .on('end', () => {
                     msg.delete(() => { })
                     if (control.initied) return
-                    unregisterGameChannel(message.channel.id)
+                    unregisterGameChannel(message.channel?.id)
                 })
         }
 
@@ -527,7 +527,7 @@ module.exports = {
             await generateButtons()
 
             if (Msg)
-                Msg?.delete().catch(() => unregisterGameChannel(message.channel.id))
+                Msg?.delete().catch(() => unregisterGameChannel(message.channel?.id))
 
             embed
                 .setDescription(`${e.Loading} | Qual é a bandeira?\n${control.atualFlag.flag} - ???`)
@@ -537,7 +537,7 @@ module.exports = {
             let msg = await message.channel.send({
                 embeds: [embed],
                 components: control.buttons
-            }).catch(() => unregisterGameChannel(message.channel.id))
+            }).catch(() => unregisterGameChannel(message.channel?.id))
 
             msg.createMessageComponentCollector({
                 filter: int => true,
@@ -561,7 +561,7 @@ module.exports = {
 
                     if (winners.length === 0) {
 
-                        unregisterGameChannel(message.channel.id)
+                        unregisterGameChannel(message.channel?.id)
                         embed
                             .setColor(client.red)
                             .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n🔄 ${control.rounds} Rounds`)
@@ -576,8 +576,8 @@ module.exports = {
                         .setDescription(`${e.Check} | ${winners.length > 1 ? `${winners.slice(0, 4)?.map(u => u.username).join(', ')}${winners.length - 4 > 0 ? ` e mais ${winners.length - 4} jogadores` : ''} acertaram` : `${winners[0].username} acertou`} o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
 
-                    msg.delete().catch(() => unregisterGameChannel(message.channel.id))
-                    let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => unregisterGameChannel(message.channel.id))
+                    msg.delete().catch(() => unregisterGameChannel(message.channel?.id))
+                    let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => unregisterGameChannel(message.channel?.id))
 
                     for (let u of winners)
                         addPoint({ username: u.username, id: u.id }, true)
@@ -673,14 +673,14 @@ module.exports = {
             control.rounds++
 
             if (Msg)
-                Msg?.delete().catch(() => unregisterGameChannel(message.channel.id))
+                Msg?.delete().catch(() => unregisterGameChannel(message.channel?.id)) // Unificar as funções no plugin para registerChannelControl function
 
             embed
                 .setDescription(`${e.Loading} | Qual é a bandeira?\n${control.atualFlag.flag} - ???`)
                 .setImage(control.atualFlag.image || null)
                 .setFooter({ text: `Round: ${control.rounds}` })
 
-            let msg = await message.channel.send({ embeds: [embed] }).catch(() => unregisterGameChannel(message.channel.id))
+            let msg = await message.channel.send({ embeds: [embed] }).catch(() => unregisterGameChannel(message.channel?.id))
 
             return msg.channel.createMessageCollector({
                 filter: m => m.content?.toLowerCase() == control.atualFlag?.country,
@@ -696,9 +696,9 @@ module.exports = {
                         .setDescription(`${e.Check} | ${Message.author} acertou o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
 
-                    msg.delete().catch(() => unregisterGameChannel(message.channel.id))
+                    msg.delete().catch(() => unregisterGameChannel(message.channel?.id))
                     await randomizeFlags(0)
-                    let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => unregisterGameChannel(message.channel.id))
+                    let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => unregisterGameChannel(message.channel?.id))
 
                     await addPoint(Message.author)
                     return setTimeout(async () => {
@@ -711,7 +711,7 @@ module.exports = {
 
                     if (control.collected) return control.collected = false
 
-                    unregisterGameChannel(message.channel.id)
+                    unregisterGameChannel(message.channel?.id)
                     embed
                         .setColor(client.red)
                         .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n🔄 ${control.rounds} Rounds`)

@@ -34,7 +34,7 @@ module.exports = {
 
                 if (reaction.emoji.name === emojis[0]) {
                     control--
-                    if (control < 0) control = embeds.length--
+                    if (control < 0) control = embeds.length - 1
                     return msg.edit({ embeds: [embeds[control]] }).catch(() => { })
                 }
 

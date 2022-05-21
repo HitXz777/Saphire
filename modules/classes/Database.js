@@ -11,7 +11,6 @@ const client = require('../../index'),
     Models = require('../database/Models'),
     config = configData.get('config'),
     e = eData.get('e')
-
 class Database extends Models {
     constructor() {
         super()
@@ -19,8 +18,8 @@ class Database extends Models {
         this.Emojis = e
         this.dbEmoji = new Ark.Database('../../JSON/emojis.json')
         this.Frases = new Ark.Database('../../JSON/frases.json')
-        this.Characters = new Ark.Database('../../src/commands/games/JSON/characters.json')
-        this.Flags = new Ark.Database('../../src/commands/games/JSON/flags.json')
+        this.Characters = new Ark.Database('../../JSON/characters.json')
+        this.Flags = new Ark.Database('../../JSON/flags.json')
         this.Names = {
             Rody: "451619591320371213",
             Gowther: "315297741406339083",
