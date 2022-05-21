@@ -17,9 +17,9 @@ module.exports = {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return BalInfo()
 
-        let user = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.find(user => user.username?.toLowerCase() == args[0]?.toLowerCase() || user.tag?.toLowerCase() == args[0]?.toLowerCase() || user.id === args[0]) || message.guild.members.cache.find(user => user.displayName?.toLowerCase() == args[0]?.toLowerCase() || user.user.username?.toLowerCase() == args[0]?.toLowerCase())?.user || message.author
+        let user = client.getUser(client, message, args, false) || message.author
 
-        if (user.id === client.user.id) return message.reply(`👝 | ${client.username} possui **∞ ${MoedaCustom}**`)
+        if (user.id === client.user.id) return message.reply(`👝 | ${user.username} possui **∞ ${MoedaCustom}**`)
 
         let userData = await Database.getUser(user.id, 'Balance Perfil')
 
