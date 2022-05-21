@@ -133,13 +133,6 @@ module.exports = {
             control.accept = false
 
             if (isJumped) return start(question, answer)
-
-            let clientData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Quiz'),
-                channelsBlockToInit = clientData?.GameChannels?.Quiz || []
-
-            if (!channelsBlockToInit || channelsBlockToInit.includes(message.channel.id))
-                return message.reply(`${e.Deny} | Já tem um quiz rolando nesse chat.`).then(m => setTimeout(() => m.delete().catch(() => { }), 2500))
-
             if (control.fast) fastMode = 5000
 
             let msg = await message.channel.send(`${e.Loading} | ${fastMode === 5000 ? '⚡ **Speed Mode** | ' : ''}Inicializando Quiz... Prepare-se!`)
@@ -154,7 +147,11 @@ module.exports = {
 
             let data = allData?.find(p => p.name.toLowerCase() === args.join(' ')?.toLowerCase()
                 || p.name.toLowerCase().includes(args[1]?.toLowerCase())
-                || p.image === args[0]) || null
+                || p.image === args[1]
+                || p.name.toLowerCase().split(/ +/g)[0] === args[0]
+                || p.name.toLowerCase().split(/ +/g)[1] === args[0]
+                || p.name.toLowerCase().split(/ +/g)[2] === args[0]
+            ) || null
 
             if (!data.image)
                 return message.reply(`${e.Deny} | Os moderadores do *Quiz Anime Theme* ainda não adicionaram esse personagem.`)
@@ -238,10 +235,12 @@ module.exports = {
                         return message.channel.send(`${e.Deny} | ${message.author}, já tem um quiz rolando nesse chat.`).then(m => setTimeout(() => m.delete().catch(() => { }), 2500))
 
                     await registerChannelControl('push', 'Quiz', message.channel.id)
+                    control.interactionReact = true
                     if (customId === 'animeMode') {
 
                         let _characters = characters.get('Characters')
                         if (_characters.length <= 3) {
+                            control.interactionReact = false
                             registerChannelControl('pull', 'Quiz', message.channel.id)
                             return msg.edit({ content: `${e.Deny} | Não foi possível iniciar o *Quiz Anime Theme* por falta de personagens no banco de dados.`, embeds: [] })
                         }
@@ -1097,7 +1096,7 @@ module.exports = {
                     registerChannelControl('pull', 'Quiz', message.channel.id)
                     control.embed
                         .setColor(client.red)
-                        .setDescription(`${e.Deny} | Ninguém acertou.\n👤 | Personagem: **\`${formatString(control.atualCharacter.name)}\`** from **\`${control.atualCharacter?.anime}\`**\n🔄 | ${control.rounds || 0} Rounds`)
+                        .setDescription(`${e.Deny} | Ninguém acertou.\n👤 | Personagem: **\`${formatString(control.atualCharacter.name)}\`** from **\`${control.atualCharacter?.anime || 'ANIME NOT FOUND'}\`**\n🔄 | ${control.rounds || 0} Rounds`)
                         .setFooter({ text: `Quiz Anime Theme Endded` })
                     msg.delete().catch(() => { })
 
