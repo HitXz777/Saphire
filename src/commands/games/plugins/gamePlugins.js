@@ -87,8 +87,40 @@ async function registerChannelControl(pullOrPush, where, channelId) {
         )
 }
 
+// palavamisturada.js
+function formatArray(array) {
+
+    // Solution by: Mrs_Isa♔༆#0002 - 510914249875390474
+
+    const arrayComSubArrays = [];
+    for (let i = 0; i < array.length; i++) {
+        arrayComSubArrays.push([array[i], array[i + 1]]);
+        array.splice(i + 1, 1);
+    }
+
+    return arrayComSubArrays.map(a => a.reduce((y, z) => `\`${y}\` ${z ? `- \`${z}\`` : ''}`)).join('\n');
+}
+
+// palavamisturada.js
+function Mix(string) {
+    // Solution by: Mateus Santos#4492 - 307983856135438337
+    return string
+        .toLowerCase()
+        .split('')
+        .sort(() => (0.5 - Math.random()))
+        .join('')
+}
+
+// palavamisturada.js
+function GetWord(Palavras) {
+    return Palavras[Math.floor(Math.random() * Palavras.length)]
+}
+
 module.exports = {
     formatString,
+    formatArray,
+    Mix,
+    GetWord,
     registerGameChannel,
     unregisterGameChannel,
     emoji,

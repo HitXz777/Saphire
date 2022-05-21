@@ -6,7 +6,6 @@ module.exports = {
     name: 'quiz',
     aliases: ['q'],
     category: 'games',
-    cooldown: 4000,
     emoji: `${e.QuestionMark}`,
     usage: 'quiz <info>',
     description: 'Quiz é bem legal, garanto.',
@@ -164,7 +163,7 @@ module.exports = {
                 embeds: [{
                     color: client.blue,
                     title: `${e.Database} ${client.user.username} Quiz Anime Theme | Show Character`,
-                    description: `\`**${formatString(data.name) || '\`NAME NOT FOUND\`'}**\` from \`${data.anime || 'ANIME NOT FOUND'}\``,
+                    description: `**\`${formatString(data.name) || '\`NAME NOT FOUND\`'}\`** from \`${data.anime || 'ANIME NOT FOUND'}\``,
                     image: { url: data.image || null },
                     footer: { text: 'Se nenhuma imagem apareceu, o link é inválido ou a imagem foi deletada.' }
                 }]
