@@ -1,11 +1,12 @@
 const { e } = require('../../../JSON/emojis.json'),
     quizData = require('../../../JSON/quiz.json'),
-    { formatString } = require('./plugins/gamePlugins')
+    { formatString, registerChannelControl, emoji } = require('./plugins/gamePlugins')
 
 module.exports = {
     name: 'quiz',
     aliases: ['q'],
     category: 'games',
+    cooldown: 4000,
     emoji: `${e.QuestionMark}`,
     usage: 'quiz <info>',
     description: 'Quiz é bem legal, garanto.',
@@ -14,10 +15,12 @@ module.exports = {
 
         let rankingControl = [],
             timesSkiped = 0,
-            control = {},
+            control = { embed: new MessageEmbed(), usersPoints: [] },
+            characters = Database.Characters,
             fastMode = 25000
 
         if (['status', 'stats', 'st'].includes(args[0]?.toLowerCase())) return quizStatus()
+        if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return quizInfo()
         if (['reset', 'reboot', 'r'].includes(args[0]?.toLowerCase())) return resetQuizChannels()
         if (['add', 'adicionar', 'new', '+'].includes(args[0]?.toLowerCase())) return addCharacter()
         if (['del', 'deletar', 'remove', '+', 'excluir'].includes(args[0]?.toLowerCase())) return deleteCharacter()
@@ -37,44 +40,89 @@ module.exports = {
 
         }
 
-        function quizInfo(msg) {
-            return msg.edit(
-                {
-                    content: null,
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(client.blue)
-                            .setTitle(`${e.QuestionMark} ${client.user.username} Quiz`)
-                            .addFields(
-                                {
-                                    name: `${e.On} Inicie um Quiz`,
-                                    value: `\`${prefix}quiz start\``
-                                },
-                                {
-                                    name: '⏩ Pule perguntas',
-                                    value: 'Quando o quiz estiver ativado, fale "**skip**"'
-                                },
-                                {
-                                    name: '⚡ Speed Mode',
-                                    value: `\`${prefix}quiz start speed\``
-                                },
-                                {
-                                    name: `${e.Info} Confira os acertos`,
-                                    value: `\`${prefix}quiz status [@user]\``
-                                },
-                                {
-                                    name: `${e.CoroaDourada} Aceita um ranking?`,
-                                    value: `\`${prefix}rank quiz\``
-                                },
-                                {
-                                    name: `${e.Info} Informações adicionais`,
-                                    value: `O tempo normal das perguntas é de 30 segundos, speed mode é 5 segundos.`
-                                }
-                            )
-                            .setFooter({ text: `${quizData?.length || 0} perguntas ativas` })
-                    ]
-                }
-            ).catch(() => { })
+        async function quizInfo(msg = false) {
+
+            let characters = Database.Characters.get('Characters') || []
+
+            let embeds = [{
+                color: client.blue,
+                title: `${e.QuestionMark} ${client.user.username} Quiz`,
+                fields: [
+                    {
+                        name: `${e.On} Inicie um Quiz`,
+                        value: `\`${prefix}quiz start\``
+                    },
+                    {
+                        name: '⏩ Pule perguntas',
+                        value: 'Quando o quiz estiver ativado, fale "**skip**"'
+                    },
+                    {
+                        name: '⚡ Speed Mode',
+                        value: `\`${prefix}quiz start speed\``
+                    },
+                    {
+                        name: `${e.Hmmm} Anime Theme`,
+                        value: `Você consegue acertar os ${characters.length || 0} personagens de animes?`
+                    },
+                    {
+                        name: `${e.Info} Confira os acertos`,
+                        value: `\`${prefix}quiz status [@user]\``
+                    },
+                    {
+                        name: `${e.CoroaDourada} Aceita um ranking?`,
+                        value: `\`${prefix}rank quiz\``
+                    },
+                    {
+                        name: `${e.Info} Informações adicionais`,
+                        value: `O tempo normal das perguntas é de 30 segundos, já o speed mode é apenas 5.\n⚙️ Quiz Administration Commands`
+                    }
+                ],
+                footer: { text: `${quizData?.length || 0} perguntas disponíveis` }
+            },
+            {
+                color: client.blue,
+                title: `${e.QuestionMark} ${client.user.username} Quiz | Administration Commands`,
+                fields: [
+                    {
+                        name: `Anime Theme`,
+                        value: `\`${prefix}quiz new <linkDaImagem> <Nome do Personagem>\` - Adicione um novo personagem\n\`${prefix}quiz delete <LinkDaImagem> ou <Nome do Personagem>\` - Delete um personagem\n\`${prefix}quiz list\` - Lista de todos os personagens\n\`${prefix}quiz personagem <Nome Do personagem>\` - Veja um personagem especifico\n\`${prefix}quiz edit name <Nome Do Personagem> ou <Link da Imagem>\` - Edite o nome de um personagem\n\`${prefix}quiz edit link <Nome do Personagem> ou <Link da Imagem>\` - Edite a imagem de um personagem\n\`${prefix}quiz edit anime <Nome do Personagem> ou Link da Imagem>\` - Edite o anime do personagem\n\`${prefix}quiz reboot\` - Retira todos os canais registrados do banco de dados`
+                    }
+                ],
+                footer: { text: `${characters.length || 0} personagens disponíveis` }
+            }]
+
+            msg
+                ? msg.edit({ content: null, embeds: [embeds[0]] })
+                : msg = await message.reply({ content: null, embeds: [embeds[0]] })
+
+            control.embedTrade = 0
+            msg.react('⚙️').catch(() => { })
+
+            return msg.createReactionCollector({
+                filter: (reaction, user) => reaction.emoji.name === '⚙️' && user.id === message.author.id,
+                idle: 30000,
+                max: 5,
+                errors: ['idle', 'time']
+            })
+                .on('collect', (r) => {
+
+                    if (r.emoji.name === '⚙️' && control.embedTrade === 0) {
+                        control.embedTrade = 1
+                        return msg.edit({ embeds: [embeds[1]] }).catch(() => { })
+                    }
+
+                    control.embedTrade = 0
+                    return msg.edit({ embeds: [embeds[0]] }).catch(() => { })
+                })
+                .on('end', () => {
+
+                    let embed = embeds[control.embedTrade]
+                    embed.color = client.red
+                    embed.footer.text += ' | Comando cancelado'
+
+                    return msg.edit({ content: null, embeds: [embed] }).catch(() => { })
+                })
+
         }
 
         async function init(isJumped) {
@@ -93,11 +141,10 @@ module.exports = {
             if (!channelsBlockToInit || channelsBlockToInit.includes(message.channel.id))
                 return message.reply(`${e.Deny} | Já tem um quiz rolando nesse chat.`).then(m => setTimeout(() => m.delete().catch(() => { }), 2500))
 
-            if (['fast', 'rapido', 'rápido', 'speed'].includes(args[1]?.toLowerCase())) fastMode = 5000
+            if (control.fast) fastMode = 5000
 
             let msg = await message.channel.send(`${e.Loading} | ${fastMode === 5000 ? '⚡ **Speed Mode** | ' : ''}Inicializando Quiz... Prepare-se!`)
 
-            registerChannel(message.channel.id)
             return setTimeout(() => start(question, answer, msg), 3000)
 
         }
@@ -117,7 +164,7 @@ module.exports = {
                 embeds: [{
                     color: client.blue,
                     title: `${e.Database} ${client.user.username} Quiz Anime Theme | Show Character`,
-                    description: `**${formatString(data.name) || '\`NAME NOT FOUND\`'}**`,
+                    description: `\`**${formatString(data.name) || '\`NAME NOT FOUND\`'}**\` from \`${data.anime || 'ANIME NOT FOUND'}\``,
                     image: { url: data.image || null },
                     footer: { text: 'Se nenhuma imagem apareceu, o link é inválido ou a imagem foi deletada.' }
                 }]
@@ -178,23 +225,45 @@ module.exports = {
                 time: 60000,
                 erros: ['time', 'max']
             })
-                .on('collect', interaction => {
+                .on('collect', async interaction => {
                     interaction.deferUpdate().catch(() => { })
 
                     let customId = interaction.values[0]
-                    if (customId === 'animeMode') return msg.edit(`${e.Warn} | Este comando está em construção.`)
                     if (customId === 'cancel') return collector.stop()
                     if (customId === 'quizInfo') return quizInfo(msg)
 
+                    let clientData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Quiz'),
+                        channelsBlockToInit = clientData?.GameChannels?.Quiz || []
+
+                    if (!channelsBlockToInit || channelsBlockToInit.includes(message.channel.id))
+                        return message.channel.send(`${e.Deny} | ${message.author}, já tem um quiz rolando nesse chat.`).then(m => setTimeout(() => m.delete().catch(() => { }), 2500))
+
+                    await registerChannelControl('push', 'Quiz', message.channel.id)
+                    if (customId === 'animeMode') {
+
+                        let _characters = characters.get('Characters')
+                        if (_characters.length <= 3) {
+                            registerChannelControl('pull', 'Quiz', message.channel.id)
+                            return msg.edit({ content: `${e.Deny} | Não foi possível iniciar o *Quiz Anime Theme* por falta de personagens no banco de dados.` })
+                        }
+
+                        msg.delete().catch(() => { })
+                        return startAnimeThemeQuiz()
+                    }
                     msg.delete().catch(() => { })
                     if (customId === 'normalMode') return init()
                     if (customId === 'fastMode') {
-                        args[1] = 'fast'
+                        control.fast = true
                         return init()
                     }
 
                 })
-                .on('end', () => msg.edit({ content: `${e.Deny} | Comando cancelado`, components: [] }))
+                .on('end', () => {
+
+                    if (control.interactionReact) return
+                    pullChannel(message.channel.id)
+                    return msg.edit({ content: `${e.Deny} | Comando cancelado`, components: [] }).catch(() => { })
+                })
         }
 
         async function start(question, answer, MessageToDelete) {
@@ -331,20 +400,12 @@ module.exports = {
             return
         }
 
-        async function registerChannel(channelId) {
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                { $push: { ['GameChannels.Quiz']: channelId } }
-            )
-            return
-        }
-
         async function listCharacters() {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
             if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
-                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de perrsonagem do *Quiz Anime Theme*.`)
+                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de personagem do *Quiz Anime Theme*.`)
 
             let jsonCharacters = Database.Characters,
                 characters = jsonCharacters.get('Characters')
@@ -402,7 +463,7 @@ module.exports = {
                 for (let i = 0; i < characters.length; i += 15) {
 
                     let current = characters.slice(i, amount),
-                        description = current.map(p => `> \`${formatString(p.name)}\``).join("\n"),
+                        description = current.map(p => `> \`${formatString(p.name)}\` from \`${p.anime || 'ANIME NOT FOUND'}\``).join("\n"),
                         pageCount = length > 1 ? ` - ${Page}/${length}` : ''
 
                     if (current.length > 0) {
@@ -444,8 +505,8 @@ module.exports = {
             if (!image || !name)
                 return message.reply(`${e.Deny} | Formato inválido! \`${prefix}quiz add <imageLink> <Nome do Personagem>\``)
 
-            if (!image.includes('https://media.discordapp.net/attachments'))
-                return message.reply(`${e.Deny} | Verique se o link da imagem segue com esse formato: \`https://media.discordapp.net/attachments\``)
+            if (!image.includes('https://media.discordapp.net/attachments') && !image.includes('https://cdn.discordapp.com/attachments/'))
+                return message.reply(`${e.Deny} | Verique se o link da imagem segue um desses formatos: \`https://media.discordapp.net/attachments\` | \`https://cdn.discordapp.com/attachments/\``)
 
             let has = characters?.find(data => data.name === name || data.image == image)
 
@@ -475,15 +536,29 @@ module.exports = {
                         return collector.stop()
 
                     clicked = true
-                    Database.Characters.push('Characters', { name: name, image: image })
-                    return msg.edit({
-                        content: `${e.Check} | O personagem **\`${name}\`** foi adicionado com sucesso!`,
-                        embeds: [{
-                            color: client.blue,
-                            image: { url: image || null },
-                            description: null
-                        }]
+
+                    msg.edit({
+                        content: `${e.Loading} | Tudo certo! Qual é o nome do anime que **\`${formatString(name)}\`** faz parte?`,
+                        embeds: []
                     }).catch(() => { })
+
+                    return message.channel.createMessageCollector({
+                        filter: m => m.author.id === message.author.id,
+                        max: 1,
+                        time: 30000,
+                        erros: ['time', 'max']
+                    })
+                        .on('collect', Message => {
+
+                            control.validated = true
+                            return pushNewCaracter(msg, { name: name, image: image, anime: Message.content })
+
+                        })
+                        .on('end', () => {
+                            if (control.validated) return
+                            return msg.edit({ content: `${e.Deny} | Adição de personagem cancelado.`, embeds: [] })
+                        })
+
                 })
                 .on('end', () => {
                     if (clicked) return
@@ -502,7 +577,8 @@ module.exports = {
 
             if (['nome', 'name'].includes(args[1]?.toLowerCase())) return editName()
             if (['link', 'image', 'imagem', 'foto', 'personagem', 'p'].includes(args[1]?.toLowerCase())) return editImage()
-            return message.reply(`${e.Deny} | Forneça o nome ou o link da imagem para que eu possa buscar um personagem no banco de dados. Logo após, forneça o conteúdo a ser editado.\n\`${prefix}quiz edit <name/image> <Nome/Link>\`\n\`<comando> <editar> <oq editar> <quem editar>\``)
+            if (args[1]?.toLowerCase() === 'anime') return editAnime()
+            return message.reply(`${e.Deny} | Forneça o nome ou o link da imagem para que eu possa buscar um personagem no banco de dados. Logo após, forneça o conteúdo a ser editado.\n\`${prefix}quiz edit <name/image/anime> <Nome/Link>\`\n\`<comando> <editar> <oq editar> <quem editar>\``)
 
             async function editName() {
 
@@ -640,8 +716,8 @@ module.exports = {
 
                         if (Message.content === 'CANCEL') return collector.stop()
 
-                        if (!Message.content.includes('https://media.discordapp.net/attachments'))
-                            return Message.reply(`${e.Deny} | Verique se o link da imagem segue com esse formato: \`https://media.discordapp.net/attachments\``)
+                        if (!Message.content.includes('https://media.discordapp.net/attachments') && !Message.content.includes('https://cdn.discordapp.com/attachments/'))
+                            return Message.reply(`${e.Deny} | Verique se o link da imagem segue um desses formatos: \`https://media.discordapp.net/attachments\` | \`https://cdn.discordapp.com/attachments/\``)
 
                         let alreadyHas = characters?.find(p => p.image === Message.content) || null
 
@@ -700,6 +776,100 @@ module.exports = {
                                             image: { url: has.image }
                                         }
                                     ]
+                                }).catch(() => { })
+
+                            })
+                            .on('end', () => {
+                                if (control.collectedReaction) return
+                                return msg.edit({
+                                    content: `${e.Deny} | Comando cancelado.`,
+                                    embeds: []
+                                }).catch(() => { })
+                            })
+                    })
+                    .on('end', () => {
+                        if (control.collected) return
+                        return msg.edit({
+                            content: `${e.Deny} | Comando cancelado.`,
+                            embeds: []
+                        }).catch(() => { })
+                    })
+            }
+
+            async function editAnime() {
+
+                let request = args.slice(2).join(' ')
+
+                if (!request)
+                    return message.reply(`${e.Deny} | Forneça o nome ou o link do personagem que você quer editar o anime.\n\`${prefix}quiz edit anime <Nome do Personagem> ou <Link Do Personagem>\``)
+
+                let has = characters?.find(p => p.name.toLowerCase() === request?.toLowerCase()
+                    || p.name.toLowerCase().includes(request?.toLowerCase())
+                    || p.image === request) || null
+
+                if (!has)
+                    return message.reply(`${e.Deny} | Nenhum personagem foi encontrado com o requisito: \`${request}\``)
+
+                let embed = {
+                    color: client.blue,
+                    title: `${e.Database} Database's Edit Information System`,
+                    description: `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Anime\`**`,
+                    image: { url: has.image || null },
+                    footer: { text: 'Quiz Anime Theme Selection' }
+                }
+
+                let msg = await message.reply({
+                    content: `${e.Loading} | Diga no chat o novo anime do personagem. Para cancelar, digite \`CANCEL\``,
+                    embeds: [embed]
+                })
+
+                let collector = msg.channel.createMessageCollector({
+                    filter: m => m.author.id === message.author.id,
+                    time: 60000,
+                    erros: ['time']
+                })
+                    .on('collect', Message => {
+
+                        if (Message.content === 'CANCEL') return collector.stop()
+
+                        if (has.anime === Message.content)
+                            return Message.reply(`${e.Deny} | Este anime já foi configurado com este personagem`)
+
+                        control.collected = true
+                        embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Anime\`**\nNew Anime Data: \`${Message.content}\``
+
+                        msg.edit({
+                            content: `${e.Loading} | Confirme as informações abaixo caso tudo esteja correto.`,
+                            embeds: [embed]
+                        }).catch(() => { })
+
+                        let emojis = ['✅', '❌']
+
+                        for (let i of emojis) msg.react(i).catch(() => { })
+
+                        return msg.createReactionCollector({
+                            filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                            time: 60000,
+                            max: 1,
+                            erros: ['time', 'max']
+                        })
+                            .on('collect', (reaction) => {
+
+                                if (reaction.emoji.name === emojis[1]) return
+
+                                control.collectedReaction = true
+
+                                let newSet = characters.filter(data => data.name !== has.name)
+
+                                Database.Characters.set('Characters', [{ name: has.name, image: has.image, anime: Message.content }, ...newSet])
+
+                                embed.color = client.green
+                                embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Anime\`**\nNew Anime Data: \`${Message.content}\``
+                                embed.image.url = null
+
+                                return msg.edit({
+                                    content: `${e.Check} | O anime do personagem **\`${formatString(has.name)}\`** foi alterada com sucesso para **\`${Message.content}\`**.`,
+                                    embeds: [embed]
                                 }).catch(() => { })
 
                             })
@@ -833,6 +1003,144 @@ module.exports = {
             )
 
             return message.reply(`${e.Check} | Todos os canais registrados no quiz foram deletados da minha database.`)
+        }
+
+        function pushNewCaracter(msg, { name: name, image: image, anime: anime }) {
+
+            Database.Characters.push('Characters', { name: name, image: image, anime: anime })
+            return msg.edit({
+                content: `${e.Check} | Personagem adicionado com sucesso!`,
+                embeds: [{
+                    color: client.blue,
+                    image: { url: image || null },
+                    description: `Nome: **\`${formatString(name)}\`**\nAnime: **\`${anime || '\`ANIME NOT FOUND\`'}\`**`
+                }]
+            }).catch(() => { })
+
+        }
+
+        async function startAnimeThemeQuiz() {
+
+            control.embed
+                .setColor(client.blue)
+                .setTitle(`${e.Hmmm} ${client.user.username}'s Quiz Anime Theme`)
+                .setDescription(`${e.Loading} | Obtendo personagens... Prepare-se!`)
+
+            randomizeCharacters(0)
+            let msg = await message.channel.send({ embeds: [control.embed] })
+
+            setTimeout(() => startCharactersGame(msg), 4000)
+            return
+        }
+
+        function randomizeCharacters(wrongAnswer = 0) {
+
+            let _characters = characters.get('Characters')
+
+            if (wrongAnswer > 0) {
+                let charac = _characters[Math.floor(Math.random() * _characters.length)]
+
+                if (charac.name === control.atualCharacter.name || control.wrongAnswers.some(p => p.name === charac.name)) return randomizeCharacters(1)
+                else control.wrongAnswers.push(charac)
+                return
+            }
+
+            let data = _characters[Math.floor(Math.random() * _characters.length)]
+            if (data.name === control.atualCharacter?.name) return randomizeCharacters(0)
+            control.atualCharacter = data
+            return
+        }
+
+        async function startCharactersGame(Msg) {
+
+            control.collectedMessage = false
+            control.rounds++
+
+            if (Msg)
+                Msg?.delete().catch(() => registerChannelControl('pull', 'Quiz', message.channel.id))
+
+            control.embed
+                .setDescription(`${e.Loading} | Qual o nome deste personagem?`)
+                .setImage(control.atualCharacter.image || null)
+                .setFooter({ text: `Round: ${control.rounds || 0}` })
+
+            let msg = await message.channel.send({ embeds: [control.embed] }).catch(() => registerChannelControl('pull', 'Quiz', message.channel.id))
+
+            return msg.channel.createMessageCollector({
+                filter: m => collectorFilter(m),
+                idle: 15000,
+                max: 1,
+                errors: ['idle', 'max']
+            })
+                .on('collect', async Message => {
+
+                    control.collectedMessage = true
+
+                    control.embed
+                        .setDescription(`${e.Check} | ${Message.author} acertou o personagem!\n👤 | Personagem: **\`${formatString(control.atualCharacter.name)}\`** from **\`${control.atualCharacter?.anime || 'ANIME NOT FOUND'}\`**\n \n${e.Loading} | Próximo personagem...`)
+                        .setImage(null)
+
+                    msg.delete().catch(() => registerChannelControl('push', 'Quiz', message.channel.id))
+                    await randomizeCharacters(0)
+                    let toDelMessage = await Message.reply({ embeds: [control.embed] }).catch(() => registerChannelControl('push', 'Quiz', message.channel.id))
+
+                    await addPoint(Message.author)
+                    return setTimeout(async () => {
+                        await toDelMessage.delete().catch(() => { })
+                        startCharactersGame()
+                    }, 4000)
+
+                })
+                .on('end', () => {
+
+                    if (control.collectedMessage) return control.collected = false
+
+                    registerChannelControl('pull', 'Quiz', message.channel.id)
+                    control.embed
+                        .setColor(client.red)
+                        .setDescription(`${e.Deny} | Ninguém acertou.\n👤 | Personagem: **\`${formatString(control.atualCharacter.name)}\`** from **\`${control.atualCharacter?.anime}\`**\n🔄 | ${control.rounds || 0} Rounds`)
+                        .setFooter({ text: `Quiz Anime Theme Endded` })
+                    msg.delete().catch(() => { })
+
+                    return message.channel.send({ embeds: [control.embed] }).catch(() => { })
+                })
+        }
+
+        function addPoint(User, justAdd = false) {
+
+            let data = control.usersPoints.find(data => data.name === User.username)
+
+            data?.name
+                ? data.points++
+                : control.usersPoints.push({ name: User.username, points: 1 })
+
+            // Liberar pontuação quando tiver animes suficientes no banco de dados
+            // Database.addGamingPoint(User.id, 'AnimeThemeCount', 1)
+
+            if (justAdd) return
+
+            let ranking = control.usersPoints
+                .sort((a, b) => b.points - a.points)
+                .slice(0, 5)
+                .map((d, i) => `${emoji(i)} ${d.name} - ${d.points} pontos`)
+                .join('\n')
+
+            if (control.embed.fields.length === 1)
+                control.embed.spliceFields(0, 1, [{ name: '🏆 Pontuação', value: `${ranking || `${e.Deny} RANKING BAD FORMATED`}` }])
+            else control.embed.addField('🏆 Pontuação', `${ranking || `${e.Deny} RANKING BAD FORMATED`}${control.usersPoints.length > 5 ? `\n+${control.usersPoints.length - 5} players` : ''}`)
+
+            return
+        }
+
+        function collectorFilter(m) {
+
+            let content = m.content?.toLowerCase(),
+                nameArray = control.atualCharacter?.name.toLowerCase().split(/ +/g)
+
+            return content === control.atualCharacter?.name.toLowerCase()
+                || nameArray[0] === content
+                || nameArray[1] === content
+                || nameArray[2] === content
         }
 
     }
