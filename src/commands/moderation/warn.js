@@ -15,7 +15,7 @@ module.exports = {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return warnInfo()
 
-        let member = client.getUser(client, message, args, true),
+        let member = client.getUser(client, message, args, 'member'),
             fill = args[0]?.startsWith('<') ? args.slice(1).join(" ") : args.slice(0).join(" "),
             reason = fill || 'Nenhuma razão definida',
             warnListControl = {}

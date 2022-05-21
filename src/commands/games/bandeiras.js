@@ -764,7 +764,7 @@ module.exports = {
 
         async function flagPoints() {
 
-            let user = client.getUser(client, message, args) || message.author
+            let user = client.getUser(client, message, args, 'user') || message.author
 
             if (!user?.id) return message.reply(`${e.Deny} | Nenhum usuário encontrado.`)
 

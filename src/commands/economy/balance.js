@@ -17,7 +17,7 @@ module.exports = {
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return BalInfo()
 
-        let user = client.getUser(client, message, args, false) || message.author
+        let user = client.getUser(client, message, args, 'user') || message.author
 
         if (user.id === client.user.id) return message.reply(`👝 | ${user.username} possui **∞ ${MoedaCustom}**`)
 
