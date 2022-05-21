@@ -72,16 +72,18 @@ function formatWord(word) {
 }
 
 // Forca Gaming
-async function registerChannel(status, channelId) {
+async function registerChannelControl(pullOrPush, where, channelId) {
 
-    return status === 'pull'
+    if (!pullOrPush || !where || !channelId) return
+
+    return pullOrPush === 'pull'
         ? await Database.Client.updateOne(
             { id: client.user.id },
-            { $pull: { ['GameChannels.Forca']: channelId } }
+            { $pull: { [`GameChannels.${where}`]: channelId } }
         )
         : await Database.Client.updateOne(
             { id: client.user.id },
-            { $push: { ['GameChannels.Forca']: channelId } }
+            { $push: { [`GameChannels.${where}`]: channelId } }
         )
 }
 
@@ -91,5 +93,5 @@ module.exports = {
     unregisterGameChannel,
     emoji,
     formatWord,
-    registerChannel
+    registerChannelControl
 }
