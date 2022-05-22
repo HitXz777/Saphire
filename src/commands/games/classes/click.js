@@ -164,13 +164,13 @@ class Click {
         }
 
         async function askingToInit() {
-
+            registerClickGame()
             msg = await message.channel.send({
                 content: `${e.QuestionMark} | ${user}, você está sendo chamado para uma partida de *Cliques*.`,
                 components: buttons.confirmAndDeclineButton
             })
 
-            return collector = msg.createMessageComponentCollector({
+            let collector = msg.createMessageComponentCollector({
                 filter: int => [message.author.id, user.id].includes(int.user.id),
                 max: 1,
                 time: 60000,
@@ -196,8 +196,10 @@ class Click {
 
                 .on('end', () => {
                     if (control.initiated) return
+                    unregisterClickGame()
                     return msg.edit({ content: `${e.Deny} | Jogo cancelado.`, components: [] }).catch(() => { })
                 })
+            return
         }
 
         function enableRandomButton() {
@@ -279,7 +281,7 @@ class Click {
                 .on('end', () => {
 
                     if (!control.finished) return
-
+                    unregisterClickGame()
                     return msg.edit({
                         content: `${e.Deny} | Jogo finalizado.\n🏆 | ${message.author} ${control.authorPoints} 🆚 ${control.userPoints} ${user}`,
                         components: []
