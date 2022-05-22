@@ -25,6 +25,7 @@ module.exports = {
         if (!dataRequire) return message.reply(`${e.Warn} | Houve um problema ao encontrar seus dados na minha database. Por favor, tente de novo.`)
 
         if (['all', 'tudo'].includes(args[0].toLowerCase())) requestValue = dataRequire?.Balance || 0
+        if (['half', 'metade'].includes(args[0].toLowerCase())) requestValue = parseInt((dataRequire?.Balance / 2)?.toFixed(0)) || 0
 
         let value = parseInt(requestValue)?.toFixed(0),
             money = dataRequire?.Balance || 0,

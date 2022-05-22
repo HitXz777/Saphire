@@ -20,7 +20,7 @@ class Database extends Models {
         this.Frases = new Ark.Database('../../JSON/frases.json')
         this.Characters = new Ark.Database('../../JSON/characters.json')
         this.Flags = new Ark.Database('../../JSON/flags.json')
-        this.Timeouts = new Ark.Database('../../timeouts.json')
+        this.Cache = new Ark.Database('../../cache.json')
         this.Names = {
             Rody: "451619591320371213",
             Gowther: "315297741406339083",
