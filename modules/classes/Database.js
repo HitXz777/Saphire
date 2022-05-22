@@ -46,7 +46,7 @@ Database.prototype.MongoConnect = async () => {
     } catch (err) {
         console.log('Mongoose Database | FAIL!\n--> ' + err)
         client.users.cache.get(config.ownerId)?.send('Erro ao conectar a database.').catch(() => { })
-        return client.off()
+        return client.destroy()
     }
 }
 

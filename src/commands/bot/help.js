@@ -5,7 +5,7 @@ const
 
 module.exports = {
     name: 'help',
-    aliases: ['comandos', 'comando', 'commands', 'h', 'ajuda', 'socorro', 'info', 'comands', 'cmd', 'cmds'],
+    aliases: ['comandos', 'comando', 'commands', 'botifo', 'h', 'ajuda', 'socorro', 'info', 'comands', 'cmd', 'cmds'],
     usage: '<help> [NomeDoComando]',
     category: 'bot',
     ClientPermissions: ['EMBED_LINKS'],
@@ -177,7 +177,15 @@ module.exports = {
                 idle: 60000
             })
 
-        collector.on('end', () => msg.edit({ components: [] }).catch(() => { }))
+        collector.on('end', () => {
+            
+            let embed = msg.embeds[0]
+            if (!embed) return
+            embed.color = client.red
+            embed.footer = { text: 'Comando cancelado.' }
+
+            return msg.edit({ embeds: [embed], components: [] }).catch(() => { })
+        })
 
         collector.on('collect', async (collected) => {
             if (collected.user.id !== message.author.id) return

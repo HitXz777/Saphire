@@ -12,7 +12,7 @@ module.exports = {
 
         if (['help', 'ajuda', 'info'].includes(args[0]?.toLowerCase())) return clickCommandInfo()
 
-        let user = getUser()
+        let user = client.getUser(client, message, args, 'member')
 
         if (!user)
             return message.reply(`${e.Deny} | Você precisa me dizer um usuário para começar o jogo.`)
@@ -26,7 +26,7 @@ module.exports = {
         if (user.user.bot)
             return message.reply(`${e.Deny} | Bots são invencíveis.`)
 
-        const buttons = {
+        let buttons = {
             lineOne: [
                 {
                     type: 1,
@@ -138,8 +138,9 @@ module.exports = {
                 initiated: false,
                 finished: false,
                 clicked: false,
+                userClicks: [],
                 buttons: [buttons.lineOne, buttons.lineTwo, buttons.lineThree].flat()
-            }
+            }, msg
 
         return askingToInit()
 
@@ -165,38 +166,28 @@ module.exports = {
             })
         }
 
-        function getUser(args0 = args[0]) {
-
-            return message.mentions.members.first()
-                || message.guild.members.cache.find(data => {
-                    return data.displayName?.toLowerCase() === args.join(' ')?.toLowerCase()
-                        || [args0?.toLowerCase()].includes(data.user.tag?.toLowerCase())
-                        || [args0].includes(data.user.discriminator)
-                        || [args0, message.mentions.repliedUser?.id].includes(data.id)
-                        || [args0?.toLowerCase()].includes(data.displayName?.toLowerCase())
-                        || data.user.username === args.join(' ')
-                })
-
-        }
-
         async function askingToInit() {
 
-            let msg = await message.channel.send({
+            msg = await message.channel.send({
                 content: `${e.QuestionMark} | ${user}, você está sendo chamado para uma partida de *Cliques*.`,
                 components: buttons.confirmAndDeclineButton
             })
 
             return collector = msg.createMessageComponentCollector({
                 filter: int => [message.author.id, user.id].includes(int.user.id),
-                time: 60000
+                max: 1,
+                time: 60000,
+                errors: ['max', 'time']
             })
                 .on('collect', (interaction) => {
                     interaction.deferUpdate().catch(() => { })
 
                     let customId = interaction.customId
 
-                    if (customId === 'accept' && interaction.user.id === user.id)
-                        return init(msg, collector)
+                    if (customId === 'accept' && interaction.user.id === user.id) {
+                        control.initiated = true
+                        return init()
+                    }
 
                     if (customId === 'deny')
                         return collector.stop()
@@ -212,7 +203,7 @@ module.exports = {
                 })
         }
 
-        function enableRandomButton(msg) {
+        function enableRandomButton() {
 
             let a1 = control.buttons[0].components[0],
                 a2 = control.buttons[0].components[1],
@@ -231,31 +222,42 @@ module.exports = {
             button.emoji = '🚀'
             control.clicked = false
 
+            control.userClicks = []
             return msg.edit({ components: control.buttons }).catch(() => { })
-
         }
 
-        function init(msg, askingCollector) {
+        async function init(collector) {
 
-            control.initiated = true
-            askingCollector.stop()
+            control.userClicks = []
+            if (collector) collector.stop()
 
             msg.edit({
                 content: `${e.Info} | Espere aparecer o botão verde e clique nele o mais rápido que puder!\n🏆 | ${message.author} ${control.authorPoints} 🆚 ${control.userPoints} ${user}\n📑 | Objetivo: ${control.maxPoints} pontos`,
                 components: control.buttons
             }).catch(() => { })
 
-            setTimeout(() => enableRandomButton(msg), 3000)
+            return setTimeout(() => { startCollector(); enableRandomButton() }, 3000)
 
-            return collector = msg.createMessageComponentCollector({
+        }
+
+        async function startCollector() {
+
+            msg.edit({ components: control.buttons }).catch(() => { })
+            let collector = msg.createMessageComponentCollector({
                 filter: int => [message.author.id, user.id].includes(int.user.id),
-                idle: 10000
+                idle: 10000,
+                errors: ['idle']
             })
                 .on('collect', async (interaction) => {
                     interaction.deferUpdate().catch(() => { })
 
-                    if (control.clicked) return
-                    control.clicked = true
+                    control.userClicks.push(interaction.user.id)
+
+                    if (control.userClicks.length >= 2) return true
+
+                    message.author.id === control.userClicks[0]
+                        ? control.authorPoints++
+                        : control.userPoints++
 
                     let customId = interaction.customId,
                         indexButton = { a1: 0, a2: 0, a3: 0, b1: 1, b2: 1, b3: 1, c1: 2, c2: 2, c3: 2 }[`${customId}`],
@@ -265,31 +267,27 @@ module.exports = {
                     button.style = 'SECONDARY'
                     button.emoji = '💤'
 
-                    interaction.user.id === message.author.id
-                        ? control.authorPoints++
-                        : control.userPoints++
-
-                    if (control.authorPoints >= control.maxPoints || control.userPoints >= control.maxPoints)
-                        return collector.stop()
-
                     msg.edit({
-                        content: `${e.Info} | Espere aparecer o botão verde e clique nele o mais rápido que puder!\n🏆 | ${message.author} ${control.authorPoints} 🆚 ${control.userPoints} ${user}`,
+                        content: `${e.Info} | Espere aparecer o botão verde e clique nele o mais rápido que puder!\n🏆 | ${message.author} ${control.authorPoints} 🆚 ${control.userPoints} ${user}\n📑 | Objetivo: ${control.maxPoints} pontos`,
                         components: control.buttons
                     }).catch(() => { })
 
-                    if (!control.finished)
-                        return setTimeout(() => enableRandomButton(msg), 3000)
+                    if (control.authorPoints >= control.maxPoints || control.userPoints >= control.maxPoints) {
+                        control.finished = true
+                        return collector.stop()
+                    }
 
-                    return
+                    return setTimeout(() => enableRandomButton(), 3000)
                 })
                 .on('end', () => {
-                    control.finished = true
+
+                    if (!control.finished) return
+
                     return msg.edit({
                         content: `${e.Deny} | Jogo finalizado.\n🏆 | ${message.author} ${control.authorPoints} 🆚 ${control.userPoints} ${user}`,
                         components: []
                     }).catch(() => { })
                 })
-
         }
 
     }
