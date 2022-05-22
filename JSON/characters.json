@@ -191,11 +191,6 @@
             "anime": ".hack//Quantum"
         },
         {
-            "name": "mysterious girl",
-            "image": "https://cdn.discordapp.com/attachments/977336593872470026/977587199631577128/unknown.png",
-            "anime": ".hack//Quantum"
-        },
-        {
             "name": "smith",
             "image": "https://cdn.discordapp.com/attachments/977336593872470026/977343145744408586/unknown.png",
             "anime": ".hack//Quantum"
@@ -809,6 +804,236 @@
             "name": "thanzamer",
             "image": "https://cdn.discordapp.com/attachments/977336968457383966/977349532092354620/unknown.png",
             "anime": "100-man no Inochi no Ue ni Ore wa Tatte Iru"
+        },
+        {
+            "name": "yukiko hirohara",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977938177618751558/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "misuzu kusakabe",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977940522427621436/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "yuka minase",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977940661280063498/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "kakeru satsuki",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977940805920624701/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "kukuri tachibana",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977940916423778414/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "takahisa tajima",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941074284798032/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "acedia",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941231059484682/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "saiko akamine",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941364450918460/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "avaritia",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941472504602664/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "gula",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941589097857075/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "invidia",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941690532900884/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "ira",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941801736495155/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "shiori momono",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941930367393883/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "kaori natsuki",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977941996608049233/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "superbia",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977942204351934464/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "tadashi teruya",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977942310581059644/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "verard",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977942425672769557/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "lisette weltall",
+            "image": "https://cdn.discordapp.com/attachments/977936699986411621/977942586520109086/unknown.png",
+            "anime": "11eyes"
+        },
+        {
+            "name": "yui aoi",
+            "image": "https://cdn.discordapp.com/attachments/977936833755361370/977944227700961410/unknown.png",
+            "anime": "12-sai.: Chicchana Mune no Tokimeki"
+        },
+        {
+            "name": "hanabi ayase",
+            "image": "https://cdn.discordapp.com/attachments/977936833755361370/977944301256470640/unknown.png",
+            "anime": "12-sai.: Chicchana Mune no Tokimeki"
+        },
+        {
+            "name": "kazuma hiyama",
+            "image": "https://cdn.discordapp.com/attachments/977936833755361370/977944357749534730/unknown.png",
+            "anime": "12-sai.: Chicchana Mune no Tokimeki"
+        },
+        {
+            "name": "yuuto takao",
+            "image": "https://cdn.discordapp.com/attachments/977936833755361370/977944415417028721/unknown.png",
+            "anime": "12-sai.: Chicchana Mune no Tokimeki"
+        },
+        {
+            "name": "kokoa hamana",
+            "image": "https://cdn.discordapp.com/attachments/977936833755361370/977944475651428432/unknown.png",
+            "anime": "12-sai.: Chicchana Mune no Tokimeki"
+        },
+        {
+            "name": "inaba mikami",
+            "image": "https://cdn.discordapp.com/attachments/977936833755361370/977944555917807616/unknown.png",
+            "anime": "12-sai.: Chicchana Mune no Tokimeki"
+        },
+        {
+            "name": "marin ogura",
+            "image": "https://cdn.discordapp.com/attachments/977936833755361370/977944617033023578/unknown.png",
+            "anime": "12-sai.: Chicchana Mune no Tokimeki"
+        },
+        {
+            "name": "ayumu tsutsumi",
+            "image": "https://cdn.discordapp.com/attachments/977936833755361370/977944663136800809/unknown.png",
+            "anime": "12-sai.: Chicchana Mune no Tokimeki"
+        },
+        {
+            "name": "katsumi kanzaki",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977946930338488340/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "lily",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977946967739088986/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "haruto tsukishiro",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977947010537750558/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "ehyeh",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977947053252542464/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "eve",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977947092318302228/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "mana hayashida",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977947705420701796/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "natsuki kamikawa",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977947741269393518/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "akito kaminaga",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977947771808153681/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "yurina kanzaki",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977947806004285460/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "airi kojima",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977947840636665936/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "mari",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977948299820691457/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "mirei mikami",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977948339339411476/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "misaki",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977948371186749520/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "nene",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977948400525922324/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "yuuko sakurabe",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977948444901650502/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "sono",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977948903032897656/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "kayo sugisaki",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977948951284154449/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "hanako sumitomo",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977948987938209802/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "yuki",
+            "image": "https://cdn.discordapp.com/attachments/977936881616556042/977949018623713340/unknown.png",
+            "anime": "18if"
+        },
+        {
+            "name": "aura",
+            "image": "https://cdn.discordapp.com/attachments/977336593872470026/977587199631577128/unknown.png",
+            "anime": ".hack//Quantum"
         }
     ]
 }
