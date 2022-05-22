@@ -66,8 +66,8 @@ module.exports = {
                 .setDescription(`🏆 ${quantia} ${moeda}\n${e.OwnerCrow} ${winner.author} Acertou o número: ${Number}`).setFooter({ text: 'Concluído' })
 
             msg.edit({ embeds: [Bingo] }).catch(() => { })
-            Database.add(winner.id, quantia)
             toCancel = true
+            Database.add(winner.author.id, quantia)
             Database.PushTransaction(winner.author.id, `${e.gain} Recebeu ${quantia || 0} Safiras jogando no bingo`)
             winner.reply(`${e.MoneyWings} | ${winner.author} acertou o número do bingo! **${Number}**`).catch(() => { })
 

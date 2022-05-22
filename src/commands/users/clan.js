@@ -20,7 +20,7 @@ module.exports = {
             Clans = await Database.Clan.find({}) || [],
             dataUser = await Database.User.findOne({ id: message.author.id }, 'Clan Balance'),
             AtualClan = dataUser.Clan,
-            user = message.mentions.members.first() || message.guild.members.cache.get(args[1]) || message.guild.members.cache.get(args[0]),
+            user = client.getUser(client, message, args, 'member'),
             keys = [],
             RequestControl,
             reg = /^[A-Za-z0-9áàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ' ]+$/i,
@@ -113,19 +113,42 @@ module.exports = {
             if (Clans.find(data => data.Name === ClanName))
                 return message.reply(`${e.Deny} | Já existe um clan com este nome.`)
 
-            new Database.Clan({
-                id: ID,
-                Name: ClanName,
-                Owner: message.author.id,
-                Members: [message.author.id],
-                LogRegister: [{ Data: Data(0, true), Message: `🛡️ ${message.author.tag} criou o clan **${ClanName}**` }]
-            }).save()
+            let msg = await message.reply(`${e.QuestionMark} | Você confirma gastar **2.000.000 ${moeda}** para criar o clan **\`${ClanName}\`**?`),
+                emojis = ['✅', '❌']
 
-            Database.updateUserData(message.author.id, 'Clan', ClanName)
-            Database.subtract(message.author.id, 2000000)
-            Database.PushTransaction(message.author.id, `${e.loss} Gastou 2000000 Safiras para criar o clan ${ClanName}`)
+            for (let i of emojis) msg.react(i).catch(() => { })
+            return msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                max: 1,
+                time: 60000,
+                erros: ['max', 'time']
+            })
+                .on('collect', (reaction) => {
 
-            return message.channel.send(`${e.Check} | Você criou o clan **${ClanName}** \`${ID}\` com sucesso!`)
+                    if (reaction.emoji.name === emojis[1]) return
+
+                    msg.delete().catch(() => { })
+                    if (reaction.emoji.name === emojis[0]) return createClan()
+
+                })
+                .on('end', () => msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { }))
+
+            function createClan() {
+
+                new Database.Clan({
+                    id: ID,
+                    Name: ClanName,
+                    Owner: message.author.id,
+                    Members: [message.author.id],
+                    LogRegister: [{ Data: Data(0, true), Message: `🛡️ ${message.author.tag} criou o clan **${ClanName}**` }]
+                }).save()
+
+                Database.updateUserData(message.author.id, 'Clan', ClanName)
+                Database.subtract(message.author.id, 2000000)
+                Database.PushTransaction(message.author.id, `${e.loss} Gastou 2000000 Safiras para criar o clan ${ClanName}`)
+
+                return message.channel.send(`${e.Check} | Você criou o clan **${ClanName}** \`${ID}\` com sucesso!`)
+            }
 
         }
 

@@ -61,7 +61,8 @@ module.exports = {
 
             function Reboot(msg) {
 
-                msg?.edit(`${e.Loading} | Reiniciando...`).catch(() => { })
+                msg?.edit(`${e.Loading} | Reiniciando em breve...`).catch(() => { })
+                return
                 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
                 fetch(`https://discloud.app/status/bot/${client.user.id}/restart`, {

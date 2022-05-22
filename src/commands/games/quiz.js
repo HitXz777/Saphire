@@ -242,7 +242,6 @@ module.exports = {
                         return message.channel.send(`${e.Deny} | ${message.author}, já tem um quiz rolando nesse chat.`).then(m => setTimeout(() => m.delete().catch(() => { }), 2500))
 
                     await registerChannelControl('push', 'Quiz', message.channel.id)
-                    control.interactionReact = true
                     if (customId === 'animeMode') {
 
                         let _characters = characters.get('Characters')
@@ -253,10 +252,12 @@ module.exports = {
                         }
 
                         msg.delete().catch(() => { })
+                        if (customId === 'animeList') return listCharacters()
                         return startAnimeThemeQuiz()
                     }
+
+                    control.interactionReact = true
                     msg.delete().catch(() => { })
-                    if (customId === 'animeList') return listCharacters()
                     if (customId === 'normalMode') return init()
                     if (customId === 'fastMode') {
                         control.fast = true
@@ -264,10 +265,10 @@ module.exports = {
                     }
 
                 })
-                .on('end', () => {
+                .on('end', async () => {
 
                     if (control.interactionReact) return
-                    pullChannel(message.channel.id)
+                    await registerChannelControl('pull', 'Quiz', message.channel.id)
                     return msg.edit({ content: `${e.Deny} | Comando cancelado`, components: [] }).catch(() => { })
                 })
         }
@@ -701,7 +702,7 @@ module.exports = {
                         description = current.map((data, i) => {
 
                             let anime = characters.filter(d => d.anime?.toLowerCase() === data) || [],
-                                animeName = anime[0]?.anime || `ANIME NOT FOUND ${formatNumberCaracters(i + 1)}`
+                                animeName = anime[0]?.anime || `${anime[0]?.name} - ANIME NOT FOUND`
 
                             options.push({
                                 label: `${formatNumberCaracters(i + 1)} - ${animeName}`,
@@ -882,15 +883,6 @@ module.exports = {
 
                         if (Message.content === 'CANCEL') return collector.stop()
 
-                        let alreadyHas = characters?.find(p => p.name.toLowerCase() === Message.content?.toLowerCase()
-                            || p.image === Message.content) || null
-
-                        if (alreadyHas && alreadyHas.name.toLowerCase() === Message.content.toLowerCase())
-                            return Message.reply(`${e.Deny} | Este nome já pertence a este personagem`)
-
-                        if (alreadyHas)
-                            return Message.reply(`${e.Deny} | Este nome já pertence a um personagem no banco de dados.`)
-
                         control.collected = true
 
                         embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Name\`**\nNew Name: \`${formatString(Message.content)}\``
@@ -918,7 +910,7 @@ module.exports = {
 
                                 let newSet = characters.filter(data => data.name !== has.name)
 
-                                Database.Characters.set('Characters', [{ name: Message.content, image: has.image }, ...newSet])
+                                Database.Characters.set('Characters', [{ name: Message.content, image: has.image, anime: has.anime }, ...newSet])
 
                                 embed.color = client.green
                                 embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Name\`**\nNew Name: \`${formatString(Message.content)}\``
@@ -1170,11 +1162,12 @@ module.exports = {
                 return message.reply(`${e.Admin} | Apenas os administradores do quiz *Anime Theme* tem o poder de deletar personagens.`)
 
             let characters = Database.Characters.get('Characters') || [],
-                image = args[1],
-                name = args.slice(1).join(' ')?.toLowerCase()
+                image = args[1]
+
+            if (args[1]?.toLowerCase() === 'anime') return deleteAnime()
 
             if (!image)
-                return message.reply(`${e.Deny} | \`${prefix}quiz del <imageLink> <Nome do Personagem>\``)
+                return message.reply(`${e.Deny} | \`${prefix}quiz del <imageLink> ou <Nome do Personagem>\``)
 
             let has = characters?.find(p => p.name.toLowerCase() === args.join(' ')?.toLowerCase()
                 || p.name.toLowerCase().includes(args[1]?.toLowerCase())
@@ -1222,6 +1215,52 @@ module.exports = {
                     if (clicked) return
                     return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [] }).catch(() => { })
                 })
+
+            async function deleteAnime() {
+
+                let animeName = args.slice(2).join(' ')?.toLowerCase()
+
+                if (!animeName)
+                    return message.reply(`${e.Deny} | \`${prefix}quiz del anime <nome do anime>\``)
+
+                let has = characters?.find(p => p.anime?.toLowerCase() === animeName
+                    || p.anime?.toLowerCase().includes(animeName) || null)
+
+                if (!has)
+                    return message.reply(`${e.Deny} | Esse anime não existe no banco de dados.`)
+
+                let msg = await message.reply({
+                    content: `${e.QuestionMark} | Você confirma deletar o anime **\`${formatString(has.anime)}\`** do banco de dados do **Quiz Anime Theme**?\n${e.Info} | Este anime possui **\`${characters.filter(data => data.anime?.toLowerCase() === animeName?.toLowerCase())?.length || 0}\`** personagens.`
+                }),
+                    emojis = ['✅', '❌'], clicked = false
+
+                for (let i of emojis) msg.react(i).catch(() => { })
+                let collector = msg.createReactionCollector({
+                    filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                    time: 60000,
+                    max: 1,
+                    erros: ['time', 'max']
+                })
+                    .on('collect', (r) => {
+
+                        if (r.emoji.name === emojis[1])
+                            return collector.stop()
+
+                        clicked = true
+                        let newSet = characters.filter(data => data.anime !== has.anime)
+
+                        Database.Characters.set('Characters', [...newSet])
+                        return msg.edit({
+                            content: `${e.Check} | O anime **\`${formatString(has.anime)}\`** foi deletado com sucesso!`
+                        }).catch(() => { })
+                    })
+                    .on('end', () => {
+                        if (clicked) return
+                        return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [] }).catch(() => { })
+                    })
+
+            }
+
         }
 
         async function pullChannel(channelId) {

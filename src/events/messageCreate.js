@@ -45,7 +45,7 @@ client.on('messageCreate', async message => {
     if (clientData?.Blacklist?.Users?.some(data => data?.id === message.author.id)) return
 
     if (message.content.startsWith(prefix) && clientData.Rebooting?.ON)
-        return message.reply(`${e.Loading} | Relogando...\n${e.BookPages} | ${clientData.Rebooting?.Features || 'Nenhum dado fornecido'}`)
+        return message.reply(`${e.Loading} | Reiciando em breve...\n${e.BookPages} | ${clientData.Rebooting?.Features || 'Nenhum dado fornecido'}`)
 
     if (!guild) Database.registerServer(message.guild, client)
     BlockCommandsBot(message, client.user.id, guild?.Blockchannels)
@@ -64,7 +64,6 @@ client.on('messageCreate', async message => {
         cmd = args.shift().toLowerCase()
 
     if (!message.content.startsWith(prefix) || cmd.length == 0) return
-    if (!isNaN(parseInt(cmd))) return
     if (args.join(' ').length > 1500) return message.reply(`${e.Deny} | O limite máximo de caracteres nas mensagens são de 1500 caracteres.`)
 
     if (!/^[A-Za-z0-9áàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]+$/i.test(cmd))
@@ -125,7 +124,6 @@ client.on('messageCreate', async message => {
     if (limited) return message.react('⏱️').catch(() => message.reply('⏱️ | Calminha!'))
 
     Database.newCommandRegister(message, data(), client.user.id, command.name)
-
     return command.execute(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
 
 })

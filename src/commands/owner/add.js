@@ -15,8 +15,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let u = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.get(args[0]) || client.users.cache.get(args[1])
-        let user = client.users.cache.get(u?.id)
+        let user = client.getUser(client, message, args, 'user')
         let amount = parseInt(args[2]?.replace(/k/g, '000')) || parseInt(args[1]?.replace(/k/g, '000'))
         let moeda = await Moeda(message)
 

@@ -36,7 +36,7 @@ module.exports = {
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
             if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
-                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team podem adicionar novas bandeiras no Flag Game.`)
+                return message.reply(`${e.Admin} | Apenas moderadores e administradores do *Flag Gaming* podem adicionar novas bandeiras.`)
 
             let flag = args[1],
                 image = args[2],
@@ -86,7 +86,7 @@ module.exports = {
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
             if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
-                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team podem remover bandeiras no Flag Game.`)
+                return message.reply(`${e.Admin} | Apenas moderadores e administradores do *Flag Gaming* podem editar bandeiras.`)
 
             if (['image', 'imagem'].includes(args[1]?.toLowerCase())) return editImage()
             if (['emoji'].includes(args[1]?.toLowerCase())) return editEmoji()
@@ -99,7 +99,7 @@ module.exports = {
                     country = args.slice(3).join(' ')?.toLowerCase()
 
                 if (!link || !country)
-                    return message.reply(`${e.Info} | \`${prefix}flag edit image <link> <emoji ou nome do país>\``)
+                    return message.reply(`${e.Info} | \`${prefix}flag edit image <new link> <emoji ou nome do país>\``)
 
                 if (!IsUrl(link) || !link?.includes('https://media.discordapp.net/attachments'))
                     return message.reply(`${e.Deny} | O link da imagem não é um link válido. Verique se o formato dele é compátivel com \`https://media.discordapp.net/attachments\``)
@@ -259,7 +259,7 @@ module.exports = {
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
             if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
-                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team podem remover bandeiras no Flag Game.`)
+                return message.reply(`${e.Admin} | Apenas moderadores e administradores do *Flag Gaming* podem remover bandeiras.`)
 
             let args1 = args.slice(1).join(' ')
 
@@ -305,7 +305,7 @@ module.exports = {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
+            if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de Bandeiras.`)
 
             if (!flags || flags.length === 0)
