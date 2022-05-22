@@ -11,6 +11,7 @@ const client = require('../../index'),
     Models = require('../database/Models'),
     config = configData.get('config'),
     e = eData.get('e')
+    
 class Database extends Models {
     constructor() {
         super()
