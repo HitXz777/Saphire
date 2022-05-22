@@ -45,7 +45,7 @@ module.exports = {
                 customIds: []
             },
             emojiDefault = e.raspadinha
-            buttons = getButtons()
+        buttons = getButtons()
 
         let msg = await message.reply(`${e.QuestionMark} | Você deseja gastar uma raspadinha e tentar sua sorte?`)
         for (let i of control.checkEmojis) msg.react(i).catch(() => { })
@@ -163,6 +163,7 @@ module.exports = {
                     disableAllButtons([a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4])
                     return win(condicional[0].emoji)
                 }
+                else continue
 
             if (control.clicks >= 16) {
                 disableAllButtons([a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4])
@@ -181,6 +182,8 @@ module.exports = {
             let winPrize = prize[emoji] || 0
 
             if (winPrize > 0) {
+                if (control.added) return
+                control.added = true
                 Database.add(message.author.id, winPrize)
                 Database.PushTransaction(message.author.id, `${e.gain} Ganhou ${winPrize} Safiras em uma *raspadinha*`)
                 addTotalPrize(winPrize)

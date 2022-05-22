@@ -15,7 +15,7 @@ module.exports = {
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return InfoPay()
 
         let moeda = await Moeda(message),
-            user = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.guild.members.cache.get(args[1]) || message.guild.members.cache.find(user => user.username?.toLowerCase() == args[0]?.toLowerCase() || user.tag?.toLowerCase() == args[0]?.toLowerCase()) || message.mentions.repliedUser
+            user = client.getUser(client, message, args, 'user')
 
         if (!user) return message.reply(`${e.MoneyWings} | Transfira dinheiro rápido e fácil! É assim olha: \`${prefix}pay <@user/id> <quantia>\``)
         if (user.id === client.user.id) return message.reply(`${e.HiNagatoro} | Preciso não coisa fofa, eu já sou rica.`)
