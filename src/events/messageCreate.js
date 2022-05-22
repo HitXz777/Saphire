@@ -43,7 +43,7 @@ client.on('messageCreate', async message => {
     if (clientData?.Blacklist?.Users?.some(data => data?.id === message.author.id)) return
 
     if (message.content.startsWith(prefix) && clientData.Rebooting?.ON)
-        return message.reply(`${e.Loading} | Reiciando em breve...\n${e.BookPages} | ${clientData.Rebooting?.Features || 'Nenhum dado fornecido'}`)
+        return message.reply(`${e.Loading} | Reiniciando em breve...\n${e.BookPages} | ${clientData.Rebooting?.Features || 'Nenhum dado fornecido'}`)
 
     if (!guild) Database.registerServer(message.guild, client)
     BlockCommandsBot(message, client.user.id, guild?.Blockchannels)

@@ -29,8 +29,8 @@ class Raspadinha {
         if (raspadinhaData?.GameChannels?.Raspadinhas?.includes(message.author.id))
             return message.reply(`${e.Deny} | Você já tem uma raspadinha sendo aberta. Termine de abrir, depois abra outra. Cuidado com a ganância, ser humano.`)
 
-        if (Database.Cache.get(`Raspadinhas.${message.channel.id}`) >= 5)
-            return message.reply(`${e.Deny} | O limite de raspadinhas por canal é 5. Espere uma raspadinha fechar para você abrir a sua, ok?`)
+        if (Database.Cache.get(`Raspadinhas.${message.channel.id}`) >= 2)
+            return message.reply(`${e.Deny} | Apenas 2 raspadinhas são permitidas por canal, ok? Espere uma raspadinha fechar para você abrir a sua.`)
 
         registerRaspadinha()
 

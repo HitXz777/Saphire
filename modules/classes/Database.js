@@ -102,13 +102,6 @@ Database.prototype.getGuild = async (guildId, params = null) => {
 
 }
 
-Database.prototype.getUser = async (userId, params = null) => {
-
-    let data = await User.findOne({ id: userId }, params)
-    return data
-
-}
-
 Database.prototype.closeLotery = async (clientId) => {
 
     await Lotery.updateOne(
