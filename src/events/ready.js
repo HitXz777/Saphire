@@ -13,6 +13,7 @@ client.on("ready", async () => {
 
     Database.registerClient(client.user.id)
     Database.openLotery(client.user.id)
+    Database.Timeouts.clear()
 
     let data = await Database.Client.findOne({ id: client.user.id }, 'Rebooting')
 

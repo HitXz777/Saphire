@@ -5,6 +5,7 @@ module.exports = {
     name: 'ping',
     aliases: ['ws', 'ms', 'latency'],
     category: 'bot',
+    cooldown: 5000,
     emoji: '🏓',
     description: 'Ping/Latency do bot',
 

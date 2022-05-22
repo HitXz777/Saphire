@@ -10,6 +10,7 @@ module.exports = {
     category: 'level',
     ClientPermissions: ['ATTACH_FILES'],
     emoji: `${e.Star}`,
+    cooldown: 4000,
     usage: '<level> [info]',
     description: 'Confira seu nível ou o de alguém',
 
