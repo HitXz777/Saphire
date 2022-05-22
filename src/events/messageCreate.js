@@ -3,8 +3,6 @@ const
     { MessageEmbed, Permissions } = require('discord.js'),
     client = require('../../index'),
     { config } = require('../../JSON/config.json'),
-    { RateLimiter } = require('discord.js-rate-limiter'),
-    rateLimiter = new RateLimiter(1, 1500),
     { e } = require('../../JSON/emojis.json'),
     xp = require('../../modules/functions/public/experience'),
     AfkSystem = require('../../modules/functions/public/AfkSystem'),
@@ -120,14 +118,26 @@ client.on('messageCreate', async message => {
     if (command.category === 'economy' && clientData?.Blacklist?.Economy?.some(data => data.id === message.author.id))
         return message.reply(`${e.Deny} | Você está na blacklist da Economia Global.`)
 
-    limited = rateLimiter.take(message.author.id)
-    if (limited) return message.react('⏱️').catch(() => message.reply('⏱️ | Calminha!'))
+    let timeout = parseInt(Database.Timeouts.get(`Timeouts.${command.name}.${message.author.id}.Time`)) || 0
+
+    if (client.Timeout(command.cooldown || 1500, timeout)) {
+
+        if (Database.Timeouts.get(`Timeouts.${command.name}.${message.author.id}.TimesTried`) > 5) return
+
+        if (Database.Timeouts.get(`Timeouts.${command.name}.${message.author.id}.Tried`))
+            Database.Timeouts.add(`Timeouts.${command.name}.${message.author.id}.Time`, 3000)
+
+        Database.Timeouts.add(`Timeouts.${command.name}.${message.author.id}.TimesTried`, 1)
+        Database.Timeouts.set(`Timeouts.${command.name}.${message.author.id}.Tried`, true)
+        return message.reply(`⏱️ | Calma, calma! Você ainda tem mais **\`${client.GetTimeout(command.cooldown || 1500, Database.Timeouts.get(`Timeouts.${command.name}.${message.author.id}.Time`), true)}\`** para usar este comando novamente.`)
+    }
+
+    Database.Timeouts.set(`Timeouts.${command.name}.${message.author.id}`, { Time: Date.now() })
 
     Database.newCommandRegister(message, data(), client.user.id, command.name)
     return command.execute(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
 
 })
-
 async function BlockCommandsBot(message, clientId, Blockchannels) {
 
     if (!message || !Blockchannels) return
