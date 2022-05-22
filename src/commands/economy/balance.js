@@ -21,7 +21,7 @@ module.exports = {
 
         if (user.id === client.user.id) return message.reply(`👝 | ${user.username} possui **∞ ${MoedaCustom}**`)
 
-        let userData = await Database.User.findOne(user.id, 'Balance Perfil')
+        let userData = await Database.User.findOne({ id: user.id }, 'Balance Perfil')
 
         if (!userData) return message.reply(`${e.Database} | DATABASE | Não foi possível obter os dados de **${user.tag}** *\`${user.id}\`*`)
 
@@ -41,7 +41,6 @@ module.exports = {
 
                 let BalanceAtEmbed = `👝 | ${NameOrUsername} **${bal} ${MoedaCustom}**`,
                     oculted = `👝 | ${NameOrUsername} **||oculto ${MoedaCustom}||**`
-
                 editMessage = msg.content === BalanceAtEmbed ? oculted : BalanceAtEmbed
 
                 return msg.edit(`${editMessage}`).catch(() => { })
