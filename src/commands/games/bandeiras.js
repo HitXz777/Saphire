@@ -316,7 +316,7 @@ module.exports = {
 
             let msg = await message.reply({ embeds: [embeds[0]] })
             if (embeds.length === 1) return
-            let emojis = ['⬅️', '➡️', '❌']
+            let emojis = ['⏪', '⬅️', '➡️', '⏩', '❌'] // TODO: Trade to buttons
 
             for (let i of emojis) msg.react(i).catch(() => { })
             let collector = msg.createReactionCollector({
@@ -326,25 +326,29 @@ module.exports = {
             })
                 .on('collect', async (reaction) => {
 
-                    if (reaction.emoji.name === emojis[2])
+                    if (reaction.emoji.name === emojis[4])
                         return collector.stop()
 
-                    if (reaction.emoji.name === emojis[0]) {
-                        control--
-                        if (control < 0) control = embeds.length - 1
-                        return msg.edit({ embeds: [embeds[control]] }).catch(() => { })
-                    }
+                    if (reaction.emoji.name === emojis[0])
+                        control = 0
+
+                    if (reaction.emoji.name === emojis[3])
+                        control = embeds.length - 1
 
                     if (reaction.emoji.name === emojis[1]) {
-                        control++
-                        if (control >= embeds.length) control = 0
-                        return msg.edit({ embeds: [embeds[control]] }).catch(() => { })
+                        control--
+                        if (control < 0) control = embeds.length - 1
                     }
 
-                    return
+                    if (reaction.emoji.name === emojis[2]) {
+                        control++
+                        if (control >= embeds.length) control = 0
+                    }
+
+                    return msg.edit({ embeds: [embeds[control]] }).catch(() => { })
                 })
                 .on('end', () => {
-                    let embed = embeds[control]
+                    let embed = msg.embeds[0]
                     embed.color = client.red
                     embed.footer.text = `${embed.footer.text} | Comando cancelado`
                     return msg.edit({ embeds: [embed] }).catch(() => { })
@@ -353,15 +357,22 @@ module.exports = {
 
             function EmbedGenerator() {
 
+                let array = [...new Set(flags.map(x => x.country?.toLowerCase()))].sort()
+
                 let amount = 15,
                     Page = 1,
                     embeds = [],
-                    length = flags.length / 15 <= 1 ? 1 : parseInt((flags.length / 15) + 1)
+                    length = array.length / 15 <= 1 ? 1 : parseInt((array.length / 15) + 1)
 
-                for (let i = 0; i < flags.length; i += 15) {
+                for (let i = 0; i < array.length; i += 15) {
 
-                    let current = flags.slice(i, amount),
-                        description = current.map(f => `> ${f.flag} **${formatString(f.country)}**`).join("\n")
+                    let current = array.slice(i, amount),
+                        description = current.map(data => {
+
+                            let f = flags.find(d => d.country?.toLowerCase() === data)
+
+                            return `> ${f.flag} **${formatString(f.country)}**`
+                        }).join("\n")
 
                     if (current.length > 0) {
 
@@ -370,7 +381,7 @@ module.exports = {
                             title: `${e.Database} Database Flag Game List - ${Page}/${length}`,
                             description: `${description}`,
                             footer: {
-                                text: `${flags.length} Flags contabilizadas`
+                                text: `${array.length} Flags contabilizadas`
                             }
                         })
 
