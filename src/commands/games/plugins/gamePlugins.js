@@ -116,6 +116,10 @@ function GetWord(Palavras) {
     return Palavras[Math.floor(Math.random() * Palavras.length)]
 }
 
+function formatNumberCaracters(number) {
+    return number < 10 ? `0${number}` : `${number}`
+}
+
 module.exports = {
     formatString,
     formatArray,
@@ -123,6 +127,7 @@ module.exports = {
     GetWord,
     registerGameChannel,
     unregisterGameChannel,
+    formatNumberCaracters,
     emoji,
     formatWord,
     registerChannelControl

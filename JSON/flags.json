@@ -1,6 +1,11 @@
 {
     "Flags": [
         {
+            "flag": "🇨🇰",
+            "country": "ilhas cook",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977746825840844860/h.webp"
+        },
+        {
             "flag": "🇸🇰",
             "country": "eslováquia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976483477094563860/unknown.png?width=705&height=470"
@@ -969,6 +974,236 @@
             "flag": "🇨🇼",
             "country": "curaçao",
             "image": "https://media.discordapp.net/attachments/945026030123499530/977587141909557258/4c2251b6f04445f82961142e9fe8adf4.jpg"
+        },
+        {
+            "flag": "🇬🇭",
+            "country": "gana",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977741167355646002/unknown.png"
+        },
+        {
+            "flag": "🇬🇳",
+            "country": "guiné",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977741765102694450/unknown.png"
+        },
+        {
+            "flag": "🇨🇽",
+            "country": "ilha christmas",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977747034675224626/h_1.png"
+        },
+        {
+            "flag": "🇨🇨",
+            "country": "ilhas cocos",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977747197921755186/h.png"
+        },
+        {
+            "flag": "🇬🇮",
+            "country": "gibraltar",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977747845111222282/h_2.png"
+        },
+        {
+            "flag": "🇲🇶",
+            "country": "martinica",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977749373406543882/h_4.png"
+        },
+        {
+            "flag": "🇬🇶",
+            "country": "guiné equatorial",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977749427114627132/h_3.png"
+        },
+        {
+            "flag": "🇦🇮",
+            "country": "anguilla",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977749940375789568/h_5.png"
+        },
+        {
+            "flag": "🇬🇺",
+            "country": "guam",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977750706360565830/h_7.png"
+        },
+        {
+            "flag": "🇬🇬",
+            "country": "guernsey",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977750765831602206/h_6.png"
+        },
+        {
+            "flag": "🇪🇺",
+            "country": "união europeia",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977751204627095562/h_8.png"
+        },
+        {
+            "flag": "🇮🇲",
+            "country": "ilha de man",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977752269690896424/h_9.png"
+        },
+        {
+            "flag": "🇪🇭",
+            "country": "saara ocidental",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977752319154335754/h_1.webp"
+        },
+        {
+            "flag": "🇦🇼",
+            "country": "aruba",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977752758792884264/h_10.png"
+        },
+        {
+            "flag": "🇪🇹",
+            "country": "etiópia",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977752802182983680/h_11.png"
+        },
+        {
+            "flag": "🇱🇸",
+            "country": "lesoto",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977753772275159120/h_2.webp"
+        },
+        {
+            "flag": "🇬🇱",
+            "country": "groenlândia",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977753829070225488/h_12.png"
+        },
+        {
+            "flag": "🇳🇫",
+            "country": "ilhas norfolk",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977754340242632704/h_14.png"
+        },
+        {
+            "flag": "🇯🇪",
+            "country": "jersey",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977754393103450142/h_13.png"
+        },
+        {
+            "flag": "🇳🇨",
+            "country": "nova caledônia",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977754837934538752/h_16.png"
+        },
+        {
+            "flag": "🇮🇨",
+            "country": "ilhas canárias",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977754888337489980/h_15.png"
+        },
+        {
+            "flag": "🇫🇰",
+            "country": "ilhas malvinas",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977755376629973012/h_18.png"
+        },
+        {
+            "flag": "🇲🇴",
+            "country": "macau",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977755407705571338/h_17.png"
+        },
+        {
+            "flag": "🇫🇮",
+            "country": "finlândia",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977755999232466974/h_19.png"
+        },
+        {
+            "flag": "🇸🇭",
+            "country": "santa helena",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977757925785341992/h_21.png"
+        },
+        {
+            "flag": "🇸🇧",
+            "country": "ilhas salomão",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977757982089691136/h_3.webp"
+        },
+        {
+            "flag": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+            "country": "país de gales",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977758114826842192/h_22.png"
+        },
+        {
+            "flag": "🇰🇼",
+            "country": "kuwait",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977758653555822612/h_4.webp"
+        },
+        {
+            "flag": "🇭🇰",
+            "country": "hong kong",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977759103218749470/h_23.png"
+        },
+        {
+            "flag": "🇬🇸",
+            "country": "ilhas geórgias do sul",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977759588822687744/h_25.png"
+        },
+        {
+            "flag": "🇻🇮",
+            "country": "ilhas virgens americanas",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977759671165276210/h_24.png"
+        },
+        {
+            "flag": "🇬🇵",
+            "country": "guadalupe",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977760207121834014/h_27.png"
+        },
+        {
+            "flag": "🇹🇦",
+            "country": "tristão da cunha",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977761199112462376/h_29.png"
+        },
+        {
+            "flag": "🇳🇺",
+            "country": "niue",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977761243769208902/h_28.png"
+        },
+        {
+            "flag": "🇬🇦",
+            "country": "gabão",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977761573273763860/h_5.webp"
+        },
+        {
+            "flag": "🇫🇴",
+            "country": "ilhas faroé",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977762260674052176/h_31.png"
+        },
+        {
+            "flag": "🇲🇵",
+            "country": "ilhas marianas",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977762312905711657/h_30.png"
+        },
+        {
+            "flag": "🇧🇶",
+            "country": "bonaire",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977763011488014396/h_32.png"
+        },
+        {
+            "flag": "🇦🇽",
+            "country": "ilhas aland",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977763083491610654/h_33.png"
+        },
+        {
+            "flag": "🇼🇫",
+            "country": "wallis e futuna",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977763830266466354/h_35.png"
+        },
+        {
+            "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+            "country": "inglaterra",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977764120722047057/h_34.png"
+        },
+        {
+            "flag": "🇷🇪",
+            "country": "ilha de reunião",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977764678065344552/h_36.png"
+        },
+        {
+            "flag": "🇹🇰",
+            "country": "tokelau",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977765397317169222/h_20.png"
+        },
+        {
+            "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+            "country": "escócia",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977765778076086352/h_37.png"
+        },
+        {
+            "flag": "🇵🇷",
+            "country": "porto rico",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977766182792855582/h_38.png"
+        },
+        {
+            "flag": "🇾🇹",
+            "country": "mayotte",
+            "image": "https://media.discordapp.net/attachments/945026030123499530/977766667272745050/h_39.png"
         }
     ]
 }

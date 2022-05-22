@@ -1,6 +1,6 @@
 const { e } = require('../../../JSON/emojis.json'),
     quizData = require('../../../JSON/quiz.json'),
-    { formatString, registerChannelControl, emoji } = require('./plugins/gamePlugins')
+    { formatString, registerChannelControl, emoji, formatNumberCaracters } = require('./plugins/gamePlugins')
 
 module.exports = {
     name: 'quiz',
@@ -14,15 +14,17 @@ module.exports = {
 
         let rankingControl = [],
             timesSkiped = 0,
-            control = { embed: new MessageEmbed(), usersPoints: [] },
+            control = { embed: new MessageEmbed(), usersPoints: [], animePaginationList: [], selectMenuForEmbedsTrading: [] },
             characters = Database.Characters,
-            fastMode = 25000
+            fastMode = 25000,
+            clientData = await Database.Client.findOne({ id: client.user.id }, 'Administradores'),
+            admins = clientData?.Administradores || []
 
         if (['status', 'stats', 'st'].includes(args[0]?.toLowerCase())) return quizStatus()
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return quizInfo()
         if (['reset', 'reboot', 'r'].includes(args[0]?.toLowerCase())) return resetQuizChannels()
         if (['add', 'adicionar', 'new', '+'].includes(args[0]?.toLowerCase())) return addCharacter()
-        if (['del', 'deletar', 'remove', '+', 'excluir'].includes(args[0]?.toLowerCase())) return deleteCharacter()
+        if (['del', 'delete', 'deletar', 'remove', '+', 'excluir'].includes(args[0]?.toLowerCase())) return deleteCharacter()
         if (['personagem', 'p', 'character', 'image'].includes(args[0]?.toLowerCase())) return showCharacter()
         if (['edit', 'editar'].includes(args[0]?.toLowerCase())) return editCharacter()
         if (['list', 'lista', 'all', 'full'].includes(args[0]?.toLowerCase())) return listCharacters()
@@ -195,11 +197,16 @@ module.exports = {
                             value: 'fastMode'
                         },
                         {
-                            label: 'Anime Theme (Construindo)',
+                            label: 'Anime Theme (Adicionando animes)',
                             emoji: e.Hmmm,
                             description: 'Você conhece personagens de animes?',
-                            value: 'animeMode',
-                            disabled: true
+                            value: 'animeMode'
+                        },
+                        {
+                            label: 'Lista de Personagens',
+                            emoji: '📝',
+                            description: 'Lista dos personagens do Anime Theme',
+                            value: 'animeList'
                         },
                         {
                             label: 'Cancelar',
@@ -249,6 +256,7 @@ module.exports = {
                         return startAnimeThemeQuiz()
                     }
                     msg.delete().catch(() => { })
+                    if (customId === 'animeList') return listCharacters()
                     if (customId === 'normalMode') return init()
                     if (customId === 'fastMode') {
                         control.fast = true
@@ -400,86 +408,347 @@ module.exports = {
 
         async function listCharacters() {
 
-            let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
+            let data = await Database.Client.findOne({ id: client.user.id }, 'Administradores GameChannels.Quiz'),
+                channelsId = data?.GameChannels?.Quiz || []
 
-            if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
-                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de personagem do *Quiz Anime Theme*.`)
+            if (message.guild.channels.cache.hasAny(...channelsId) && !data?.Administradores?.includes(message.author.id))
+                return message.reply(`${e.Deny} | Tem um Quiz rolando neste servidor. Está lista só é liberada quando não há nenhum quiz rolando. Para evitar trapaças e colas, ok?`)
 
-            let jsonCharacters = Database.Characters,
-                characters = jsonCharacters.get('Characters')
+            let characters = Database.Characters.get('Characters')
 
             if (!characters || characters.length === 0)
                 return message.reply(`${e.Deny} | Não há nenhum personagem no meu banco de dados.`)
 
-            let embeds = EmbedGenerator(),
-                control = 0
+            let selectMenuObject = [],
+                embeds = EmbedGenerator(characters)
+            control.embedTradeControl = 0
 
-            let msg = await message.reply({ embeds: [embeds[0]] })
-            if (embeds.length === 1) return
-            let emojis = ['⬅️', '➡️', '❌']
+            let msg = await message.reply({
+                embeds: [embeds[control.embedTradeControl]],
+                components: [buttons(embeds), selectMenuObject[control.embedTradeControl]]
+            })
 
-            for (let i of emojis) msg.react(i).catch(() => { })
-            let collector = msg.createReactionCollector({
-                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
-                idle: 30000,
+            let collector = msg.createMessageComponentCollector({
+                filter: int => int.user.id === message.author.id,
+                idle: 60000,
                 errors: ['idle']
             })
-                .on('collect', async (reaction) => {
+                .on('collect', async interaction => {
+                    interaction.deferUpdate().catch(() => { })
 
-                    if (reaction.emoji.name === emojis[2])
-                        return collector.stop()
+                    customId = interaction.isButton()
+                        ? interaction.customId
+                        : interaction?.values[0]
 
-                    if (reaction.emoji.name === emojis[0]) {
-                        control--
-                        if (control < 0) control = embeds.length - 1
-                        return msg.edit({ embeds: [embeds[control]] }).catch(() => { })
+                    if (customId === 'right') {
+
+                        if (control.atualPage === 'animeList') {
+                            control.embedTradeControl++
+                            if (control.embedTradeControl >= embeds.length) control.embedTradeControl = 0
+                            return msg.edit({
+                                content: null,
+                                embeds: [embeds[control.embedTradeControl]],
+                                components: [buttons(embeds), selectMenuForEmbedsTrading[control.embedTradeControl]]
+                            }).catch(() => { })
+                        }
+
+                        if (control.atualPage === 'charactersList') {
+                            control.embedsTradingControl++
+                            if (control.embedsTradingControl >= control.embedsTrading.length) control.embedsTradingControl = 0
+                            return msg.edit({
+                                content: null,
+                                embeds: [control.embedsTrading[control.embedsTradingControl]],
+                                components: [buttons(control.embedsTrading), control.selectMenuForEmbedsTrading[control.embedsTradingControl]]
+                            }).catch(() => { })
+                        }
+
                     }
 
-                    if (reaction.emoji.name === emojis[1]) {
-                        control++
-                        if (control >= embeds.length) control = 0
-                        return msg.edit({ embeds: [embeds[control]] }).catch(() => { })
+                    if (customId === 'left') {
+
+                        if (control.atualPage === 'animeList') {
+                            control.embedTradeControl--
+                            if (control.embedTradeControl < 0) control.embedTradeControl = embeds.length - 1
+                            return msg.edit({
+                                content: null,
+                                embeds: [embeds[control.embedTradeControl]],
+                                components: [buttons(embeds), selectMenuForEmbedsTrading[control.embedTradeControl]]
+                            }).catch(() => { })
+                        }
+
+                        if (control.atualPage === 'charactersList') {
+                            control.embedsTradingControl--
+                            if (control.embedsTradingControl < 0) control.embedsTradingControl = control.embedsTrading.length - 1
+                            return msg.edit({
+                                content: null,
+                                embeds: [control.embedsTrading[control.embedsTradingControl]],
+                                components: [buttons(control.embedsTrading), control.selectMenuForEmbedsTrading[control.embedsTradingControl]]
+                            }).catch(() => { })
+                        }
+
                     }
 
-                    return
+                    if (customId === 'delete') {
+                        return msg.edit({ embeds: [{ color: client.red, title: `${e.Info} | Esta funciona está em desenvolvimento.` }] })
+                    }
+
+                    if (customId === 'cancel') return collector.stop()
+                    if (customId === 'animeList') {
+                        control.embedTradeControl = 0
+                        control.atualPage = 'animeList'
+                        return msg.edit({ content: null, embeds: [embeds[0]], components: [buttons(embeds), selectMenuObject[0]] }).catch(() => { })
+                    }
+
+                    if (customId === 'charactersList') {
+                        control.embedsTradingControl = 0
+                        control.atualPage = 'charactersList'
+                        return msg.edit({ content: null, embeds: [control.embedsTrading[0]], components: [buttons(control.embedsTrading), control.selectMenuForEmbedsTrading[0]] })
+                    }
+
+                    let animeInteractionData = control.animePaginationList.find(data => data.id === customId)
+                    let animeData = characters.filter(data => data.anime === animeInteractionData?.name) || []
+
+                    if (animeData)
+                        await EmbedGenerator()
+
+                    control.embedsTradingControl = 0
+
+                    msg.edit({
+                        content: null,
+                        embeds: [control.embedsTrading[0]],
+                        components: [buttons(control.embedsTrading), control.selectMenuForEmbedsTrading[0]]
+                    }).catch(() => { })
+
+                    let character = characters.find(data => data.name == customId)
+
+                    if (!character) return
+
+                    return msg.edit({
+                        content: null,
+                        embeds: [{
+                            color: client.blue,
+                            title: `👤 Quiz Anime Theme Showing Mode`,
+                            description: `Character: **\`${formatString(customId)}\`**\nFrom: **\`${character.anime}\`**`,
+                            image: { url: character.image },
+                            footer: { text: 'Se a imagem não aparecer, o link está corrompido.' }
+                        }],
+                        components: [buttons([], true), {
+                            type: 1,
+                            components: [{
+                                type: 3,
+                                custom_id: 'menu',
+                                placeholder: 'Voltar',
+                                options: [
+                                    {
+                                        label: 'Lista de animes',
+                                        emoji: '📝',
+                                        description: 'Lista de todos os animes no banco de dados',
+                                        value: 'animeList'
+                                    },
+                                    {
+                                        label: `Personagens`,
+                                        emoji: '📝',
+                                        description: `Lista de personagens do anime ${character.anime || 'ANIME NOT FOUND'}`,
+                                        value: 'charactersList'
+                                    },
+                                    {
+                                        label: 'Cancelar',
+                                        emoji: '❌',
+                                        description: 'Cancelar comando',
+                                        value: 'cancel'
+                                    }
+                                ]
+                            }]
+                        }]
+                    })
+
+                    function EmbedGenerator(array = animeData || []) {
+
+                        if (array.length === 0) return
+                        control.selectMenuForEmbedsTrading = []
+                        control.atualPage = 'charactersList'
+
+                        let amount = 10,
+                            page = 1,
+                            embeds = [],
+                            length = array.length / 10 <= 1 ? 1 : parseInt((array.length / 10) + 1),
+                            options = []
+
+                        for (let i = 0; i < array.length; i += 10) {
+
+                            let current = array.slice(i, amount),
+                                description = current.map((data, i) => {
+
+                                    options.push({
+                                        label: `${formatNumberCaracters(i + 1)} - ${data.name ? formatString(data.name) : 'NAME NOT FOUND'}`,
+                                        description: `from: ${data.anime || 'ANIME NOT FOUND'}`,
+                                        emoji: '👤',
+                                        value: data.name
+                                    })
+
+                                    return `\`${data.name || 'NAME NOT FOUND'}\``
+                                }).join('\n'),
+                                pageCount = length > 1 ? ` - ${page}/${length}` : ''
+
+                            embeds.push({
+                                color: client.blue,
+                                title: `👤 Lista de Personagens${pageCount}`,
+                                description: `Anime: **\`${animeData[0]?.anime || '\`ANIME NOT FOUND\`'}\`**\n \n${description || 'MAP BAD FORMATED'}`
+                            })
+
+                            control.selectMenuForEmbedsTrading.push({
+                                type: 1,
+                                components: [{
+                                    type: 3,
+                                    custom_id: 'menu',
+                                    placeholder: 'Ver um personagem',
+                                    options: [
+                                        {
+                                            label: 'Lista de animes',
+                                            emoji: '📝',
+                                            description: 'Lista de todos os animes no banco de dados',
+                                            value: 'animeList'
+                                        },
+                                        {
+                                            label: `Personagens`,
+                                            emoji: '📝',
+                                            description: `Lista de personagens do anime ${animeData[0]?.anime || 'ANIME NOT FOUND'}`,
+                                            value: 'charactersList'
+                                        },
+                                        options,
+                                        {
+                                            label: 'Cancelar',
+                                            emoji: '❌',
+                                            description: 'Cancelar comando',
+                                            value: 'cancel'
+                                        }
+                                    ]
+                                }]
+                            })
+
+                            options = []
+                            page++
+                            amount += 10
+
+                        }
+
+                        control.embedsTrading = embeds
+                        return
+                    }
+
                 })
                 .on('end', () => {
-                    let embed = embeds[control]
+                    let embed = msg.embeds[0]
+                    if (!embed) return
+                    control = {}
                     embed.color = client.red
-                    embed.footer.text = `${embed.footer.text} | Comando cancelado`
-                    return msg.edit({ embeds: [embed] }).catch(() => { })
-
+                    embed.footer = { text: `${embed?.footer?.text ? `${embed?.footer?.text} | ` : ''}Comando cancelado` }
+                    return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [embed], components: [] }).catch(() => { })
                 })
+            return
 
-            function EmbedGenerator() {
+            function buttons(embeds = [], admin) {
+
+                let buttons = {
+                    type: 1,
+                    components: [
+                        {
+                            type: 2,
+                            emoji: '⬅️',
+                            custom_id: 'left',
+                            style: 'PRIMARY',
+                            disabled: false
+                        },
+                        {
+                            type: 2,
+                            emoji: '➡️',
+                            custom_id: 'right',
+                            style: 'PRIMARY',
+                            disabled: false
+                        }
+                    ]
+                }
+
+                if (admin && admins.includes(message.author.id))
+                    buttons.components.push({
+                        type: 2,
+                        emoji: '🗑️',
+                        custom_id: 'delete',
+                        style: 'DANGER',
+                        disabled: false
+                    })
+
+                if (embeds.length <= 1) {
+                    buttons.components[0].disabled = true
+                    buttons.components[1].disabled = true
+                }
+                return buttons
+            }
+
+            function EmbedGenerator(arrayCharacters) {
+
+                let array = [...new Set(arrayCharacters?.map(c => c.anime?.toLowerCase()))].sort()
 
                 let amount = 15,
-                    Page = 1,
+                    page = 1,
                     embeds = [],
-                    length = characters.length / 15 <= 1 ? 1 : parseInt((characters.length / 15) + 1)
+                    length = array.length / 15 <= 1 ? 1 : parseInt((array.length / 15) + 1),
+                    options = []
 
-                for (let i = 0; i < characters.length; i += 15) {
+                for (let i = 0; i < array.length; i += 15) {
 
-                    let current = characters.slice(i, amount),
-                        description = current.map(p => `> \`${formatString(p.name)}\` from \`${p.anime || 'ANIME NOT FOUND'}\``).join("\n"),
-                        pageCount = length > 1 ? ` - ${Page}/${length}` : ''
+                    let current = array.slice(i, amount),
+                        description = current.map((data, i) => {
 
-                    if (current.length > 0) {
+                            let anime = characters.filter(d => d.anime?.toLowerCase() === data) || [],
+                                animeName = anime[0]?.anime || `ANIME NOT FOUND ${formatNumberCaracters(i + 1)}`
 
-                        embeds.push({
-                            color: client.blue,
-                            title: `${e.Database} Database Quiz Anime Theme${pageCount}`,
-                            description: `${description}`,
-                            footer: {
-                                text: `${characters.length} personagens contabilizados`
-                            }
-                        })
+                            options.push({
+                                label: `${formatNumberCaracters(i + 1)} - ${animeName}`,
+                                description: `${anime.length || 0} Personagens`,
+                                emoji: '🎞️',
+                                value: `${formatNumberCaracters(i + 1)}` || `ANIME NOT FOUND ${formatNumberCaracters(i + 1)}`
+                            })
 
-                        Page++
-                        amount += 15
+                            control.animePaginationList.push({ id: formatNumberCaracters(i + 1), name: animeName })
 
-                    }
+                            return `\`${formatNumberCaracters(i + 1)}\` - \`${animeName}\``
+                        }).join('\n'),
+                        pageCount = length > 1 ? ` - ${page}/${length}` : ''
 
+                    embeds.push({
+                        color: client.blue,
+                        title: `${e.Database} Database Quiz Anime Theme${pageCount}`,
+                        description: description || 'MAP FUNCTION IS NOT WORKING'
+                    })
+
+                    selectMenuObject.push({
+                        type: 1,
+                        components: [{
+                            type: 3,
+                            custom_id: 'menu',
+                            placeholder: 'Selecionar um anime',
+                            options: [
+                                {
+                                    label: 'Lista de animes',
+                                    emoji: '📝',
+                                    description: 'Lista de todos os animes no banco de dados',
+                                    value: 'animeList'
+                                },
+                                options,
+                                {
+                                    label: 'Cancelar',
+                                    emoji: '❌',
+                                    description: 'Cancelar comando',
+                                    value: 'cancel'
+                                }
+                            ]
+                        }]
+                    })
+
+                    options = []
+                    page++
+                    amount += 15
                 }
 
                 return embeds
@@ -488,10 +757,11 @@ module.exports = {
 
         async function addCharacter() {
 
-            let { Rody, Gowther } = Database.Names
+            let data = await Database.Client.findOne({ id: client.user.id }, 'Administradores'),
+                adms = data?.Administradores || []
 
-            if (![Rody, Gowther].includes(message.author.id))
-                return message.reply(`${e.Admin} | Apenas os administradores do quiz *Anime Theme* tem o poder de adicionar novos personagens.`)
+            if (!adms.includes(message.author.id))
+                return message.reply(`${e.Admin} | Apenas os administradores da **Saphire's Team** tem o poder de adicionar novos personagens.`)
 
             let characters = Database.Characters.get('Characters') || [],
                 image = args[1],
@@ -506,10 +776,10 @@ module.exports = {
             if (!image.includes('https://media.discordapp.net/attachments') && !image.includes('https://cdn.discordapp.com/attachments/'))
                 return message.reply(`${e.Deny} | Verique se o link da imagem segue um desses formatos: \`https://media.discordapp.net/attachments\` | \`https://cdn.discordapp.com/attachments/\``)
 
-            let has = characters?.find(data => data.name === name || data.image == image)
+            let has = characters?.find(data => data.image == image)
 
             if (has)
-                return message.reply(`${e.Deny} | Esse personagem já existe no banco de dados.`)
+                return message.reply(`${e.Deny} | Está mesma imagem já existe no banco de dados.`)
 
             let msg = await message.reply({
                 content: `${e.QuestionMark} | Você confirma adicionar o personagem **\`${formatString(name)}\`** no banco de dados do **Quiz Anime Theme**?`,
@@ -547,10 +817,8 @@ module.exports = {
                         erros: ['time', 'max']
                     })
                         .on('collect', Message => {
-
                             control.validated = true
                             return pushNewCaracter(msg, { name: name, image: image, anime: Message.content })
-
                         })
                         .on('end', () => {
                             if (control.validated) return
@@ -644,7 +912,7 @@ module.exports = {
                         })
                             .on('collect', (reaction) => {
 
-                                if (reaction.emoji.name === emojis[1]) return
+                                if (reaction.emoji.name === emojis[1]) return collector.stop()
 
                                 control.collectedReaction = true
 
@@ -655,11 +923,11 @@ module.exports = {
                                 embed.color = client.green
                                 embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Name\`**\nNew Name: \`${formatString(Message.content)}\``
 
-                                return msg.edit({
+                                msg.edit({
                                     content: `${e.Check} | O nome do personagem **\`${formatString(has.name)}\`** foi alterado para **\`${formatString(Message.content)}\`**`,
                                     embeds: [embed]
                                 }).catch(() => { })
-
+                                return collector.stop()
                             })
                             .on('end', () => {
                                 if (control.collectedReaction) return
@@ -676,6 +944,7 @@ module.exports = {
                             embeds: []
                         }).catch(() => { })
                     })
+                return
             }
 
             async function editImage() {
@@ -747,7 +1016,7 @@ module.exports = {
                         })
                             .on('collect', (reaction) => {
 
-                                if (reaction.emoji.name === emojis[1]) return
+                                if (reaction.emoji.name === emojis[1]) return collector.stop()
 
                                 control.collectedReaction = true
 
@@ -759,7 +1028,7 @@ module.exports = {
                                 embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Image\`**`
                                 embed.image.url = null
 
-                                return msg.edit({
+                                msg.edit({
                                     content: `${e.Check} | A imagem do personagem **\`${formatString(has.name)}\`** foi alterada com sucesso.`,
                                     embeds: [
                                         embed,
@@ -775,7 +1044,7 @@ module.exports = {
                                         }
                                     ]
                                 }).catch(() => { })
-
+                                return collector.stop()
                             })
                             .on('end', () => {
                                 if (control.collectedReaction) return
@@ -792,6 +1061,7 @@ module.exports = {
                             embeds: []
                         }).catch(() => { })
                     })
+                return
             }
 
             async function editAnime() {
@@ -853,7 +1123,7 @@ module.exports = {
                         })
                             .on('collect', (reaction) => {
 
-                                if (reaction.emoji.name === emojis[1]) return
+                                if (reaction.emoji.name === emojis[1]) return collector.stop()
 
                                 control.collectedReaction = true
 
@@ -865,10 +1135,11 @@ module.exports = {
                                 embed.description = `Personagem selecionado: **\`${formatString(has.name)}\`**\nInformação para edição: **\`Character's Anime\`**\nNew Anime Data: \`${Message.content}\``
                                 embed.image.url = null
 
-                                return msg.edit({
+                                msg.edit({
                                     content: `${e.Check} | O anime do personagem **\`${formatString(has.name)}\`** foi alterada com sucesso para **\`${Message.content}\`**.`,
                                     embeds: [embed]
                                 }).catch(() => { })
+                                return collector.stop()
 
                             })
                             .on('end', () => {
@@ -886,6 +1157,7 @@ module.exports = {
                             embeds: []
                         }).catch(() => { })
                     })
+                return
             }
 
         }
@@ -1096,7 +1368,7 @@ module.exports = {
                     registerChannelControl('pull', 'Quiz', message.channel.id)
                     control.embed
                         .setColor(client.red)
-                      .setDescription(`${e.Deny} | Ninguém acertou.\n👤 | Personagem: **\`${formatString(control.atualCharacter.name)}\`** from **\`${control.atualCharacter?.anime || 'ANIME NOT FOUND'}\`**\n🔄 | ${control.rounds || 0} Rounds`)
+                        .setDescription(`${e.Deny} | Ninguém acertou.\n👤 | Personagem: **\`${formatString(control.atualCharacter.name)}\`** from **\`${control.atualCharacter?.anime || 'ANIME NOT FOUND'}\`**\n🔄 | ${control.rounds || 0} Rounds`)
                         .setFooter({ text: `Quiz Anime Theme Endded` })
                     msg.delete().catch(() => { })
 

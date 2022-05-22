@@ -35,7 +35,7 @@ module.exports = {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
+            if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team podem adicionar novas bandeiras no Flag Game.`)
 
             let flag = args[1],
@@ -85,7 +85,7 @@ module.exports = {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
+            if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team podem remover bandeiras no Flag Game.`)
 
             if (['image', 'imagem'].includes(args[1]?.toLowerCase())) return editImage()
@@ -258,7 +258,7 @@ module.exports = {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
+            if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team podem remover bandeiras no Flag Game.`)
 
             let args1 = args.slice(1).join(' ')
