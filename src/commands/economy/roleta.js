@@ -13,8 +13,10 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let userData = await Database.User.findOne({ id: message.author.id }, 'Balance Timeouts.Roleta'),
-            color = await Colors(message.author.id),
+        let userData = await Database.User.findOne({ id: message.author.id }, 'Balance Timeouts.Roleta')
+        if (!userData) return message.reply(`${e.Deny} | Opa opa, parece que o Discord não me enviou todos os dados necessários, tente de novo, por favor.`)
+
+        let color = await Colors(message.author.id),
             moeda = await Moeda(message)
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase()) || !args[0]) return message.reply({
@@ -29,7 +31,7 @@ module.exports = {
             ]
         })
 
-        if (client.Timeout(1200000, userData.Timeouts?.Roleta))
+        if (client.Timeout(1200000, userData?.Timeouts?.Roleta))
             return message.channel.send(`${e.Loading} | ${message.author}, as roletas estão voltando ao lugar, volte em: \`${client.GetTimeout(1200000, userData.Timeouts?.Roleta)}\``)
 
         let valor = parseInt(args[0].replace(/k/g, '000')),

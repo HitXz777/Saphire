@@ -27,8 +27,8 @@ module.exports = {
                 .addField(`${e.CoroaDourada} Premium Stage`, `Tem interesse em desbloquear comandos únicos? Use \`${prefix}premium\` e descubra mais.`)
                 .addField('⭐ Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
                 .addField(`📄 Documentação`, `https://saphire.gitbook.io/saphire/\n*obs: A documentação da Saphire está incompleta.*`)
-                .setFooter({ text: 'Este painel se fechará após 1 minuto de inatividade' }),         
-                // .addField(`${e.TopGG} Top.gg`, `[Votar](${config.TopGGLink}/vote) na ${client.user.username}.`),
+                .setFooter({ text: 'Este painel se fechará após 1 minuto de inatividade' }),
+            // .addField(`${e.TopGG} Top.gg`, `[Votar](${config.TopGGLink}/vote) na ${client.user.username}.`),
             painel = new MessageActionRow()
                 .addComponents(new MessageSelectMenu()
                     .setCustomId('menu')
@@ -178,7 +178,7 @@ module.exports = {
             })
 
         collector.on('end', () => {
-            
+
             let embed = msg.embeds[0]
             if (!embed) return
             embed.color = client.red
@@ -299,7 +299,7 @@ module.exports = {
                             .addFields(
                                 {
                                     name: '🆕 Novidades',
-                                    value: `**${prefix}zeppelin** - Novo comando de apostas\n**${prefix}sticker** - Adicione, delete e edite figurinhas no servidor\n**${prefix}avatar** - Um pequeno upgrade\n**${prefix}signo** - Rework para melhor usabilidade\n**${prefix}bet** - Adição do **Global Bet System**\n**${prefix}warn** - Sistema Avançado de Warns\n**${prefix}flag** - Novo jogo com sistema automático`
+                                    value: `**${prefix}zeppelin** - Novo comando de apostas\n**${prefix}sticker** - Adicione, delete e edite figurinhas no servidor\n**${prefix}avatar** - Um pequeno upgrade\n**${prefix}signo** - Rework para melhor usabilidade\n**${prefix}bet** - Adição do **Global Bet System**\n**${prefix}warn** - Sistema Avançado de Warns\n**${prefix}flag** - Novo jogo com sistema automático\n**${prefix}quiz** Reword e novo modo *Anime Theme*`
                                 },
                                 {
                                     name: '⛔ Remoção',
@@ -307,7 +307,7 @@ module.exports = {
                                 },
                                 {
                                     name: `${e.bug} Bugs`,
-                                    value: `QUIZ COMMAND - Logical Skip End - ${e.Check} Fixed | \`Bug Found At: 03/03/2022\`\nLEVEL COMMAND - Infinity Loading - ${e.Check} Fixed | \`Bug Found At: 09/05/2022\``
+                                    value: `QUIZ - Logical Skip End - ${e.Check} Fixed | \`03/03/2022\`\nLEVEL - Infinity Loading - ${e.Check} Fixed | \`09/05/2022\`\nCLICK - Delay Response - ${e.Check} Fixed | \`22/05/2022\`\nRASPADINHA - Multiple Channels Interactions - ${e.Check} Fixed | \`22/05/2022\``
                                 }
                             )
                     ],
