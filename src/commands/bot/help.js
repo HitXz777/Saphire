@@ -303,7 +303,7 @@ module.exports = {
                                 },
                                 {
                                     name: '⛔ Remoção',
-                                    value: `**${prefix}banner** - Comando integrado ao \`${prefix}avatar\``
+                                    value: `**${prefix}banner** - Comando integrado ao \`${prefix}avatar\`\n**${prefix}coinflip** - Comando movido para \`economy\``
                                 },
                                 {
                                     name: `${e.bug} Bugs`,

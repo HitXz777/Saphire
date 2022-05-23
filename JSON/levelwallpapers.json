@@ -5,7 +5,7 @@
             "Image": "https://media.discordapp.net/attachments/899493577623756801/899852259154866276/unknown.png?width=708&height=409",
             "Price": "0",
             "Designer": "830226550116057149",
-            "Limit": 0
+            "Limit": 9999999
         },
         "bg1": {
             "Name": "Polvo na Praia",
@@ -540,6 +540,14 @@
             "Price": 5000,
             "DesignerId": "545189821245685781",
             "Limit": 95,
+            "Designer": "545189821245685781"
+        },
+        "bg102": {
+            "Name": "Pocoyo Background",
+            "Image": "https://media.discordapp.net/attachments/899493577623756801/978091678168649778/1653263641215.jpg",
+            "Price": 30000,
+            "DesignerId": "545189821245685781",
+            "Limit": 100,
             "Designer": "545189821245685781"
         }
     }

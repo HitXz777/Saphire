@@ -135,9 +135,9 @@ class Saphire extends Client {
                 || message.guild.members.cache.get(args[1])
                 || message.guild.members.cache.get(message.mentions.repliedUser?.id)
                 || message.guild.members.cache.find(member => {
-                    return member.user.username.toLowerCase() == args[0]?.toLowerCase()
+                    return member.displayName?.toLowerCase() == args[0]?.toLowerCase()
+                        || member.user.username.toLowerCase() == args[0]?.toLowerCase()
                         || member.user.tag.toLowerCase() == args[0]?.toLowerCase()
-                        || member.displayName?.toLowerCase() == args[0]?.toLowerCase()
                         || member.user.discriminator === args[0]
                         || member.user.id === args[0]
                         || member.user.username.toLowerCase() == args.join(' ')?.toLowerCase()
