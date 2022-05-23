@@ -29,8 +29,10 @@ class Raspadinha {
         if (raspadinhaData?.GameChannels?.Raspadinhas?.includes(message.author.id))
             return message.reply(`${e.Deny} | Você já tem uma raspadinha sendo aberta. Termine de abrir, depois abra outra. Cuidado com a ganância, ser humano.`)
 
-        if (Database.Cache.get(`Raspadinhas.${message.channel.id}`) >= 2)
-            return message.reply(`${e.Deny} | Apenas 2 raspadinhas são permitidas por canal, ok? Espere uma raspadinha fechar para você abrir a sua.`)
+        let channelsId = Database.Cache.get('Raspadinhas') || []
+
+        if (channelsId.includes(message.channel.id))
+            return message.reply(`${e.Deny} | Já tem uma raspadinha sendo aberta neste canal. Espere ela fechar para você abrir a sua, ok?.`)
 
         registerRaspadinha()
 
@@ -216,8 +218,8 @@ class Raspadinha {
         }
 
         async function registerRaspadinha() {
-            Database.Cache.add(`Raspadinhas.${message.channel.id}`, 1)
-            
+            Database.Cache.push('Raspadinhas', message.channel.id)
+
             await Database.Client.updateOne(
                 { id: client.user.id },
                 { $push: { ['GameChannels.Raspadinhas']: message.author.id } },
@@ -226,9 +228,7 @@ class Raspadinha {
         }
 
         async function unregisterRaspadinha() {
-            if (Database.Cache.get(`Raspadinhas.${message.channel.id}`) <= 1)
-                Database.Cache.delete(`Raspadinhas.${message.channel.id}`)
-            else Database.Cache.subtract(`Raspadinhas.${message.channel.id}`, 1)
+            Database.Cache.pull('Raspadinhas', message.channel.id)
 
             await Database.Client.updateOne(
                 { id: client.user.id },
