@@ -132,7 +132,7 @@ module.exports = {
                 }).catch(() => { })
 
                 Database.add(winner.id, prize)
-                registerBet(winner, winner.id === message.author.id ? member.user : message.author, amount, prize)
+                registerBet(winner.user, winner.id === message.author.id ? member.user : message.author, amount, prize)
 
             }, 5000)
 
