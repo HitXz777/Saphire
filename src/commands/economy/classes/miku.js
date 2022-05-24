@@ -17,7 +17,8 @@ class Miku {
         return msg.createMessageComponentCollector({
             filter: int => int.user.id === message.author.id,
             time: 60000,
-            errors: ['time']
+            max: 1,
+            errors: ['time', 'max']
         })
             .on('collect', interaction => {
                 interaction.deferUpdate().catch(() => { })
@@ -89,7 +90,7 @@ class Miku {
                 fields: [
                     {
                         name: `${e.Info} Objetivo`,
-                        value: 'Você tem que adivinhar qual é a opção que a Miku escolheu. Se você acertar, ela vai ter pagar metade do valor que você apostou.'
+                        value: 'Você tem que adivinhar qual é a letra que a Miku escolheu. Se você acertar, ela vai te pagar metade do valor que você apostou.'
                     },
                     {
                         name: `${e.eagora} Inicie uma aposta com a Miku`,
