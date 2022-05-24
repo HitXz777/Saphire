@@ -77,7 +77,7 @@ module.exports = {
             return message.channel.send(`${e.Check} | Confissão enviada com sucesso!`)
 
         } catch (err) {
-            return message.channel.send(`${e.Deny} | Ocorreu um erro ao enviar a confissão... Caso não saiba resolver, utilize o comando \`${prefix}bug\` e relate o problema.\n\`${err}\`\n> Code Error Number: \`${err.code}\``)
+            return message.channel.send(`${e.Deny} | Ocorreu um erro ao enviar a confissão... Caso não saiba resolver, utilize o comando \`${prefix}bug\` e relate o problema.\n\`${err}\`\n> Error Number Code: \`${err.code}\``)
         }
 
         async function SetNewChannel() {
@@ -128,7 +128,7 @@ module.exports = {
                                 { ConfessChannel: NewChannel.id }
                             )
 
-                            return message.reply(`${e.Check} | Feito! Canal configurado com sucesso!`)
+                            return msg.edit(`${e.Check} | Feito! Canal configurado com sucesso!`).catch(() => { })
                         } catch (err) {
                             message.channel.send(`${err}`)
                             return message.channel.send(`${e.Deny} | Eu não tenho permissão para enviar mensagens neste canal. Eu tirei ele da minha database :D`)
@@ -178,7 +178,7 @@ module.exports = {
                             { $unset: { ConfessChannel: 1 } }
                         )
 
-                        return msg.edit(`${e.Check} | Canal e comando desativado com sucesso!`)
+                        return msg.edit(`${e.Check} | Canal e comando desativado com sucesso!`).catch(() => { })
 
                     }
 
