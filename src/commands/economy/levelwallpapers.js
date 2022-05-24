@@ -72,6 +72,15 @@ module.exports = {
                 )
                 .addComponents(
                     new MessageButton()
+                        .setCustomId('cancel')
+                        .setEmoji('❌')
+                        .setLabel('Cancelar')
+                        .setStyle('DANGER')
+                )
+
+            let buttons2 = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
                         .setCustomId('fastBuy')
                         .setEmoji('💳')
                         .setLabel('Comprar')
@@ -84,20 +93,12 @@ module.exports = {
                         .setLabel('Comprar e equipar')
                         .setStyle('SUCCESS')
                 )
-                .addComponents(
-                    new MessageButton()
-                        .setCustomId('cancel')
-                        .setEmoji('❌')
-                        .setLabel('Cancelar')
-                        .setStyle('DANGER')
-                )
 
-            const msg = await message.reply(
-                {
-                    content: `Para ver algum wallpaper em especifico, use \`${prefix}levelwallpapers <code>\`. Caso queira ver todos, use \`${prefix}lvlwall all\` ou use \`${prefix}lvlwall server\`.`,
-                    embeds: [WallPaperEmbed],
-                    components: [buttons]
-                })
+            const msg = await message.reply({
+                content: `Para ver algum wallpaper em especifico, use \`${prefix}levelwallpapers <code>\`. Caso queira ver todos, use \`${prefix}lvlwall all\` ou use \`${prefix}lvlwall server\`.`,
+                embeds: [WallPaperEmbed],
+                components: [buttons, buttons2]
+            })
             //  emojis = ['⬅️', '➡️', '🔄', '💳', '❌']
 
             // for (let i of emojis) msg.react(i).catch(() => { })
@@ -111,8 +112,6 @@ module.exports = {
                     interaction.deferUpdate().catch(() => { })
 
                     let intId = interaction.customId
-
-                    if (!['left', 'right', 'random', 'fastBuy', 'cancel'].includes(intId)) return
 
                     if (intId === 'cancel')
                         return collector.stop()
@@ -278,7 +277,7 @@ module.exports = {
             if (price > money)
                 return message.channel.send(`${e.Deny} | ${message.author}, você precisa de pelo menos **${price} ${moeda}** para comprar o fundo **${name}**`)
 
-            let msg = await message.channel.send(`${e.QuestionMark} | ${message.author}, você confirma a compra do wallpaper \`${name}\` por **${price} ${moeda}**?`),
+            let msg = await message.channel.send(`${e.QuestionMark} | ${message.author}, você realmente quer comprar${equip ? ' e equipar' : ''} o wallpaper \`${name}\` por **${price} ${moeda}**?`),
                 emojis = ['✅', '❌']
 
             for (let i of emojis) msg.react(i).catch(() => { })
@@ -330,7 +329,7 @@ module.exports = {
                     embeds: [
                         new MessageEmbed().setColor('GREEN')
                             .setTitle(`💳 Compra rápida efetuada`)
-                            .setDescription(`${e.Info} | ${message.author}, você comprou o wallpaper \`${name}\`, para ativar, use o comando \`${prefix}level set ${code}\`.`)
+                            .setDescription(`${e.Info} | ${message.author}, você comprou${equip ? ' e equipou' : ''} o wallpaper \`${name}\`. ${equip ? '' : `Para ativa-lo, use o comando \`${prefix}level set ${code}\`.`}`)
                     ]
                 })
             }
