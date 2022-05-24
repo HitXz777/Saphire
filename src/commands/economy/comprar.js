@@ -49,9 +49,10 @@ module.exports = {
                     },
                     {
                         name: 'Fundos/Wallpapers/Backgrounds',
-                        value: `\`${prefix}comprar bg <code>\`\n\`${prefix}levelwallpapers\``
+                        value: `\`${prefix}comprar bg <code>\` Compre um único wallpaper\n\`${prefix}levelwallpapers\` Todos os wallpapers de levels`
                     }
                 )
+                .setImage('https://media.discordapp.net/attachments/893361065084198954/978449901522399362/unknown.png?width=729&height=361')
                 .setFooter({ text: `${prefix}buy | ${prefix}vender | ${prefix}slot` }),
             itens = new MessageEmbed()
                 .setColor(color)
@@ -86,19 +87,25 @@ module.exports = {
                     },
                     {
                         label: 'Quiz Skip',
-                        description: 'Pule pergunta usando a palavra \`skip\`',
+                        description: 'Pule pergunta usando a palavra "skip"',
                         emoji: '⏩',
                         value: 'Skip',
                     },
                     {
+                        label: 'Completar Raspadinhas',
+                        description: `Completar limite de 50 raspadinhas | ${prefix}raspadinha`,
+                        emoji: e.raspadinha,
+                        value: 'Raspadinha',
+                    },
+                    {
                         label: 'Tickets da Loteria',
-                        description: `Comprar 100 tickets > ${prefix}loteria`,
+                        description: `Comprar 100 tickets | ${prefix}loteria`,
                         emoji: '🎫',
                         value: 'Ticket',
                     },
                     {
                         label: 'Carta de Amor',
-                        description: `Completar limite de 50 cartas > ${prefix}carta`,
+                        description: `Completar limite de 50 cartas | ${prefix}carta`,
                         emoji: '💌',
                         value: 'Carta',
                     },
@@ -158,6 +165,7 @@ module.exports = {
                     case 'Cores': NewColor(); break;
                     case 'Titulo': Titulo(); break;
                     case 'Skip': buySkips(); break;
+                    case 'Raspadinha': buyRaspadinhas(); break;
                     case 'Close': msg.edit({ components: [] }).catch(() => { }); break;
                     default: msg.edit({ components: [PainelLoja] }).catch(() => { }); break;
                 }
@@ -232,6 +240,7 @@ module.exports = {
                 return message.channel.send(`${e.Check} | ${message.author} comprou a permissão 🔰 \`Título\`.\n${e.PandaProfit} | -10000 ${moeda}`)
             }
         }
+
         async function buySkips() {
 
             let data = await Database.User.findOne({ id: message.author.id }, 'Slot.Skip Balance')
@@ -249,6 +258,26 @@ module.exports = {
                 addLotery(((10 - x) * 50) / 2)
                 Database.addItem(message.author.id, 'Slot.Skip', 10 - x)
                 return message.channel.send(`${e.Check} | ${message.author} completou o limite de \`Quiz Skip\` comprando +${10 - x} cartas.\n${e.PandaProfit} | -${(10 - x) * 50} ${moeda}`)
+            }
+        }
+
+        async function buyRaspadinhas() {
+
+            let data = await Database.User.findOne({ id: message.author.id }, 'Slot.Raspadinhas Balance')
+            let x = data.Slot?.Raspadinhas || 0
+
+            return x >= 50
+                ? message.reply(`${e.Deny} | Você já atingiu o limite de Raspadinhas.`)
+                : data.Balance >= (50 - x) * 100
+                    ? completeRaspadinhas()
+                    : message.channel.send(`${e.Deny} | ${message.author}, você precisa de ${(100 - x) * 2} ${moeda} para comprar mais ${50 - x} Raspadinhas.`)
+
+            function completeRaspadinhas() {
+                Database.subtract(message.author.id, (50 - x) * 100)
+                PushData((50 - x) * 100)
+                addLotery(((50 - x) * 100) / 2)
+                Database.addItem(message.author.id, 'Slot.Raspadinhas', 50 - x)
+                return message.channel.send(`${e.Check} | ${message.author} completou o limite de \`Raspadinhas\` comprando +${50 - x} unidades.\n${e.PandaProfit} | -${(50 - x) * 100} ${moeda}`)
             }
         }
 

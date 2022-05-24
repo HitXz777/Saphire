@@ -79,6 +79,13 @@ module.exports = {
                 )
                 .addComponents(
                     new MessageButton()
+                        .setCustomId('buyAndEquip')
+                        .setEmoji('💳')
+                        .setLabel('Comprar e equipar')
+                        .setStyle('SUCCESS')
+                )
+                .addComponents(
+                    new MessageButton()
                         .setCustomId('cancel')
                         .setEmoji('❌')
                         .setLabel('Cancelar')
@@ -113,6 +120,9 @@ module.exports = {
                     if (intId === 'fastBuy')
                         return trade(true)
 
+                    if (intId === 'buyAndEquip')
+                        return trade(true, true)
+
                     if (intId === 'random') {
                         indexControl = Math.floor(Math.random() * ObjKey.length)
                         return trade()
@@ -130,10 +140,10 @@ module.exports = {
                         return trade()
                     }
 
-                    function trade(fastBuy = false) {
+                    function trade(fastBuy = false, equip = false) {
                         key = ObjKey[indexControl]
 
-                        if (fastBuy) return BuyBackground(key)
+                        if (fastBuy) return BuyBackground(key, equip)
 
                         wallpaper = BgLevel.get(`LevelWallpapers.${key}`)
                         price = `${wallpaper.Price} ${moeda}\n${e.VipStar} Vip: ${wallpaper.Price - (wallpaper.Price * 0.3)} ${moeda}`
@@ -234,7 +244,7 @@ module.exports = {
 
         }
 
-        async function BuyBackground(code) {
+        async function BuyBackground(code, equip) {
 
             let Client = await Database.Client.findOne({ id: client.user.id }, 'BackgroundAcess'),
                 vip = await Vip(message.author.id),
@@ -245,10 +255,13 @@ module.exports = {
 
             const BgLevel = Database.BgLevel
 
-            let price = BgLevel.get(`LevelWallpapers.${code}.Price`),
-                name = BgLevel.get(`LevelWallpapers.${code}.Name`),
-                designerId = BgLevel.get(`LevelWallpapers.${code}.Designer`),
-                limite = BgLevel.get(`LevelWallpapers.${code}.Limit`),
+            let data = BgLevel.get(`LevelWallpapers.${code}`)
+
+            let price = data.Price,
+                name = data.Name,
+                designerId = data.Designer,
+                limite = data.Limit,
+                image = data.Image,
                 money = userData?.Balance || 0
 
             if (vip)
@@ -276,7 +289,6 @@ module.exports = {
                 time: 30000,
                 errors: ['time']
             })
-
                 .on('collect', (reaction) => {
 
                     if (reaction.emoji.name === emojis[0])
@@ -287,13 +299,16 @@ module.exports = {
 
                 .on('end', () => msg.delete().catch(() => { }))
 
-            function newFastBuy() {
+            async function newFastBuy() {
 
                 let comissao = parseInt(price * 0.02)
 
                 if (comissao < 1) comissao = 0
 
                 Database.pushUserData(message.author.id, 'Walls.Bg', code)
+
+                if (equip)
+                    Database.updateUserData(message.author.id, 'Walls.Set', image)
 
                 if (client.users.cache.has(designerId) && comissao > 1) {
                     Database.PushTransaction(designerId, `${e.gain} Ganhou ${comissao} Safiras via *Wallpaper Designers CashBack*`)

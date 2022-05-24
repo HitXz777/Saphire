@@ -16,6 +16,9 @@ module.exports = {
 
         if (!args[0] || ['help', 'ajuda', 'info'].includes(args[0]?.toLowerCase())) return coinflipInfo()
 
+        if (Database.Cache.get(`Raspadinhas.Users.${message.author.id}`))
+            return message.reply(`${e.Deny} | Você já tem um coinflip aberto. Calma, calma. É apenas um por vez.`)
+
         if (!args[1] && !member)
             return message.reply(`${e.Deny} | Eu procurei em todos os lugares e não achei nenhum membro para efetuar a aposta 😔`)
 
@@ -75,6 +78,8 @@ module.exports = {
             components: buttons
         })
 
+        Database.Cache.set(`Raspadinhas.Users.${message.author.id}`, true)
+
         let collector = msg.createMessageComponentCollector({
             filter: int => [message.author.id, member.id].includes(int.user.id),
             time: 60000,
@@ -97,11 +102,13 @@ module.exports = {
             })
             .on('end', () => {
                 if (data.collected) return
+                Database.Cache.delete(`Raspadinhas.Users.${message.author.id}`)
                 return msg.edit({ content: `${e.Deny} | Aposta cancelada.`, components: [] }).catch(() => { })
             })
 
         function startCoinflip(customId, amount) {
 
+            Database.Cache.delete(`Raspadinhas.Users.${message.author.id}`)
             data.memberOption = customId
             data.authorOption = customId === 'cara' ? 'coroa' : 'cara'
 
