@@ -1,6 +1,66 @@
 {
     "Flags": [
         {
+            "flag": "🇰🇷",
+            "country": "coreia do sul",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978655797741518908/h_13.png"
+        },
+        {
+            "flag": "🇭🇷",
+            "country": "croácia",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978655749842559046/h_2.webp"
+        },
+        {
+            "flag": "🇷🇼",
+            "country": "ruanda",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978655008000180244/h_12.png"
+        },
+        {
+            "flag": "🇹🇻",
+            "country": "tuvalu",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978654369065074688/h_11.png"
+        },
+        {
+            "flag": "🇦🇬",
+            "country": "antígua e barbuda",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978652055919005716/h.webp"
+        },
+        {
+            "flag": "🇹🇲",
+            "country": "turcomenistão",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978652027074777138/h_1.webp"
+        },
+        {
+            "flag": "🇹🇯",
+            "country": "tajiquistão",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978652097044156416/h_10.png"
+        },
+        {
+            "flag": "🇬🇩",
+            "country": "granada",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978650729575247942/h_7.png"
+        },
+        {
+            "flag": "🇫🇲",
+            "country": "micronésia",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978650697509777438/h_9.png"
+        },
+        {
+            "flag": "🇨🇬",
+            "country": "congo",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978650711942373396/h_8.png"
+        },
+        {
+            "flag": "🇱🇮",
+            "country": "liechtenstein",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978649482101149696/h_5.png"
+        },
+        {
+            "flag": "🇳🇪",
+            "country": "níger",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978648739222781972/h_4.png"
+        },
+        {
             "flag": "🇺🇸",
             "country": "estados unidos",
             "image": "https://media.discordapp.net/attachments/975974003229474846/978464910398857266/unknown.png?width=898&height=473"
@@ -231,19 +291,9 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976076649286205470/53379cd4d8f91febcd83bc06c68b7e53.jpg"
         },
         {
-            "flag": "🇭🇷",
-            "country": "croácia",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976076499910295613/f58c94a2a2b3221328fc1e2b7acfa656.jpg"
-        },
-        {
             "flag": "🇨🇮",
             "country": "costa do marfim",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976076154706489394/45a3123b3163a066d9e3dd825569d869.jpg"
-        },
-        {
-            "flag": "🇰🇷",
-            "country": "coreia do sul",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976076065967570964/e5397c0357af41d5549cc122c10300e9.jpg"
         },
         {
             "flag": "🇨🇴",
@@ -611,11 +661,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976234544246161448/1280px-Flag_of_the_Democratic_Republic_of_the_Congo.svg.png?width=630&height=473"
         },
         {
-            "flag": "🇷🇼",
-            "country": "ruanda",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976234930092773376/255px-Flag_of_Rwanda.svg.png"
-        },
-        {
             "flag": "🇸🇻",
             "country": "el salvador",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976235233739411496/800px-Flag_of_El_Salvador.svg.png?width=705&height=398"
@@ -721,11 +766,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976240100637810708/8619bd81d56be6c66e34cf65df591d90.jpg?width=705&height=469"
         },
         {
-            "flag": "🇹🇯",
-            "country": "tajiquistão",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976240280292442132/cde6dc06c208419d5537d5a01d2c4cf4.jpg"
-        },
-        {
             "flag": "🇹🇿",
             "country": "tanzânia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976240428967931964/41818f4bb9abe80eb49298f3db1cf239.jpg?width=705&height=469"
@@ -756,19 +796,9 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976241086160842782/bf8766c8362c3073d68b953bff987ff2.jpg?width=705&height=469"
         },
         {
-            "flag": "🇹🇲",
-            "country": "turcomenistão",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976241173956010044/80718b21b36b0a9a15741ffc489d7bc6.jpg"
-        },
-        {
             "flag": "🇹🇷",
             "country": "turquia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976241241413017690/a3aa6b51580cfe9e5a661e67dcb83c90.jpg?width=672&height=473"
-        },
-        {
-            "flag": "🇹🇻",
-            "country": "tuvalu",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976241324107923516/c3652f924107f8dfa2c982703db7d46e.jpg?width=705&height=353"
         },
         {
             "flag": "🇩🇴",
@@ -811,11 +841,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976242324910768198/7205111d81570795ac5ef719be63ca5b.jpg?width=705&height=353"
         },
         {
-            "flag": "🇦🇬",
-            "country": "antígua e barbuda",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976242484088832060/6d9fe4c8d014690c8f025f64152fdc22.jpg"
-        },
-        {
             "flag": "🇧🇭",
             "country": "bahrein",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976242863006425128/993113850fca347df5a2b5a6540aa561.jpg?width=705&height=422"
@@ -839,11 +864,6 @@
             "flag": "🇰🇲",
             "country": "comores",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976244454191144980/4a05574ca47b33f38ff6cd9c954477dc.jpg?width=705&height=423"
-        },
-        {
-            "flag": "🇨🇬",
-            "country": "congo",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976244618444279818/e2c22ea8c774411a073d194a61bc109d.jpg"
         },
         {
             "flag": "🇽🇰",
@@ -871,11 +891,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976246364432375849/6d5af9862567b2dcddce30aa1cc03ab0.jpg?width=705&height=353"
         },
         {
-            "flag": "🇬🇩",
-            "country": "granada",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976246721287974974/grenada-flag.jpg"
-        },
-        {
             "flag": "🇾🇪",
             "country": "iêmen",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976246979761934336/40b4c6df06b6c0944c7c39a104a09941.jpg?width=612&height=430"
@@ -901,11 +916,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976248926942421072/222f941bd1f7eb375c6af21982d85586.jpg?width=705&height=397"
         },
         {
-            "flag": "🇫🇲",
-            "country": "micronésia",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976249152122011658/c3203718b795ec4cb0a23a7f48b101be.jpg"
-        },
-        {
             "flag": "🇲🇨",
             "country": "mônaco",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976249407156658226/bc39b5b2314696b37bbb79669aed0cdc.jpg?width=538&height=430"
@@ -914,11 +924,6 @@
             "flag": "🇳🇷",
             "country": "nauru",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976249850872090624/0ed4b8e02167eda0f4092c4cb1ded4a2.jpg"
-        },
-        {
-            "flag": "🇳🇪",
-            "country": "níger",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976250262614327376/03de85fc8ab1ebb5e7192d9b1d4df099.jpg?width=502&height=430"
         },
         {
             "flag": "🇻🇬",
@@ -959,11 +964,6 @@
             "flag": "🇦🇨",
             "country": "ilha de ascensão",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976255202267123712/Ascension-Island.png?width=705&height=353"
-        },
-        {
-            "flag": "🇱🇮",
-            "country": "liechtenstein",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976247996339617812/c61539de8cea316a525651bdde2dc318.jpg"
         },
         {
             "flag": "🇪🇸",

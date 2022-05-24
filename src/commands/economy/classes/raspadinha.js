@@ -265,7 +265,7 @@ class Raspadinha {
                             .addFields(
                                 {
                                     name: '1 - Como jogar?',
-                                    value: `Primeiramente, você precisa de uma raspadinha para jogar a raspadinha, né?. Você pode comprar usando o comando \`${prefix}buy raspadinha <Quantidade>\` *(max: 50)*`
+                                    value: `Primeiramente, você precisa de uma raspadinha para jogar a raspadinha, né? Você pode comprar usando o comando \`${prefix}buy raspadinha <Quantidade>\` *(max: 50)*`
                                 },
                                 {
                                     name: '1.1 - Eu já comprei as raspadinhas, como jogar?',
@@ -273,7 +273,7 @@ class Raspadinha {
                                 },
                                 {
                                     name: '2 - Vitórias e Derrotas',
-                                    value: `Para você ganhar, você tem que ter a sorte de obter uma sequência de **3 emojis** ao clicar nos botões. Caso não tenha, já sabe, Perdeu.`
+                                    value: `Para você ganhar, você tem que ter a sorte de obter uma sequência de **3 emojis** ao clicar nos botões. Caso não tenha, já sabe, perdeu.`
                                 },
                                 {
                                     name: '3 - Prêmios',
