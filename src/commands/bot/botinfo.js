@@ -14,10 +14,10 @@ module.exports = {
 
     let LogRegister = await Database.LogRegister.find({}),
       clientData = await Database.Client.findOne({ id: client.user.id }, 'ComandosUsados')
-      InDataCommands = `${LogRegister?.length || 0}`,
+      InDataCommands = LogRegister?.length || 0,
       d = moment.duration(message.client.uptime),
       days = (d.days() == 1) ? `${d.days()}d` : `${d.days()}d`,
-      hours = (d.hours() == 1) ? `${d.hours()}h` : `${d.hours()}h`,
+      hours = (d.hours() == 1) ? `${d.hours()}h` : `${d.hours()}h`, // TODO: Atualizar isso aqui pro formatHours do client
       minutes = (d.minutes() == 1) ? `${d.minutes()}m` : `${d.minutes()}m`,
       data = client.user.createdAt,
       DataFormatada = `${data.getDate()}/${data.getMonth() + 1}/${data.getFullYear()}`,
