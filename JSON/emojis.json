@@ -139,6 +139,11 @@
         "catBan": "<:cat_ban:975518365647011910>",
         "bigbrain": "<:bigbrain:930818109047205941>",
         "Stonks": "<:saphstonks:976483813796503562>",
-        "dogecoin": "<a:dogecoin:978282824501174344>"
+        "dogecoin": "<a:dogecoin:978282824501174344>",
+        "miku": "<:miku:978462827478151228>",
+        "MikuWinBet": "<a:mikuvv:978468612438384660>",
+        "MikuLoseBet": "<:miku:978468360448802876>",
+        "MikuDefault": "<a:miku_xd:978468239086616597>",
+        "eagora": "<:eagora:978473574211932180>"
     }
 }

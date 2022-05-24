@@ -20,9 +20,11 @@ async function Error(message, err) {
      * 50013 - DiscordAPIError: Missing Permissions
      * 50035 - message_reference - Invalid Form Body
      */
-     
+    
     if (err?.code === 50035)
         return message?.channel?.send(`${e.Warn} | A mensagem original é desconhecida. Verifique se alguém ou algo está apagando a mensagem dos comandos.`)
+
+    if (err.code === 50013 && !message) return
 
     if (err?.code === 50013)
         return message?.channel?.send(`${e.Warn} | Eu não tenho permissão suficiente para prosseguir com este comando.`)

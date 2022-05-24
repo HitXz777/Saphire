@@ -32,27 +32,17 @@ function formatString(string) {
 }
 
 // Flag Gaming
-async function registerGameChannel(channelId) {
+function registerGameChannel(channelId) {
 
-    await Database.Client.updateOne(
-        { id: client.user.id },
-        {
-            $push: { ['GameChannels.Flags']: channelId }
-        }
-    )
+    Database.Cache.push('GameChannels.Flags', channelId)
+
     return
 }
 
 // Flag Gaming
-async function unregisterGameChannel(channelId) {
-
-    await Database.Client.updateOne(
-        { id: client.user.id },
-        {
-            $pull: { ['GameChannels.Flags']: channelId }
-        }
-    )
-
+function unregisterGameChannel(channelId) {
+    Database.Cache.pull('GameChannels.Flags', channelId)
+    return
 }
 
 // Flag Gaming

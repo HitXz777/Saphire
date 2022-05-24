@@ -83,6 +83,12 @@ module.exports = {
                             value: 'economy',
                         },
                         {
+                            label: 'Economia 2',
+                            description: 'Economy Global System',
+                            emoji: `${e.PandaProfit}`,
+                            value: 'economy2',
+                        },
+                        {
                             label: 'Games/Jogos',
                             description: 'Que tal só se divertir?',
                             emoji: '🎮',
@@ -198,7 +204,7 @@ module.exports = {
             if (valor === 'att') return atualization()
             if (valor === 'Close') return collector.stop()
 
-            let values = ['admin', 'premium', 'animes', 'bot', 'config', 'economy', 'games', 'users', 'images', 'interactions', 'moderation', 'owner', 'perfil', 'vip', 'random', 'reactions', 'servidor', 'util']
+            let values = await readdirSync('./src/commands/')
 
             if (values.includes(valor?.toLowerCase()))
                 return HelpPainel(`${valor}`)

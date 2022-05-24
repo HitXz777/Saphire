@@ -129,7 +129,11 @@ client.on('messageCreate', async message => {
 
         Database.Cache.add(`Timeouts.${command.name}.${message.author.id}.TimesTried`, 1)
         Database.Cache.set(`Timeouts.${command.name}.${message.author.id}.Tried`, true)
-        return message.reply(`⏱️ | Calma, calma! Você ainda tem mais **\`${client.GetTimeout(command.cooldown || 1500, Database.Cache.get(`Timeouts.${command.name}.${message.author.id}.Time`), true)}\`** para usar este comando novamente.`)
+
+        let timeResponse = client.GetTimeout(command.cooldown || 1500, Database.Cache.get(`Timeouts.${command.name}.${message.author.id}.Time`), true)
+
+        if (timeResponse === 'Invalid Cooldown Acess Bad Formated') timeResponse = 0
+        return message.reply(`⏱️ | Calma, calma! Você ainda tem mais **\`${timeResponse}\`** para usar este comando novamente.`)
     }
 
     Database.Cache.set(`Timeouts.${command.name}.${message.author.id}`, { Time: Date.now() })

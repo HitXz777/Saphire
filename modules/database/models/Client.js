@@ -17,7 +17,6 @@ module.exports = model("Client", new Schema({
         Bingo: Array,
         Quiz: Array,
         Forca: Array,
-        Flags: Array,
         Raspadinhas: Array,
         Mix: Array,
     },

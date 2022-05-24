@@ -1,6 +1,56 @@
 {
     "Flags": [
         {
+            "flag": "🇺🇸",
+            "country": "estados unidos",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978464910398857266/unknown.png?width=898&height=473"
+        },
+        {
+            "flag": "🇩🇲",
+            "country": "dominica",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978464567845863444/unknown.png?width=946&height=473"
+        },
+        {
+            "flag": "🇬🇪",
+            "country": "geórgia",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978464299523653632/unknown.png"
+        },
+        {
+            "flag": "🇵🇦",
+            "country": "panamá",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978463901190586389/unknown.png"
+        },
+        {
+            "flag": "🇦🇫",
+            "country": "afeganistão",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978463679379017738/unknown.png"
+        },
+        {
+            "flag": "🇵🇬",
+            "country": "papua-nova guiné",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978463268316278784/unknown.png?width=630&height=473"
+        },
+        {
+            "flag": "🇳🇬",
+            "country": "nigéria",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978461797604532244/unknown.png?width=946&height=473"
+        },
+        {
+            "flag": "🇲🇪",
+            "country": "montenegro",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978461398143238174/unknown.png?width=946&height=473"
+        },
+        {
+            "flag": "🇨🇼",
+            "country": "curaçao",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978460434376060978/unknown.png?width=710&height=473"
+        },
+        {
+            "flag": "🇻🇺",
+            "country": "vanuatu",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978460071459713064/unknown.png?width=789&height=473"
+        },
+        {
             "flag": "🇲🇷",
             "country": "mauritânia",
             "image": "https://media.discordapp.net/attachments/913429397678198795/977958307677491280/425417f4dd24e2c64baa09ce0e43fb6e.jpg"
@@ -134,11 +184,6 @@
             "flag": "🇬🇷",
             "country": "grécia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976078549930901525/8743900a6edf3ee8ae43648d28eae7d7.jpg"
-        },
-        {
-            "flag": "🇬🇪",
-            "country": "geórgia",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976078404300451880/bb617ceb3d1faac99cac2040e0b2551e.jpg"
         },
         {
             "flag": "🇬🇲",
@@ -366,11 +411,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976071435825053746/088f23928f46a01f46c6518dcdc3b1c7.jpg?width=729&height=418"
         },
         {
-            "flag": "🇦🇫",
-            "country": "afeganistão",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976071323518402560/cc48a21210a9ba774c6cdfd19f28eb28.jpg"
-        },
-        {
             "flag": "🇧🇯",
             "country": "benin",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976073387296321606/2c4e6b5ac9d608290602f8eb4def2388.jpg"
@@ -384,11 +424,6 @@
             "flag": "🇵🇱",
             "country": "polônia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976178447187587122/Flag_of_Poland.svg.png"
-        },
-        {
-            "flag": "🇩🇲",
-            "country": "dominica",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976077163457572915/f845d7e9c993528ad4885d1d950f8fd5.jpg"
         },
         {
             "flag": "🇨🇷",
@@ -501,11 +536,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976084279744409622/53d2a3e4d8bd572fb484451b71241595.jpg"
         },
         {
-            "flag": "🇳🇬",
-            "country": "nigéria",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976084371536740353/2c84ddd5a4febc8b6b668f2342c97827.jpg"
-        },
-        {
             "flag": "🇳🇴",
             "country": "noruega",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976084456534331472/d6c60448bff5340687e1891ac3738f9d.jpg"
@@ -526,19 +556,9 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976231697140039762/1200px-Flag_of_Oman.svg.png?width=705&height=353"
         },
         {
-            "flag": "🇵🇦",
-            "country": "panamá",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976232098547503145/300px-Flag_of_Panama.svg.png"
-        },
-        {
             "flag": "🇵🇼",
             "country": "palau",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976231990875537418/significado-da-bandeira-palau-1-1200x675.jpg?width=705&height=397"
-        },
-        {
-            "flag": "🇵🇬",
-            "country": "papua-nova guiné",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976232223298715718/Bandeira-Papua-Nova-Guine.jpg"
         },
         {
             "flag": "🇵🇰",
@@ -766,11 +786,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976241608024551445/5296f724606511387a32fbfbd664de11.jpg?width=612&height=430"
         },
         {
-            "flag": "🇻🇺",
-            "country": "vanuatu",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976241827701194772/56709dddfb69e1161a5a1bf67275ae5e.jpg"
-        },
-        {
             "flag": "🇻🇦",
             "country": "vaticano",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976241941358473246/95fdc0642207b6edda840cbef3419c91.jpg?width=430&height=430"
@@ -901,11 +916,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976249850872090624/0ed4b8e02167eda0f4092c4cb1ded4a2.jpg"
         },
         {
-            "flag": "🇲🇪",
-            "country": "montenegro",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976249666662432848/3b6e7d044ec2fbd3373f9187c3bd1277.jpg"
-        },
-        {
             "flag": "🇳🇪",
             "country": "níger",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976250262614327376/03de85fc8ab1ebb5e7192d9b1d4df099.jpg?width=502&height=430"
@@ -961,19 +971,9 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976268606969090139/de9db407ce1c0686d60a106af71b4746.jpg?width=710&height=473"
         },
         {
-            "flag": "🇺🇸",
-            "country": "estados unidos",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976268881633112084/03af623d4246ea4bffb7c9997928285a.jpg"
-        },
-        {
             "flag": "🇦🇸",
             "country": "samoa americana",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976253891417100329/7dec71b9a799413b8fde4810c31ace41.jpg"
-        },
-        {
-            "flag": "🇨🇼",
-            "country": "curaçao",
-            "image": "https://media.discordapp.net/attachments/945026030123499530/977587141909557258/4c2251b6f04445f82961142e9fe8adf4.jpg"
         },
         {
             "flag": "🇬🇭",
@@ -1224,6 +1224,11 @@
             "flag": "🇹🇫",
             "country": "terras austrais e antárticas francesas",
             "image": "https://media.discordapp.net/attachments/975974003229474846/977944044854448168/h-2.png"
+        },
+        {
+            "flag": "🇰🇳",
+            "country": "são cristóvão e névis",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978462209703301130/unknown.png?width=708&height=472"
         }
     ]
 }
