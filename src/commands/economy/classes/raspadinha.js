@@ -105,8 +105,8 @@ class Raspadinha {
                     buttom.emoji = getRandomEmoji()
                     buttom.disabled = true
                     buttom.style = 'PRIMARY'
-                    msg.edit({ components: buttons }).catch(() => { })
                     await checkButtons(customId, buttonIndex)
+                    msg.edit({ components: buttons }).catch(() => { })
                     return
                 })
                 .on('end', () => {
