@@ -19,14 +19,7 @@ client.on("ready", async () => {
 
     await Database.Client.updateOne(
         { id: client.user.id },
-        {
-            $unset: {
-                GameChannels: 1,
-                Rebooting: 1,
-                ['Raspadinhas.Channels']: 1,
-                ['Zeppelin.Channels']: 1
-            }
-        })
+        { $unset: { Rebooting: 1 } })
 
     if (data?.Rebooting?.ON) {
         let channel = client.channels.cache.get(data.Rebooting?.ChannelId),

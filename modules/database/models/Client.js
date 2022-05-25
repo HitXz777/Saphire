@@ -13,13 +13,6 @@ module.exports = model("Client", new Schema({
     BackgroundAcess: Array,
     BlockedUsers: Array,
     PremiumServers: Array,
-    GameChannels: {
-        Bingo: Array,
-        Quiz: Array,
-        Forca: Array,
-        Raspadinhas: Array,
-        Mix: Array,
-    },
     FlagGame: {
         TopOne: String
     },
@@ -28,12 +21,10 @@ module.exports = model("Client", new Schema({
         totalValue: Number
     },
     Raspadinhas: {
-        Channels: Array,
         Bought: Number,
         totalPrize: Number
     },
     Zeppelin: {
-        Channels: Array,
         winTotalMoney: Number,
         loseTotalMoney: Number,
         Explode: Number

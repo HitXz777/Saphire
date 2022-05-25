@@ -35,7 +35,7 @@ module.exports = {
         if (['all', 'tudo'].includes(args[0]?.toLowerCase()) || ['all', 'tudo'].includes(args[1]?.toLowerCase())) quantia = money || 0
         if (!quantia || isNaN(quantia)) return message.reply(`${e.Deny} | Só faltou dizer o valor do pagamento em números...`)
         if (quantia > money) return message.reply(`${e.Deny} | Você não tem todo esse dinheiro...`)
-        if (quantia <= 0) return message.reply(`${e.Deny} | Você não pode pagar alguém come menos de uma 1 ${moeda}, baaaaka.`)
+        if (quantia <= 0) return message.reply(`${e.Deny} | Você não pode pagar alguém com menos de 1 ${moeda}, baaaaka.`)
 
         let payCache = quantia
         Database.subtract(message.author.id, quantia)

@@ -40,12 +40,6 @@ function registerGameChannel(channelId) {
 }
 
 // Flag Gaming
-function unregisterGameChannel(channelId) {
-    Database.Cache.pull('GameChannels.Flags', channelId)
-    return
-}
-
-// Flag Gaming
 function emoji(i) {
     return {
         0: '🥇',
@@ -59,22 +53,6 @@ function formatWord(word) {
     let format = ''
     for (let i of word) i === ' ' ? format += '-' : format += '_'
     return format.split('')
-}
-
-// Forca Gaming
-async function registerChannelControl(pullOrPush, where, channelId) {
-
-    if (!pullOrPush || !where || !channelId) return
-
-    return pullOrPush === 'pull'
-        ? await Database.Client.updateOne(
-            { id: client.user.id },
-            { $pull: { [`GameChannels.${where}`]: channelId } }
-        )
-        : await Database.Client.updateOne(
-            { id: client.user.id },
-            { $push: { [`GameChannels.${where}`]: channelId } }
-        )
 }
 
 // palavamisturada.js
@@ -116,9 +94,7 @@ module.exports = {
     Mix,
     GetWord,
     registerGameChannel,
-    unregisterGameChannel,
     formatNumberCaracters,
     emoji,
-    formatWord,
-    registerChannelControl
+    formatWord
 }

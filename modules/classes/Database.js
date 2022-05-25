@@ -7,28 +7,30 @@ const client = require('../../index'),
     User = require('../database/models/User'),
     Ark = require('ark.db'),
     eData = new Ark.Database('../../JSON/emojis.json'),
+    cache = new Ark.Database('../../cache.json'),
     configData = new Ark.Database('../../JSON/config.json'),
     Models = require('../database/Models'),
     config = configData.get('config'),
     e = eData.get('e')
-    
+
 class Database extends Models {
     constructor() {
         super()
         this.BgLevel = new Ark.Database('../../JSON/levelwallpapers.json')
-        this.Emojis = e
         this.dbEmoji = new Ark.Database('../../JSON/emojis.json')
         this.Frases = new Ark.Database('../../JSON/frases.json')
         this.Characters = new Ark.Database('../../JSON/characters.json')
         this.Flags = new Ark.Database('../../JSON/flags.json')
-        this.Cache = new Ark.Database('../../cache.json')
+        this.Cache = cache
+        this.Emojis = e
         this.Names = {
             Rody: "451619591320371213",
             Gowther: "315297741406339083",
             Makol: "351903530161799178",
             Moana: "737238491842347098",
             Dspofu: "781137239194468403",
-            Pepy: "830226550116057149"
+            Pepy: "830226550116057149",
+            Lereo: "978659462602711101"
         }
     }
 
@@ -232,6 +234,16 @@ Database.prototype.deleteGiveaway = async (DataId, All = false) => {
         ? await Giveaway.deleteMany({ GuildId: DataId })
         : await Giveaway.deleteOne({ MessageID: DataId })
 
+}
+
+Database.prototype.registerChannelControl = (pullOrPush = '', where = '', channelId = '') => {
+
+    if (!pullOrPush || !where || !channelId) return
+
+    pullOrPush === 'push'
+        ? cache.push(`GameChannels.${where}`, channelId)
+        : cache.pull(`GameChannels.${where}`, channelId)
+    return
 }
 
 Database.prototype.deleteUser = async (userId) => {

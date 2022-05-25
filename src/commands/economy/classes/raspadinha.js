@@ -24,15 +24,15 @@ class Raspadinha {
         let raspadinhas = data.Slot?.Raspadinhas || 0
         if (!raspadinhas || raspadinhas <= 0) return message.reply(`${e.Deny} | Você não tem nenhuma raspadinha. Que tal comprar algumas? \`${prefix}comprar raspadinhas <quantidade>\`\n> ${e.Info} | Se quiser ver mais detalhes, use o comando \`${prefix}raspadinha info\``)
 
-        let raspadinhaData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Raspadinhas')
+        let raspadinhaData = Database.Cache.get('Raspadinhas') || []
 
-        if (raspadinhaData?.GameChannels?.Raspadinhas?.includes(message.author.id))
+        if (raspadinhaData.includes(message.author.id))
             return message.reply(`${e.Deny} | Você já tem uma raspadinha sendo aberta. Termine de abrir, depois abra outra. Cuidado com a ganância, ser humano.`)
 
-        let channelsId = Database.Cache.get('Raspadinhas') || []
+        let channelsId = Database.Cache.get('GameChannels.Raspadinhas') || []
 
         if (channelsId.includes(message.channel.id))
-            return message.reply(`${e.Deny} | Já tem uma raspadinha sendo aberta neste canal. Espere ela fechar para você abrir a sua, ok?.`)
+            return message.reply(`${e.Deny} | Já tem uma raspadinha sendo aberta neste canal. Espere ela fechar para você abrir a sua, ok?`)
 
         registerRaspadinha()
 
@@ -218,22 +218,13 @@ class Raspadinha {
         }
 
         async function registerRaspadinha() {
-            Database.Cache.push('Raspadinhas', message.channel.id)
-
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                { $push: { ['GameChannels.Raspadinhas']: message.author.id } },
-                { upsert: true }
-            )
+            Database.Cache.push('Raspadinhas', message.author.id)
+            Database.registerChannelControl('push', 'Raspadinhas', message.channel.id)
         }
 
         async function unregisterRaspadinha() {
-            Database.Cache.pull('Raspadinhas', message.channel.id)
-
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                { $pull: { ['GameChannels.Raspadinhas']: message.author.id } }
-            )
+            Database.Cache.pull('Raspadinhas', message.author.id)
+            Database.registerChannelControl('pull', 'Raspadinhas', message.channel.id)
         }
 
         async function addRaspadinha() {

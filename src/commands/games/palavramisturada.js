@@ -2,7 +2,7 @@
 let { e } = require("../../../JSON/emojis.json"),
     Moeda = require('../../../modules/functions/public/moeda'),
     IsMod = require('../../../modules/functions/plugins/ismod'),
-    { formatArray, Mix, GetWord, registerChannelControl } = require('./plugins/gamePlugins')
+    { formatArray, Mix, GetWord } = require('./plugins/gamePlugins')
 
 module.exports = {
     name: "palavramisturada",
@@ -28,13 +28,12 @@ module.exports = {
         if (['add', 'adicionar', 'new'].includes(args[0]?.toLowerCase())) return AddNewWord()
         if (['del', 'deletar', 'delete', 'apagar', 'excluir'].includes(args[0]?.toLowerCase())) return DeleteWord()
 
-        let data = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Mix'),
-            channelsInGame = data?.GameChannels?.Mix || []
+        let channelsInGame = Database.Cache.get('GameChannels.Mix') || []
 
         if (channelsInGame.includes(message.channel.id))
             return message.reply(`${e.Deny} | Já tem um Mixing rolando neste chat. Espere ele acabar para começar outro, ok?`)
 
-        await registerChannelControl('push', 'Mix', message.channel.id)
+        Database.registerChannelControl('push', 'Mix', message.channel.id)
 
         return GetAndValidateWord()
 
@@ -75,7 +74,7 @@ module.exports = {
 
                         if (control) return
 
-                        registerChannelControl('pull', 'Mix', message.channel.id)
+                        Database.registerChannelControl('pull', 'Mix', message.channel.id)
                         msg.delete().catch(() => { })
                         return message.channel.send(`${e.Deny} | Ninguém acertou a palavra: **\`${mixed}\`** -> **\`${palavra}\`**`).catch(() => { })
 

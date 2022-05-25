@@ -1,4 +1,4 @@
-const { formatWord, registerChannelControl } = require('./plugins/gamePlugins')
+const { formatWord } = require('./plugins/gamePlugins')
 
 module.exports = {
     name: 'forca',
@@ -56,12 +56,11 @@ module.exports = {
 
             if (control.blocked) return
 
-            let clientData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Forca'),
-                channelsBlocked = clientData.GameChannels.Forca || []
+            let channelsBlocked = Database.Cache.get('GameChannels.Forca') || []
 
             if (channelsBlocked.includes(message.channel.id))
                 return message.channel.send(`${e.Deny} | Já tem uma forca rolando nesse chat.\n${e.Info} | Se a mensagem for apagada, dentro de 20 segundos esse canal será liberado.`)
-                registerChannelControl('push', 'forca', message.channel.id)
+            Database.registerChannelControl('push', 'Forca', message.channel.id)
 
             embed = new MessageEmbed()
                 .setColor(client.blue)
@@ -141,7 +140,7 @@ module.exports = {
                     }
                 })
                 .on('end', () => {
-                    registerChannelControl('pull', 'forca', message.channel.id)
+                    Database.registerChannelControl('pull', 'Forca', message.channel.id)
 
                     if (control.endedCollector) {
                         embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)

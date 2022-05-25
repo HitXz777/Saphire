@@ -16,7 +16,8 @@ module.exports = {
 
         if (!args[0] || ['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return zeppelinInfo()
 
-        if (zeppelin?.Zeppelin?.Channels?.includes(message.channel.id))
+        let channels = Database.Cache.get('GameChannels.Zeppelin') || []
+        if (channels.includes(message.channel.id))
             return message.reply(`${e.Deny} | Já tem um balãozinho subindo neste canal.`)
 
         let requestValue = args[0].replace(/k/g, '000'),
@@ -203,10 +204,7 @@ module.exports = {
         }
 
         async function removeChannelFromDatabase() {
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                { $pull: { ['Zeppelin.Channels']: message.channel.id } }
-            )
+            Database.registerChannelControl('pull', 'Zeppelin', message.channel.id)
             return
         }
 
@@ -222,10 +220,7 @@ module.exports = {
         }
 
         async function registerChannel() {
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                { $push: { ['Zeppelin.Channels']: message.channel.id } }
-            )
+            Database.registerChannelControl('push', 'Zeppelin', message.channel.id)
             return
         }
 

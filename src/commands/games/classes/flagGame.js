@@ -1,10 +1,10 @@
 const { e } = require('../../../../JSON/emojis.json'),
     IsUrl = require('../../../../modules/functions/plugins/isurl'),
-    { formatString, registerGameChannel, unregisterGameChannel, emoji } = require('../plugins/gamePlugins')
+    { formatString, emoji } = require('../plugins/gamePlugins')
 
 class flagGame {
 
-    async init(client, message, args, prefix, MessageEmbed, Database, ) {
+    async init(client, message, args, prefix, MessageEmbed, Database,) {
 
         let flags = Database.Flags.get('Flags') || [],
             control = { atualFlag: {}, usersPoints: [], rounds: 0, collected: false, winners: [], alreadyAnswer: [], wrongAnswers: [] },
@@ -29,7 +29,7 @@ class flagGame {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
+            if (![...data?.Administradores, Database.Names.Lereo, ...data?.Moderadores]?.includes(message.author.id))
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores do *Flag Gaming* podem adicionar novas bandeiras.`)
 
             let flag = args[1],
@@ -79,7 +79,7 @@ class flagGame {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
+            if (![...data?.Administradores, Database.Names.Lereo, ...data?.Moderadores]?.includes(message.author.id))
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores do *Flag Gaming* podem editar bandeiras.`)
 
             if (['image', 'imagem'].includes(args[1]?.toLowerCase())) return editImage()
@@ -252,7 +252,7 @@ class flagGame {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
+            if (![...data?.Administradores, Database.Names.Lereo, ...data?.Moderadores]?.includes(message.author.id))
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores do *Flag Gaming* podem remover bandeiras.`)
 
             let args1 = args.slice(1).join(' ')
@@ -299,7 +299,7 @@ class flagGame {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (![...data?.Administradores, '537691734755377152', ...data?.Moderadores]?.includes(message.author.id))
+            if (![...data?.Administradores, Database.Names.Lereo, ...data?.Moderadores]?.includes(message.author.id))
                 return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de Bandeiras.`)
 
             if (!flags || flags.length === 0)
@@ -392,12 +392,12 @@ class flagGame {
 
         async function chooseGameMode() {
 
-            let channels = Database.Cache.get('GameChannels.Flags') || []
+            let channels = Database.Cache.get('Flags') || []
 
             if (channels.includes(message.channel?.id))
                 return message.reply(`${e.Deny} | Já tem um flag game rolando nesse canal. Espere ele terminar para poder iniciar outro, ok?`)
 
-            await registerGameChannel(message.channel?.id)
+            Database.registerChannelControl('push', 'Flag', message.channel.id)
 
             const buttons = [
                 {
@@ -454,7 +454,7 @@ class flagGame {
                 .on('end', () => {
                     msg.delete(() => { })
                     if (control.initied) return
-                    return unregisterGameChannel(message.channel?.id)
+                    return Database.registerChannelControl('pull', 'Flag', message.channel?.id)
                 })
         }
 
@@ -531,7 +531,7 @@ class flagGame {
             await generateButtons()
 
             if (Msg)
-                Msg?.delete().catch(() => unregisterGameChannel(message.channel?.id))
+                Msg?.delete().catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
 
             embed
                 .setDescription(`${e.Loading} | Qual é a bandeira?\n${control.atualFlag.flag} - ???`)
@@ -541,7 +541,7 @@ class flagGame {
             let msg = await message.channel.send({
                 embeds: [embed],
                 components: control.buttons
-            }).catch(() => unregisterGameChannel(message.channel?.id))
+            }).catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
 
             msg.createMessageComponentCollector({
                 filter: int => true,
@@ -565,7 +565,7 @@ class flagGame {
 
                     if (winners.length === 0) {
 
-                        unregisterGameChannel(message.channel?.id)
+                        Database.registerChannelControl('pull', 'Flag', message.channel?.id)
                         embed
                             .setColor(client.red)
                             .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n🔄 ${control.rounds} Rounds`)
@@ -580,8 +580,8 @@ class flagGame {
                         .setDescription(`${e.Check} | ${winners.length > 1 ? `${winners.slice(0, 4)?.map(u => u.username).join(', ')}${winners.length - 4 > 0 ? ` e mais ${winners.length - 4} jogadores` : ''} acertaram` : `${winners[0].username} acertou`} o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
 
-                    msg.delete().catch(() => unregisterGameChannel(message.channel?.id))
-                    let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => unregisterGameChannel(message.channel?.id))
+                    msg.delete().catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
+                    let toDelMessage = await message.channel.send({ embeds: [embed], components: [] }).catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
 
                     for (let u of winners)
                         addPoint({ username: u.username, id: u.id }, true)
@@ -648,7 +648,7 @@ class flagGame {
                             },
                             {
                                 name: '📝 Créditos',
-                                value: `${e.Gear} Código fonte e automatização: ${client.users.cache.get(Database.Names.Rody)?.tag || '\`NOT FOUND\`'}\n${e.bigbrain} Emojis, Países, Bandeiras, Recursos: ${client.users.cache.get(Database.Names.Moana)?.tag || '\`NOT FOUND\`'}\n${e.Stonks} Dicas de funcionalidades: ${client.users.cache.get(Database.Names.Dspofu)?.tag || '\`NOT FOUND\`'}\n📈 Ajuda e suporte na adição de novas bandeiras: ${client.users.cache.get('537691734755377152')?.tag || '\`NOT FOUND\`'}` // 537691734755377152 = Lereo#1665
+                                value: `${e.Gear} Código fonte e automatização: ${client.users.cache.get(Database.Names.Rody)?.tag || '\`NOT FOUND\`'}\n${e.bigbrain} Emojis, Países, Bandeiras, Recursos: ${client.users.cache.get(Database.Names.Moana)?.tag || '\`NOT FOUND\`'}\n${e.Stonks} Dicas de funcionalidades: ${client.users.cache.get(Database.Names.Dspofu)?.tag || '\`NOT FOUND\`'}\n📈 Ajuda e suporte na adição de novas bandeiras: ${client.users.cache.get(Database.Names.Lereo)?.tag || '\`NOT FOUND\`'}`
                             }
                         )
                         .setFooter({ text: '<> obrigatório | [] opicional' })
@@ -677,14 +677,14 @@ class flagGame {
             control.rounds++
 
             if (Msg)
-                Msg?.delete().catch(() => unregisterGameChannel(message.channel?.id)) // Unificar as funções no plugin para registerChannelControl function
+                Msg?.delete().catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
 
             embed
                 .setDescription(`${e.Loading} | Qual é a bandeira?\n${control.atualFlag.flag} - ???`)
                 .setImage(control.atualFlag.image || null)
                 .setFooter({ text: `Round: ${control.rounds}` })
 
-            let msg = await message.channel.send({ embeds: [embed] }).catch(() => unregisterGameChannel(message.channel?.id))
+            let msg = await message.channel.send({ embeds: [embed] }).catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
 
             return msg.channel.createMessageCollector({
                 filter: m => m.content?.toLowerCase() == control.atualFlag?.country,
@@ -700,9 +700,9 @@ class flagGame {
                         .setDescription(`${e.Check} | ${Message.author} acertou o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
 
-                    msg.delete().catch(() => unregisterGameChannel(message.channel?.id))
+                    msg.delete().catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
                     await randomizeFlags(0)
-                    let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => unregisterGameChannel(message.channel?.id))
+                    let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
 
                     await addPoint(Message.author)
                     return setTimeout(async () => {
@@ -715,7 +715,7 @@ class flagGame {
 
                     if (control.collected) return control.collected = false
 
-                    unregisterGameChannel(message.channel?.id)
+                    Database.registerChannelControl('pull', 'Flag', message.channel?.id)
                     embed
                         .setColor(client.red)
                         .setDescription(`${e.Deny} | Ninguém acertou o país.\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n🔄 ${control.rounds} Rounds`)

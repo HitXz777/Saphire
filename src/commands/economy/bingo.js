@@ -13,8 +13,7 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Balance'),
-            clientData = await Database.Client.findOne({ id: client.user.id }, 'GameChannels.Bingo'),
-            canaisAtivos = clientData?.GameChannels?.Bingo || [],
+            canaisAtivos = Database.Cache.get('GameChannels.Bingo') || [],
             money = parseInt(authorData?.Balance) || 0,
             moeda = await Moeda(message)
 
@@ -52,7 +51,7 @@ module.exports = {
             msg = await message.channel.send({ embeds: [Bingo] }),
             toCancel = false
 
-        bingoStarted()
+        Database.registerChannelControl('push', 'Bingo', message.channel.id)
 
         const collector = message.channel.createMessageCollector({
             filter: msg => msg.content === `${Number}`,
@@ -71,7 +70,7 @@ module.exports = {
             Database.PushTransaction(winner.author.id, `${e.gain} Recebeu ${quantia || 0} Safiras jogando no bingo`)
             winner.reply(`${e.MoneyWings} | ${winner.author} acertou o número do bingo! **${Number}**`).catch(() => { })
 
-            finishBingo()
+            Database.registerChannelControl('pull', 'Bingo', message.channel.id)
             return
 
         })
@@ -84,7 +83,7 @@ module.exports = {
             msg.edit({ embeds: [Bingo] }).catch(() => { })
             Database.add(message.author.id, quantia)
             Database.PushTransaction(message.author.id, `${e.gain} Recebeu ${quantia || 0} Safiras jogando no bingo`)
-            finishBingo()
+            Database.registerChannelControl('pull', 'Bingo', message.channel.id)
             return message.channel.send(`${e.Deny} | Tempo do bingo expirado!\n${message.author}, o dinheiro lançado no Bingo retornou a sua carteira.`)
 
         })
@@ -231,7 +230,7 @@ module.exports = {
                         msg = await message.channel.send({ embeds: [Bingo] }),
                         toCancel = false
 
-                    bingoStarted()
+                    Database.registerChannelControl('push', 'Bingo', message.channel.id)
                     const collector = message.channel.createMessageCollector({
                         filter: m => m.content === `${Number}` && arrayControl.includes(m.author.id),
                         time: 60000,
@@ -254,7 +253,7 @@ module.exports = {
                     })
 
                     collector.on('end', () => {
-                        finishBingo()
+                        Database.registerChannelControl('pull', 'Bingo', message.channel.id)
                         if (toCancel) return
 
                         Bingo.setColor('RED')
@@ -271,22 +270,6 @@ module.exports = {
 
             }
 
-        }
-
-        async function finishBingo() {
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                { $pull: { ['GameChannels.Bingo']: message.channel.id } }
-            )
-            return
-        }
-
-        async function bingoStarted() {
-            await Database.Client.updateOne(
-                { id: client.user.id },
-                { $push: { ['GameChannels.Bingo']: message.channel.id } }
-            )
-            return
         }
 
     }

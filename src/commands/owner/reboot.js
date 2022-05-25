@@ -123,7 +123,7 @@ module.exports = {
 
             for (let guild of guilds) {
 
-                if (!client.guilds.cache.get(guild?.id)) {
+                if (!client.guilds.cache.has(guild?.id)) {
                     guildsDeleted++
                     deleteGuild(guild?.id)
                 }
@@ -148,7 +148,7 @@ module.exports = {
 
             for (let user of users) {
 
-                if (!client.users.cache.get(user?.id) || client.users.cache.get(user?.id)?.bot) {
+                if (!client.users.cache.has(user?.id) || client.users.cache.get(user?.id)?.bot) {
                     usersDeleted++
                     deleteUser(user?.id)
                 }
