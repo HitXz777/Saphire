@@ -316,7 +316,7 @@ Database.prototype.registerServer = async (guild, client) => {
     let clientData = await Database.Client.findOne({ id: client.user.id }, 'Blacklist.Guilds')
     if (clientData?.Blacklist?.Guilds.includes(guild.id)) return
 
-    let g = await Database.findOne({ id: guild.id })
+    let g = await Database.Guild.findOne({ id: guild.id })
 
     if (g || g?.id === guild.id) return
 
