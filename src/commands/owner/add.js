@@ -21,6 +21,7 @@ module.exports = {
 
         // NO USERS
         if (['commands', 'comandos', 'comando', 'cmd', 'cmds', 'commands'].includes(args[0]?.toLowerCase())) return AddCommands()
+        if (['news'].includes(args[0]?.toLowerCase())) return newRole()
 
         if (!user) return message.channel.send(`${e.Deny} | Usuário não encontrado.`)
         if (user.bot) return message.channel.send(`${e.Deny} | No bots.`)
@@ -209,12 +210,46 @@ module.exports = {
             return message.channel.send(`${e.Check} | ${user.username} agora é um Developer!`)
         }
 
+        function newRole() {
+
+            let button = [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 2,
+                            label: 'OBTER CARGO',
+                            custom_id: 'newRole',
+                            style: 'SUCCESS'
+                        },
+                        {
+                            type: 2,
+                            label: 'RETIRAR CARGO',
+                            custom_id: 'delRole',
+                            style: 'DANGER'
+                        }
+                    ]
+                }
+            ]
+
+            let role = message.guild.roles.cache.get('914925531529609247')
+
+            if (!role)
+                return message.reply(`${e.Deny} | Eu não achei o cargo de novidades.`)
+
+            return message.reply({
+                content: `${e.Info} | Obtendo o cargo ${role}, você ficará por dentro de todas as novidades que a Saphire's Team anunciar.`,
+                components: button
+            })
+
+        }
+
         async function AddNewSixthStar() {
 
             let get = await Database.User.findOne({ id: user.id }, 'Perfil.Estrela.Seis')
-                
+
             if (!get) return message.channel.send(`${e.Database} | DATABASE | Usuário não encontrado.`)
-            
+
             let data = get.Perfil?.Estrela?.Seis
 
             if (data)

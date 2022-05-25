@@ -305,7 +305,7 @@ Database.prototype.registerUser = async (user, blocked) => {
     let u = await Database.User.findOne({ id: user.id })
     if (u || u?.id === user.id) return
 
-    new User({ id: user.id }).save()
+    new Database.User({ id: user.id }).save()
     return
 }
 
