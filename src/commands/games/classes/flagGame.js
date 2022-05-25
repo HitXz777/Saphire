@@ -648,7 +648,7 @@ class flagGame {
                             },
                             {
                                 name: '📝 Créditos',
-                                value: `${e.Gear} Código fonte e automatização: ${client.users.cache.get(Database.Names.Rody)?.tag || '\`NOT FOUND\`'}\n${e.bigbrain} Emojis, Países, Bandeiras, Recursos: ${client.users.cache.get(Database.Names.Moana)?.tag || '\`NOT FOUND\`'}\n${e.Stonks} Dicas de funcionalidades: ${client.users.cache.get(Database.Names.Dspofu)?.tag || '\`NOT FOUND\`'}\n📈 Ajuda e suporte na adição de novas bandeiras: ${client.users.cache.get(Database.Names.Lereo)?.tag || '\`NOT FOUND\`'}`
+                                value: `${e.Gear} Código fonte e automatização: ${client.users.cache.get(Database.Names.Rody)?.tag || '\`NOT FOUND\`'}\n${e.bigbrain} Emojis, Países, Bandeiras, Recursos: ${client.users.cache.get(Database.Names.Lereo)?.tag || '\`NAME NOT FOUND\`'} & ${client.users.cache.get(Database.Names.Moana)?.tag || '\`NOT FOUND\`'}\n${e.Stonks} Dicas de funcionalidades: ${client.users.cache.get(Database.Names.Dspofu)?.tag || '\`NOT FOUND\`'}`
                             }
                         )
                         .setFooter({ text: '<> obrigatório | [] opicional' })
@@ -696,6 +696,7 @@ class flagGame {
 
                     control.collected = true
 
+                    await addPoint(Message.author)
                     embed
                         .setDescription(`${e.Check} | ${Message.author} acertou o país!\n${control.atualFlag.flag} - ${formatString(control.atualFlag?.country)}\n \n${e.Loading} Próxima bandeira...`)
                         .setImage(null)
@@ -704,7 +705,6 @@ class flagGame {
                     await randomizeFlags(0)
                     let toDelMessage = await Message.reply({ embeds: [embed] }).catch(() => Database.registerChannelControl('pull', 'Flag', message.channel?.id))
 
-                    await addPoint(Message.author)
                     return setTimeout(async () => {
                         await toDelMessage.delete().catch(() => { })
                         start()

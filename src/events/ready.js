@@ -9,7 +9,7 @@ client.on("ready", async () => {
 
     console.log('Event Ready | OK!')
 
-    await Database.MongoConnect()
+    await Database.MongoConnect(client)
 
     Database.registerClient(client.user.id)
     Database.openLotery(client.user.id)

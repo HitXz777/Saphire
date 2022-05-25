@@ -1,28 +1,17 @@
-const client = require('../../index'),
-    Client = require('../database/models/Client'),
-    Giveaway = require('../database/models/Giveaway'),
-    Guild = require('../database/models/Guild'),
-    LogRegister = require('../database/models/LogRegister'),
-    Lotery = require('../database/models/Lotery'),
-    User = require('../database/models/User'),
-    Ark = require('ark.db'),
-    eData = new Ark.Database('../../JSON/emojis.json'),
-    cache = new Ark.Database('../../cache.json'),
-    configData = new Ark.Database('../../JSON/config.json'),
-    Models = require('../database/Models'),
-    config = configData.get('config'),
-    e = eData.get('e')
+const JSON = require('ark.db').Database,
+    Models = require('../database/Models')
 
 class Database extends Models {
     constructor() {
         super()
-        this.BgLevel = new Ark.Database('../../JSON/levelwallpapers.json')
-        this.dbEmoji = new Ark.Database('../../JSON/emojis.json')
-        this.Frases = new Ark.Database('../../JSON/frases.json')
-        this.Characters = new Ark.Database('../../JSON/characters.json')
-        this.Flags = new Ark.Database('../../JSON/flags.json')
-        this.Cache = cache
-        this.Emojis = e
+        this.BgLevel = new JSON('../../JSON/levelwallpapers.json')
+        this.EmojisJSON = Database.EmojisJSON
+        this.Frases = new JSON('../../JSON/frases.json')
+        this.Characters = new JSON('../../JSON/characters.json')
+        this.Flags = new JSON('../../JSON/flags.json')
+        this.Cache = Database.Cache
+        this.Emojis = Database.Emojis
+        this.Config = Database.Config
         this.Names = {
             Rody: "451619591320371213",
             Gowther: "315297741406339083",
@@ -34,12 +23,23 @@ class Database extends Models {
         }
     }
 
+    static Client = require('../database/models/Client')
+    static Giveaway = require('../database/models/Giveaway')
+    static Guild = require('../database/models/Guild')
+    static LogRegister = require('../database/models/LogRegister')
+    static Lotery = require('../database/models/Lotery')
+    static User = require('../database/models/User')
+    static Cache = new JSON('../../cache.json')
+    static EmojisJSON = new JSON('../../JSON/emojis.json')
+    static Emojis = Database.EmojisJSON.get('e')
+    static ConfigJSON = new JSON('../../JSON/config.json')
+    static Config = Database.ConfigJSON.get('config')
+
 }
 
-Database.prototype.MongoConnect = async () => {
+Database.prototype.MongoConnect = async (client) => {
 
-    const { connect } = require('mongoose'),
-        { config } = require('../../JSON/config.json')
+    const { connect } = require('mongoose')
 
     try {
         await connect(process.env.MONGODB_LINK_CONNECTION, {
@@ -49,7 +49,7 @@ Database.prototype.MongoConnect = async () => {
         return console.log('Mongoose Database | OK!')
     } catch (err) {
         console.log('Mongoose Database | FAIL!\n--> ' + err)
-        client.users.cache.get(config.ownerId)?.send('Erro ao conectar a database.').catch(() => { })
+        client.users.cache.get(Database.Config.ownerId)?.send('Erro ao conectar a database.').catch(() => { })
         return client.destroy()
     }
 }
@@ -58,7 +58,7 @@ Database.prototype.add = async (userId, amount) => {
 
     if (!userId || isNaN(amount)) return
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $inc: { Balance: amount } },
         { upsert: true }
@@ -70,7 +70,7 @@ Database.prototype.subtract = async (userId, amount) => {
 
     if (!userId || isNaN(amount)) return
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $inc: { Balance: -amount } },
         { upsert: true }
@@ -80,7 +80,7 @@ Database.prototype.subtract = async (userId, amount) => {
 
 Database.prototype.SetTimeout = async (userId, TimeoutRoute) => {
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { [TimeoutRoute]: Date.now() },
         { upsert: true }
@@ -90,7 +90,7 @@ Database.prototype.SetTimeout = async (userId, TimeoutRoute) => {
 
 Database.prototype.pushUsersLotery = async (usersArray, clientId) => {
 
-    await Lotery.updateOne(
+    await Database.Lotery.updateOne(
         { id: clientId },
         { $push: { Users: { $each: [...usersArray] } } }
     )
@@ -100,14 +100,14 @@ Database.prototype.pushUsersLotery = async (usersArray, clientId) => {
 
 Database.prototype.getGuild = async (guildId, params = null) => {
 
-    let data = await Guild.findOne({ id: guildId }, params)
+    let data = await Database.Guild.findOne({ id: guildId }, params)
     return data
 
 }
 
 Database.prototype.closeLotery = async (clientId) => {
 
-    await Lotery.updateOne(
+    await Database.Lotery.updateOne(
         { id: clientId },
         { Close: true },
         { upsert: true }
@@ -118,11 +118,11 @@ Database.prototype.closeLotery = async (clientId) => {
 
 Database.prototype.openLotery = async (clientId) => {
 
-    let data = await Lotery.findOne({ id: clientId })
+    let data = await Database.Lotery.findOne({ id: clientId })
 
     if (!data) return
 
-    await Lotery.updateOne(
+    await Database.Lotery.updateOne(
         { id: clientId },
         { $unset: { Close: 1 } },
         { upsert: true }
@@ -132,7 +132,7 @@ Database.prototype.openLotery = async (clientId) => {
 
 Database.prototype.resetLoteryUsers = async (clientId) => {
 
-    await Lotery.updateOne(
+    await Database.Lotery.updateOne(
         { id: clientId },
         { $unset: { Users: 1 } },
         { upsert: true }
@@ -145,7 +145,7 @@ Database.prototype.addItem = async (userId, ItemDB, amount) => {
 
     if (!userId || !ItemDB || isNaN(amount)) return
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $inc: { [ItemDB]: amount } },
         { upsert: true }
@@ -156,7 +156,7 @@ Database.prototype.addItem = async (userId, ItemDB, amount) => {
 
 Database.prototype.balance = async (userId) => {
 
-    let data = await User.findOne({ id: userId }, 'Balance')
+    let data = await Database.User.findOne({ id: userId }, 'Balance')
     return data ? parseInt(data.Balance) : 0
 
 }
@@ -166,7 +166,7 @@ Database.prototype.addGamingPoint = async (userId, type, value) => {
     if (!userId || !type || isNaN(value)) return
 
     // TODO: Adicionar o Flag Gaming no ranking
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $inc: { [`GamingCount.${type}`]: value } },
         { upsert: true }
@@ -178,7 +178,7 @@ Database.prototype.subtractItem = async (userId, ItemDB, amount) => {
 
     if (!userId || !ItemDB || isNaN(amount)) return
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $inc: { [ItemDB]: -amount } },
         { upsert: true }
@@ -191,7 +191,7 @@ Database.prototype.updateUserData = async (userId, keyData, valueData) => {
 
     if (!userId || !keyData || !valueData) return
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { [keyData]: valueData },
         { upsert: true }
@@ -204,7 +204,7 @@ Database.prototype.pushUserData = async (userId, keyData, dataToPush) => {
 
     if (!userId || !keyData || !dataToPush) return
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $push: { [keyData]: { $each: [dataToPush] } } },
         { upsert: true }
@@ -217,7 +217,7 @@ Database.prototype.pullUserData = async (userId, keyData, dataToPush) => {
 
     if (!userId || !keyData || !dataToPush) return
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $pull: { [keyData]: dataToPush } },
         { upsert: true }
@@ -231,8 +231,8 @@ Database.prototype.deleteGiveaway = async (DataId, All = false) => {
     if (!DataId) return
 
     return All
-        ? await Giveaway.deleteMany({ GuildId: DataId })
-        : await Giveaway.deleteOne({ MessageID: DataId })
+        ? await Database.Giveaway.deleteMany({ GuildId: DataId })
+        : await Database.Giveaway.deleteOne({ MessageID: DataId })
 
 }
 
@@ -241,14 +241,14 @@ Database.prototype.registerChannelControl = (pullOrPush = '', where = '', channe
     if (!pullOrPush || !where || !channelId) return
 
     pullOrPush === 'push'
-        ? cache.push(`GameChannels.${where}`, channelId)
-        : cache.pull(`GameChannels.${where}`, channelId)
+        ? Database.Cache.push(`GameChannels.${where}`, channelId)
+        : Database.Cache.pull(`GameChannels.${where}`, channelId)
     return
 }
 
 Database.prototype.deleteUser = async (userId) => {
 
-    await User.deleteOne({ id: userId })
+    await Database.User.deleteOne({ id: userId })
     return
 
 }
@@ -257,7 +257,7 @@ Database.prototype.addLotery = async (value, clientId) => {
 
     if (!value || isNaN(value)) return
 
-    await Lotery.updateOne(
+    await Database.Lotery.updateOne(
         { id: clientId },
         { $inc: { Prize: value } },
         { upsert: true }
@@ -271,7 +271,7 @@ Database.prototype.delete = async (userId, key) => {
 
     if (!userId || !key) return
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $unset: { [key]: 1 } }
     )
@@ -285,10 +285,10 @@ Database.prototype.PushTransaction = async (userId, Frase) => {
 
     let Data = require('../functions/plugins/data')
 
-    let userData = await User.findOne({ id: userId }, 'Balance'),
+    let userData = await Database.User.findOne({ id: userId }, 'Balance'),
         balance = userData?.Balance || 0
 
-    await User.updateOne(
+    await Database.User.updateOne(
         { id: userId },
         { $push: { Transactions: { $each: [{ time: `${Data(0, true)} - ${balance}`, data: `${Frase}` }], $position: 0 } } },
         { upsert: true }
@@ -302,7 +302,7 @@ Database.prototype.registerUser = async (user, blocked) => {
 
     if (blocked || !user || user?.bot) return
 
-    let u = await User.findOne({ id: user.id })
+    let u = await Database.User.findOne({ id: user.id })
     if (u || u?.id === user.id) return
 
     new User({ id: user.id }).save()
@@ -313,29 +313,29 @@ Database.prototype.registerServer = async (guild, client) => {
 
     if (!guild || !guild?.id) return
 
-    let clientData = await Client.findOne({ id: client.user.id }, 'Blacklist.Guilds')
+    let clientData = await Database.Client.findOne({ id: client.user.id }, 'Blacklist.Guilds')
     if (clientData?.Blacklist?.Guilds.includes(guild.id)) return
 
-    let g = await Guild.findOne({ id: guild.id })
+    let g = await Database.findOne({ id: guild.id })
 
     if (g || g?.id === guild.id) return
 
-    new Guild({ id: guild.id }).save()
+    new Database.Guild({ id: guild.id }).save()
 
-    await client?.channels?.cache?.get(config.LogChannelId)?.send(`${e.Database} | DATABASE | O servidor **${guild.name}** foi registrado com sucesso!`).catch(() => { })
+    await client?.channels?.cache?.get(Database.Config.LogChannelId)?.send(`${Database.Emojis.Database} | DATABASE | O servidor **${guild.name}** foi registrado com sucesso!`).catch(() => { })
     return true
 }
 
 Database.prototype.newCommandRegister = async (message, date, clientId, commandName) => {
 
-    new LogRegister({
+    new Database.LogRegister({
         Author: `${message.author.tag} - ${message.author.id}` || 'Indefinido',
         Server: `${message.guild.name} - ${message.guild.id}` || 'Indefinido',
         Command: message.content || 'Indefinido',
         Time: date || 0
     }).save()
 
-    await Client.updateOne(
+    await Database.Client.updateOne(
         { id: clientId },
         {
             $inc: {
@@ -351,9 +351,9 @@ Database.prototype.newCommandRegister = async (message, date, clientId, commandN
 
 Database.prototype.registerClient = async (clientId) => {
 
-    let data = await Client.findOne({ id: clientId })
+    let data = await Database.Client.findOne({ id: clientId })
     if (data) return
-    return new Client({ id: clientId }).save()
+    return new Database.Client({ id: clientId }).save()
 
 }
 

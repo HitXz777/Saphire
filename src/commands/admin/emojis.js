@@ -1,7 +1,5 @@
-const { DatabaseObj: { config } } = require('../../../modules/functions/plugins/database'),
-    ark = require('ark.db'),
-    emojis = new ark.Database('../../../JSON/emojis.json'),
-    e = emojis.get('e')
+const Database = require('../../../modules/classes/Database'),
+    { Config: config, EmojisJSON: emojis, Emojis: e } = Database
 
 module.exports = {
     name: 'emojis',
@@ -12,10 +10,9 @@ module.exports = {
     usage: '<setemoji> <add/remove> <emoji>',
     description: 'Permite meus administradores adicionar ou remover emojis do meu banco de dados',
 
-    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
+    execute: async (client, message, args, prefix, MessageEmbed) => {
 
-        const owner = message.author.id === config.ownerId,
-            e = emojis.get('e')
+        const owner = message.author.id === config.ownerId
 
         if (!args[0]) return AllEmojis()
         if (!owner) return message.reply(`${e.OwnerCrow} | Acesso privado ao meu criador.`)
