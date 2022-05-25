@@ -55,7 +55,7 @@
             "Image": "https://media.discordapp.net/attachments/899493577623756801/900170362908713060/violet_evergarden.png?width=708&height=262",
             "Price": 25000,
             "Designer": "830226550116057149",
-            "Limit": 49
+            "Limit": 48
         },
         "bg9": {
             "Name": "Garota Neko Fundo Rosa",
@@ -547,7 +547,7 @@
             "Image": "https://media.discordapp.net/attachments/899493577623756801/978091678168649778/1653263641215.jpg",
             "Price": 30000,
             "DesignerId": "545189821245685781",
-            "Limit": 100,
+            "Limit": 99,
             "Designer": "545189821245685781"
         }
     }

@@ -1,6 +1,11 @@
 {
     "Flags": [
         {
+            "flag": "🇹🇩",
+            "country": "chade",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/978655810752221224/h_14.png"
+        },
+        {
             "flag": "🇰🇷",
             "country": "coreia do sul",
             "image": "https://media.discordapp.net/attachments/975974003229474846/978655797741518908/h_13.png"
@@ -314,11 +319,6 @@
             "flag": "🇨🇱",
             "country": "chile",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976075549615226900/d5a36a80c29fabfcaf79fcea3e5f2c85.jpg"
-        },
-        {
-            "flag": "🇹🇩",
-            "country": "chade",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976075481650712626/5245d69820f7c1a3a76a54db5f766766.jpg"
         },
         {
             "flag": "🇰🇿",

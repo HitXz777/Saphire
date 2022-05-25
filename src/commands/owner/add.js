@@ -237,7 +237,7 @@ module.exports = {
             if (!role)
                 return message.reply(`${e.Deny} | Eu não achei o cargo de novidades.`)
 
-            return message.reply({
+            return message.channel.send({
                 content: `${e.Info} | Obtendo o cargo ${role}, você ficará por dentro de todas as novidades que a Saphire's Team anunciar.`,
                 components: button
             })
