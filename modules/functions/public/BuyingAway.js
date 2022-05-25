@@ -10,14 +10,10 @@ const { Message, MessageEmbed } = require('discord.js'),
 * @param {Message} message
 */
 
-async function BuyingAway(message, prefix, args, money, color, moeda) {
+async function BuyingAway(message, prefix, args, money, color, moeda, user) {
 
-    let user = await Database.User.findOne({ id: message.author.id }, 'Color Perfil Slot Balance')
-
-    if (!user) {
-        Database.registerUser(message.author)
-        return message.reply(`${e.Menhera} | Opa! Você não tinha nenhuma informação no banco de dados. Acabei de registrar você. Pode usar o comando de novo.`)
-    }
+    if (!user)
+        return message.reply(`${e.Menhera} | Opa! tenta usar o comando de novo.`)
 
     let vip = await Vip(`${message.author.id}`),
         reg = /^\d+$/
@@ -187,9 +183,35 @@ async function BuyingAway(message, prefix, args, money, color, moeda) {
 
     function BuyItem(Rota1, NameDB, ItemName, Price) {
 
-        user[Rota1][NameDB] ? JaPossui() : (money >= Price ? BuyItemFunction() : NoMoney(Price))
+        return user[Rota1][NameDB] ? JaPossui() : (money >= Price ? confirmation() : NoMoney(Price))
 
-        function BuyItemFunction() {
+        async function confirmation() {
+
+            let msg = await message.reply(`${e.QuestionMark} | Você tem certeza que deseja comprar o item \`${ItemName}\` por **${Price} ${moeda}**?`),
+                emojis = ['✅', '❌'], clicked = false
+            for (let i of emojis) msg.react(i).catch(() => { })
+
+            collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
+                max: 1,
+                time: 60000,
+                erros: ['max', 'time']
+            })
+                .on('collect', (reaction) => {
+
+                    if (reaction.emoji.name === emojis[1]) return
+
+                    clicked = true
+                    return BuyItemFunction(msg)
+
+                })
+                .on('end', () => {
+                    if (clicked) return
+                    return msg.edit(`${e.Deny} | Compra cancelada.`).catch(() => { })
+                })
+        }
+
+        function BuyItemFunction(msg) {
             Database.subtract(message.author.id, Price)
             AddLoteria(Price / 2)
             Database.updateUserData(message.author.id, `${Rota1}.${NameDB}`, true)
@@ -197,7 +219,7 @@ async function BuyingAway(message, prefix, args, money, color, moeda) {
                 message.author.id,
                 `${e.loss} Gastou ${Price} Safiras na loja.`
             )
-            return message.channel.send(`${e.Check} | ${message.author} comprou um item: \`${ItemName}\`\n${e.PandaProfit} | -${Price} ${moeda}`)
+            return msg.edit(`${e.Check} | ${message.author} comprou um item: \`${ItemName}\`\n${e.PandaProfit} | -${Price} ${moeda}`).catch(() => { })
         }
     }
 
@@ -255,7 +277,7 @@ async function BuyingAway(message, prefix, args, money, color, moeda) {
 
     }
 
-    function NoMoney(x) { return message.channel.send(`${e.Deny} | ${message.author}, você precisa de pelo menos ${x} ${moeda} na carteira para comprar este item.`) }
+    function NoMoney(x) { return message.channel.send(`${e.Deny} | ${message.author}, você precisa de pelo menos **${x} ${moeda}** na carteira para comprar este item.`) }
     function JaPossui() { return message.reply(`${e.Info} | Você já possui este item.`) }
 
     async function AddLoteria(Amount) {

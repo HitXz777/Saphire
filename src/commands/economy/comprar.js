@@ -22,7 +22,7 @@ module.exports = {
             loteryPrize = lotery?.Prize || 0,
             money = user?.Balance || 0
 
-        if (args[0]) return BuyingAway(message, prefix, args, money, color, moeda)
+        if (args[0]) return BuyingAway(message, prefix, args, money, color, moeda, user)
 
         let attColorPerm,
             attTitlePerm = user.Perfil?.TitlePerm,
