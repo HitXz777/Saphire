@@ -127,6 +127,7 @@ class Saphire extends Client {
                     || data.tag?.toLowerCase() === args[1]?.toLowerCase()
                     || data.discriminator === args[1]
                     || data.id === args[1]
+                    || data.id === args[0]
             })
 
         function searchMember() {
