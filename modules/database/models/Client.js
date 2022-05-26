@@ -27,7 +27,11 @@ module.exports = model("Client", new Schema({
     Zeppelin: {
         winTotalMoney: Number,
         loseTotalMoney: Number,
-        Explode: Number
+        Explode: Number,
+        distanceData: {
+            value: Number,
+            winner: String
+        }
     },
     Rebooting: {
         ON: Boolean,

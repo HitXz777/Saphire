@@ -505,8 +505,8 @@ class flagGame {
 
             let data = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores')
 
-            if (!data?.Administradores?.includes(message.author.id) && !data?.Moderadores?.includes(message.author.id))
-                return message.reply(`${e.Admin} | Apenas moderadores e administradores da Saphire's Team possue o acesso a lista de Bandeiras.`)
+            if (![...data?.Administradores, Database.Names.Lereo, ...data?.Moderadores]?.includes(message.author.id))
+                return message.reply(`${e.Admin} | Apenas moderadores e administradores do *Flag Gaming* podem visualizar bandeiras indisponíveis.`)
 
             let arr = []
 

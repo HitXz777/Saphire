@@ -9,7 +9,7 @@ client.on("guildCreate", async (guild) => {
         blacklistServers = clientData?.Blacklist?.Guilds || []
 
     if (blacklistServers.some(data => data?.id === guild.id))
-        return guild.leave().catch(async err => client.cache.get(config.owner).send(`${e.Deny} | Não foi possível sair da ${guild.id} \`${guild.id}\` que está na blacklist.\n\`${err}\``).catch(() => { }))
+        return guild.leave().catch(async err => client.users.cache.get(config.ownerId).send(`${e.Deny} | Não foi possível sair da ${guild.id} \`${guild.id}\` que está na blacklist.\n\`${err}\``).catch(() => { }))
 
     let server = await Database.Guild.findOne({ id: guild.id })
     if (!server) await Database.registerServer(guild, client)
