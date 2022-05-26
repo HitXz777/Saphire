@@ -1,0 +1,130 @@
+const Database = require('../../../modules/classes/Database')
+
+async function buttonsFunctions(interaction) {
+
+    let { customId, channel, user } = interaction
+
+    if (customId === 'setStatusChange') return setStatusCommand()
+    if (['newRole', 'delRole'].includes(customId)) return reactionRole()
+    if (customId === 'forcaChooseWord') return forcaChooseWord()
+
+    async function setStatusCommand() {
+
+        const modal = {
+            title: "Set Status Command",
+            custom_id: "setStatusModal",
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "newStatus",
+                            label: "Digite seu novo status",
+                            style: 1,
+                            min_length: 5,
+                            max_length: 80,
+                            placeholder: "No mundo da lua",
+                            required: true
+                        }
+                    ]
+                } // MAX: 5 Fields
+            ]
+        }
+
+        return await interaction.showModal(modal);
+    }
+
+    async function reactionRole() {
+
+        let role = channel.guild.roles.cache.get('914925531529609247'),
+            member = channel.guild.members.cache.get(user.id)
+
+        if (!member || !role)
+            return await interaction.reply({
+                content: '❌ | Não foi possível acionar o cargo.',
+                ephemeral: true
+            })
+
+        if (customId === 'newRole') return addRole()
+        if (customId === 'delRole') return delRole()
+        return
+
+        async function addRole() {
+
+            if (member.roles.cache.has('914925531529609247'))
+                return await interaction.reply({
+                    content: '❌ | Você já possui o cargo de notificações.',
+                    ephemeral: true
+                })
+
+            member.roles.add(role).catch(async (err) => {
+
+                return await interaction.reply({
+                    content: `❌ | Houve um erro ao adicionar o cargo.\n${err}`,
+                    ephemeral: true
+                })
+
+            })
+
+            return await interaction.reply({
+                content: '✅ | Cargo **adicionado** com sucesso!',
+                ephemeral: true
+            })
+        }
+
+        async function delRole() {
+
+            if (!member.roles.cache.has('914925531529609247'))
+                return await interaction.reply({
+                    content: '❌ | Você não possui o cargo de notificações.',
+                    ephemeral: true
+                })
+
+            member.roles.remove(role).catch(async (err) => {
+
+                return await interaction.reply({
+                    content: `❌ | Houve um erro ao remover o cargo.\n${err}`,
+                    ephemeral: true
+                })
+
+            })
+
+            return await interaction.reply({
+                content: '✅ | Cargo **removido** com sucesso!',
+                ephemeral: true
+            })
+        }
+    }
+
+    async function forcaChooseWord() {
+
+        const modal = {
+            title: "Hangman Game",
+            custom_id: "forcaChooseWord",
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "componentOne",
+                            label: "Diga sua palavra",
+                            style: 1,
+                            min_length: 3,
+                            max_length: 25,
+                            placeholder: "Discord",
+                            required: true
+                        }
+                    ]
+                } // MAX: 5 Fields
+            ]
+        }
+
+        return await interaction.showModal(modal)
+
+    }
+
+}
+
+module.exports = buttonsFunctions
