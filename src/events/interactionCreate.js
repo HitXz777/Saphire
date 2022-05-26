@@ -4,12 +4,13 @@ const client = require('../../index'),
 
 client.on('interactionCreate', async interaction => {
 
+    if (interaction.isModalSubmit()) return submitModalFunction()
     if (!interaction.isButton()) return
 
-    // interaction.deferUpdate().catch(() => { })
+    if (interaction.customId === 'setStatusChange') return modalSetStatus()
     if (!['newRole', 'delRole'].includes(interaction.customId)) return
 
-    let { customId, channel, user, message } = interaction
+    let { customId, channel, user } = interaction
 
     let role = channel.guild.roles.cache.get('914925531529609247'),
         member = channel.guild.members.cache.get(user.id)
@@ -66,6 +67,47 @@ client.on('interactionCreate', async interaction => {
 
         return await interaction.reply({
             content: '✅ | Cargo **removido** com sucesso!',
+            ephemeral: true
+        })
+    }
+
+    async function modalSetStatus() {
+
+        const { MessageActionRow, Modal, TextInputComponent } = require('discord.js')
+        // Create the modal
+        const modal = new Modal()
+            .setCustomId('setStatusModal')
+            .setTitle('Set Status Command');
+
+        const newStatus = new TextInputComponent()
+            .setCustomId('newStatus')
+            .setLabel('Digite seu novo status')
+            .setPlaceholder('No mundo da lua')
+            .setStyle('PARAGRAPH')
+            .setRequired(true)
+            .setMinLength(5)
+            .setMaxLength(80)
+
+        const modalComponent = new MessageActionRow().addComponents(newStatus);
+        modal.addComponents(modalComponent);
+        return await interaction.showModal(modal);
+    }
+
+    async function submitModalFunction() {
+
+        const { fields, user } = interaction
+
+        const newStatus = fields.getTextInputValue('newStatus')
+
+        if (!newStatus)
+            return await interaction.reply({
+                content: '❌ | Não foi possível verificar o seu novo status.',
+                ephemeral: true
+            })
+
+        Database.updateUserData(user.id, 'Perfil.Status', newStatus)
+        return await interaction.reply({
+            content: `✅ | Novo status definido com sucesso!\n📝 | ${newStatus}`,
             ephemeral: true
         })
     }

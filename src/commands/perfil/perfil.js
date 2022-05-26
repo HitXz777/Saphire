@@ -107,7 +107,7 @@ module.exports = {
             HalloweenTitle = clientData.Titles?.Halloween?.includes(user.id)
                 ? `\n🎃 **Halloween 2021**`
                 : '',
-            Titulo = data.Perfil?.Titulo || 'Sem título definido \`${prefix}title\`',
+            Titulo = data.Perfil?.Titulo || `Sem título definido \`${prefix}title\``,
             titulo = data.Perfil?.TitlePerm
                 ? `🔰 ${Titulo}`
                 : `${e.Deny} Não possui título`,
