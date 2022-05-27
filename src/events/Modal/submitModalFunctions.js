@@ -17,28 +17,45 @@ async function submitModalFunctions(interaction, client) {
 
     async function editProfile() {
 
-        let data = await Database.User.findOne({ id: user.id }, 'Perfil')
+        let data = await Database.User.findOne({ id: user.id }, 'Perfil'),
+            moment = require('moment'), title = undefined,
+            job = fields.getTextInputValue('profileJob'),
+            status = fields.getTextInputValue('profileStatus'),
+            birth = fields.getTextInputValue('profileBirth'),
+            msg = 'ℹ | Validação concluída. Resultado:'
 
-        const job = fields.getTextInputValue('profileJob')
-        const status = fields.getTextInputValue('profileStatus')
-        const title = fields.getTextInputValue('profileTitle')
+        if (data?.Perfil?.TitlePerm)
+            title = fields.getTextInputValue('profileTitle')
 
-        let msg = 'ℹ | Validação concluída. Resultado:'
+        if (title && title !== data?.Perfil?.Titulo) {
+            msg += '\n✅ | Título'
+            Database.updateUserData(user.id, 'Perfil.Titulo', title)
+        } else msg += '\n❌ | Título'
 
         if (job && job !== data?.Perfil?.Trabalho) {
             msg += '\n✅ | Trabalho'
             Database.updateUserData(user.id, 'Perfil.Trabalho', job)
         } else msg += '\n❌ | Trabalho'
 
+        if (birth && birth !== data?.Profile?.Aniversario) {
+
+            const date = moment(birth, "DDMMYYYY"),
+                formatedData = date.locale('BR').format('L')
+
+            if (!date.isValid() || date.isBefore(eightyYears()) || date.isAfter(Now())) {
+                msg += '\n❌ | Aniversário'
+            } else {
+                msg += '\n✅ | Aniversário'
+                Database.updateUserData(user.id, 'Perfil.Aniversario', formatedData)
+            }
+
+        } else msg += '\n❌ | Aniversário'
+
         if (status && status !== data?.Perfil?.Status) {
             msg += '\n✅ | Status'
             Database.updateUserData(user.id, 'Perfil.Status', status)
         } else msg += '\n❌ | Status'
 
-        if (title && title !== data?.Perfil?.Titulo) {
-            msg += '\n✅ | Título'
-            Database.updateUserData(user.id, 'Perfil.Titulo', title)
-        } else msg += '\n❌ | Título'
 
         return await interaction.reply({
             content: msg,
@@ -136,6 +153,39 @@ async function submitModalFunctions(interaction, client) {
 
     }
 
+}
+
+function eightyYears(formatBr = false) {
+
+    const date = new Date(Date.now() - 3155760000000)
+    date.setHours(date.getHours() - 3)
+
+    let Dia = FormatNumber(date.getDate()),
+        Ano = date.getFullYear()
+
+    if (formatBr)
+        return `${Dia}/${FormatNumber(date.getMonth() + 1)}/${Ano}`
+
+    return `${Ano}-${FormatNumber(date.getMonth() + 1)}-${Dia}`
+}
+
+function Now(formatBr = false) {
+
+    const date = new Date(Date.now() - 410248800000)
+    date.setHours(date.getHours() - 3)
+
+    let Dia = FormatNumber(date.getDate()),
+        Ano = date.getFullYear()
+
+    if (formatBr)
+        return `${Dia}/${FormatNumber(date.getMonth() + 1)}/${Ano}`
+
+    return `${Ano}-${FormatNumber(date.getMonth() + 1)}-${Dia}`
+
+}
+
+function FormatNumber(data) {
+    return data < 10 ? `0${data}` : data
 }
 
 module.exports = submitModalFunctions

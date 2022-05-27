@@ -20,7 +20,7 @@ async function buttonsFunctions(interaction) {
         let data = await Database.User.findOne({ id: user.id }, 'Perfil')
 
         const modal = {
-            title: "Set Status Command",
+            title: "Edit Profile Information",
             custom_id: "editProfile",
             components: [
                 {
@@ -37,6 +37,20 @@ async function buttonsFunctions(interaction) {
                         }
                     ]
                 }, // MAX: 5 Fields
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "profileBirth",
+                            label: "Digite seu aniversário",
+                            style: 2,
+                            min_length: 10,
+                            max_length: 10,
+                            placeholder: "26/06/1999"
+                        }
+                    ]
+                },
                 {
                     type: 1,
                     components: [

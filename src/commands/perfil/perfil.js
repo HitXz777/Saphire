@@ -62,7 +62,7 @@ module.exports = {
 
         if (user.bot) return message.reply(`${e.Deny} | Bots não possuem perfil.`)
 
-        if (!data) return message.reply(`${e.Database} | DATABASE | Nenhum dado encontrado.`)
+        if (!data) return message.reply(`${e.Database} | DATABASE | Nenhum dado encontrado.${message.author.id === user.id ? ' Tenta novamente, por favor.' : ''}`)
 
         let color = await Colors(user.id),
             Embed = new MessageEmbed().setColor(color),
@@ -251,7 +251,7 @@ module.exports = {
 
             if (user.id === message.author.id)
                 msg.createMessageComponentCollector({
-                    filter: int => int.user.id === message.author.id,
+                    filter: int => int.user.id === message.author.id && int.customId === 'editProfile',
                     time: 60000,
                     errors: ['time']
                 })
