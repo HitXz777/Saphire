@@ -2,7 +2,7 @@ const Database = require('../../../modules/classes/Database')
 
 async function submitModalFunctions(interaction, client) {
 
-    const { customId, fields, user, channelId } = interaction
+    const { customId, fields, user } = interaction
 
     if (customId === 'setStatusModal') return setStatusCommad()
     if (customId === 'forcaChooseWord') return forcaGame()
@@ -33,11 +33,20 @@ async function submitModalFunctions(interaction, client) {
         let data = await Database.Guild.findOne({ id: interaction.guildId }, 'Prefix'),
             prefix = data?.Prefix || Database.Config.Prefix
 
-        await interaction.reply({
-            content: '✅ | Ok! Palavra coletada com sucesso!'
+        let validate = /^[a-z ]+$/i
+
+        if (!validate.test(word))
+            return await interaction.reply({
+                content: '❌ | O texto informado contém acentos ou números.',
+                ephemeral: true
+            })
+
+        let message = await interaction.reply({
+            content: '✅ | Ok! Palavra coletada com sucesso!',
+            fetchReply: true
         })
 
-        return new Forca().game(client, false, [], prefix, MessageEmbed, Database, word, user, channelId)
+        return new Forca().game(client, false, [], prefix, MessageEmbed, Database, word?.toLowerCase(), user, message.channel)
     }
 
 }

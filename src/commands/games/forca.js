@@ -11,7 +11,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        return new Forca().game(client, message, args, prefix, MessageEmbed, Database, false, message.author, message.channelId)
+        return new Forca().game(client, message, args, prefix, MessageEmbed, Database, false, message.author, message.channel)
 
     }
 }

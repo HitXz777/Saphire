@@ -95,7 +95,7 @@ module.exports = {
                 return message.reply(`${e.Deny} | Você fez tudo certo, só esqueceu de falar o novo nome do Sticker`)
 
             return sticker.edit({ name: name })
-                .then(s => message.reply(`${e.Check} | O nome do emoji foi alterado para: \`${s.name}\``))
+                .then(s => message.reply(`${e.Check} | O nome do sticker foi alterado para: \`${s.name}\``))
                 .catch(err => reportError(err))
 
         }

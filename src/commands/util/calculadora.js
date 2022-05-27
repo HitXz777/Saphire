@@ -6,7 +6,7 @@ module.exports = {
     category: 'util',
     emoji: '🧮',
     usage: 'Não informado',
-    description: 'Calculado simples',
+    description: 'Calculadora simples',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
         try {

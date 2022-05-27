@@ -2,10 +2,9 @@ const { formatWord } = require('../plugins/gamePlugins')
 
 class Forca {
 
-    async game(client, message, args, prefix, MessageEmbed, Database, isInteraction, author, channelId) {
+    async game(client, message, args, prefix, MessageEmbed, Database, isInteraction, author, channel) {
 
-        let e = Database.Emojis,
-            channel = message ? message.channel : client.channels.cache.get(channelId)
+        let e = Database.Emojis
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return forcaInfo()
 
@@ -18,8 +17,10 @@ class Forca {
         let wordFormated = control.trass.join(''),
             status = 0, msg, embed, lettersUsed = []
 
-        if (isInteraction)
+        if (isInteraction) {
+            control.authorWord = author.id
             return init()
+        }
 
         let buttons = [
             {
@@ -75,23 +76,6 @@ class Forca {
             let words = Database.Frases.get('f.Mix'),
                 word = words[Math.floor(Math.random() * words.length)].toLowerCase()
 
-            // if (args[0]) {
-            //     word = args[0]
-
-            //     if (word.length < 3 || word.length > 15) {
-            //         control.blocked = true
-            //         return message.reply(`${e.Deny} | Apenas palavras entre **3~15 caracteres** são aceitas.`)
-            //     }
-
-            //     if (!/^[a-z]+$/i.test(word)) {
-            //         control.blocked = true
-            //         return message.reply(`${e.Deny} | Apenas palavras com caracteres de A-Z são permitidos.\n> *Acentos e caracteres não alfabéticos não são permitidos.*`)
-            //     }
-
-            //     control.authorWord = message.author.id
-            //     message.delete()
-            // }
-
             if (!/^[a-z]+$/i.test(word)) return getWord()
             return word.split('').join('')
         }
@@ -122,7 +106,7 @@ class Forca {
 
                     if (control.authorWord === Message.author.id) return
 
-                    let validate = /^[a-z]+$/i,
+                    let validate = /^[a-z ]+$/i,
                         content = Message.content?.toLowerCase()
 
                     control.resend++
@@ -161,7 +145,9 @@ class Forca {
                             return Message.channel.send({ content: `${e.Deny} | Forca cancelada.`, embeds: [embed] }).catch(() => { })
                         }
 
-                        if (wordFormated === word) {
+                        let wordFomatedWithoutTrass = wordFormated.replace(/-/g, ' ')
+
+                        if (wordFomatedWithoutTrass === word) {
 
                             embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)
                                 .setColor(client.green)
@@ -182,6 +168,7 @@ class Forca {
                             return msg.edit({ embeds: [embed] }).catch(() => { })
                         }
                     }
+
                 })
                 .on('end', () => {
                     Database.registerChannelControl('pull', 'Forca', channel.id)
@@ -202,6 +189,7 @@ class Forca {
                     wordFormated = word
                     control.verified = true
                 }
+
                 return
             }
         }
@@ -238,7 +226,7 @@ class Forca {
                         .addFields(
                             {
                                 name: `${e.QuestionMark} Como mandar uma palavra?`,
-                                value: `Você pode começar um jogo com qualquer palavra utilizando \`${prefix}forca SuaPalavra\`\n> *Lembrando: Palavras com acentos e caracteres não alfabéticos não são aceitos aqui. Apenas letras de A~Z*`
+                                value: `Você pode começar um jogo com qualquer palavra utilizando \`${prefix}forca\`\n> *Lembrando: Palavras com acentos e caracteres não alfabéticos não são aceitos aqui. Apenas letras de A~Z*`
                             },
                             {
                                 name: `${e.Check} Comece um jogo`,

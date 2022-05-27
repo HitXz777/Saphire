@@ -20,7 +20,7 @@ module.exports = {
 
         let user = message.mentions.members.first() || message.guild.members.cache.find(user => user.user.id === args[0] || user.displayName?.toLowerCase() == args[0]?.toLowerCase() || user.user.username?.toLowerCase() == args[0]?.toLowerCase())
 
-        if (user?.id === client.user.id) return message.reply('Saiiii, fumo pólvora?')
+        if (user?.id === client.user.id) return message.reply('Saiiii, fumou pólvora?')
         if (user?.user?.bot) return message.reply(`${e.Deny} | Noooooooo! Nada disso, não não não! Os bots não tem nada a ver com sua perversidade.`)
 
         let result = Math.floor(Math.random() * 3) + 1
