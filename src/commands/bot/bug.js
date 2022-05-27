@@ -20,20 +20,78 @@ module.exports = {
         if (blocked.includes(message.author.id))
             return message.reply(`${e.Deny} | Você está bloqueado e perdeu acesso ao comando \`${prefix}bug\``)
 
-        if (!args[0])
-            return message.reply({
-                embeds: [
-                    new MessageEmbed()
-                        .setColor('#246FE0')
-                        .setTitle(`${e.Gear} Reporte bugs/erros`)
-                        .setDescription('Com este comando, você reporta bugs/erros direto pro meu criador. Assim tudo é resolvido de maneira rápida! *(Links são permitidos)*')
-                        .addField('Comando exemplo', `\`${prefix}bug Quando eu uso "comando x" tal bug acontece\``)
-                        .setFooter({ text: 'Quaisquer abuso deste comando não será tolerado.' })
-                ]
-            })
-
         if (client.Timeout(900000, timeoutBug))
             return message.reply(`⏱️ | Global Cooldown | \`${client.GetTimeout(900000, timeoutBug)}\``).catch(() => { })
+
+        let buttons = [{
+            type: 1,
+            components: [
+                {
+                    type: 2,
+                    label: 'REPORTAR UM BUG/ERRO',
+                    emoji: e.bug || null,
+                    custom_id: 'bugReport',
+                    style: 'SUCCESS'
+                },
+                {
+                    type: 2,
+                    label: 'CANCELAR',
+                    emojis: '❌',
+                    custom_id: 'cancel',
+                    style: 'DANGER'
+                }
+            ]
+        }]
+
+        let msg = await message.reply({
+            embeds: [
+                new MessageEmbed()
+                    .setColor('#246FE0')
+                    .setTitle(`${e.Gear} Reporte bugs/erros`)
+                    .setDescription('Com este comando, você reporta bugs/erros direto pro meu criador. Assim tudo é resolvido de maneira rápida! *(Links são permitidos)*')
+                    .setFooter({ text: 'Quaisquer abuso deste comando não será tolerado.' })
+            ],
+            components: buttons
+        })
+
+        return msg.createMessageComponentCollector({
+            filter: interaction => interaction.user.id === message.author.id,
+            max: 1,
+            time: 60000,
+            errors: ['max', 'time']
+        })
+            .on('collect', interaction => {
+
+                const { customId } = interaction
+
+                let embed = msg.embeds[0]
+                if (!embed) return msg.delete().catch(() => { })
+
+                if (customId === 'cancel') {
+
+                    embed.color = client.red
+                    embed.footer.text += ' | Comando cancelado.'
+
+                    return msg.edit({
+                        content: null,
+                        embeds: [embed],
+                        components: []
+                    })
+                }
+
+                embed.color = client.green
+                embed.title += ' | Pedido aceito'
+                embed.fields = [{
+                    name: `${e.Info} Questionário`,
+                    value: `Responda o questionário que todas as informações vão diretamente para o meu criador. E claro, você ganhará um recompensa se o reporte for veridíco.`
+                }]
+
+                return msg.edit({
+                    content: null,
+                    components: [], embeds: [embed]
+                }).catch(() => { })
+
+            })
 
         let mensagem = args.join(" ")
         if (mensagem === 'Quando eu uso "comando x" tal bug acontece') return message.reply(`${e.Nagatoro} | Está mensagem claramente não é permitida, né?`)

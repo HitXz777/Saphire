@@ -1,11 +1,18 @@
-const Database = require('../../../modules/classes/Database')
+const Database = require('../../../modules/classes/Database'),
+    { Emojis: e } = Database
 
 async function submitModalFunctions(interaction, client) {
 
-    const { customId, fields, user } = interaction
+    const { customId, fields, user, channel, guild } = interaction
 
-    if (customId === 'setStatusModal') return setStatusCommad()
-    if (customId === 'forcaChooseWord') return forcaGame()
+    switch (customId) {
+        case 'setStatusModal': setStatusCommad(); break;
+        case 'forcaChooseWord': forcaGame(); break;
+        case 'BugModalReport': BugModalReport(); break;
+        default:
+            break;
+    }
+
     return
 
     async function setStatusCommad() {
@@ -47,6 +54,54 @@ async function submitModalFunctions(interaction, client) {
         })
 
         return new Forca().game(client, false, [], prefix, MessageEmbed, Database, word?.toLowerCase(), user, message.channel)
+    }
+
+    async function BugModalReport() {
+
+        const textExplain = fields.getTextInputValue('bugTextInfo')
+        const commandWithError = fields.getTextInputValue('commandBuggued') || 'Nenhum'
+        let ChannelInvite = await channel.createInvite({ maxAge: 0 }).catch(() => { }) || null
+        let guildName = ChannelInvite?.url ? `[${guild.name}](${ChannelInvite.url})` : guild.name
+       
+        const embed = {
+            color: client.red,
+            title: '📢 Report de Bug/Erro Recebido',
+            url: ChannelInvite?.url || null,
+            description: `> Reporte enviado de: ${guildName}\n> ${user.username} - \`${user.id}\`\n\`\`\`txt\n${textExplain || 'Nenhum dado coletado.'}\n\`\`\``,
+            fields: [
+                {
+                    name: 'ℹ️ | Comando reportado',
+                    value: `\`${commandWithError || 'Nenhum'}\``,
+                }
+            ],
+            timestamp: new Date()
+        }
+
+        const { Config } = Database
+
+        const guildChannel = client.channels.cache.get(Config.BugsChannelId)
+
+        if (!guildChannel)
+            return await interaction.reply({
+                content: `❌ | Houve um erro ao encontrar o canal designado para recebimento de reports. Por favor, fale diretamente com meu criador: ${client.users.cache.get(Config.ownerId)?.tag || 'Não encontrado'}`,
+                embeds: [embed],
+                ephemeral: true
+            })
+
+        await guildChannel.send({ embeds: [embed] }).catch(async err => {
+            return await interaction.reply({
+                content: `❌ | Houve um erro ao enviar o reporte para o canal designado. Por favor, fale diretamente com meu criador: ${client.users.cache.get(Config.OwnerId)?.tag || 'Não encontrado'}\n${err}`,
+                embeds: [embed],
+                ephemeral: true
+            })
+        })
+
+        return await interaction.reply({
+            content: `✅ | Reporte enviado com sucesso! Muito obrigada pelo seu apoio.`,
+            embeds: [embed],
+            ephemeral: true
+        })
+
     }
 
 }

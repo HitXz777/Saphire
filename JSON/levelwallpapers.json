@@ -549,6 +549,14 @@
             "DesignerId": "545189821245685781",
             "Limit": 99,
             "Designer": "545189821245685781"
+        },
+        "bg103": {
+            "Name": "Ducks in Ducks",
+            "Image": "https://cdn.discordapp.com/attachments/899493577623756801/979568322519658566/unknown.png",
+            "Price": 100000,
+            "DesignerId": "545189821245685781",
+            "Limit": 300,
+            "Designer": "545189821245685781"
         }
     }
 }

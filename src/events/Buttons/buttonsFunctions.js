@@ -8,6 +8,16 @@ async function buttonsFunctions(interaction) {
     if (['newRole', 'delRole'].includes(customId)) return reactionRole()
     if (customId === 'forcaChooseWord') return forcaChooseWord()
 
+    switch (customId) {
+        case 'setStatusChange': setStatusCommand(); break;
+        case 'newRole': case 'delRole': reactionRole(); break;
+        case 'forcaChooseWord': forcaChooseWord(); break;
+        case 'bugReport': bugReportSend(); break;
+        default:
+            break;
+    }
+    return
+
     async function setStatusCommand() {
 
         const modal = {
@@ -123,6 +133,45 @@ async function buttonsFunctions(interaction) {
 
         return await interaction.showModal(modal)
 
+    }
+
+    async function bugReportSend() {
+
+        const modal = {
+            title: "Bugs & Errors Reporting",
+            custom_id: "BugModalReport",
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "commandBuggued",
+                            label: "Qual é o comando?",
+                            style: 1,
+                            max_length: 15
+                        }
+                    ]
+                }, // MAX: 5 Fields
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "bugTextInfo",
+                            label: "O que aconteceu?",
+                            style: 2,
+                            min_length: 20,
+                            max_length: 3900,
+                            placeholder: "Quando tal recurso é usado acontece...",
+                            required: true
+                        }
+                    ]
+                }
+            ]
+        }
+
+        return await interaction.showModal(modal)
     }
 
 }
