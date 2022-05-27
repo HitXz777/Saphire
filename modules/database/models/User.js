@@ -10,12 +10,15 @@ module.exports = model("User", new Schema({
     Balance: Number,
     AfkSystem: String,
     DailyCount: Number,
-
     MixCount: Number,
     QuizCount: Number,
     TicTacToeCount: Number,
     CompetitiveMemoryCount: Number,
     ForcaCount: Number,
+    Letters: {
+        Sended: Array,
+        Recieved: Array
+    },
     GamingCount: {
         FlagCount: Number,
         AnimeThemeCount: Number

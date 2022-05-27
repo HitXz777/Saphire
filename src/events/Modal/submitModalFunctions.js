@@ -1,14 +1,17 @@
-const Database = require('../../../modules/classes/Database')
+const Database = require('../../../modules/classes/Database'),
+    { Emojis: e } = Database,
+    { eightyYears, Now, getUser } = require('./modalPlugins')
 
 async function submitModalFunctions(interaction, client) {
 
     const { customId, fields, user, channel, guild } = interaction
 
     switch (customId) {
-        case 'setStatusModal': setStatusCommad(); break;
-        case 'forcaChooseWord': forcaGame(); break;
+        case 'setStatusModal': setStatusModal(); break;
+        case 'forcaChooseWord': forcaChooseWord(); break;
         case 'BugModalReport': BugModalReport(); break;
         case 'editProfile': editProfile(); break;
+        case 'newLetter': newLetter(); break;
         default:
             break;
     }
@@ -64,7 +67,7 @@ async function submitModalFunctions(interaction, client) {
 
     }
 
-    async function setStatusCommad() {
+    async function setStatusModal() {
 
         const newStatus = fields.getTextInputValue('newStatus')
 
@@ -81,7 +84,7 @@ async function submitModalFunctions(interaction, client) {
         })
     }
 
-    async function forcaGame() {
+    async function forcaChooseWord() {
         const Forca = require('../../commands/games/classes/forca')
         const word = fields.getTextInputValue('componentOne')
         const { MessageEmbed } = require('discord.js')
@@ -153,39 +156,110 @@ async function submitModalFunctions(interaction, client) {
 
     }
 
-}
+    async function newLetter() {
 
-function eightyYears(formatBr = false) {
+        let usernameData = fields.getTextInputValue('username')
+        let anonymous = fields.getTextInputValue('anonymous')
+        let letterContent = fields.getTextInputValue('letterContent'),
+            isError = false
 
-    const date = new Date(Date.now() - 3155760000000)
-    date.setHours(date.getHours() - 3)
+        let userLetted = getUser(usernameData, client)
 
-    let Dia = FormatNumber(date.getDate()),
-        Ano = date.getFullYear()
+        if (!userLetted)
+            return await interaction.reply({
+                content: `❌ | Não foi possível achar ninguém com o dado informado: "${usernameData}"`,
+                embeds: [{
+                    color: client.blue,
+                    title: '📝 Lette\'s Content',
+                    description: `\`\`\`txt\n${letterContent}\n\`\`\``
+                }],
+                ephemeral: true
+            })
 
-    if (formatBr)
-        return `${Dia}/${FormatNumber(date.getMonth() + 1)}/${Ano}`
+        if (userLetted.id === user.id)
+            return await interaction.reply({
+                content: '❌ | Você não pode enviar cartas para você mesmo.',
+                ephemeral: true
+            })
 
-    return `${Ano}-${FormatNumber(date.getMonth() + 1)}-${Dia}`
-}
+        if (userLetted.id === client.user.id)
+            return await interaction.reply({
+                content: '❌ | Eu agradeço seu gesto por me enviar uma carta, mas assim... Eu sou um bot, sabe? Fico te devendo essa.',
+                ephemeral: true
+            })
 
-function Now(formatBr = false) {
+        if (userLetted.bot)
+            return await interaction.reply({
+                content: '❌ | Você não pode enviar cartas para bots.',
+                ephemeral: true
+            })
 
-    const date = new Date(Date.now() - 410248800000)
-    date.setHours(date.getHours() - 3)
+        let isAnonymous = ['sim', 'yes'].includes(anonymous?.toLowerCase()) ? true : false
 
-    let Dia = FormatNumber(date.getDate()),
-        Ano = date.getFullYear()
+        try {
 
-    if (formatBr)
-        return `${Dia}/${FormatNumber(date.getMonth() + 1)}/${Ano}`
+            await userLetted.send({
+                content: `${e.Info} | Algum problema com a carta? Contacte algúm administrador usando o comando \`-adm\``,
+                embeds: [{
+                    color: client.blue,
+                    title: `📨 ${client.user.username}'s Letters System`,
+                    description: `${e.Info} Está carta foi enviada por: ${isAnonymous ? '\`Usuário anônimo\`' : `${user.tag} - ${user.id}`}`,
+                    fields: [{
+                        name: `📝 Conteúdo da carta`,
+                        value: `\`\`\`txt\n${letterContent}\n\`\`\``
+                    }],
+                    footer: { text: `A ${client.user.username} não se responsabiliza pelo conteúdo presente nesta carta.` }
+                }]
+            }).catch(() => {
+                isError = true
+                return error()
+            })
 
-    return `${Ano}-${FormatNumber(date.getMonth() + 1)}-${Dia}`
+            if (isError) return
+            Database.subtractItem(user.id, 'Slot.Cartas', 1)
+            Database.SetTimeout(user.id, 'Timeouts.Letter')
 
-}
+            Database.pushUserData(user.id, 'Letters.Sended', {
+                to: userLetted.id,
+                guildId: guild.id,
+                anonymous: isAnonymous,
+                content: letterContent,
+                date: Date.now()
+            })
 
-function FormatNumber(data) {
-    return data < 10 ? `0${data}` : data
+            Database.pushUserData(userLetted.id, 'Letters.Recieved', {
+                from: user.id,
+                guildId: guild.id,
+                anonymous: isAnonymous,
+                content: letterContent,
+                date: Date.now()
+            })
+
+            return await interaction.reply({
+                content: `✅ | A carta foi enviada para ${userLetted.tag} com sucesso! (-1 carta)\n🕵️ | Anônimo: ${isAnonymous ? 'Sim' : 'Não'}`,
+                ephemeral: true
+            })
+
+        } catch (err) {
+            isError = true
+            return error()
+        }
+
+        async function error() {
+            isError = true
+            return await interaction.reply({
+                content: `❌ | Aparentemente a DM de ${userLetted.tag} está fechada e não posso efetuar o envio da carta.`,
+                embeds: [{
+                    color: client.blue,
+                    title: '📝 Lette\'s Content',
+                    description: `\`\`\`txt\n${letterContent}\n\`\`\``
+                }],
+                ephemeral: true
+            })
+        }
+
+    }
+
 }
 
 module.exports = submitModalFunctions

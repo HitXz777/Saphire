@@ -5,6 +5,6 @@ const client = require('../../index'),
 client.on('interactionCreate', async interaction => {
 
     if (interaction.isModalSubmit()) return submitModalFunctions(interaction, client)
-    if (interaction.isButton()) return buttonsFunctions(interaction)
+    if (interaction.isButton()) return buttonsFunctions(interaction, client)
     return
 })

@@ -1,6 +1,6 @@
 const Database = require('../../../modules/classes/Database')
 
-async function buttonsFunctions(interaction) {
+async function buttonsFunctions(interaction, client) {
 
     let { customId, channel, user, message } = interaction
 
@@ -10,6 +10,7 @@ async function buttonsFunctions(interaction) {
         case 'forcaChooseWord': forcaChooseWord(); break;
         case 'bugReport': bugReportSend(); break;
         case 'editProfile': editProfile(); break;
+        case 'sendNewLetter': sendNewLetter(); break;
         default:
             break;
     }
@@ -241,6 +242,89 @@ async function buttonsFunctions(interaction) {
         }
 
         return await interaction.showModal(modal)
+    }
+
+    async function sendNewLetter() {
+
+        let data = await Database.User.findOne({ id: user.id }, 'Balance Slot.Cartas Timeouts.Letter'),
+            cartas = data?.Slot?.Cartas || 0,
+            Timer = data?.Timeouts?.Letter || 0
+
+        if (!data) {
+            Database.registerUser(user)
+
+            return await interaction.reply({
+                content: '❌ | Nenhum dado foi encontrado no banco de dados. Tente novamente.',
+                ephemeral: true
+            })
+        }
+
+        if (cartas <= 0)
+            return await interaction.reply({
+                content: '❌ | Você não possui nenhuma carta. Que tal comprar umas na loja?',
+                ephemeral: true
+            })
+
+        if (client.Timeout(900000, Timer))
+            return await interaction.reply({
+                content: `⏱️ | Letters System Cooldown | Tempo restante para o envio de uma próxima carta: \`${client.GetTimeout(900000, Timer)}\``,
+                ephemeral: true
+            })
+
+        const modal = {
+            title: `${client.user.username}'s Letters System`,
+            custom_id: "newLetter",
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "username",
+                            label: "Para quem é a carta?",
+                            style: 1,
+                            min_length: 7,
+                            max_length: 37,
+                            placeholder: "Nome#0000 ou ID",
+                            required: true
+                        }
+                    ]
+                },
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "anonymous",
+                            label: "Está é um carta anonima?",
+                            style: 1,
+                            min_length: 3,
+                            max_length: 3,
+                            placeholder: "Sim | Não",
+                            required: true
+                        }
+                    ]
+                },
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "letterContent",
+                            label: "Escreva sua carta",
+                            style: 2,
+                            min_length: 10,
+                            max_length: 1024,
+                            placeholder: "Em um dia, eu te vi na rua, foi quando...",
+                            required: true
+                        }
+                    ]
+                }
+            ]
+        }
+
+        return await interaction.showModal(modal)
+
     }
 
 }
