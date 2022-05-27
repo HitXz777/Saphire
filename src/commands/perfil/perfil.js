@@ -215,20 +215,65 @@ module.exports = {
         warns.length > 0 ? Embed.setFooter({ text: `${warns.length} avisos neste servidor` }) : 0
         // Ideia de warns no perfil de: joãozinho#0001
 
-        msg.edit({ content: `${e.Info} Algo errado no Família ou Parças? Use \`${prefix}perfil refresh\``, embeds: [Embed] }).catch()
+        let buttons = [
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        label: 'LIKE',
+                        emoji: '💙',
+                        custom_id: 'likeProfile',
+                        style: 'PRIMARY'
+                    }
+                ]
+            }
+        ]
 
-        return like()
-
-        async function like() {
-
-            msg.react('💙').catch(() => { })
-
-            return msg.createReactionCollector({
-                filter: (reaction, u) => reaction.emoji.name === '💙' && !u.bot,
-                time: 30000
+        if (message.author.id === user.id)
+            buttons[0].components.push({
+                type: 2,
+                label: 'EDITAR PERFIL',
+                emoji: '📝',
+                custom_id: 'editProfile',
+                style: 'SUCCESS'
             })
 
-                .on('collect', (reaction, u) => NewLike(u))
+        msg.edit({
+            content: `${e.Info} Algo errado no Família ou Parças? Use \`${prefix}perfil refresh\``,
+            embeds: [Embed],
+            components: buttons
+        }).catch(() => { })
+
+        return reactionsButtons()
+
+        async function reactionsButtons() {
+
+            if (user.id === message.author.id)
+                msg.createMessageComponentCollector({
+                    filter: int => int.user.id === message.author.id,
+                    time: 60000,
+                    errors: ['time']
+                })
+                    .on('collect', () => { })
+
+            msg.createMessageComponentCollector({
+                filter: int => int.customId === 'likeProfile',
+                time: 60000,
+                errors: ['time']
+            })
+                .on('collect', interaction => {
+                    interaction.deferUpdate().catch(() => { })
+                    const { customId, user } = interaction
+
+                    if (customId === 'likeProfile') return NewLike(user)
+
+                })
+                .on('end', () => msg.edit({
+                    content: null,
+                    embeds: [Embed],
+                    components: []
+                }).catch(() => { }))
 
             async function NewLike(Author) {
                 if (user.id === client.user.id) return message.channel.send(`${Author}, olha... Eu agradeço... Mas você já viu meu \`${prefix}perfil @${client.user.username}\`?`)

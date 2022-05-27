@@ -2,21 +2,76 @@ const Database = require('../../../modules/classes/Database')
 
 async function buttonsFunctions(interaction) {
 
-    let { customId, channel, user } = interaction
-
-    if (customId === 'setStatusChange') return setStatusCommand()
-    if (['newRole', 'delRole'].includes(customId)) return reactionRole()
-    if (customId === 'forcaChooseWord') return forcaChooseWord()
+    let { customId, channel, user, message } = interaction
 
     switch (customId) {
         case 'setStatusChange': setStatusCommand(); break;
         case 'newRole': case 'delRole': reactionRole(); break;
         case 'forcaChooseWord': forcaChooseWord(); break;
         case 'bugReport': bugReportSend(); break;
+        case 'editProfile': editProfile(); break;
         default:
             break;
     }
     return
+
+    async function editProfile() {
+
+        let data = await Database.User.findOne({ id: user.id }, 'Perfil')
+
+        const modal = {
+            title: "Set Status Command",
+            custom_id: "editProfile",
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "profileJob",
+                            label: "Qual sua profissão?",
+                            style: 1,
+                            min_length: 5,
+                            max_length: 30,
+                            placeholder: "Estoquista, Gamer, Terapeuta..."
+                        }
+                    ]
+                }, // MAX: 5 Fields
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "profileStatus",
+                            label: "Digite seu novo status",
+                            style: 2,
+                            min_length: 5,
+                            max_length: 100,
+                            placeholder: "No mundo da lua..."
+                        }
+                    ]
+                }
+            ]
+        }
+
+        if (data?.Perfil?.TitlePerm)
+            modal.components.unshift({
+                type: 1,
+                components: [
+                    {
+                        type: 4,
+                        custom_id: "profileTitle",
+                        label: "Qual seu título?",
+                        style: 1,
+                        min_length: 3,
+                        max_length: 20,
+                        placeholder: "Escrever novo título"
+                    }
+                ]
+            })
+
+        return await interaction.showModal(modal)
+    }
 
     async function setStatusCommand() {
 

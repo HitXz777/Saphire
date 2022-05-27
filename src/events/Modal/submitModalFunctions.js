@@ -1,5 +1,4 @@
-const Database = require('../../../modules/classes/Database'),
-    { Emojis: e } = Database
+const Database = require('../../../modules/classes/Database')
 
 async function submitModalFunctions(interaction, client) {
 
@@ -9,11 +8,44 @@ async function submitModalFunctions(interaction, client) {
         case 'setStatusModal': setStatusCommad(); break;
         case 'forcaChooseWord': forcaGame(); break;
         case 'BugModalReport': BugModalReport(); break;
+        case 'editProfile': editProfile(); break;
         default:
             break;
     }
 
     return
+
+    async function editProfile() {
+
+        let data = await Database.User.findOne({ id: user.id }, 'Perfil')
+
+        const job = fields.getTextInputValue('profileJob')
+        const status = fields.getTextInputValue('profileStatus')
+        const title = fields.getTextInputValue('profileTitle')
+
+        let msg = 'ℹ | Validação concluída. Resultado:'
+
+        if (job && job !== data?.Perfil?.Trabalho) {
+            msg += '\n✅ | Trabalho'
+            Database.updateUserData(user.id, 'Perfil.Trabalho', job)
+        } else msg += '\n❌ | Trabalho'
+
+        if (status && status !== data?.Perfil?.Status) {
+            msg += '\n✅ | Status'
+            Database.updateUserData(user.id, 'Perfil.Status', status)
+        } else msg += '\n❌ | Status'
+
+        if (title && title !== data?.Perfil?.Titulo) {
+            msg += '\n✅ | Título'
+            Database.updateUserData(user.id, 'Perfil.Titulo', title)
+        } else msg += '\n❌ | Título'
+
+        return await interaction.reply({
+            content: msg,
+            ephemeral: true
+        })
+
+    }
 
     async function setStatusCommad() {
 
@@ -62,7 +94,7 @@ async function submitModalFunctions(interaction, client) {
         const commandWithError = fields.getTextInputValue('commandBuggued') || 'Nenhum'
         let ChannelInvite = await channel.createInvite({ maxAge: 0 }).catch(() => { }) || null
         let guildName = ChannelInvite?.url ? `[${guild.name}](${ChannelInvite.url})` : guild.name
-       
+
         const embed = {
             color: client.red,
             title: '📢 Report de Bug/Erro Recebido',
