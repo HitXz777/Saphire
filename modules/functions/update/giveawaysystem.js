@@ -25,7 +25,7 @@ async function GiveawaySystem() {
         else continue
 
         if (CheckAndDeleteGiveaway(gwData?.TimeToDelete, gwData.MessageID))
-        return
+            return
     }
 
     return
@@ -33,15 +33,16 @@ async function GiveawaySystem() {
 
 async function start(MessageId, Guild, ChannelId) {
 
-    let sorteio = await Database.Giveaway.findOne({ MessageID: MessageId }),
-        emoji = sorteio.Emoji || '🎉'
+    let sorteio = await Database.Giveaway.findOne({ MessageID: MessageId })
+
 
     if (!sorteio) {
         Database.deleteGiveaway(MessageId)
         return
     }
 
-    let channel = await Guild.channels.cache.get(ChannelId),
+    let emoji = sorteio.Emoji || '🎉',
+        channel = await Guild.channels.cache.get(ChannelId),
         message = await channel?.messages.fetch(MessageId),
         reaction = message?.reactions.cache.get(emoji)
 
