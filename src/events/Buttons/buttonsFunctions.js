@@ -222,7 +222,7 @@ async function buttonsFunctions(interaction, client) {
                             label: "Qual é o comando?",
                             placeholder: "Balance, Giveaway, AFk, Hug...",
                             style: 1,
-                            max_length: 15
+                            max_length: 50
                         }
                     ]
                 }, // MAX: 5 Fields

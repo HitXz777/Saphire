@@ -385,7 +385,24 @@ module.exports = {
                         description = `> :id: \`${MessageId}\`\n> 👐 Patrocinador*(a)*: ${message.guild.members.cache.get(Sponsor)?.user.tag || 'Não encontrado'}\n> ${e.Star} Prêmio: ${Prize}\n> 👥 Participantes: ${Participantes?.length || 0}\n> ${e.CoroaDourada} Vencedores: ${WinnersAmount}\n> ${e.Info} Emoji: ${Emoji}\n> ⏱️ Término: \`${sorteio?.TimeEnding || 'Indefinido'}\`\n> ${Actived ? `${e.Check} Ativado` : `${e.Deny} Desativado`}\n> 🔗 [Sorteio Link](${MessageLink})`,
                         Emojis = ['⬅️', '➡️', '❌'],
                         Control = 0,
-                        Embeds = EmbedGenerator(),
+                        Embeds = EmbedGenerator() || [{
+                            color: client.blue,
+                            title: `${e.Tada} Informações do sorteio`,
+                            description: `${description}`,
+                            fields: [
+                                {
+                                    name: '👥 Participantes',
+                                    value: '> Contagem válida após sorteio'
+                                },
+                                {
+                                    name: `${e.OwnerCrow} Vencedores do Sorteios`,
+                                    value: '> Contagem válida após sorteio'
+                                }
+                            ],
+                            footer: {
+                                text: `${Participantes.length} participantes contabilizados`
+                            },
+                        }],
                         msg = await message.reply({ embeds: [Embeds[0]] }),
                         react = false
 
@@ -482,7 +499,7 @@ module.exports = {
 
                         }
 
-                        return embeds;
+                        return embeds.length === 0 ? null : embeds
                     }
 
                 })()
@@ -626,7 +643,7 @@ module.exports = {
                                 )
 
                                 react = true
-                                return message.reply(`${e.Check} | Todos os sorteios e configurações foram deletados.`)
+                                return msg.edit(`${e.Check} | Todos os sorteios e configurações foram deletados.`).catch(() => { })
                             })()
                             : collector.stop()
 
@@ -634,7 +651,7 @@ module.exports = {
 
                     .on('end', () => {
                         if (react) return
-                        msg.edit(`${e.Deny} | Comando cancelado.`)
+                        return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
                     })
 
                 return

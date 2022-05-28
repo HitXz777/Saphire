@@ -105,9 +105,8 @@ class Raspadinha {
                     buttom.emoji = getRandomEmoji()
                     buttom.disabled = true
                     buttom.style = 'PRIMARY'
-                    await checkButtons(customId, buttonIndex)
-                    msg.edit({ components: buttons }).catch(() => { })
-                    return
+                    await checkButtons()
+                    return msg.edit({ components: buttons }).catch(() => { })
                 })
                 .on('end', () => {
                     if (control.ended) return
@@ -120,7 +119,7 @@ class Raspadinha {
             return emojis[Math.floor(Math.random() * emojis.length)]
         }
 
-        function checkButtons(customId, buttonIndex) {
+        function checkButtons() {
 
             let a1 = buttons[0].components[0],
                 a2 = buttons[0].components[1],
@@ -139,7 +138,7 @@ class Raspadinha {
                 d3 = buttons[3].components[2],
                 d4 = buttons[3].components[3]
 
-            let winCondicionals = [
+            const winCondicionals = [
                 [a1, a2, a3], [a1, b1, c1], [a1, b2, c3],
                 [a2, a3, a4], [a2, b2, c2], [a2, b3, c4],
                 [a3, b3, c3], [a3, b2, c1],
@@ -214,6 +213,7 @@ class Raspadinha {
             for (let button of arr)
                 if (!button.disabled)
                     button.disabled = true
+                else continue
             return
         }
 

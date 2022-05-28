@@ -294,6 +294,7 @@ async function submitModalFunctions(interaction, client) {
                 })
 
                 collected = true
+                collector.stop()
                 return registerGiveaway(msg, emoji, emojiData, Message)
             })
             .on('end', () => {

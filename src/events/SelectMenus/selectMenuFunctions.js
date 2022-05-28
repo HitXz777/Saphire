@@ -23,7 +23,8 @@ async function selectMenuFunctions(interaction, client) {
 
         if (user.id !== Message.author.id)
             return await interaction.reply({
-                content: `❌ | Opa opa! Não foi você que iniciou o comando. Então, este não é o seu lugar.`
+                content: `❌ | Opa opa! Não foi você que iniciou o comando. Então, este não é o seu lugar.`,
+                ephemeral: true
             })
 
         let data = await Database.Guild.findOne({ id: message.guild.id }, 'GiveawayChannel Prefix'),
