@@ -3,7 +3,7 @@ const Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
     name: 'carta',
-    aliases: ['letter'],
+    aliases: ['letter', 'cartas'],
     category: 'interactions',
     emoji: '📨',
     usage: '<carta> <@user/id> <Sua mensagem em diante>',

@@ -70,7 +70,6 @@ module.exports = {
                 } else { return msg.edit(`${e.Deny} | Comando cancelado.`) }
             }).catch(() => msg.edit(`${e.Deny} | Comando cancelado por tempo expirado.`))
 
-
         }
 
         function DeleteBirthData() {

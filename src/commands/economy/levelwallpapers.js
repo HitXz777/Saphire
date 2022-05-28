@@ -6,7 +6,7 @@ const { e } = require('../../../JSON/emojis.json'),
 
 module.exports = {
     name: 'levelwallpapers',
-    aliases: ['lvlwall', 'levelwall'],
+    aliases: ['lvlwall', 'levelwall', 'levelwallpaper'],
     category: 'economy',
     ClientPermissions: ['ADD_REACTIONS'],
     emoji: '🖼️',

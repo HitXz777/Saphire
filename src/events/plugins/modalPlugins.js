@@ -42,9 +42,25 @@ function getUser(nameOrId, client) {
 
 }
 
+function day(tomorrow = false) {
+
+    const date = new Date()
+    date.setHours(date.getHours() - 3)
+
+    if (tomorrow)
+        date.setDate(date.getDate() + 1)
+
+    let Mes = FormatNumber(date.getMonth() + 1),
+        Dia = FormatNumber(date.getDate()),
+        Ano = date.getFullYear()
+
+    return `${Dia}/${Mes}/${Ano}`
+}
+
 module.exports = {
     eightyYears,
     Now,
     FormatNumber,
-    getUser
+    getUser,
+    day
 }

@@ -1,4 +1,5 @@
-const Database = require('../../../modules/classes/Database')
+const Database = require('../../../modules/classes/Database'),
+    { Emojis: e } = Database
 
 async function buttonsFunctions(interaction, client) {
 
@@ -11,6 +12,7 @@ async function buttonsFunctions(interaction, client) {
         case 'bugReport': bugReportSend(); break;
         case 'editProfile': editProfile(); break;
         case 'sendNewLetter': sendNewLetter(); break;
+        case 'newGiveaway': newGiveaway(); break;
         default:
             break;
     }
@@ -218,6 +220,7 @@ async function buttonsFunctions(interaction, client) {
                             type: 4,
                             custom_id: "commandBuggued",
                             label: "Qual é o comando?",
+                            placeholder: "Balance, Giveaway, AFk, Hug...",
                             style: 1,
                             max_length: 15
                         }
@@ -285,7 +288,7 @@ async function buttonsFunctions(interaction, client) {
                             style: 1,
                             min_length: 7,
                             max_length: 37,
-                            placeholder: "Nome#0000 ou ID",
+                            placeholder: "Nome, Nome#0000 ou ID",
                             required: true
                         }
                     ]

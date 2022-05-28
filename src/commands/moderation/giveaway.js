@@ -1,5 +1,4 @@
 const { e } = require('../../../JSON/emojis.json'),
-    ms = require('ms'),
     Data = require('../../../modules/functions/plugins/data'),
     Aliases = ['sorteio', 'gw']
 
@@ -17,152 +16,133 @@ module.exports = {
 
         const embed = new MessageEmbed().setColor(client.blue)
 
-        if (['create', 'criar', 'new'].includes(args[0]?.toLowerCase())) return CreateNewGiveaway()
         if (['delete', 'deletar', 'del', 'apagar', 'excluir'].includes(args[0]?.toLowerCase())) return DeleteGiveaway()
         if (['reroll', 'resortear'].includes(args[0]?.toLowerCase())) return Reroll()
         if (['finalizar', 'finish'].includes(args[0]?.toLowerCase())) return FinishGiveaway()
-        if (['list', 'all', 'todos', 'lista'].includes(args[0]?.toLowerCase())) return GiveawayList()
         if (['info', 'help', 'ajuda', 'i', 'h'].includes(args[0]?.toLowerCase())) return GiveawayInfo()
         if (['setchannel', 'config'].includes(args[0]?.toLowerCase())) return ConfigGiveawayChannel()
         if (['reset', 'resetar'].includes(args[0]?.toLowerCase())) return ResetGiveawayTime()
-        return NaoSabeUsarOComando()
 
-        async function CreateNewGiveaway() {
-
-            let guild = await Database.Guild.findOne({ id: message.guild.id }, 'GiveawayChannel'),
-                WinnersAmount = args[1],
-                Time = args[2],
-                Prize = args.slice(3).join(' '),
-                ChannelId = guild?.GiveawayChannel,
-                Channel = message.guild.channels.cache.get(ChannelId),
-                TimeMs
-
-            if (!ChannelId)
-                return message.reply(`${e.Deny} | Para criar um sorteio, o servidor deve ter um canal de sorteio configurado. Tem tudo no \`${prefix}giveaway info\`, dá uma olhadinha.`)
-
-            if (ChannelId && !Channel) {
-
-                await Database.Guild.updateOne(
-                    { id: message.guild.id },
-                    { $unset: { GiveawayChannel: 1 } }
-                )
-
-                return message.reply(`${e.Deny} | Para criar um sorteio, o servidor deve ter um canal de sorteio configurado. Tem tudo no \`${prefix}giveaway info\`, dá uma olhadinha.`)
-            }
-
-            if (!Channel)
-                return message.reply(`${e.Deny} | Para criar um sorteio, o servidor deve ter um canal de sorteio configurado. Tem tudo no \`${prefix}giveaway info\`, dá uma olhadinha.`)
-
-            if (!WinnersAmount)
-                return NaoSabeUsarOComando()
-
-            if (isNaN(WinnersAmount))
-                return message.reply(`${e.Deny} | O número de vencedores deve ser um número, não acha? Olha um exemplo:\n\`${prefix}giveaway create <QuantidadeDeVencedores> <TempoDoSorteio> <O Prêmio do Sorteio>\` | \`${prefix}giveaway create 3 10h Cargo Mod\``)
-
-            if (parseInt(WinnersAmount) > 20 || parseInt(WinnersAmount) < 1)
-                return message.reply(`${e.Deny} | O limite máximo de vencedores é entre 1 e 20.`)
-
-            if (!['s', 'm', 'h', 'd'].includes(Time.slice(-1)))
-                return message.reply(`${e.Deny} | Tempo inválido! Tenta colocar o tempo assim: \`50s | 10m | 1h | 2d\`\nOu seja: Segundos, Minutos, Horas e Dias`)
-
-            if (!Prize)
-                return message.reply(`${e.Info} | O mais legal é que você disse tudo do sorteio e só se esqueceu do prêmio 🤡`)
-
-            if (Prize.length > 200)
-                return message.reply(`${e.Deny} | O prêmio não pode passar de **200 caracteres**`)
-
-            try {
-                TimeMs = ms(Time)
-            } catch (err) { return message.reply(`${e.Deny} | O tempo informado é inválido.`) }
-
-            if (TimeMs > 2592000000)
-                return message.reply(`${e.Deny} | O tempo limite é de 30 dias.`)
-
-            const msg = await Channel.send({ embeds: [embed.setTitle(`${e.Loading} | Construindo sorteio...`)] })
-
-            if (!msg?.id)
-                return message.reply(`${e.Deny} | Falha ao obter o ID da mensagem do sorteio. Verifique se eu realmente tenho permissão para enviar mensagem no canal de sorteios.`)
-
-            let Message = await message.channel.send(`${e.Loading} | Tudo certo! Última parte agora. Escolha o emoji que você quer para o sorteio. Caso queira o padrão, basta reagir na 🎉`)
-            Message.react('🎉').catch(() => { })
-
-            return Message.createReactionCollector({
-                filter: (r, u) => u.id === message.author.id,
-                time: 20000
-            })
-                .on('collect', (reaction) => {
-
-                    let emoji = reaction.emoji
-
-                    if (emoji.id && !message.guild.emojis.cache.get(emoji.id))
-                        return Message.edit(`${Message.content}\n \n${e.Deny} | Este emoji não pertence a este servidor.`)
-
-                    let emojiData = emoji.id || emoji.name
-
-                    msg.react(emoji).catch(err => {
-                        Database.deleteGiveaway(msg.id)
-                        return message.channel.send(`${e.Warn} | Erro ao reagir no sorteio. | \`${err}\``)
-                    })
-
-                    return registerGiveaway(msg, emoji, emojiData, Message)
-                })
-
-
-            async function registerGiveaway(msg, emoji, emojiData, Message) {
-
-                new Database.Giveaway({ // new Class Model
-                    MessageID: msg.id, // Id da Mensagem
-                    GuildId: message.guild.id, // Id do Servidor
-                    Prize: Prize, // Prêmio do sorteio
-                    Winners: WinnersAmount, // Quantos vencedores
-                    Emoji: emojiData, // Quantos vencedores
-                    TimeMs: TimeMs, // Tempo do Sorteio
-                    DateNow: Date.now(), // Agora
-                    ChannelId: ChannelId, // Id do Canal
-                    Actived: true, // Ativado
-                    MessageLink: msg.url, // Link da mensagem
-                    Sponsor: message.author.id, // Quem fez o sorteio
-                    TimeEnding: Data(TimeMs) // Hora que termina o sorteio
-                }).save()
-
-                embed
-                    .setTitle(`${e.Tada} Sorteios ${message.guild.name}`)
-                    .setDescription(`Para entrar no sorteio, basta reagir no emoji ${emoji}`)
-                    .addFields(
-                        {
-                            name: `${e.Star} Prêmio`,
-                            value: `> ${Prize}`
-                        },
-                        {
-                            name: '⏱️ Data de Término',
-                            value: `> \`${Data(TimeMs)}\``,
-                            inline: true
-                        },
-                        {
-                            name: `${e.ModShield} Patrocinado por`,
-                            value: `> ${message.author}`,
-                            inline: true
-                        },
-                        {
-                            name: `${e.CoroaDourada} Vencedores`,
-                            value: `> ${parseInt(WinnersAmount)}`,
-                            inline: true
-                        }
-                    )
-                    .setFooter({ text: `Giveaway ID: ${msg?.id}` })
-
-                msg.edit({ embeds: [embed] }
-                ).catch(err => {
-                    msg.delete().catch(() => { })
-
-                    Database.deleteGiveaway(msg.id)
-                    return Message.edit(`${e.Warn} | Erro ao criar o sorteio. | \`${err}\``).catch(() => { })
-                })
-
-                return Message.edit(`${e.Check} | Sorteio criado com sucesso! Você pode vê-lo no canal ${msg.channel}`).catch(() => { })
-            }
-
+        let selectMenuObject = {
+            type: 1,
+            components: [{
+                type: 3,
+                custom_id: 'giveawayCommand',
+                placeholder: 'Escolher uma opção',
+                options: [
+                    {
+                        label: 'Painel Principal',
+                        emoji: '📌',
+                        description: 'Voltar ao  painel inicial do comando',
+                        value: 'inicial'
+                    },
+                    {
+                        label: 'New Giveaway',
+                        emoji: '🆕',
+                        description: 'Comece um novo sorteio no servidor',
+                        value: 'newGiveaway'
+                    },
+                    {
+                        label: 'Lista de Sorteios',
+                        emoji: e.Commands || '📜',
+                        description: 'Veja os dados de todos os sorteios do servidor.',
+                        value: 'giveawayList'
+                    },
+                    {
+                        label: 'Cancelar',
+                        emoji: e.Deny || '❌',
+                        description: 'Force o cancelamento do comando',
+                        value: 'cancel'
+                    }
+                ]
+            }]
         }
+
+        let principalEmbed = embed
+            .setTitle(`${e.Tada} ${client.user.username} Giveaway Manager | Info Class`)
+            .setDescription(`Com este comando é possível fazer sorteios. E isso é bem legal.`)
+            .addFields(
+                {
+                    name: `:link: Atalhos`,
+                    value: `\`${prefix}giveaway\`, ${Aliases.map(cmd => `\`${prefix}${cmd}\``).join(', ')}`
+                },
+                {
+                    name: `${e.Deny} Delete sorteios`,
+                    value: `\`${prefix}giveaway delete <IdDoSorteio>\` ou \`${prefix}giveaway delete all\``
+                },
+                {
+                    name: `${e.Gear} Configure o canal ou delete tudo`,
+                    value: `\`${prefix}giveaway config [#channel]\` ou \`${prefix}giveaway config <delete>\``
+                },
+                {
+                    name: `🔄 Reroll`,
+                    value: `\`${prefix}giveaway reroll <IdDoSorteio> [QuantidadeDeVencedores]\``
+                },
+                {
+                    name: `🌀 Reset o tempo do sorteio`,
+                    value: `\`${prefix}giveaway reset <IdDoSorteio>\``
+                },
+                {
+                    name: `⏱️ Finalize um sorteio antes da hora`,
+                    value: `\`${prefix}giveaway finish <IdDoSorteio>\``
+                },
+                {
+                    name: `${e.Info} Informações do sorteio`,
+                    value: `\`${prefix}giveaway info <IdDoSorteio>\``
+                }
+            )
+            .setFooter({ text: `Este comando faz parte da: ${client.user.username} Hiper Commmands Systems` })
+
+        let Message = await message.reply({
+            embeds: [principalEmbed],
+            components: [selectMenuObject]
+        })
+
+        let collector = Message.createMessageComponentCollector({
+            filter: interaction => interaction.user.id === message.author.id,
+            idle: 60000,
+            erros: ['idle']
+        })
+            .on('collect', int => {
+
+                const { values } = int
+                let value = values[0]
+
+                if (value === 'cancel') return collector.stop()
+
+                Message.edit({ components: [selectMenuObject] }).catch(() => { })
+
+                if (value === 'newGiveaway') return
+                int.deferUpdate().catch(() => { })
+
+                if (Message.reactions.cache.size > 0)
+                    Message.reactions.removeAll().catch(() => { })
+
+                if (value === 'inicial') return Message.edit({ content: null, embeds: [principalEmbed] }).catch(() => { })
+                if (value === 'giveawayList') return GiveawayList()
+            })
+            .on('end', () => {
+
+                let embed = Message.embeds[0]
+
+                if (embed) {
+                    embed.color = client.red
+
+                    return Message.edit({
+                        content: `${e.Deny} | Comando cancelado.`,
+                        embeds: [embed],
+                        components: []
+                    }).catch(() => { })
+                } else {
+                    return Message.edit({
+                        content: `${e.Deny} | Comando cancelado.`,
+                        embeds: [],
+                        components: []
+                    }).catch(() => { })
+                }
+            })
+
+        return
 
         async function DeleteGiveaway() {
 
@@ -295,12 +275,12 @@ module.exports = {
             let Sorteios = await Database.Giveaway.find({ GuildId: message.guild.id })
 
             if (!Sorteios || Sorteios.length === 0)
-                return message.reply(`${e.Deny} | Este servidor não tem nenhum sorteio na lista.`)
+                return Message.edit({ content: `${e.Deny} | Este servidor não tem nenhum sorteio na lista.`, embeds: [] }).catch(() => { })
 
             let Embeds = EmbedGenerator(),
                 Control = 0,
                 Emojis = ['◀️', '▶️', '❌'],
-                msg = await message.reply({ embeds: [Embeds[0]] }),
+                msg = await Message.edit({ embeds: [Embeds[0]] }),
                 react = false
 
             if (Embeds.length > 1)
@@ -602,10 +582,6 @@ module.exports = {
                     return msg.edit(`${e.Deny} | Comando cancelado.`)
                 })
 
-        }
-
-        function NaoSabeUsarOComando() {
-            return message.reply(`${e.Info} | Não sabe usar o comando de sorteio? Tenta usar o comando \`${prefix}giveaway info\``)
         }
 
         async function ConfigGiveawayChannel() {
