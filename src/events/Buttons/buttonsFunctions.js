@@ -3,7 +3,7 @@ const Database = require('../../../modules/classes/Database'),
 
 async function buttonsFunctions(interaction, client) {
 
-    let { customId, user } = interaction
+    let { customId, user, guild } = interaction
 
     switch (customId) {
         case 'setStatusChange': setStatusCommand(); break;
@@ -12,6 +12,8 @@ async function buttonsFunctions(interaction, client) {
         case 'editProfile': editProfile(); break;
         case 'sendNewLetter': sendNewLetter(); break;
         case 'newGiveaway': newGiveaway(); break;
+        case 'newProof': newProof(); break;
+        case 'closeProof': newProof(true); break;
         default:
             break;
     }
@@ -87,6 +89,82 @@ async function buttonsFunctions(interaction, client) {
             })
 
         return await interaction.showModal(modal)
+    }
+
+    async function newProof(close = false) {
+
+        let hasChannel = guild.channels.cache.find(ch => ch.topic === user.id)
+
+        if (close) {
+            if (!hasChannel)
+                return await interaction.reply({
+                    content: '❌ | Você não possui nenhum canal aberto no servidor.',
+                    ephemeral: true
+                })
+
+            hasChannel.delete().catch(async err => {
+                return await interaction.reply({
+                    content: '❌ | Falha ao deletar o seu canal.',
+                    ephemeral: true
+                })
+            })
+
+            return await interaction.reply({
+                content: '✅ | Canal deletado com sucesso!',
+                ephemeral: true
+            })
+        }
+
+        if (hasChannel)
+            return await interaction.reply({
+                content: `❌ | Você já possui um canal aberto no servidor. Ele está aqui: ${hasChannel}`,
+                ephemeral: true
+            })
+
+        let arr = [], parentId = '893307009246580746'
+        guild.channels.cache.map(ch => arr.push(ch.parentId))
+
+        let parentIds = [...new Set(arr)].filter(d => typeof d === 'string')
+
+        if (!parentIds.includes(parentId))
+            parentId = null
+
+        const { Permissions } = require('discord.js')
+
+        return guild.channels.create(user.tag, {
+            type: 'GUILD_TEXT',
+            topic: user.id,
+            parent: parentId,
+            permissionOverwrites: [
+                {
+                    id: guild.id,
+                    deny: [Permissions.FLAGS.VIEW_CHANNEL],
+                },
+                {
+                    id: user.id,
+                    allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.ATTACH_FILES, Permissions.FLAGS.EMBED_LINKS],
+                }
+            ],
+            reason: `Solicitado por ${user.id}`
+        }).then(async channel => {
+            channel.send(`${e.Check} | ${user}, o seu canal de comprovante foi aberto com sucesso!\n🔍 | Mande o **COMPROVANTE** do pagamento/pix/transação contendo **DATA, HORA e VALOR**.\n${e.Info} | Lembrando! Cada real doado é convertido em 15.000 Safiras + 7 Dias de VIP`)
+            return await interaction.reply({
+                content: `✅ | Canal criado com sucesso. Aqui está ele: ${channel}`,
+                ephemeral: true
+            })
+        }).catch(async err => {
+            if (err.code === 30013)
+                return await interaction.reply({
+                    content: 'ℹ | O servidor atingiu o limite de **500 canais**.',
+                    ephemeral: true
+                })
+
+            return await interaction.reply({
+                content: `❌ | Ocorreu um erro ao criar um novo canal.\n\`${err}\``,
+                ephemeral: true
+            })
+        })
+
     }
 
     async function setStatusCommand() {

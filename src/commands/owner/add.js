@@ -22,6 +22,7 @@ module.exports = {
         // NO USERS
         if (['commands', 'comandos', 'comando', 'cmd', 'cmds', 'commands'].includes(args[0]?.toLowerCase())) return AddCommands()
         if (['news'].includes(args[0]?.toLowerCase())) return newRole()
+        if (['comprovante'].includes(args[0]?.toLowerCase())) return newComprovante()
 
         if (!user) return message.channel.send(`${e.Deny} | Usuário não encontrado.`)
         if (user.bot) return message.channel.send(`${e.Deny} | No bots.`)
@@ -186,6 +187,32 @@ module.exports = {
                 Error(message, err)
             })
             return message.channel.send(`${e.Check} | ${user.username} agora é um Designer Official & Emojis Productor`)
+        }
+
+        async function newComprovante() {
+
+            return message.channel.send({
+                content: `${e.Info} | **NÃO** abra um ticket de comprovante sem motivo! Toda a Staff é notificada e nós puniremos caso você faça isso.`,
+                components: [{
+                    type: 1,
+                    components: [
+                        {
+                            type: 2,
+                            label: 'Mostrar comprovante',
+                            emoji: e.ballonChat || '🔍',
+                            custom_id: 'newProof',
+                            style: 'SUCCESS'
+                        },
+                        {
+                            type: 2,
+                            label: 'Deletar comprovante',
+                            emoji: '✖',
+                            custom_id: 'closeProof',
+                            style: 'DANGER'
+                        }
+                    ]
+                }]
+            })
         }
 
         async function SetNewDeveloper() {

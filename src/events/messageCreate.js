@@ -139,7 +139,7 @@ client.on('messageCreate', async message => {
     Database.Cache.set(`Timeouts.${command.name}.${message.author.id}`, { Time: Date.now() })
 
     Database.newCommandRegister(message, data(), client.user.id, command.name)
-    return command.execute(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
+    return await command.execute(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
 
 })
 async function BlockCommandsBot(message, clientId, Blockchannels) {
