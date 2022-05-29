@@ -1,4 +1,5 @@
-const Database = require('../../../modules/classes/Database')
+const Database = require('../../../modules/classes/Database'),
+    { newReminder } = require('../plugins/modalPlugins')
 
 async function selectMenuFunctions(interaction, client) {
 
@@ -8,6 +9,7 @@ async function selectMenuFunctions(interaction, client) {
 
     switch (value) {
         case 'newGiveaway': newGiveaway(); break;
+        case 'newReminder': newReminder(interaction); break;
         case '914925531529609247':
         case '980293085298839572':
         case '920012840356683776':
@@ -30,6 +32,9 @@ async function selectMenuFunctions(interaction, client) {
 
             let role = guild.roles.cache.get(roleId),
                 member = guild.members.cache.get(user.id)
+
+            if (!role)
+                return msgConfirmation += `\n⚠️ | ${role?.name || 'NOT FOUND'} - **ERRO**`
 
             if (member.roles.cache.has(roleId)) {
                 member.roles.remove(role)

@@ -272,9 +272,9 @@ module.exports = {
                             value: '899393472283410493',
                         },
                         {
-                            label: 'Verde',
+                            label: 'Azul',
                             emoji: '🔵',
-                            description: 'Mude a cor do seu nome para verde',
+                            description: 'Mude a cor do seu nome para azul',
                             value: '894615786138787941',
                         }
                     ]

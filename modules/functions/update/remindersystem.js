@@ -32,7 +32,7 @@ async function ReminderSystem() {
 
 async function reminderStart(user, data) {
 
-    let RemindMessage = data.RemindMessage,
+    let RemindMessage = data.RemindMessage.slice(0, 3500),
         Time = data.Time,
         DateNow = data.DateNow,
         TimeOver = client.Timeout(Time, DateNow),

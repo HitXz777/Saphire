@@ -80,7 +80,7 @@ module.exports = {
         if (value <= 0)
             return message.reply(`${e.Deny} | Você não acha que para uma aposta o valor deve ser maior ou igual a 1?`)
 
-        if (value >= money)
+        if (value > money)
             return message.reply(`${e.Deny} | Você não possui todo esse dinheiro.`)
 
         Database.Cache.set(`Miku.${message.author.id}`, true)

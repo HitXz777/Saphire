@@ -1,5 +1,6 @@
 const Database = require('../../../modules/classes/Database'),
-    { Emojis: e } = Database
+    { Emojis: e } = Database,
+    { newReminder } = require('../plugins/modalPlugins')
 
 async function buttonsFunctions(interaction, client) {
 
@@ -14,6 +15,7 @@ async function buttonsFunctions(interaction, client) {
         case 'newGiveaway': newGiveaway(); break;
         case 'newProof': newProof(); break;
         case 'closeProof': newProof(true); break;
+        case 'newReminder': newReminder(interaction); break;
         default:
             break;
     }

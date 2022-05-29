@@ -57,10 +57,48 @@ function day(tomorrow = false) {
     return `${Dia}/${Mes}/${Ano}`
 }
 
+async function newReminder(interaction) {
+
+    const modal = {
+        title: "New Reminder Creation",
+        custom_id: "newReminder",
+        components: [
+            {
+                type: 1,
+                components: [{
+                    type: 4,
+                    custom_id: "time",
+                    label: "Para quando é o lembrete?",
+                    style: 1,
+                    max_length: 80,
+                    placeholder: "Amanhã 21:00 | 1d 4h 5s | 19:00",
+                    required: true
+                }]
+            },
+            {
+                type: 1,
+                components: [{
+                    type: 4,
+                    custom_id: "dataInfo",
+                    label: "Devo te lembrar de...",
+                    style: 2,
+                    min_length: 1,
+                    max_length: 3500,
+                    placeholder: "Comprar pão",
+                    required: true
+                }]
+            }
+        ]
+    }
+
+    return await interaction.showModal(modal)
+}
+
 module.exports = {
     eightyYears,
     Now,
     FormatNumber,
     getUser,
-    day
+    day,
+    newReminder
 }
