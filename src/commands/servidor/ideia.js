@@ -3,7 +3,7 @@ const ms = require('parse-ms')
 
 module.exports = {
     name: 'ideia',
-    aliases: ['sugerir', 'sugestão', 'ideias'],
+    aliases: ['sugerir', 'sugestão', 'ideias', 'sugestao'],
     category: 'servidor',
     ClientPermissions: ['ADD_REACTIONS', 'EMBED_LINKS'],
     emoji: '💭',
