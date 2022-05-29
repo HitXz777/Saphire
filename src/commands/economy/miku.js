@@ -70,10 +70,12 @@ module.exports = {
 
         let arg = args[0].toLowerCase()
 
-        let value = parseInt(arg.replace(/k/g, '000')?.toFixed(0))
+        let value = parseInt(arg.replace(/k/g, '000'))
 
         if (['all', 'tudo'].includes(arg)) value = money
-        if (['half', 'metade'].includes(arg)) value = parseInt((money / 2).toFixed(0))
+        if (['half', 'metade'].includes(arg)) value = parseInt(money / 2)
+
+        value = parseInt(value?.toFixed(0))
 
         if (value <= 0)
             return message.reply(`${e.Deny} | Você não acha que para uma aposta o valor deve ser maior ou igual a 1?`)

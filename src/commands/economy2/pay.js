@@ -77,7 +77,7 @@ module.exports = {
 
             validate = true
 
-            let taxa = parseInt(payCache * 0.05).toFixed(0),
+            let taxa = parseInt((payCache * 0.05).toFixed(0)),
                 taxaValidate
 
             if (payCache >= 1000) {

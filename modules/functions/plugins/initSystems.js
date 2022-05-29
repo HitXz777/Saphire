@@ -6,7 +6,8 @@ const
     RaffleSystem = require('../update/rifasystem')
 
 function init() {
-
+    
+    TopGlobalRanking()
     console.log('Systems Intervals | OK!')
 
     setInterval(() => {
@@ -16,7 +17,7 @@ function init() {
     }, 3000)
 
     setInterval(() => boostReward(), 60000)
-    setInterval(() => TopGlobalRanking(), 3600000)
+    setInterval(() => TopGlobalRanking(), 1800000)
 
 }
 

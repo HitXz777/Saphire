@@ -15,7 +15,7 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let msg = await message.reply(`${e.Loading} | Obtendo informações e construindo...`),
-            user = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.find(user => user.username?.toLowerCase() == args[1]?.toLowerCase() || user.tag?.toLowerCase() == args[1]?.toLowerCase() || user.id === args[1]),
+            user = client.getUser(client, message, args, 'user'),
             embed = new MessageEmbed(),
             moeda = await Moeda(message)
 
@@ -103,6 +103,8 @@ module.exports = {
                         },
                     ])
                 )
+            let timingToRefresh = Database.Cache.get('GlobalRefreshTime'),
+                timing = client.GetTimeout(1800000, timingToRefresh)
 
             msg.edit({
                 embeds: [
@@ -110,9 +112,9 @@ module.exports = {
                         .setColor('#246FE0')
                         .setTitle(`🏆 | ${client.user.username} Global Ranking System`)
                         .setDescription('Aqui você pode ver os top 10 em cada classe')
-                        .addField('🌐 Ranking Global', `\`${prefix}rank global\` - \`${prefix}rank global refresh\``)
-                        .addField(`${e.MoneyWings} Ranking Money`, `\`${prefix}rank money [local/invertido]\`\n\`${prefix}rank invertido [Local]\``)
-                        .addField(`${e.RedStar} Ranking Experiência`, `\`${prefix}rank xp [local/invertido]\``)
+                        .addField(`🌐 Ranking Global (Refresh in ${timing})`, `\`${prefix}rank global\` - \`${prefix}rank global refresh\``)
+                        .addField(`${e.MoneyWings} Ranking Money (Refresh in ${timing})`, `\`${prefix}rank money [local/invertido]\`\n\`${prefix}rank invertido [Local]\``)
+                        .addField(`${e.RedStar} Ranking Experiência (Refresh in ${timing})`, `\`${prefix}rank xp [local/invertido]\``)
                         .addField(`${e.Like} Ranking Reputação`, `\`${prefix}rank likes [local]\``)
                         .addField(`${e.duvida || '❔'} Ranking Global Memory Game`, `\`${prefix}rank memory [local]\``)
                         .addField('😵 Ranking Global Forca Game', `\`${prefix}rank forca [local]\``)
@@ -143,9 +145,9 @@ module.exports = {
 
                 switch (item) {
                     case 'principal': PrincipalEmbedHome(); break
-                    case 'topGlobais': TopGlobalRanking(); break
-                    case 'level': RankLevel(); break;
-                    case 'money': RankMoney(); break;
+                    case 'topGlobais': TopGlobalRanking(timing); break
+                    case 'level': RankLevel(timing); break;
+                    case 'money': RankMoney(timing); break;
                     case 'like': RankLikes(); break;
                     case 'invert': RankInvert(); break;
                     case 'mix': mixGlobalRanking(); break;
@@ -166,8 +168,8 @@ module.exports = {
             return
         }
 
-        if (['xp', 'level', 'nivel'].includes(args[0]?.toLowerCase())) return RankLevel()
-        if (['dinheiro', 'money', 'cash', 'sp', 'coin', 'moeda', 'bank', 'coins'].includes(args[0]?.toLowerCase())) return RankMoney()
+        if (['xp', 'level', 'nivel'].includes(args[0]?.toLowerCase())) return RankLevel(timing)
+        if (['dinheiro', 'money', 'cash', 'sp', 'coin', 'moeda', 'bank', 'coins'].includes(args[0]?.toLowerCase())) return RankMoney(timing)
         if (['like', 'curtidas', 'likes'].includes(args[0]?.toLowerCase())) return RankLikes()
         if (['dividas', 'invertido', 'dívidas', 'invert', 'invertido'].includes(args[0]?.toLowerCase())) return RankInvert()
         if (['mix', 'palavramisturada'].includes(args[0]?.toLowerCase())) return mixGlobalRanking()
@@ -177,7 +179,7 @@ module.exports = {
         if (['forca', 'hangman'].includes(args[0]?.toLowerCase())) return forcaGlobalRanking()
         if (['quiz'].includes(args[0]?.toLowerCase())) return quizGlobalRanking()
         if (['clan', 'clans'].includes(args[0]?.toLowerCase())) return ClanRanking()
-        if (['top', 'global'].includes(args[0]?.toLowerCase())) return TopGlobalRanking()
+        if (['top', 'global', 'g'].includes(args[0]?.toLowerCase())) return TopGlobalRanking(timing)
         if (['flag', 'brandeiras', 'bandeira', 'falg'].includes(args[0]?.toLowerCase())) return flagGamingRanking()
 
         return msg.edit(`${e.Deny} | ${message.author}, este ranking não existe ou você escreveu errado. Use \`${prefix}rank\` e veja os rankings disponiveis.`).catch(() => { })
@@ -208,7 +210,7 @@ module.exports = {
             }).catch(() => { })
         }
 
-        async function TopGlobalRanking() {
+        async function TopGlobalRanking(timing) {
 
             if (['refresh', 'att', 'atualizar', 'reboot', 'restart'].includes(args[1]?.toLowerCase())) return refreshTopGlobalRanking()
 
@@ -234,7 +236,7 @@ module.exports = {
                         new MessageEmbed()
                             .setColor(client.blue)
                             .setTitle(`${e.CoroaDourada} Top Globais`)
-                            .setDescription('⏲️ Os Top Globais se atualizam a cada 1 hora.')
+                            .setDescription(`⏲️ Os Top Globais se atualizarão daqui ${timing || 'Searching Timing'}`)
                             .addFields(
                                 {
                                     name: `${e.RedStar} **Top Global Level**`,
@@ -283,7 +285,7 @@ module.exports = {
 
             function formatUser(userId) {
                 let user = client.users.cache.get(`${userId}`)
-                if (!user) return `${e.Loading} | Aguardando a próxima atualização global`
+                if (!user) return `${e.Loading} | Aguardando a próxima atualização global...`
                 return `${user.tag?.replace(/`/g, '')} - \`${user.id}\``
             }
 
@@ -384,32 +386,29 @@ module.exports = {
 
         }
 
-        async function RankLevel() {
+        async function RankLevel(timing) {
 
-            let users = await Database.User.find({}, 'id Xp Level'),
-                UsersArray = []
+            let users = Database.Cache.get('rankLevel') || []
 
-            for (const data of users) {
+            if (!users || !users.length) return msg.edit(`${e.Info} | Não há ninguém no ranking`).catch(() => { })
 
-                let Exp = data.Xp || 0,
-                    Level = data.Level || 0,
-                    XpNeeded = Level * 275
+            let index = users.findIndex(author => author.id === message.author.id)
 
-                if (Exp > 0)
-                    UsersArray.push({ id: data.id, xp: Exp, XpNeeded: XpNeeded, level: Level })
-            }
+            if (index === -1) users = await Database.User.find({}, 'id Xp Level')
 
-            if (!UsersArray.length) return msg.edit(`${e.Info} Não há ninguém no ranking`).catch(() => { })
+            let RankingSorted = index === -1 ? users : users.filter(d => d.Level > 0).sort((a, b) => b.Level - a.Level)
+            index = RankingSorted.findIndex(author => author.id === message.author.id)
+            let data = RankingSorted.map((u, i) => { return { i: i, id: u.id, xp: u.Xp, XpNeeded: parseInt(u.Level * 275)?.toFixed(0), level: u.Level } })
 
-            let RankingSorted = UsersArray.sort((a, b) => b.level - a.level),
-                Rank = RankingSorted.slice(0, 10),
-                RankMapped = Rank.map((user, i) => `**${Medals(i)} ${GetUser(user.id)}** - \`${user.id}\`\n${e.RedStar} ${user.level} *(${user.xp}/${user.XpNeeded})*\n`).join('\n'),
-                myrank = RankingSorted.findIndex(author => author.id === message.author.id) + 1 || "N/A"
+            if (!data.length) return msg.edit(`${e.Info} | Não há ninguém no ranking`).catch(() => { })
+
+            let RankMapped = data.slice(0, 10).map(user => `**${Medals(user.i)} ${GetUser(user.id)}** - \`${user.id}\`\n${e.RedStar} ${user.level} *(${user.xp}/${user.XpNeeded})*\n`).join('\n'),
+                myrank = index === -1 ? 'N/A' : index + 1
 
             embed
                 .setColor('YELLOW')
                 .setTitle(`👑 Ranking - Global Experience`)
-                .setDescription(`${RankMapped}`)
+                .setDescription(`Próxima atualização em: ${timing}\n \n${RankMapped}`)
                 .setFooter({ text: `Seu ranking: ${myrank} | Rank Base: XP` })
 
             if (['local', 'server'].includes(args[1]?.toLowerCase())) return InServerLocalRanking()
@@ -423,15 +422,15 @@ module.exports = {
 
             function InServerLocalRanking() {
 
-                let Rank = RankingSorted.filter(user => message.guild.members.cache.has(user.id)),
+                let Rank = data.filter(user => message.guild.members.cache.has(user.id)),
                     RankMapped = Rank.slice(0, 10).map((user, i) => `**${Medals(i)} ${GetUser(user.id)}** - \`${user.id}\`\n${e.RedStar} ${user.level || 0} *(${user.xp}/${user.XpNeeded})*\n`).join('\n'),
                     myrank = Rank.findIndex(author => author.id === message.author.id) + 1 || "N/A"
 
                 embed
                     .setColor('YELLOW')
-                    .setTitle(`👑 Ranking - ${message.guild.name}`)
+                    .setTitle('👑 Ranking Level Locale')
                     .setDescription(`${RankMapped}`)
-                    .setFooter({ text: `Seu ranking: ${myrank} | Rank Base: XP` })
+                    .setFooter({ text: `Seu ranking: ${myrank} | O ranking se atualiza de 30 em 30 minutos` })
 
                 return msg.edit({
                     content: `${e.Check} | Ranking local carregado com sucesso!`,
@@ -439,49 +438,50 @@ module.exports = {
                 }).catch(() => { })
             }
 
-            function VerifyLocationRanking() {
+            async function VerifyLocationRanking() {
 
-                let Num = parseInt(args[1])
+                let Num = parseInt(args[1] || 0) - 1
 
-                if (['me', 'eu'].includes(args[1]?.toLowerCase())) Num = myrank
+                if (['me', 'eu'].includes(args[1]?.toLowerCase())) Num = AuthorRank
 
-                if (user) Num = RankingSorted.findIndex(u => u.id === user.id) + 1 || "N/A"
+                if (user) Num = data.findIndex(u => u.id === user.id)
 
-                if (Num === 0 || !UsersArray[Num - 1])
+                if (!data[Num]) {
+                    users = await Database.User.find({}, 'id Level')
+                    data = users.filter(d => d.Balance > 0).sort((a, b) => b.Level - a.Level)
+                }
+
+                if (!data[Num])
                     return msg.edit({ content: `${e.Deny} | Ranking não encontrado.` }).catch(() => { })
 
-                let InLocaleRanking = UsersArray.splice(Num - 1, 1)
+                let InLocaleRanking = data.splice(Num, 1)
 
-                return msg.edit({ content: InLocaleRanking.map(user => `**${Medals(Num - 1)} ${GetUser(user.id)}** - \`${user.id}\`\n${e.RedStar} ${user.level || 0} *(${user.xp}/${user.XpNeeded})*`).join('\n') }).catch(() => { })
+                return msg.edit({ content: InLocaleRanking.map(user => `**${Medals(Num)} ${GetUser(user.id)}** - \`${user.id}\`\n${e.RedStar} ${user.level || 0} *(${user.xp}/${user.XpNeeded})*`).join('\n') }).catch(() => { })
 
             }
 
         }
 
-        async function RankMoney() {
+        async function RankMoney(timing) {
 
-            let USERS = await Database.User.find({}, 'id Balance'),
-                UsersMoney = []
+            let users = Database.Cache.get('rankBalance') || []
 
-            if (USERS.length === 0)
-                return msg.edit(`${e.Info} | Não há nenhum usuário na minha database por enquanto.`).catch(() => { })
+            if (!users || !users.length) return msg.edit(`${e.Info} | Não há ninguém no ranking`).catch(() => { })
 
-            for (const data of USERS) {
+            let index = users.findIndex(author => author.id === message.author.id)
 
-                let money = data.Balance || 0
+            if (index === -1) users = await Database.User.find({}, 'id Balance')
 
-                if (money > 0)
-                    UsersMoney.push({ id: data.id, bal: money })
-            }
+            let RankingSorted = index === -1 ? users : users.filter(d => d.Balance > 0).sort((a, b) => b.Balance - a.Balance)
+            index = RankingSorted.findIndex(author => author.id === message.author.id)
+            let data = RankingSorted.map((u, i) => { return { i: i, id: u.id, Balance: u.Balance } })
 
-            if (UsersMoney.length === 0)
-                return msg.edit(`${e.Info} | Tudo vázio por aqui.`).catch(() => { })
+            if (!data.length) return msg.edit(`${e.Info} | Não há ninguém no ranking`).catch(() => { })
 
-            let Sorted = UsersMoney.sort((a, b) => b.bal - a.bal),
-                AuthorRank = Sorted.findIndex(author => author.id === message.author.id) + 1 || "N/A",
-                rank = Sorted.slice(0, 10).map((a, i) => `**${Medals(i)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.bal} ${moeda}\n`).join('\n')
+            let AuthorRank = index === -1 ? 'N/A' : index + 1,
+                rank = data.slice(0, 10).map((a, i) => `**${Medals(i)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.Balance} ${moeda}\n`).join('\n')
 
-            if (!UsersMoney.length) rank = 'Não há ninguém no ranking'
+            if (!data.length) rank = 'Não há ninguém no ranking'
 
             if (['local', 'server'].includes(args[1]?.toLowerCase())) return InServerLocalRanking()
 
@@ -493,15 +493,15 @@ module.exports = {
                         new MessageEmbed()
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Money`)
-                            .setDescription(`O ranking abaixo representa todo seu dinheiro.\n \n${rank}`)
+                            .setDescription(`O ranking abaixo representa todo capital acumulado dinheiro.\nPróxima atualizão em ${timing}\n \n${rank}`)
                             .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Saldo` })
                     ]
                 }).catch(() => { })
 
             function InServerLocalRanking() {
 
-                let Rank = Sorted.filter(user => message.guild.members.cache.has(user.id)),
-                    RankMapped = Rank.slice(0, 10).map((a, i) => `**${Medals(i)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.bal || 0} ${moeda}\n`).join('\n'),
+                let Rank = data.filter(user => message.guild.members.cache.has(user.id)),
+                    RankMapped = Rank.slice(0, 10).map((a, i) => `**${Medals(i)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.Balance || 0} ${moeda}\n`).join('\n'),
                     myrank = Rank.findIndex(author => author.id === message.author.id) + 1 || "N/A"
 
                 embed
@@ -517,20 +517,25 @@ module.exports = {
 
             }
 
-            function VerifyLocationRanking() {
+            async function VerifyLocationRanking() {
 
-                let Num = parseInt(args[1])
+                let Num = parseInt(args[1] || 0) - 1
 
                 if (['me', 'eu'].includes(args[1]?.toLowerCase())) Num = AuthorRank
 
-                if (user) Num = Sorted.findIndex(u => u.id === user.id) + 1 || "N/A"
+                if (user) Num = data.findIndex(u => u.id === user.id)
 
-                if (Num === 0 || !UsersMoney[Num - 1])
+                if (!data[Num]) {
+                    users = await Database.User.find({}, 'id Balance')
+                    data = users.filter(d => d.Balance > 0).sort((a, b) => b.Balance - a.Balance)
+                }
+
+                if (!data[Num])
                     return msg.edit({ content: `${e.Deny} | Ranking não encontrado.` }).catch(() => { })
 
-                let InLocaleRanking = UsersMoney.splice(Num - 1, 1)
+                let InLocaleRanking = data.splice(Num, 1)
 
-                return msg.edit({ content: InLocaleRanking.map(a => `**${Medals(Num - 1)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.bal || 0} ${moeda}`).join('\n') })
+                return msg.edit({ content: InLocaleRanking.map(a => `**${Medals(Num)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.Balance || 0} ${moeda}`).join('\n') })
 
             }
 

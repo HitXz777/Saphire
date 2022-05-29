@@ -3,7 +3,7 @@ const client = require('../../../index'),
 
 async function TopGlobalRanking() {
 
-    let Users = await Database.User.find({}, 'id Level Likes Balance QuizCount MixCount Jokempo.Wins TicTacToeCount CompetitiveMemoryCount ForcaCount GamingCount.FlagCount'),
+    let Users = await Database.User.find({}, 'id Level Xp Likes Balance QuizCount MixCount Jokempo.Wins TicTacToeCount CompetitiveMemoryCount ForcaCount GamingCount.FlagCount'),
         data = { LikesArray: [], balanceArray: [], XpArray: [], quizArray: [], mixArray: [], jokempoArray: [], tictactoeArray: [], memoryArray: [], forcaArray: [], flagArray: [] }
 
     if (!Users || Users.length === 0) return
@@ -74,6 +74,7 @@ async function TopGlobalRanking() {
         }
     )
 
+    await globalSaveData(Users)
     return
 
     function sortData(array) {
@@ -81,6 +82,21 @@ async function TopGlobalRanking() {
         return arraySorted[0]?.id
     }
 
+}
+
+async function globalSaveData(Users) {
+
+    let UsersArray = []
+
+    Users.map(data => UsersArray.push({ id: data.id || 0, Level: data.Level || 0, Xp: data.Xp || 0, Balance: data.Balance || 0 }))
+    if (!UsersArray.length) return
+
+    let rankLevel = UsersArray.filter(d => d.Level > 0).sort((a, b) => b.Level - a.Level).slice(0, 100)
+    let rankBalance = UsersArray.filter(d => d.Balance > 0).sort((a, b) => b.Balance - a.Balance).slice(0, 100)
+
+    Database.Cache.set('rankLevel', rankLevel)
+    Database.Cache.set('rankBalance', rankBalance)
+    return Database.Cache.set('GlobalRefreshTime', Date.now())
 }
 
 module.exports = TopGlobalRanking

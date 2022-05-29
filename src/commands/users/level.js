@@ -153,22 +153,15 @@ module.exports = {
             data.level = userData.Level || 0
             data.exp = userData.Xp || 0
             data.xpNeeded = parseInt((userData.Level || 0) * 275)
-            let usersAllData = await Database.User.find({}, 'id Level')
 
-            if (!usersAllData || usersAllData.length === 0) {
-                data.rank = 0
+            let usersAllData = Database.Cache.get('rankLevel') || []
+
+            if (!usersAllData || usersAllData.length === 0 || !usersAllData.find(d => d.id === user.id)) {
+                data.rank = 'N/A'
                 return
             }
 
-            let UsersArray = []
-
-            usersAllData.map(data => UsersArray.push({ id: data.id || 0, level: data.Level || 0 }))
-
-            if (!UsersArray.length) return 0
-
-            data.rank = UsersArray
-                .sort((a, b) => b.level - a.level)
-                .findIndex(author => author.id === user.id) + 1 || 0
+            data.rank = usersAllData.findIndex(author => author?.id === user.id) + 1 || '100^'
             return
         }
 

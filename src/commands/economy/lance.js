@@ -2,7 +2,7 @@ const { e } = require('../../../JSON/emojis.json'),
     Moeda = require('../../../modules/functions/public/moeda'),
     Colors = require('../../../modules/functions/plugins/colors')
 
-    module.exports = {
+module.exports = {
     name: 'lance',
     aliases: ['lançar'],
     category: 'economy',
@@ -161,7 +161,7 @@ const { e } = require('../../../JSON/emojis.json'),
                 if (!UsersLance || UsersLance.length === 0 || UsersLance.length <= 1 && UsersLance.includes(message.author.id)) {
 
                     Database.add(message.author.id, prize)
-                    return message.channel.send(`${e.Deny} | Lance cancelado por falta de participantes (Min: 2 players). Dinheiro retornado a carteira. `)
+                    return message.channel.send(`${e.Deny} | Lance cancelado por falta de participantes (Min: 2 players). Dinheiro retornado a carteira.`)
 
                 }
 
@@ -183,10 +183,18 @@ const { e } = require('../../../JSON/emojis.json'),
                     return message.channel.send(`${e.Deny} | Eu não encontrei o usuário ${winner} na minha database. Cancelei o lance e devolvi o dinheiro para o autor do lance. ${message.author}`)
                 }
 
+                let taxa = parseInt((prize * 0.05).toFixed(0)),
+                    taxaValidate = ''
+
+                if (prize >= 1000) {
+                    prize -= taxa
+                    taxaValidate = `\n${e.Taxa} | *Prêmios maiores que 1000 ${moeda} tem uma taxa de 5% (-${taxa})*`
+                }
+
                 Database.add(winner.id, prize)
                 Database.PushTransaction(winner.id, `${e.gain} Recebeu ${prize} Safiras de um lançamento no chat`)
-                message.channel.send(`${e.MoneyWings} | ${winner} pegou ${prize} ${moeda} lançadas por ${message.author}\n${e.SaphireObs} | ${winner}, ${lancePrize} ${moeda} foram adicionado a sua carteria.`).catch(() => { })
-                return msg.edit(`${e.Check} ${message.author} lançou ${prize} ${moeda} no chat. | ${winner} levou este lance.`).catch(() => { })
+                message.channel.send(`${e.MoneyWings} | ${winner} pegou ${prize} ${moeda} lançadas por ${message.author}.${taxaValidate}`).catch(() => { })
+                return msg.edit(`${e.Check} ${message.author} lançou ${prize} ${moeda} no chat. | ${winner} levou este lance.${taxaValidate}`).catch(() => { })
 
             }
 
