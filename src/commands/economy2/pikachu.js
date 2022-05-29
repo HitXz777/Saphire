@@ -6,7 +6,7 @@ module.exports = {
     name: 'pikachu',
     aliases: ['zeppelin', 'zep', 'pika', 'pk'],
     category: 'economy',
-    emoji: `${e.pikachuRunning} || '🎈'`,
+    emoji: e.pikachuRunning || '🎈',
     usage: 'pikachu <info>',
     description: 'Um jogo de aposta na base da sorte com o Pikachu.',
 
