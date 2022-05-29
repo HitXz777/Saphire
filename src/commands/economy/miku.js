@@ -70,7 +70,7 @@ module.exports = {
 
         let arg = args[0].toLowerCase()
 
-        let value = parseInt(arg.replace(/k/g, '000')).toFixed(0)
+        let value = parseInt(arg.replace(/k/g, '000')?.toFixed(0))
 
         if (['all', 'tudo'].includes(arg)) value = money
         if (['half', 'metade'].includes(arg)) value = parseInt((money / 2).toFixed(0))

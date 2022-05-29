@@ -1,8 +1,7 @@
 const
     { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database'),
     simply = require('simply-djs'),
-    Error = require('../../../modules/functions/config/errors'),
-    ms = require("parse-ms")
+    Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
     name: 'level',
@@ -10,7 +9,7 @@ module.exports = {
     category: 'level',
     ClientPermissions: ['ATTACH_FILES'],
     emoji: `${e.Star}`,
-    cooldown: 4000,
+    cooldown: 5000,
     usage: '<level> [info]',
     description: 'Confira seu nível ou o de alguém',
 
@@ -20,48 +19,14 @@ module.exports = {
         if (['acess', 'bgacess'].includes(args[0]?.toLowerCase())) return bgAcess()
 
         let user = message.mentions.users.first() || message.mentions.repliedUser || client.users.cache.find(data => data.username?.toLowerCase() === args.join(' ')?.toLowerCase() || data.tag?.toLowerCase() === args[0]?.toLowerCase() || data.discriminator === args[0] || data.id === args[0]) || message.author,
-            userData = await Database.User.findOne({ id: user.id }, 'Walls Timeouts Level Xp'),
-            BgLevel = Database.BgLevel
+            userData = await Database.User.findOne({ id: user.id }, 'Walls Level Xp'),
+            { BgLevel } = Database, data = {}
 
         if (!userData) return message.reply(`${e.Database} | DATABASE | O usuário **${user?.tag || 'Indefinido'}** *\`${user?.id || '0'}\`* não foi encontrado.`)
 
         if (user.bot) return message.reply(`${e.Deny} | Bots não possuem experiência.`)
 
-        let level = userData.Level || 0,
-            exp = userData.Xp || 0,
-            xpNeeded = level * 275,
-            usersAllData = await Database.User.find({}, 'id Xp Level'),
-            rank = (() => {
-
-                let UsersArray = []
-
-                return usersAllData.length > 0
-                    ? (() => {
-
-                        for (const data of usersAllData) {
-                            let Exp = data.Xp || 0,
-                                Level = data.Level || 0
-
-                            if (Exp > 0)
-                                UsersArray.push({ id: data.id, level: Level })
-                        }
-
-                        if (!UsersArray.length) return 0
-
-                        return UsersArray
-                            .sort((a, b) => b.level - a.level)
-                            .findIndex(author => author.id === user.id) + 1 || 0
-
-                    })()
-                    : 0
-
-            })(),
-            LevelWallpapers = BgLevel.get('LevelWallpapers'),
-            TimeDB = userData.Timeouts?.LevelImage || 0,
-            Timing = ms(5000 - (Date.now() - TimeDB))
-
-        if (client.Timeout(5000, TimeDB))
-            return message.reply(`⏱️ | Calminha coisa linda! \`${Timing.seconds}s\``)
+        let LevelWallpapers = BgLevel.get('LevelWallpapers')
 
         if (['set', 'wall', 'wallpaper', 'fundo', 'bg', 'background', 'capa'].includes(args[0]?.toLowerCase())) return setNewWallpaper()
         if (['reset', 'excluir', 'off', 'tirar', 'delete', 'del', 'bg0'].includes(args[0]?.toLowerCase())) resetWallpaper()
@@ -79,15 +44,9 @@ module.exports = {
 
         async function setNewWallpaper() {
 
-            let Cooldown = userData.Timeouts?.LevelTrade || 0,
-                Time = ms(180000 - (Date.now() - Cooldown)),
-                wallSetted = userData.Walls?.Set,
+            let wallSetted = userData.Walls?.Set,
                 Client = await Database.Client.findOne({ id: client.user.id }, 'BackgroundAcess') || [],
-                minutos = Time.minutes > 0 ? `${Time.minutes} minutos e` : '',
                 option = args[1]?.toLowerCase()
-
-            if (client.Timeout(180000, Cooldown))
-                return message.reply(`⏱️ | Espere mais **${minutos} ${Time.seconds} segundos** para trocar de wallpaper`)
 
             if (!option)
                 return message.reply(`${e.Info} | Selecione o background dizendo o **código** dele. Você pode ver seus backgrounds usando \`${prefix}slot bg\``)
@@ -110,7 +69,6 @@ module.exports = {
                 return message.reply(`${e.Deny} | Você não tem esse background. Que tal comprar ele usando \`${prefix}buy bg ${option}\`?`)
 
             Database.updateUserData(message.author.id, 'Walls.Set', BgLevel.get(`LevelWallpapers.${option}.Image`))
-            Database.updateUserData(message.author.id, 'Timeouts.LevelTrade', Date.now())
             return SendLevel()
 
         }
@@ -118,19 +76,19 @@ module.exports = {
         async function SendLevel() {
             const msg = await message.reply(`${e.Loading} | Carregando...`)
 
+            await build()
+
             let reData = await Database.User.findOne({ id: user.id }, 'Walls.Set')
 
             try {
-                Database.updateUserData(message.author.id, 'Timeouts.LevelImage', Date.now())
-
                 await simply.rankCard(client, message, {
                     member: user, // String
-                    level: level || 0, // Number
-                    currentXP: exp || 0, // Number
-                    neededXP: xpNeeded || 0, // Number
-                    rank: rank || 0, // Number
-                    slash: false, // It isn't a slash command
-                    background: reData.Walls?.Set || LevelWallpapers?.bg0?.Image || null // Image URL from Discord Chats || It's work perfectly
+                    level: data.level || 0, // Number
+                    currentXP: data.exp || 0, // Number
+                    neededXP: data.xpNeeded || 0, // Number
+                    rank: data.rank || 0, // Number
+                    slash: false, // Boolean
+                    background: reData.Walls?.Set || LevelWallpapers?.bg0?.Image || null // String
                 }).then(() => { msg.delete().catch(() => { }) }).catch(err => { })
 
                 return
@@ -189,6 +147,29 @@ module.exports = {
                 ]
             })
 
+        }
+
+        async function build() {
+            data.level = userData.Level || 0
+            data.exp = userData.Xp || 0
+            data.xpNeeded = parseInt((userData.Level || 0) * 275)
+            let usersAllData = await Database.User.find({}, 'id Level')
+
+            if (!usersAllData || usersAllData.length === 0) {
+                data.rank = 0
+                return
+            }
+
+            let UsersArray = []
+
+            usersAllData.map(data => UsersArray.push({ id: data.id || 0, level: data.Level || 0 }))
+
+            if (!UsersArray.length) return 0
+
+            data.rank = UsersArray
+                .sort((a, b) => b.level - a.level)
+                .findIndex(author => author.id === user.id) + 1 || 0
+            return
         }
 
     }
