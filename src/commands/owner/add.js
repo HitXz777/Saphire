@@ -212,34 +212,51 @@ module.exports = {
 
         function newRole() {
 
-            let button = [
-                {
-                    type: 1,
-                    components: [
+            let selectMenuObject = {
+                type: 1,
+                components: [{
+                    type: 3,
+                    minValues: 1,
+                    custom_id: 'menu',
+                    placeholder: 'Selecionar cargos',
+                    options: [
                         {
-                            type: 2,
-                            label: 'OBTER CARGO',
-                            custom_id: 'newRole',
-                            style: 'SUCCESS'
+                            label: 'Avisos e Notificações',
+                            emoji: '🔔',
+                            description: 'Seja notificado com informações relevantes',
+                            value: '914925531529609247',
                         },
                         {
-                            type: 2,
-                            label: 'RETIRAR CARGO',
-                            custom_id: 'delRole',
-                            style: 'DANGER'
+                            label: 'Giveaways & Drops',
+                            emoji: '🎉',
+                            description: 'Seja notificado sobre todos os sorteios',
+                            value: '980293085298839572',
+                        },
+                        {
+                            label: 'Vermelho',
+                            emoji: '🔴',
+                            description: 'Mude a cor do seu nome para vermelho',
+                            value: '920012840356683776',
+                        },
+                        {
+                            label: 'Roxo',
+                            emoji: '🟣',
+                            description: 'Mude a cor do seu nome para roxo',
+                            value: '899393472283410493',
+                        },
+                        {
+                            label: 'Verde',
+                            emoji: '🔵',
+                            description: 'Mude a cor do seu nome para verde',
+                            value: '894615786138787941',
                         }
                     ]
-                }
-            ]
-
-            let role = message.guild.roles.cache.get('914925531529609247')
-
-            if (!role)
-                return message.reply(`${e.Deny} | Eu não achei o cargo de novidades.`)
+                }]
+            }
 
             return message.channel.send({
-                content: `${e.Info} | Obtendo o cargo ${role}, você ficará por dentro de todas as novidades que a Saphire's Team anunciar.`,
-                components: button
+                content: `${e.Info} | Clique no cargo que você quer receber. Para remover, basta clicar novamente na mesma opção.`,
+                components: [selectMenuObject]
             })
 
         }

@@ -62,7 +62,7 @@ module.exports = {
 
         async function newBetRoll() {
 
-            let amount = parseInt(args[2]?.replace(/k/g, '000'))?.toFixed(0),
+            let amount = parseInt(args[2]?.replace(/k/g, '000')?.toFixed(0)) || 0,
                 numberChoice = parseInt(args[1]),
                 diceNumbers = [1, 2, 3, 4, 5, 6]
 
