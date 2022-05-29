@@ -29,7 +29,6 @@ module.exports = model("User", new Schema({
         Bug: Number,
         Daily: Number,
         Cu: Number,
-        Roleta: Number,
         Esmola: Number,
         Work: Number,
         ImagesCooldown: Number,

@@ -13,7 +13,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let userData = await Database.User.findOne({ id: message.author.id }, 'Balance Timeouts.Roleta')
+        let userData = await Database.User.findOne({ id: message.author.id }, 'Balance')
         if (!userData) return message.reply(`${e.Deny} | Opa opa, parece que o Discord não me enviou todos os dados necessários, tente de novo, por favor.`)
 
         let color = await Colors(message.author.id),
@@ -31,8 +31,8 @@ module.exports = {
             ]
         })
 
-        if (client.Timeout(1200000, userData?.Timeouts?.Roleta))
-            return message.channel.send(`${e.Loading} | ${message.author}, as roletas estão voltando ao lugar, volte em: \`${client.GetTimeout(1200000, userData.Timeouts?.Roleta)}\``)
+        if (Database.Cache.get(`Roleta.${message.author.id}`))
+            return message.channel.send(`${e.Warn} | ${message.author}, você já tem uma roleta rodando, não?`)
 
         let valor = parseInt(args[0].replace(/k/g, '000')),
             money = userData?.Balance || 0
@@ -56,7 +56,7 @@ module.exports = {
             if (money <= 0)
                 return message.reply(`${e.Deny} | Você não tem dinheiro para jogar.`)
 
-            Database.SetTimeout(message.author.id, 'Timeouts.Roleta')
+            Database.Cache.set(`Roleta.${message.author.id}`, true)
 
             let msg = await message.reply(`${e.QuestionMark} | Você confirma apostar todo o seu dinheiro no valor de **${money || 0} ${moeda}**?`),
                 emojis = ['✅', '❌'],
@@ -79,19 +79,17 @@ module.exports = {
                     validate = true
                     return collector.stop()
 
-                } else {
-
-                    Database.delete(message.author.id, 'Timeouts.Roleta')
-                    return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
                 }
 
+                Database.Cache.delete(`Roleta.${message.author.id}`)
+                return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
             })
 
             collector.on('end', () => {
 
                 if (validate) return
 
-                Database.delete(message.author.id, 'Timeouts.Roleta')
+                Database.Cache.delete(`Roleta.${message.author.id}`)
                 return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
 
             })
@@ -101,13 +99,14 @@ module.exports = {
         async function StartNewRol(value) {
 
             Database.subtract(message.author.id, value)
-            Database.SetTimeout(message.author.id, 'Timeouts.Roleta')
+            Database.Cache.set(`Roleta.${message.author.id}`, true)
 
             const msg = await message.channel.send(`${e.Loading} | ${message.author} iniciou um jogo na roleta no valor de **${value?.toFixed(0)} ${moeda}**...`)
 
             let result = Math.floor(Math.random() * 100)
             setTimeout(() => {
 
+                Database.Cache.delete(`Roleta.${message.author.id}`)
                 if (result <= 20) return AddMoneyVictory(value, msg)
                 if (result > 60) return GiveBackMoneyDraw(value, msg)
                 return SubtractMoneyLose(value, msg)
@@ -150,8 +149,7 @@ module.exports = {
 
         function GiveBackMoneyDraw(prize, msg) {
             Database.add(message.author.id, prize)
-            Database.delete(message.author.id, 'Timeouts.Roleta')
-            return msg.edit(`${e.Nagatoro} | **EMPATE!** | ${message.author} jogou na roleta e empatou. O dinheiro foi retornado e o timeout zerado.`).catch(() => { })
+            return msg.edit(`${e.Nagatoro} | **EMPATE!** | ${message.author} jogou na roleta e empatou. O dinheiro foi retornado a sua conta.`).catch(() => { })
         }
     }
 }

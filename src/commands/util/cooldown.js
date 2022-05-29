@@ -33,7 +33,6 @@ module.exports = {
             Porquinho = timeouts.Porquinho,
             Work = timeouts.Work,
             Cu = timeouts.Cu,
-            Roleta = timeouts.Roleta,
             Bitcoin = timeouts.Bitcoin,
             Rep = timeouts.Rep,
             Vip = {
@@ -41,7 +40,7 @@ module.exports = {
                 TimeRemaing: data.Vip.TimeRemaing || 0,
                 Permanent: data.Vip.Permanent
             },
-            TDaily, TPig, TWork, TRestoreDividas, TCu, TRoleta, TBit, TLikes, TVip,
+            TDaily, TPig, TWork, TRestoreDividas, TCu, TBit, TLikes, TVip,
             TimeRestoreDividas = clientTimeouts.RestoreDividas
 
         // Timeout Daily
@@ -58,9 +57,6 @@ module.exports = {
 
         // Timeout Cu
         TCu = cooldown(600000, Cu)
-
-        // Timeout Roleta
-        TRoleta = cooldown(1200000, Roleta)
 
         // Timeout Bitcoin
         TBit = cooldown(7200000, Bitcoin)
@@ -100,10 +96,6 @@ module.exports = {
                         {
                             name: `${e.PepeOk} ${prefix}cu`,
                             value: TCu || `\`Você não deveria ver essa mensagem... Usa "${prefix}bug", por favor?\``
-                        },
-                        {
-                            name: `🎫 ${prefix}roleta`,
-                            value: TRoleta || `\`Você não deveria ver essa mensagem... Usa "${prefix}bug", por favor?\``
                         },
                         {
                             name: `${e.BitCoin} ${prefix}bitcoin`,
