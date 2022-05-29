@@ -95,7 +95,7 @@ async function start(MessageId, Guild, ChannelId) {
         let vencedoresMapped = vencedores.map(memberId => `${GetMember(Guild, memberId, MessageId)}`)
 
         Channel.send({
-            content: `${e.Notification} | ${vencedoresMapped.join(', ')}`,
+            content: `${e.Notification} | ${[Sponsor, ...vencedores].map(id => Channel.guild.members.cache.get(id)).join(', ').slice(0, 4000)}`,
             embeds: [
                 new MessageEmbed()
                     .setColor('GREEN')
