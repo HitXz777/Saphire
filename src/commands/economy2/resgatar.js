@@ -7,7 +7,7 @@ module.exports = {
     category: 'economy',
     emoji: `${e.MoneyWings}`,
     usage: '<resgatar>',
-    description: 'Resgate seu dinheiro em cache',
+    description: 'Resgate códigos VIP',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 

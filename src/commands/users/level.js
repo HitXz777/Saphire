@@ -152,7 +152,7 @@ module.exports = {
         async function build() {
             data.level = userData.Level || 0
             data.exp = userData.Xp || 0
-            data.xpNeeded = parseInt((userData.Level || 0) * 275)
+            data.xpNeeded = parseInt((userData.Level || 1) * 275)
 
             let usersAllData = Database.Cache.get('rankLevel') || []
 
