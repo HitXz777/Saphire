@@ -5,15 +5,8 @@ const { DatabaseObj: { config } } = require('../../../modules/functions/plugins/
     e = Database.Emojis,
     dailyPrizes = require('../../../modules/functions/plugins/dailyPrizes')
 
-module.exports = {
-    name: 'daily',
-    aliases: ['d', 'diário', 'diario', 'c', 'claim', 'claim'],
-    category: 'economy',
-    emoji: `${e.Coin}`,
-    usage: '<daily>',
-    description: 'Pegue uma recompensa diária',
-
-    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
+class Daily {
+    async execute(client, message, args, prefix, MessageEmbed, Database) {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Timeouts DailyCount'),
             dailyTimeout = authorData?.Timeouts?.Daily || 0,
@@ -143,8 +136,21 @@ module.exports = {
             if (count === 0)
                 return message.reply(`${e.Info} | Você não tem nenhum dia consecutivo contabilizado.`)
 
-                return message.reply(`${e.Info} | Atualmente, você resgatou **${count - 1}** prêmios diários consecutivos.`)
+            return message.reply(`${e.Info} | Atualmente, você resgatou **${count - 1}** prêmios diários consecutivos.`)
         }
 
+    }
+}
+
+module.exports = {
+    name: 'daily',
+    aliases: ['d', 'diário', 'diario', 'c', 'claim', 'claim'],
+    category: 'economy',
+    emoji: `${e.Coin}`,
+    usage: '<daily>',
+    description: 'Pegue uma recompensa diária',
+
+    execute: async (client, message, args, prefix, MessageEmbed, Database) => {
+        return new Daily().execute(client, message, args, prefix, MessageEmbed, Database)
     }
 }

@@ -41,7 +41,7 @@ module.exports = {
                         .addFields(
                             {
                                 name: `${e.QuestionMark} Como funciona?`,
-                                value: 'O balão vai voando e voando carregando o Pikachu e a distância vai aumentando. Se ele estourar, você perde. Se você cancelar antes dele estourar, você ganha metade do valor da sua aposta vezes o número da distância que você parou o voo.'
+                                value: 'O Pikachu vai correndo e correndo e a distância vai aumentando. Se ele fugir, você perde. Se você pegar ele antes, você ganha metade do valor da sua aposta vezes o número da distância que você parou o voo.'
                             },
                             {
                                 name: `${e.Stonks} 1.8`,

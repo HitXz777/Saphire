@@ -19,7 +19,6 @@ module.exports = {
         if (['delete', 'deletar', 'del', 'apagar', 'excluir'].includes(args[0]?.toLowerCase())) return DeleteGiveaway()
         if (['reroll', 'resortear'].includes(args[0]?.toLowerCase())) return Reroll()
         if (['finalizar', 'finish'].includes(args[0]?.toLowerCase())) return FinishGiveaway()
-        if (['info', 'help', 'ajuda', 'i', 'h'].includes(args[0]?.toLowerCase())) return GiveawayInfo()
         if (['setchannel', 'config'].includes(args[0]?.toLowerCase())) return ConfigGiveawayChannel()
         if (['reset', 'resetar'].includes(args[0]?.toLowerCase())) return ResetGiveawayTime()
 
