@@ -230,6 +230,7 @@ async function BuyingAway(message, prefix, args, money, color, moeda, user) {
         if (Consumiveis >= Limit) return message.reply(`${e.Deny} | Você já atingiu o seu limite de ${Emoji} ${NomeUser}.`)
         if (!quantia) return message.reply(`${e.QuestionMark} | Quantas ${NomeUser} você quer comprar? \`${prefix}buy ${NomeUser} quantidade\``)
         if (isNaN(quantia)) return message.reply(`${e.Deny} | O valor informado não é um número.`)
+        if (quantia <= 0) return message.reply(`${e.Deny} | Você não pode estar falando sério, né? Uma compra negativa?`)
         if (money <= 0) return message.reply(`${e.Deny} | ${message.author}, você não possui dinheiro na carteira.`)
         let q = quantia * Price
         let check = quantia + Consumiveis
