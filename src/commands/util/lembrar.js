@@ -71,7 +71,7 @@ module.exports = {
             components: buttons
         })
 
-        let collector = msg.createMessageComponentCollector({
+    let collector = msg.createMessageComponentCollector({
             filter: int => int.user.id === message.author.id,
             idle: 60000,
             errors: ['idle']

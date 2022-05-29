@@ -305,12 +305,12 @@ module.exports = {
                             .addFields(
                                 {
                                     name: '🆕 Novidades',
-                                    value: `**${prefix}zeppelin** - Novo comando de apostas\n**${prefix}sticker** - Adicione, delete e edite figurinhas no servidor\n**${prefix}avatar** - Um pequeno upgrade\n**${prefix}signo** - Rework para melhor usabilidade\n**${prefix}bet** - Adição do **Global Bet System**\n**${prefix}warn** - Sistema Avançado de Warns\n**${prefix}flag** - Novo jogo com sistema automático\n**${prefix}quiz** Reword e novo modo *Anime Theme*`
+                                    value: `**${prefix}quiz** Reword e novo modo *Anime Theme*\nAlguns comandos receberam os seus Modals: \`${prefix}forca | ${prefix}reminder | ${prefix}bug\` entre outros...`
                                 },
-                                {
-                                    name: '⛔ Remoção',
-                                    value: `**${prefix}banner** - Comando integrado ao \`${prefix}avatar\`\n**${prefix}coinflip** - Comando movido para \`economy\``
-                                },
+                                // {
+                                //     name: '⛔ Remoção',
+                                //     value: ''
+                                // },
                                 {
                                     name: `${e.bug} Bugs`,
                                     value: `QUIZ - Logical Skip End - ${e.Check} Fixed | \`03/03/2022\`\nLEVEL - Infinity Loading - ${e.Check} Fixed | \`09/05/2022\`\nCLICK - Delay Response - ${e.Check} Fixed | \`22/05/2022\`\nRASPADINHA - Multiple Channels Interactions - ${e.Check} Fixed | \`22/05/2022\``
