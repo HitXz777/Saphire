@@ -156,12 +156,13 @@ module.exports = {
 
             let usersAllData = Database.Cache.get('rankLevel') || []
 
-            if (!usersAllData || usersAllData.length === 0 || !usersAllData.find(d => d.id === user.id)) {
-                data.rank = 'N/A'
-                return
-            }
+            if (!usersAllData || usersAllData.length === 0)
+                return data.rank = 'N/A'
 
-            data.rank = usersAllData.findIndex(author => author?.id === user.id) + 1 || '100^'
+            if (!usersAllData.find(d => d.id === user.id))
+                return data.rank = '2000^'
+
+            data.rank = usersAllData.findIndex(author => author?.id === user.id) + 1 || '2000^'
             return
         }
 

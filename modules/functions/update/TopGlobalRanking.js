@@ -86,13 +86,13 @@ async function TopGlobalRanking() {
 
 async function globalSaveData(Users) {
 
-    let UsersArray = []
+    let rank = { level: [], money: [] }
 
-    Users.map(data => UsersArray.push({ id: data.id || 0, Level: data.Level || 0, Xp: data.Xp || 0, Balance: data.Balance || 0 }))
-    if (!UsersArray.length) return
+    Users.filter(data => data.Level > 0).map(data => rank.level.push({ id: data.id || 0, Level: data.Level || 0, Xp: data.Xp || 0 }))
+    Users.filter(data => data.Balance > 0).map(data => rank.money.push({ id: data.id || 0, Balance: data.Balance || 0 }))
 
-    let rankLevel = UsersArray.filter(d => d.Level > 0).sort((a, b) => b.Level - a.Level).slice(0, 100)
-    let rankBalance = UsersArray.filter(d => d.Balance > 0).sort((a, b) => b.Balance - a.Balance).slice(0, 100)
+    let rankLevel = rank.level.sort((a, b) => b.Level - a.Level).slice(0, 2000)
+    let rankBalance = rank.money.sort((a, b) => b.Balance - a.Balance).slice(0, 2000)
 
     Database.Cache.set('rankLevel', rankLevel)
     Database.Cache.set('rankBalance', rankBalance)

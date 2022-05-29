@@ -6,7 +6,6 @@ async function selectMenuFunctions(interaction, client) {
 
     let value = values[0]
 
-    console.log(values)
     switch (value) {
         case 'newGiveaway': newGiveaway(); break;
         case '914925531529609247':

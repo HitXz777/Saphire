@@ -1,8 +1,8 @@
 const client = require('../../../index'),
-    { DatabaseObj: { e } } = require('../plugins/database'),
     { MessageEmbed } = require('discord.js'),
     data = require('../plugins/data'),
-    Database = require('../../classes/Database')
+    Database = require('../../classes/Database'),
+    { Emojis: e } = Database
 
 async function GiveawaySystem() {
 
@@ -92,9 +92,10 @@ async function start(MessageId, Guild, ChannelId) {
             return
         }
 
-        let vencedoresMapped = vencedores.map(memberId => `${GetMember(Guild, memberId, MessageId)}`).join('\n')
+        let vencedoresMapped = vencedores.map(memberId => `${GetMember(Guild, memberId, MessageId)}`)
 
         Channel.send({
+            content: `${e.Notification} | ${vencedoresMapped.join(', ')}`,
             embeds: [
                 new MessageEmbed()
                     .setColor('GREEN')
@@ -103,7 +104,7 @@ async function start(MessageId, Guild, ChannelId) {
                     .addFields(
                         {
                             name: `${e.CoroaDourada} Vencedores`,
-                            value: `${vencedoresMapped || 'Ninguém'}`,
+                            value: `${vencedoresMapped.join('\n') || 'Ninguém'}`,
                             inline: true
                         },
                         {

@@ -1,6 +1,46 @@
 {
     "Flags": [
         {
+            "flag": "🇱🇦",
+            "country": "laos",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980082084456579132/Flag_of_Laos.svg.png"
+        },
+        {
+            "flag": "🇻🇳",
+            "country": "vietnã",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980078862488698900/h_19.png"
+        },
+        {
+            "flag": "🇬🇼",
+            "country": "guiné-bissau",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980078845933801522/h_18.png"
+        },
+        {
+            "flag": "🇧🇪",
+            "country": "bélgica",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980078798320066631/h_17.png"
+        },
+        {
+            "flag": "🇨🇿",
+            "country": "república tcheca",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980078771216470077/h_16.png"
+        },
+        {
+            "flag": "🇦🇴",
+            "country": "angola",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980078742577766450/h_4.webp"
+        },
+        {
+            "flag": "🇦🇺",
+            "country": "austrália",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980078718963822692/h_3.webp"
+        },
+        {
+            "flag": "🇸🇮",
+            "country": "eslovênia",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980078697128284170/h_15.png"
+        },
+        {
             "flag": "🇹🇩",
             "country": "chade",
             "image": "https://media.discordapp.net/attachments/975974003229474846/978655810752221224/h_14.png"
@@ -139,11 +179,6 @@
             "flag": "🇵🇪",
             "country": "peru",
             "image": "https://media.discordapp.net/attachments/913429397678198795/976305647027118130/30a39a44c2877bc9a0e780730ba9c36d.jpg"
-        },
-        {
-            "flag": "🇸🇮",
-            "country": "eslovênia",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976269162508857374/d82e37202b3153a8a150a607efb51b0f.jpg"
         },
         {
             "flag": "🇺🇬",
@@ -376,11 +411,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976073249182068756/5618928c4def0bc56ca317a24ed3ff52.jpg"
         },
         {
-            "flag": "🇧🇪",
-            "country": "bélgica",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976073163186262067/f2971d5628894fd807eb69e04244e50d.jpg"
-        },
-        {
             "flag": "🇧🇧",
             "country": "barbados",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976073037814321182/14411d1f7181e4239572c24ae63523c2.jpg"
@@ -416,11 +446,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976072674008784936/56b41a97c1d0783d5efc6c9b1a0a7ef3.jpg"
         },
         {
-            "flag": "🇦🇺",
-            "country": "austrália",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976072553917452348/042ac37a35e4c602bbb3c31d2cc875d8.jpg"
-        },
-        {
             "flag": "🇦🇲",
             "country": "armênia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976072442604834826/ebe6486325f583da80609c124002982f.jpg?width=729&height=365"
@@ -434,11 +459,6 @@
             "flag": "🇸🇦",
             "country": "arábia saudita",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976072077905907772/74bf821f2e4b500bd458a8f07585082a.jpg?width=727&height=484"
-        },
-        {
-            "flag": "🇦🇴",
-            "country": "angola",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976071980858109982/d3ef74e48e1164551ba88f340d3a27bb.jpg"
         },
         {
             "flag": "🇦🇩",
@@ -481,11 +501,6 @@
             "image": "https://media.discordapp.net/attachments/976212242611728424/976215757086150728/2e8123204ebac307d254c12e7e14c69f.jpg"
         },
         {
-            "flag": "🇬🇼",
-            "country": "guiné-bissau",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976079268960428042/e94d56e4b1c3de6ea14c3bda3978026c.jpg"
-        },
-        {
             "flag": "🇲🇭",
             "country": "ilhas marshall",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976079878090805308/88854f57ebb2a988fcbbec032266ab86.jpg"
@@ -494,11 +509,6 @@
             "flag": "🇮🇩",
             "country": "indonésia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976080023461175356/29a06ecdb7423ab7448be567dffd00d3.jpg?width=705&height=404"
-        },
-        {
-            "flag": "🇱🇦",
-            "country": "laos",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976080804486725632/47fe7f62afecde27363e10de67527dc9.jpg"
         },
         {
             "flag": "🇱🇾",
@@ -649,11 +659,6 @@
             "flag": "🇨🇫",
             "country": "república centro-africana",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976234285726044200/cf.png"
-        },
-        {
-            "flag": "🇨🇿",
-            "country": "república tcheca",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976234417930518558/255px-Flag_of_the_Czech_Republic.svg.png"
         },
         {
             "flag": "🇨🇩",
@@ -824,11 +829,6 @@
             "flag": "🇻🇪",
             "country": "venezuela",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976242013173329950/2208e50c596c0b31ab695f7c23f932d8.jpg"
-        },
-        {
-            "flag": "🇻🇳",
-            "country": "vietnã",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976242129284255764/3440feb1f087ede36f48fa102af8181f.jpg?width=646&height=430"
         },
         {
             "flag": "🇿🇲",

@@ -17,7 +17,9 @@ module.exports = {
         let msg = await message.reply(`${e.Loading} | Obtendo informações e construindo...`),
             user = client.getUser(client, message, args, 'user'),
             embed = new MessageEmbed(),
-            moeda = await Moeda(message)
+            moeda = await Moeda(message),
+            timingToRefresh = Database.Cache.get('GlobalRefreshTime'),
+            timing = client.GetTimeout(1800000, timingToRefresh)
 
         if (!args[0] || ['help', 'info', 'ajuda'].includes(args[0]?.toLowerCase())) {
 
@@ -103,8 +105,6 @@ module.exports = {
                         },
                     ])
                 )
-            let timingToRefresh = Database.Cache.get('GlobalRefreshTime'),
-                timing = client.GetTimeout(1800000, timingToRefresh)
 
             msg.edit({
                 embeds: [
@@ -396,7 +396,7 @@ module.exports = {
 
             if (index === -1) users = await Database.User.find({}, 'id Xp Level')
 
-            let RankingSorted = index === -1 ? users : users.filter(d => d.Level > 0).sort((a, b) => b.Level - a.Level)
+            let RankingSorted = index > 0 ? users : users.filter(d => d.Level > 0).sort((a, b) => b.Level - a.Level)
             index = RankingSorted.findIndex(author => author.id === message.author.id)
             let data = RankingSorted.map((u, i) => { return { i: i, id: u.id, xp: u.Xp, XpNeeded: parseInt(u.Level * 275)?.toFixed(0), level: u.Level } })
 
@@ -442,13 +442,15 @@ module.exports = {
 
                 let Num = parseInt(args[1] || 0) - 1
 
-                if (['me', 'eu'].includes(args[1]?.toLowerCase())) Num = AuthorRank
+                if (['me', 'eu'].includes(args[1]?.toLowerCase())) Num = myrank
 
                 if (user) Num = data.findIndex(u => u.id === user.id)
 
                 if (!data[Num]) {
-                    users = await Database.User.find({}, 'id Level')
-                    data = users.filter(d => d.Balance > 0).sort((a, b) => b.Level - a.Level)
+                    users = await Database.User.find({}, 'id Level Xp')
+                    data = users.filter(d => d.Level > 0).sort((a, b) => b.Level - a.Level)
+                    if (user) Num = data.findIndex(u => u.id === user.id)
+                    if (['me', 'eu'].includes(args[1]?.toLowerCase())) Num = data.findIndex(u => u.id === message.author.id)
                 }
 
                 if (!data[Num])
@@ -456,7 +458,7 @@ module.exports = {
 
                 let InLocaleRanking = data.splice(Num, 1)
 
-                return msg.edit({ content: InLocaleRanking.map(user => `**${Medals(Num)} ${GetUser(user.id)}** - \`${user.id}\`\n${e.RedStar} ${user.level || 0} *(${user.xp}/${user.XpNeeded})*`).join('\n') }).catch(() => { })
+                return msg.edit({ content: InLocaleRanking.map(user => `**${Medals(Num)} ${GetUser(user.id)}** - \`${user.id}\`\n${e.RedStar} ${user.level || user.Level || 0} *(${user.xp || user.Xp || 0}/${user.XpNeeded || parseInt(user.Xp * 275) || 0})*`).join('\n') }).catch(() => { })
 
             }
 
@@ -472,7 +474,7 @@ module.exports = {
 
             if (index === -1) users = await Database.User.find({}, 'id Balance')
 
-            let RankingSorted = index === -1 ? users : users.filter(d => d.Balance > 0).sort((a, b) => b.Balance - a.Balance)
+            let RankingSorted = index >= 0 ? users : users.filter(d => d.Balance > 0).sort((a, b) => b.Balance - a.Balance)
             index = RankingSorted.findIndex(author => author.id === message.author.id)
             let data = RankingSorted.map((u, i) => { return { i: i, id: u.id, Balance: u.Balance } })
 
@@ -528,6 +530,8 @@ module.exports = {
                 if (!data[Num]) {
                     users = await Database.User.find({}, 'id Balance')
                     data = users.filter(d => d.Balance > 0).sort((a, b) => b.Balance - a.Balance)
+                    if (user) Num = data.findIndex(u => u.id === user.id)
+                    if (['me', 'eu'].includes(args[1]?.toLowerCase())) Num = data.findIndex(u => u.id === message.author.id)
                 }
 
                 if (!data[Num])
