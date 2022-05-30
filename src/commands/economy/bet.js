@@ -11,7 +11,11 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        return new Bet().execute(client, message, args, prefix, MessageEmbed, Database)
+        let member = client.getUser(client, message, args, 'member')        
+
+        if (member) return new Bet().betWithUser(client, message, args, prefix, MessageEmbed, member)
+
+        return new Bet().execute(client, message, args, prefix, MessageEmbed)
 
     }
 }
