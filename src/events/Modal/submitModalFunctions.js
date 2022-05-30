@@ -1,10 +1,12 @@
 const Database = require('../../../modules/classes/Database'),
-    { e } = require('../../../JSON/emojis.json'),
+    { Emojis: e, Config: config } = Database,
     { eightyYears, Now, getUser, day } = require('../plugins/modalPlugins')
 
 async function submitModalFunctions(interaction, client) {
 
-    const { customId, fields, user, channel, guild } = interaction
+    const { customId, fields, user, channel, guild } = interaction,
+        guildData = await Database.Guild.findOne({ id: guild.id }, 'Prefix'),
+        prefix = guildData?.Prefix || client.prefix
 
     switch (customId) {
         case 'setStatusModal': setStatusModal(); break;
@@ -14,6 +16,7 @@ async function submitModalFunctions(interaction, client) {
         case 'newLetter': newLetter(); break;
         case 'newReminder': newReminder(); break;
         case 'createNewGiveaway': createNewGiveaway(); break;
+        case 'lettersReport': lettersReport(); break;
         default:
             break;
     }
@@ -584,14 +587,15 @@ async function submitModalFunctions(interaction, client) {
         let letterContent = fields.getTextInputValue('letterContent'),
             isError = false
 
-        let userLetted = getUser(usernameData, client)
+        let userLetted = getUser(usernameData, client),
+            passCode = require('../../../modules/functions/plugins/PassCode')
 
         if (!userLetted)
             return await interaction.reply({
                 content: `❌ | Não foi possível achar ninguém com o dado informado: "${usernameData}"`,
                 embeds: [{
                     color: client.blue,
-                    title: '📝 Lette\'s Content',
+                    title: '📝 Letter\'s Content',
                     description: `\`\`\`txt\n${letterContent}\n\`\`\``
                 }],
                 ephemeral: true
@@ -615,7 +619,17 @@ async function submitModalFunctions(interaction, client) {
                 ephemeral: true
             })
 
-        let isAnonymous = ['sim', 'yes'].includes(anonymous?.toLowerCase()) ? true : false
+        let userData = await Database.User.findOne({ id: userLetted.id }, 'Letters.Blocked'),
+            isBlock = userData?.Letters?.Blocked
+
+        if (isBlock)
+            return await interaction.reply({
+                content: `❌ | Este usuário bloqueou o envio de cartas. Você vai precisar pedir para que ${userLetted.tag} libere o envio usando o comando '${prefix}carta block'`,
+                ephemeral: true
+            })
+
+        let isAnonymous = ['sim', 'yes'].includes(anonymous?.toLowerCase()) ? true : false,
+            ID = passCode(7).toLocaleUpperCase()
 
         try {
 
@@ -624,7 +638,7 @@ async function submitModalFunctions(interaction, client) {
                 embeds: [{
                     color: client.blue,
                     title: `📨 ${client.user.username}'s Letters System`,
-                    description: `ℹ Está carta foi enviada por: ${isAnonymous ? '\`Usuário anônimo\`' : `${user.tag} - ${user.id}`}`,
+                    description: `ℹ Esta carta foi enviada por: ${isAnonymous ? '\`Usuário anônimo\`' : `${user.tag} - ${user.id}`}`,
                     fields: [{
                         name: `📝 Conteúdo da carta`,
                         value: `\`\`\`txt\n${letterContent}\n\`\`\``
@@ -641,6 +655,7 @@ async function submitModalFunctions(interaction, client) {
             Database.SetTimeout(user.id, 'Timeouts.Letter')
 
             Database.pushUserData(user.id, 'Letters.Sended', {
+                letterId: ID,
                 to: userLetted.id,
                 guildId: guild.id,
                 anonymous: isAnonymous,
@@ -649,6 +664,7 @@ async function submitModalFunctions(interaction, client) {
             })
 
             Database.pushUserData(userLetted.id, 'Letters.Recieved', {
+                letterId: ID,
                 from: user.id,
                 guildId: guild.id,
                 anonymous: isAnonymous,
@@ -679,6 +695,46 @@ async function submitModalFunctions(interaction, client) {
             })
         }
 
+    }
+
+    async function lettersReport() {
+
+        let data = await Database.Guild.findOne({ id: guild.id }, 'Prefix'),
+            prefix = data.Prefix || client.prefix
+
+        let letterId = fields.getTextInputValue('letterId'),
+            reason = fields.getTextInputValue('reason')
+
+        let Channel = client.channels.cache.get(config.letterChannelReport)
+
+        if (!Channel)
+            return await interaction.reply({
+                content: '❌ | Não foi possível contactar o canal de reports no servidor principal.',
+                ephemeral: true
+            })
+
+        Channel.send({
+            embeds: [{
+                color: client.red,
+                title: `${e.Loud} Novo reporte de carta recebido`,
+                fields: [
+                    {
+                        name: '🆔 ID da Carta/Usuário',
+                        value: `\`${letterId}\``
+                    },
+                    {
+                        name: `${e.Info} Motivo do reporte`,
+                        value: `\`\`\`txt\n${reason}\`\`\``
+                    }
+                ],
+                footer: { text: `ID do usuário: ${user.id}` }
+            }]
+        })
+
+        return await interaction.reply({
+            content: `✅ | Seu reporte foi enviado com sucesso! Caso você não queira receber mais cartas através da Saphire, use o comando \'${prefix}carta block\'. A Staff da ${client.user.username} analisará o ocorrido e punirá o responsável a altura.`,
+            ephemeral: true
+        })
     }
 
 }

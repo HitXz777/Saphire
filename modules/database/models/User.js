@@ -16,6 +16,7 @@ module.exports = model("User", new Schema({
     CompetitiveMemoryCount: Number,
     ForcaCount: Number,
     Letters: {
+        Blocked: Boolean,
         Sended: Array,
         Recieved: Array
     },

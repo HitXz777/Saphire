@@ -13,9 +13,9 @@ const SaphireClientConfiguration = {
 class Saphire extends Client {
     constructor() {
         super(SaphireClientConfiguration)
+        this.prefix = '-'
         this.commands = new Collection()
         this.aliases = new Collection()
-        this.prefix = '-'
         this.blue = '#246FE0'
         this.red = '#ED4245'
         this.green = '#57f287'
