@@ -12,6 +12,7 @@ async function selectMenuFunctions(interaction, client) {
         case 'newReminder': newReminder(interaction); break;
         case 'sendNewLetter': sendNewLetter(); break;
         case 'report': letterReport(); break;
+        case 'reportTransactions': reportTransactions(); break;
         case '914925531529609247':
         case '980293085298839572':
         case '920012840356683776':
@@ -179,6 +180,15 @@ async function selectMenuFunctions(interaction, client) {
         }
 
         return await interaction.showModal(modal)
+
+    }
+
+    async function reportTransactions() {
+
+        return await interaction.reply({
+            content: 'Esta função está em construção.',
+            ephemeral: true
+        })
 
     }
 
