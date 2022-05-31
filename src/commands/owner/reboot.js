@@ -65,10 +65,10 @@ module.exports = {
             function Reboot(msg) {
 
                 msg?.edit(`${e.Loading} | Reiniciando em breve...`).catch(() => { })
-                return
+
                 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-                fetch(`https://discloud.app/status/bot/${client.user.id}/restart`, {
+                fetch(`https://discloud.app/api/v2/app/${client.user.id}/restart`, {
                     method: 'POST',
                     headers: {
                         "api-token": process.env.DISCLOUD_API_TOKEN

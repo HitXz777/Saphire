@@ -82,7 +82,6 @@
         "Taxa": "<:taxa:932355661713522738>",
         "SaphireTimida": "<:saphire_timida:981009908621275186>",
         "Admin": "<:admin:935708553950396447>",
-        "SaphireOk": "<:saphiok:935899036576256090>",
         "Ram": "<:memoryram:936239809209438238>",
         "Mercadopago": "<:mercadopago:936239848472342530>",
         "Picpay": "<:picpay:936240807202132038>",
@@ -120,7 +119,6 @@
         "SaphireObs": "<:saphire_gatinha:981009896067694632>",
         "BagMoney2": "💰",
         "SaphireCoberta": "<:saphire_coberta:979111435814711297>",
-        "PepeOk": "<:saphire_ok:981009921913024522>",
         "pikachuRunning": "<a:running_pikachu:979193158934085662>",
         "pikachuInBrush": "<:pikachu_lurk:979193889657339974>",
         "pikachuLose": "<a:pikachu_lose:979196427399999518>",
@@ -138,6 +136,7 @@
         "GadoDemais": "<a:Y2_GADO_:937562078955327529>",
         "Boost": "<a:boost:981022657816461322>",
         "CoroaDePrata": "<a:PlatineCrow:937562085712330833>",
-        "thirdcrown": "<a:BrownCrown:981023070229762160>"
+        "thirdcrown": "<a:BrownCrown:981023070229762160>",
+        "SaphireOk": "<:saphire_ok:981009921913024522>"
     }
 }

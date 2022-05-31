@@ -94,7 +94,7 @@ module.exports = {
                             value: TPig || `\`Você não deveria ver essa mensagem... Usa "${prefix}bug", por favor?\``
                         },
                         {
-                            name: `${e.PepeOk} ${prefix}cu`,
+                            name: `${e.SaphireOk} ${prefix}cu`,
                             value: TCu || `\`Você não deveria ver essa mensagem... Usa "${prefix}bug", por favor?\``
                         },
                         {
