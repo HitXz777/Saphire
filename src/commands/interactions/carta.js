@@ -162,7 +162,7 @@ module.exports = {
             }
 
             if (!control.atualEmbeds?.length)
-                return msg.edit({ content: `${e.Deny} | Você não tem nenhuma carta ${customId === 'sended' ? 'recebida' : 'enviada'}.`, embeds: [], components: [selectMenuObject] })
+                return msg.edit({ content: `${e.Deny} | Você não tem nenhuma carta ${customId === 'sended' ? 'enviada' : 'recebida'}.`, embeds: [], components: [selectMenuObject] })
 
             if (control.atualEmbeds?.length === 1)
                 return msg.edit({ embeds: [control.atualEmbeds[0]], components: [selectMenuObject] })

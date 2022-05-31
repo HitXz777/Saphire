@@ -55,6 +55,7 @@ Bet.prototype.execute = async (client, message, args, prefix, MessageEmbed) => {
 
         BetEmbed
             .setDescription(`Valor da aposta: ${atualPrize} ${moeda}\n**Participantes**\n${BetUsersEmbed()}\n \n💰 Prêmio acumulado: ${(BetUsers?.length || 0) * quantia}`)
+            .addField('⠀', 'Dinheiro perdido no comando de aposta não será extornado. Cuidado com promessas de jogadores e sua ganância. Uma vez que o dinheiro foi perdido, você não o terá de volta por meios de reclamações.')
 
         let buttons = {
             type: 1,
@@ -829,14 +830,16 @@ Bet.prototype.betWithUser = async (client, message, args, prefix, MessageEmbed, 
 
     let value = parseInt(args[1]?.replace(/k/g, '000')) || parseInt(args[0]?.replace(/k/g, '000'))
 
+    let authorData = await Database.User.findOne({ id: message.author.id }, 'Balance'),
+        money = authorData?.Balance || 0
+
+    if (['all', 'tudo'].includes(args[1]?.toLowerCase())) value = money
+
     if (!value)
         return message.reply(`${e.Deny} | OPA OPA! Você precisa de diezr um valor para apostar, não acha? Tenta assim: \`${prefix}bet @user <quantia>\``)
 
     if (value <= 0)
         return message.reply(`${e.Deny} | Qual é? Você tem que apostar com um valor acima de 0, não acha?`)
-
-    let authorData = await Database.User.findOne({ id: message.author.id }, 'Balance'),
-        money = authorData?.Balance || 0
 
     if (!money || money <= 0)
         return message.reply(`${e.Deny} | Você não tem dinheiro nenhum... Poxa...`)
@@ -951,3 +954,23 @@ Bet.prototype.betWithUser = async (client, message, args, prefix, MessageEmbed, 
 }
 
 module.exports = Bet
+
+function a() {
+
+    let emojisInDB = Object.entries(e)
+
+    let guild = client.guilds.cache.get('980891407659196567')
+    let supportEmojis = guild.emojis.cache
+
+    supportEmojis.forEach(emoji => {
+        let dbEmoji = emojisInDB.find(data => data[1].includes(emoji.name))
+
+        if (dbEmoji)
+            trade(dbEmoji[0], `<${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`)
+    })
+
+    function trade(nameInDb, emoteDATA) {
+        Database.EmojisJSON.set(nameInDb, emoteDATA)
+    }
+
+}
