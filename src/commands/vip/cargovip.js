@@ -16,7 +16,7 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
-            return message.reply(`${e.Deny} | Este é um comando do meu servidor. Você pode entrar clicando no link:\n${config.ServerLink}`)
+            return message.reply(`${e.Deny} | Este é um comando do meu servidor. Você pode entrar clicando no link:\n${config.SupportServerLink}`)
 
         const Role = await message.guild.roles.cache.find(role => role.id === '903099828945428502'),
             vip = await Vip(message.author.id)

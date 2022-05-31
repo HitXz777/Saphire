@@ -261,7 +261,7 @@ module.exports = {
                     new MessageEmbed()
                         .setColor(client.blue)
                         .setTitle(`${e.ticketRifa} ${client.user.username} Rifa`)
-                        .setDescription(`Seja muito bem vindo*(a)* a **${client.user.username} Rifa**, ${message.author}!\n \nO jogo é fácil. Você pode comprar números da rifa para ter mais chances. Atualmente, o limite é 90 rifas globalmente. *(Com o decorrer do tempo pode aumentar.)*\n \n${e.Info} O resultado da rifa é liberado no [meu servidor](${config.ServerLink}) em duas ocasiões.\n> 1. Todos os números da rifa foram comprados.\n> 2. Meia noite da Sexta-Feira pro Sábado.\n*obs: Atualmente, o limite mínimo para sorteio são de 20 números comprados, o máximo é 90.*`)
+                        .setDescription(`Seja muito bem vindo*(a)* a **${client.user.username} Rifa**, ${message.author}!\n \nO jogo é fácil. Você pode comprar números da rifa para ter mais chances. Atualmente, o limite é 90 rifas globalmente. *(Com o decorrer do tempo pode aumentar.)*\n \n${e.Info} O resultado da rifa é liberado no [meu servidor](${config.SupportServerLink}) em duas ocasiões.\n> 1. Todos os números da rifa foram comprados.\n> 2. Meia noite da Sexta-Feira pro Sábado.\n*obs: Atualmente, o limite mínimo para sorteio são de 20 números comprados, o máximo é 90.*`)
                         .addFields(
                             {
                                 name: `${e.MoneyWings} Compre números`,

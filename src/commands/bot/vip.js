@@ -11,7 +11,7 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const link1Real = 'https://mpago.la/2YbvxZd'
-        const LinkServidor = `${config.ServerLink}`
+        const LinkServidor = `${config.SupportServerLink}`
 
         if (['vantagens'].includes(args[0]?.toLowerCase())) return VantageFunction()
 

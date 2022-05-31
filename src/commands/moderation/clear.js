@@ -50,7 +50,7 @@ module.exports = {
           if (err.code === 50034)
             return message.channel.send(`${e.Warn} | As mensagens acima são velhas demais para eu apagar.`)
 
-          message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.ServerLink}).\n\`${err}\``)
+          message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.SupportServerLink}).\n\`${err}\``)
           Error(message, err)
         })
       }).catch(err => { return message.reply(`${e.Warn} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no meu servidor, link no perfil.\n\`${err}\``) })
@@ -77,11 +77,11 @@ module.exports = {
           if (err.code === 50034)
             return message.channel.send(`${e.Warn} | As mensagens acima são velhas demais para eu apagar.`)
 
-          message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.ServerLink}).\n\`${err}\``)
+          message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.SupportServerLink}).\n\`${err}\``)
           Error(message, err)
         })
       }).catch(err => {
-        message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.ServerLink}).\n\`${err}\``)
+        message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.SupportServerLink}).\n\`${err}\``)
       })
 
     }
@@ -108,7 +108,7 @@ module.exports = {
           return message.channel.send(`${e.Warn} | Houve algum tipo de "erro" na execução:\n\`${err}\``)
         })
       }).catch(err => {
-        message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.ServerLink}).\n\`${err}\``)
+        message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.SupportServerLink}).\n\`${err}\``)
         Error(message, err)
       })
 
@@ -142,7 +142,7 @@ module.exports = {
               return message.channel.send(`${e.Warn} | Alguma mensagem é desconhecida... Osh, o que houve?`)
 
             Error(message, err)
-            return message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.ServerLink}).\n\`${err}\``)
+            return message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.SupportServerLink}).\n\`${err}\``)
           })
           messages += deleteAble.size
           i = false
@@ -179,7 +179,7 @@ module.exports = {
               return message.channel.send(`${e.Warn} | Alguma mensagem é desconhecida... Osh, o que houve?`)
 
             Error(message, err)
-            return message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.ServerLink}).\n\`${err}\``)
+            return message.reply(`${e.Deny} | Aconteceu um erro ao executar este comando, caso não saiba resolver, reporte o problema com o comando \`${prefix}bug\` ou entre no [meu servidor](${config.SupportServerLink}).\n\`${err}\``)
 
           })
 

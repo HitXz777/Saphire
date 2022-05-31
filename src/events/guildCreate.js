@@ -73,6 +73,6 @@ client.on("guildCreate", async (guild) => {
         if (target.id !== client.user.id || !executor)
             return
 
-        return executor.send(`${e.SaphireHi} Oiiee.\n \nJá que foi você que me adicionou no servidor ${guild.name}, quero dizer que você pode personalizar e ativar vários comandos indo no painel \`${config.prefix}help\` na sessão **Configurações** e também em **Servidor**.\n \nQualquer problema, você pode entrar no meu servidor que a Saphire's Team vai te ajudar em tudo.\n \n*Obs: Caso eu tenha saído do servidor, isso quer dizer que o servidor "${guild.name}" está na blacklist.*\n${config.ServerLink}`).catch(() => { })
+        return executor.send(`${e.SaphireHi} Oiiee.\n \nJá que foi você que me adicionou no servidor ${guild.name}, quero dizer que você pode personalizar e ativar vários comandos indo no painel \`${config.prefix}help\` na sessão **Configurações** e também em **Servidor**.\n \nQualquer problema, você pode entrar no meu servidor que a Saphire's Team vai te ajudar em tudo.\n \n*Obs: Caso eu tenha saído do servidor, isso quer dizer que o servidor "${guild.name}" está na blacklist.*\n${config.SupportServerLink}`).catch(() => { })
     }
 })

@@ -12,14 +12,14 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
         
         const link1Real = 'https://mpago.la/2YbvxZd'
-        const LinkServidor = `${config.ServerLink}`
+        const LinkServidor = `${config.SupportServerLink}`
         
         const FaqEmbed = new MessageEmbed()
             .setColor('#246FE0')
             .setTitle(`${e.Info} Perguntas Frequentes`)
             .setURL(`https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=applications.commands%20bot`)
             .setDescription(`${e.SaphireHi} Oie! Aqui é mais ou menos uma Central de Atendimento ao Cliente. Mas não aquelas chatas, ok?\nAqui estão listadas todas as perguntas frequentes que fazem sobre a mim`)
-            .addField(`${e.QuestionMark} | Eu não achei o que eu queria`, `Não tem problemas! Você pode acessar [meu servidor](${config.ServerLink}) e a minha equipe é capaz de te ajudar em tudo! E se for necessário, você pode contactar meu criador.`)
+            .addField(`${e.QuestionMark} | Eu não achei o que eu queria`, `Não tem problemas! Você pode acessar [meu servidor](${config.SupportServerLink}) e a minha equipe é capaz de te ajudar em tudo! E se for necessário, você pode contactar meu criador.`)
 
         const FaqPainel = new MessageActionRow()
             .addComponents(new MessageSelectMenu()
@@ -202,7 +202,7 @@ module.exports = {
                 const TitulosEmbed = new MessageEmbed()
                     .setColor('#246FE0')
                     .setTitle('Títulos')
-                    .setDescription(`${e.SaphireObs} Os títulos são bem díficeis de conseguir. Atualmente, os membros que possuem títulos não passam de 10. Os títulos pode ser obtidos estando em primeiro lugar do ranking, participando de eventos no [servidor principal](${config.ServerLink}) ou sendo da parte da ${client.user.username}'s Team.`)
+                    .setDescription(`${e.SaphireObs} Os títulos são bem díficeis de conseguir. Atualmente, os membros que possuem títulos não passam de 10. Os títulos pode ser obtidos estando em primeiro lugar do ranking, participando de eventos no [servidor principal](${config.SupportServerLink}) ou sendo da parte da ${client.user.username}'s Team.`)
                 msg.edit({ embeds: [TitulosEmbed] }).catch(() => { })
             }
 
@@ -234,7 +234,7 @@ module.exports = {
                 const MoneybackEmbed = new MessageEmbed()
                     .setColor('#246FE0')
                     .setTitle(`${client.user.username} SAPHIRE BANDIDAAAA`)
-                    .setDescription(`Entre no meu [servidor](${config.ServerLink}) e fale com alguém da Saphire\'s Team sobre isso, o dinheiro será extornado.`)
+                    .setDescription(`Entre no meu [servidor](${config.SupportServerLink}) e fale com alguém da Saphire\'s Team sobre isso, o dinheiro será extornado.`)
                 msg.edit({ embeds: [MoneybackEmbed] }).catch(() => { })
             }
 
@@ -247,7 +247,7 @@ module.exports = {
             function Comprovante() {
                 const ComprovanteEmbed = new MessageEmbed()
                     .setTitle(`${e.SaphireObs} Comprovante`)
-                    .setDescription(`Isso é MUITO fácil! Primeiro entre no [meu servidor](${config.ServerLink}) e use o comando \`${prefix}comprovante\` em qualquer canal. O resto vai ser dito a você.`)
+                    .setDescription(`Isso é MUITO fácil! Primeiro entre no [meu servidor](${config.SupportServerLink}) e use o comando \`${prefix}comprovante\` em qualquer canal. O resto vai ser dito a você.`)
                 msg.edit({ embeds: [ComprovanteEmbed] }).catch(() => { })
             }
 

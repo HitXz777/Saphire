@@ -20,10 +20,9 @@ module.exports = {
                 .setTitle(`${e.BlueHeart} Centralzinha de Ajuda da ${client.user.username}`)
                 .setURL(`${SaphireInviteLink}`)
                 .setImage('https://media.discordapp.net/attachments/893361065084198954/939681589724598282/teste.png?width=720&height=223')
-                .setDescription(`Oiiii!!! Acho que já sabe, mas eu sou a Saphire Moon, muito prazer! ${e.SaphireTimida}\nAqui estão todas as informações que você precisa sobre os meus comandos! As que você não achar, você vai encontrar na [Docs Saphire](${config.SaphiDocs})\nMas antes de eu apresentar tudo, quero que conheça minha pequena história!\n \nLá no começo de tudo, eu era apenas uma faísca no meio da poeira do universo, não tinha muita coisa na minha memória. Então, com o tempo eu fui evoluindo e crescendo, mas teve um dia que aconteceu algo bem ruim! ${e.SaphireCry} O universo foi resetado.\nEu sofri e ainda sofro muitas mudanças... Estou sendo recriada, do zero. A cada dia, meu criador me mostra e me ensina algo novo, e com a ajuda de milhares de pessoas em centenas de servidores brincando comigo, eu aprendo e aprendo cada vez mais. Hoje, eu tenho ${client.commands.size || 0} comandos ativos e venho ganhando comandos novos quase todos os dias. E você, o que tem pra me ensinar hoje? ${e.SaphireLove}`)
                 .addField(`${e.Info} Perguntas frequentes`, `Está com alguma dúvida? \`${prefix}faq\``)
                 .addField('🛰️ Global System Notification', `Ative o \`${prefix}logs\` no servidor e aproveite do meu sistema avançado de notificação. Eu vou te avisar desde os bans/kicks até Autoroles com permissões editadas.`)
-                .addField(`${e.SaphireTimida} Saphire`, `Você pode [me adicionar](${SaphireInviteLink}) no seu servidor e também pode entrar no [meu servidor](${config.ServerLink}) pra interagir ou tirar algumas dúvida.`)
+                .addField(`${e.SaphireTimida} Saphire`, `Você pode [me adicionar](${SaphireInviteLink}) no seu servidor e também pode entrar no [meu servidor de suporte](${config.SupportServerLink}) pra tirar algumas dúvida ou quem sabe entrar na [Moon](${config.MoonServerLink}) para se divertir?.`)
                 .addField(`${e.CoroaDourada} Premium Stage`, `Tem interesse em desbloquear comandos únicos? Use \`${prefix}premium\` e descubra mais.`)
                 .addField('⭐ Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
                 .addField(`📄 Documentação`, `https://saphire.gitbook.io/saphire/\n*obs: A documentação da Saphire está incompleta.*`)
@@ -301,7 +300,7 @@ module.exports = {
                         new MessageEmbed()
                             .setColor(client.blue)
                             .setTitle(`⭐ Notas da Última Atualização`)
-                            .setDescription(`Aqui ficam informações da última atualização que eu recebi. Caso queria ver as atualizações antigas, acesse [meu servidor](${config.ServerLink}).`)
+                            .setDescription(`Aqui ficam informações da última atualização que eu recebi. Caso queria ver as atualizações antigas, acesse [meu servidor](${config.SupportServerLink}).`)
                             .addFields(
                                 {
                                     name: '🆕 Novidades',

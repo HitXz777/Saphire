@@ -16,7 +16,7 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
-            return message.reply(`${e.Deny} | Este é um comando privado do meu servidor principal. Você pode entrar se quiser.\n${config.ServerLink}`)
+            return message.reply(`${e.Deny} | Este é um comando privado do meu servidor principal. Você pode entrar se quiser.\n${config.SupportServerLink}`)
 
         let vip = await Vip(message.author.id)
 

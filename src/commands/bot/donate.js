@@ -15,7 +15,7 @@ module.exports = {
             Link1RMercadoPago: 'https://mpago.la/2YbvxZd',
             LinkPicPay: 'https://picpay.me/donatesaphire',
             PixEmail: 'saphirediscord@gmail.com',
-            LinkServidor: `${config.ServerLink}`
+            LinkServidor: `${config.SupportServerLink}`
         }
 
         const DonateEmbed = new MessageEmbed()
