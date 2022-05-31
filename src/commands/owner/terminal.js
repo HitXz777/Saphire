@@ -14,9 +14,12 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const msg = await message.reply(`${e.Loading} | Obtendo os dados necessários...`),
-            terminal = (await axios.get(`https://discloud.app/status/bot/${client.user.id}/logs`, {
+            terminal = (await axios.get(`https://discloud.app/api/v2/app/${client.user.id}/logs`, {
+                method: 'GET',
                 headers: { "api-token": process.env.DISCLOUD_API_TOKEN }
             })).data
+
+            return console.log(terminal)
 
         return msg.edit({
             content: `${e.Check} | Tudo certo!`,

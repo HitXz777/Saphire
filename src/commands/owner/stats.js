@@ -13,12 +13,13 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         const msg = await message.reply(`${e.Loading} | Obtendo os dados necessários...`),
-            info = (await axios.get(`https://discloud.app/status/bot/${client.user.id}`, {
+            info = (await axios.get(`https://discloud.app/api/v2/app/${client.user.id}`, {
+                method: 'GET',
                 headers: {
                     "api-token": process.env.DISCLOUD_API_TOKEN
                 }
             })).data,
-            user = (await axios.get('https://discloud.app/status/user', {
+            user = (await axios.get('https://discloud.app/api/v2/user', {
                 headers: {
                     "api-token": process.env.DISCLOUD_API_TOKEN
                 }
