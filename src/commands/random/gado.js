@@ -4,8 +4,6 @@ module.exports = {
     name: 'gado',
     aliases: ['boi'],
     category: 'random',
-
-
     emoji: '🐂',
     usage: '<gado> [@user]',
     description: 'Quanto % @user é gado(a)?',
@@ -16,7 +14,7 @@ module.exports = {
             user = message.mentions.members.first() || message.member,
             Emoji = num > 70 ? e.GadoDemais : '🐂'
 
-        if (user.id === client.user.id) { return message.reply(`${e.SaphireTimida} | Eu não sou gada, sai pra lá.`) }
+        if (user.id === client.user.id) return message.reply(`${e.SaphireTimida} | Eu não sou gada, sai pra lá.`)
 
         return message.reply(`${Emoji} | Pelo histórico de ${user}, posso afirmar que é ${num}% gado.`)
     }

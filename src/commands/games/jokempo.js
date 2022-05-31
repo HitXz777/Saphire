@@ -363,7 +363,7 @@ module.exports = {
                                     value: `\`${prefix}jokempo winrate [@user]\``
                                 },
                                 {
-                                    name: `${e.SaphireRich} Bet no jokempo`,
+                                    name: `${e.MoneyWings} Bet no jokempo`,
                                     value: `\`${prefix}jokempo bet @user quantia\``
                                 },
                                 {
