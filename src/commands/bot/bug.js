@@ -36,7 +36,7 @@ module.exports = {
                 {
                     type: 2,
                     label: 'CANCELAR',
-                    emojis: '❌',
+                    emoji: '❌',
                     custom_id: 'cancel',
                     style: 'DANGER'
                 }

@@ -1,6 +1,11 @@
 {
     "Flags": [
         {
+            "flag": "🇹🇱",
+            "country": "timor-leste",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980997045642997760/unknown.png"
+        },
+        {
             "flag": "🇮🇷",
             "country": "irã",
             "image": "https://media.discordapp.net/attachments/975974003229474846/981007468224204832/unknown.png"
@@ -819,11 +824,6 @@
             "flag": "🇹🇿",
             "country": "tanzânia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976240428967931964/41818f4bb9abe80eb49298f3db1cf239.jpg?width=705&height=469"
-        },
-        {
-            "flag": "🇹🇱",
-            "country": "timor-leste",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976240545661861948/87b703f2a878c2b82a4c04628ed222d8.jpg"
         },
         {
             "flag": "🇩🇴",

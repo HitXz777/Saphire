@@ -347,7 +347,10 @@ async function submitModalFunctions(interaction, client) {
             let date = moment.tz({ day: dia, month: mes, year: ano, hour: hora, minutes: minutos, seconds: segundos }, "America/Sao_Paulo")
 
             if (!date.isValid())
-                return cancelReminder()
+                return await interaction.reply({
+                    content: '❌ | O tempo informado não é válido. Verifique se você escreveu o tempo de forma correta.',
+                    ephemeral: true
+                })
 
             date = date.valueOf()
 

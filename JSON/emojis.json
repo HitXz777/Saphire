@@ -93,7 +93,6 @@
         "boxes": "<:boxes:935500704985010196>",
         "SaphireDie": "<:saphire_morrida:981009903369998377>",
         "yay": "<:gtcYay:981009909871153162>",
-        "bug": "<:bug:947349132002074624>",
         "duvida": "<:saphire_duvida:981009915491520572>",
         "ticketRifa": "🎟️",
         "data": "<:Data:928132836425338901>",
@@ -114,7 +113,6 @@
         "SaphireRaivaFogo": "<a:a_angrys:937534385777954926>",
         "SaphireComoAssim": "<:saphire_observa:939669414784172102>",
         "SaphireUi": "<:saphire_apaixonada:938088137375223898>",
-        "SaphireHi": "<:saphire_partiu:937029598561062962>",
         "SaphireEntaoKkk": "<:saphire_curiosa:981009909321695252>",
         "SaphireObs": "<:saphire_gatinha:981009896067694632>",
         "BagMoney2": "💰",
@@ -137,6 +135,9 @@
         "Boost": "<a:boost:981022657816461322>",
         "CoroaDePrata": "<a:PlatineCrow:937562085712330833>",
         "thirdcrown": "<a:BrownCrown:981023070229762160>",
-        "SaphireOk": "<:saphire_ok:981009921913024522>"
+        "SaphireOk": "<:saphire_ok:981009921913024522>",
+        "SaphireFeliz": "<:saphire_timida:981009908621275186>",
+        "bug": "<:bug:981351064701902949>",
+        "SaphireHi": "<:saphire_pipoca:981009898336813156>"
     }
 }

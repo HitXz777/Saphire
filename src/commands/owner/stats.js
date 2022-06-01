@@ -26,7 +26,7 @@ module.exports = {
             })).data
 
         return msg.edit({
-            content: `${e.Check} Sucess`,
+            content: `${e.Check} Success`,
             embeds: [
                 new MessageEmbed()
                     .setColor(client.blue)

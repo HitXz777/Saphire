@@ -21,8 +21,8 @@ async function Error(message, err) {
      * 50035 - message_reference - Invalid Form Body
      */
     
-    if (err?.code === 50035)
-        return message?.channel?.send(`${e.Warn} | A mensagem original é desconhecida. Verifique se alguém ou algo está apagando a mensagem dos comandos.`)
+    // if (err?.code === 50035)
+    //     return message?.channel?.send(`${e.Warn} | A mensagem original é desconhecida. Verifique se alguém ou algo está apagando a mensagem dos comandos.`)
 
     if (err.code === 50013 && !message) return
 

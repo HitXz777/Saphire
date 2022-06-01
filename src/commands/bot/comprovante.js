@@ -12,7 +12,7 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         if (message.guild.id !== config.guildId)
-            return message.reply(`${e.SaphireObs} | Este é um comando privado do meu servidor de suporte para comprovação de doações. Você fez alguma doação? Simples! Entre no meu servidor e usa o comando \`${prefix}comprovante\`.\nhttps://discord.gg/dDX47fEzb9`)
+            return message.reply(`${e.SaphireObs} | Este é um comando privado do meu servidor de suporte para comprovação de doações. Você fez alguma doação? Simples! Entre no meu servidor e use o comando \`${prefix}comprovante\`.\n${config.SupportServerLink}`)
 
         let user = await Database.User.findOne({ id: message.author.id }, 'Cache')
 

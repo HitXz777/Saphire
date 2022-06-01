@@ -4,7 +4,7 @@ module.exports = {
     name: 'dicas',
     aliases: ['dica', 'tip', 'tips'],
     category: 'bot',
-    emoji: `${e.SaphireFeliz}`,
+    emoji: `${e.Stonks}`,
     usage: '<dicas>',
     description: 'Dicas da Saphire',
 

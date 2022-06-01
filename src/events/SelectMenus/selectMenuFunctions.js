@@ -3,9 +3,11 @@ const Database = require('../../../modules/classes/Database'),
 
 async function selectMenuFunctions(interaction, client) {
 
-    const { values, message, user, guild } = interaction
+    const { customId, values, message, user, guild } = interaction
 
     let value = values[0]
+
+    if (customId === 'reactionRole') return reactionRole()
 
     switch (value) {
         case 'newGiveaway': newGiveaway(); break;
@@ -13,12 +15,6 @@ async function selectMenuFunctions(interaction, client) {
         case 'sendNewLetter': sendNewLetter(); break;
         case 'report': letterReport(); break;
         case 'reportTransactions': reportTransactions(); break;
-        case '914925531529609247':
-        case '980293085298839572':
-        case '920012840356683776':
-        case '899393472283410493':
-        case '894615786138787941':
-            reactionRole(); break;
         default: break;
     }
 

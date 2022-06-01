@@ -42,6 +42,6 @@ module.exports = {
         .addField('Comandos', `\`\`\`asciidoc\n${CommandStats}\`\`\``)
         .addField(`Status ${client.user.username}`, `\`\`\`asciidoc\n${clientStats}\`\`\``)
 
-    return msg.edit({ content: `${e.Check} Sucess!`,embeds: [embed] }).catch(() => { })
+    return msg.edit({ content: `${e.Check} Success!`,embeds: [embed] }).catch(() => { })
   }
 }
