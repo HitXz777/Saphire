@@ -106,10 +106,16 @@ module.exports = {
                             value: 'users',
                         },
                         {
-                            label: 'Moderação/Administração',
+                            label: 'Moderação/Administração 1',
                             description: 'Comandos só pros Mod/Adm de plantão',
                             emoji: `${e.ModShield}`,
                             value: 'moderation',
+                        },
+                        {
+                            label: 'Moderação/Administração 2',
+                            description: 'Comandos só pros Mod/Adm de plantão',
+                            emoji: `${e.ModShield}`,
+                            value: 'moderation2',
                         },
                         {
                             label: 'Desenvolvedor',

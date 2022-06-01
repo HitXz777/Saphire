@@ -12,6 +12,7 @@ class Database extends Models {
         this.Cache = Database.Cache
         this.Emojis = Database.Emojis
         this.Config = Database.Config
+        this.ConfigJSON = Database.ConfigJSON
         this.Names = {
             Rody: "451619591320371213",
             Gowther: "315297741406339083",
