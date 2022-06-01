@@ -25,7 +25,7 @@ module.exports = {
                 .addField(`${e.SaphireTimida} Saphire`, `Você pode [me adicionar](${SaphireInviteLink}) no seu servidor e também pode entrar no [meu servidor de suporte](${config.SupportServerLink}) pra tirar algumas dúvida ou quem sabe entrar na [Moon](${config.MoonServerLink}) para se divertir?.`)
                 .addField(`${e.CoroaDourada} Premium Stage`, `Tem interesse em desbloquear comandos únicos? Use \`${prefix}premium\` e descubra mais.`)
                 .addField('⭐ Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
-                .addField(`📄 Documentação`, `https://saphire.gitbook.io/saphire/\n*obs: A documentação da Saphire está incompleta.*`)
+                .addField(`${e.Stonks} New Reaction Role System`, `Siiiim! Agora eu possuo um sistema de Reaction Role! Vem dar uma olhada! \`${prefix}reactionrole\``)
                 .setFooter({ text: 'Este painel se fechará após 1 minuto de inatividade' }),
             // .addField(`${e.TopGG} Top.gg`, `[Votar](${config.TopGGLink}/vote) na ${client.user.username}.`),
             painel = new MessageActionRow()

@@ -17,6 +17,7 @@ async function submitModalFunctions(interaction, client) {
         case 'newReminder': newReminder(); break;
         case 'createNewGiveaway': createNewGiveaway(); break;
         case 'lettersReport': lettersReport(); break;
+        case 'reactionRoleCreateModal': reactionRoleCreateModal(); break;
         default:
             break;
     }
@@ -533,6 +534,95 @@ async function submitModalFunctions(interaction, client) {
             return Message.edit(`${e.Check} | Sorteio criado com sucesso! Você pode vê-lo no canal ${msg.channel}`).catch(() => { })
         }
 
+    }
+
+    async function reactionRoleCreateModal() {
+
+        const roleData = fields.getTextInputValue('roleData'),
+            title = fields.getTextInputValue('roleTitle'),
+            description = fields.getTextInputValue('roleDescription'),
+            role = guild.roles.cache.find(role => role.id === roleData || role.name?.toLowerCase() === roleData?.toLowerCase()),
+            guildData = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
+            roleArray = guildData?.ReactionRole || []
+
+        if (!role)
+            return await interaction.reply({
+                content: `❌ | Não existe nenhum cargo no servidor com o ID ou nome fornecido. \`${roleData}\`.\n \n> Não sabe pegar o ID do cargo? Olhe esse tópico do suporte do Discord: https://support.discord.com/hc/pt-br/articles/206346498-Onde-posso-encontrar-minhas-IDs-de-Usu%C3%A1rio-Servidor-Mensagem-`,
+                ephemeral: true
+            })
+
+        if (roleArray.find(data => data.roleId === role.id))
+            return await interaction.reply({
+                content: `❌ | O cargo ${role} já foi configurado como reaction role.`
+            })
+
+        if (!role.editable)
+            return await interaction.reply({
+                content: `❌ | Eu não consigo adicionar o cargo ${role} por entrar acima de mim no ranking de cargos. Suba meu cargo para cima dele que tudo dará certo.`
+            })
+
+        const RolePermissions = role?.permissions.toArray() || [],
+            BlockPermissionsArray = ['KICK_MEMBERS', 'BAN_MEMBERS', 'MANAGE_GUILD', 'MANAGE_MESSAGES', 'MUTE_MEMBERS', 'DEAFEN_MEMBERS', 'MOVE_MEMBERS', 'MANAGE_NICKNAMES', 'MANAGE_ROLES', 'ADMINISTRATOR', 'MODERATE_MEMBERS']
+
+        for (const perm of RolePermissions)
+            if (BlockPermissionsArray.includes(perm))
+                return await interaction.reply({
+                    content: `❌ | O cargo ${role} possui a permissão **${config.Perms[perm]}** ativada. Não vou prosseguir com a adição deste cargo, isso pode prejudicar o seu servidor.`
+                })
+
+        await interaction.reply({ content: '✅ | Tudo certo! Agora é hora de escolher qual o emoji do Reaction Role!', ephemeral: true })
+        let msg = await channel.send({
+            content: `${e.Loading} | Qual emoji você quer para este cargo?\n> **\`Reaja nesta mensagem com um emoji do Discord ou DESTE SERVIDOR.\`**\n> *Clique no ❌ caso não queria nenhum emoji.*`
+        }), collected = false
+        msg.react('❌').catch(() => { })
+
+        let collector = msg.createReactionCollector({
+            filter: (r, u) => u.id === user.id,
+            time: 120000,
+            errors: ['time']
+        })
+            .on('collect', (reaction) => {
+
+                let { emoji } = reaction
+
+                if (emoji.name === '❌') return registerReactionRole(null, msg)
+
+                let emojiData = emoji.id || emoji.name
+
+                if (emoji.id && !guild.emojis.cache.get(emoji.id))
+                    return msg.edit(`${msg.content}\n \n❌ | Este emoji não pertence a este servidor. Por favor, escolha um emoji deste servidor ou do Discord.`)
+
+                collected = true
+                collector.stop()
+                return registerReactionRole(emojiData, msg)
+            })
+
+            .on('end', () => {
+                if (collected) return
+                return msg.edit(`${e.Deny} | Criação do Reaction Role cancelado por falta de respota.`).catch(() => { })
+            })
+
+        async function registerReactionRole(emoji = null, msg) {
+            msg.reactions.removeAll().catch(() => { })
+
+            let objData = { roleId: role.id, title: title }
+
+            if (emoji)
+                objData.emoji = emoji
+
+            if (description)
+                objData.description = description
+
+
+            let data = await Database.Guild.findOneAndUpdate(
+                { id: guild.id },
+                { $push: { ReactionRole: objData } }
+            )
+
+            return msg.edit({
+                content: `${e.Check} | O cargo ${role} foi adicionado com sucesso a lista de reaction roles!\n${e.Info} | Para executar o novo reaction role, use o comando \`${prefix}reactionrole\` e clique em "Throw".\n${e.QuestionMark} | Configurou o cargo errado? Delete ele usando o comando \`${prefix}reactionrole\` na opção "Delete".\n${e.Stonks} | Agora, ${guild.name} possui ${data.ReactionRole?.length || 0} reaction roles!`
+            }).catch(() => { })
+        }
     }
 
     async function BugModalReport() {

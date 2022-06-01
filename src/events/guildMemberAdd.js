@@ -61,7 +61,8 @@ client.on('guildMemberAdd', async (member) => {
         Canal = member?.guild.channels.cache.get(guild?.WelcomeChannel?.Canal)
 
     Welcome()
-    AutoroleSystem()
+    return AutoroleSystem()
+
     function AutoroleSystem() {
 
         if (!member.guild.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES) && RolesId.length > 0) {

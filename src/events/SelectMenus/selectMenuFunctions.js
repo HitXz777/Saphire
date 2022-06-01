@@ -1,9 +1,10 @@
 const Database = require('../../../modules/classes/Database'),
+    { Config: config, Emojis: e } = Database,
     { newReminder } = require('../plugins/modalPlugins')
 
 async function selectMenuFunctions(interaction, client) {
 
-    const { customId, values, message, user, guild } = interaction
+    const { customId, values, message, user, guild, channel } = interaction
 
     let value = values[0]
 
@@ -15,12 +16,23 @@ async function selectMenuFunctions(interaction, client) {
         case 'sendNewLetter': sendNewLetter(); break;
         case 'report': letterReport(); break;
         case 'reportTransactions': reportTransactions(); break;
+        case 'newReactionRole': newReactionRole(); break;
         default: break;
     }
 
     return
 
     async function reactionRole() {
+
+        if (value === 'refreshReactionRole' || values.includes('refreshReactionRole')) return refreshReactionRole()
+
+        let permsArray = guild.me.permissions.toArray() || []
+
+        if (!permsArray.includes('MANAGE_ROLES') && !permsArray.includes('ADMINISTRATOR'))
+            return await interaction.reply({
+                content: '❌ | Eu não tenho a permissão **Gerenciar Cargos** ativada. A adição de cargo está suspensa.',
+                ephemeral: true
+            })
 
         let msgConfirmation = 'ℹ | Feedback'
 
@@ -35,17 +47,32 @@ async function selectMenuFunctions(interaction, client) {
             if (!role)
                 return msgConfirmation += `\n⚠️ | ${role?.name || 'NOT FOUND'} - **ERRO**`
 
+            if (!role.editable) {
+                deleteReaction(roleId)
+                return msgConfirmation += `\n⚠️ | ${role?.name || 'NOT FOUND'} - **Não posso manusear este cargo.**`
+            }
+
+            const RolePermissions = role?.permissions.toArray() || [],
+                BlockPermissionsArray = ['KICK_MEMBERS', 'BAN_MEMBERS', 'MANAGE_GUILD', 'MANAGE_MESSAGES', 'MUTE_MEMBERS', 'DEAFEN_MEMBERS', 'MOVE_MEMBERS', 'MANAGE_NICKNAMES', 'MANAGE_ROLES', 'ADMINISTRATOR', 'MODERATE_MEMBERS']
+
             if (member.roles.cache.has(roleId)) {
                 member.roles.remove(role)
                     .catch(() => msgConfirmation += `\n⚠️ | ${role || 'NOT FOUND'} - **ERRO**`)
 
-                msgConfirmation += `\n❌ | ${role} - **REMOVIDO**`
+                return msgConfirmation += `\n❌ | ${role || 'NOT FOUND'} - **REMOVIDO**`
 
             } else {
-                member.roles.add(role)
-                    .catch(() => msgConfirmation += `\n⚠️ | ${role} - **ERRO**`)
 
-                msgConfirmation += `\n✅ | ${role} - **ADICIONADO**`
+                for (const perm of RolePermissions)
+                    if (BlockPermissionsArray.includes(perm)) {
+                        deleteReaction(roleId)
+                        return msgConfirmation += `\n❌ | ${role || 'NOT FOUND'} - Este cargo possui a permissão **${config.Perms[perm]}** ativada. Adição ignorada.`
+                    }
+
+                member.roles.add(role)
+                    .catch(() => msgConfirmation += `\n⚠️ | ${role || 'NOT FOUND'} - **ERRO**`)
+
+                return msgConfirmation += `\n✅ | ${role || 'NOT FOUND'} - **ADICIONADO**`
             }
 
         }
@@ -174,6 +201,83 @@ async function selectMenuFunctions(interaction, client) {
                 }
             ]
         }
+
+        return await interaction.showModal(modal)
+
+    }
+
+    async function newReactionRole() {
+
+        let member = guild.members.cache.get(user.id)
+        if (!member) return
+
+        let perms = member.permissions.toArray() || []
+
+        if (!perms.includes('MANAGE_ROLES') && !perms.includes('ADMINISTRATOR'))
+            return await interaction.reply({
+                content: '❌ | Você não tem permissão para mexer no sistema de reaction roles.',
+                ephemeral: true
+            })
+
+        const modal = {
+            title: "Reaction Role Create",
+            custom_id: "reactionRoleCreateModal",
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "roleData",
+                            label: "ID ou nome exato do cargo",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 100,
+                            placeholder: "123456789123456789 | Cor Azul | Viajante",
+                            required: true
+                        }
+                    ]
+                }, // MAX: 5 Fields
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "roleTitle",
+                            label: "Título para o cargo",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 25,
+                            placeholder: "Novidades e Notificações | Sorteios e Prêmios",
+                            required: true
+                        }
+                    ]
+                }, // MAX: 5 Fields
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "roleDescription",
+                            label: "Descrição da Reaction Role",
+                            style: 1,
+                            min_length: 0,
+                            max_length: 50,
+                            placeholder: "Novidades e Notificações | Sorteios e Prêmios"
+                        }
+                    ]
+                }, // MAX: 5 Fields
+            ]
+        }
+
+        let guildData = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
+            roles = guildData?.ReactionRole || []
+
+        if (roles.length >= 24)
+            return await interaction.reply({
+                content: '❌ | O limite é de 24 Reaction Roles por servidor.',
+                ephemeral: true
+            })
 
         return await interaction.showModal(modal)
 
@@ -313,6 +417,88 @@ async function selectMenuFunctions(interaction, client) {
 
     }
 
+    async function refreshReactionRole() {
+
+        let member = guild.members.cache.get(user.id)
+        if (!member) return
+
+        let perms = member.permissions.toArray() || []
+
+        if (!perms.includes('MANAGE_ROLES') && !perms.includes('ADMINISTRATOR'))
+            return await interaction.reply({
+                content: '❌ | Você não tem permissão para mexer no sistema de reaction roles.',
+                ephemeral: true
+            })
+
+        message.delete().catch(() => { })
+
+        let data = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
+            ReactionRoleData = data?.ReactionRole || []
+
+        if (!ReactionRoleData || ReactionRoleData.length === 0)
+            return await interaction.reply({
+                content: `${e.Deny} | Este servidor não possui nenhuma reaction role configurada.`,
+                ephemeral: true
+            })
+
+        let selectMenuObject = {
+            type: 1,
+            components: [{
+                type: 3,
+                minValues: 1,
+                custom_id: 'reactionRole',
+                placeholder: 'Escolher cargos',
+                options: []
+            }]
+        }
+
+        for (let data of ReactionRoleData) {
+
+            let objData = { label: data.title, value: data.roleId }
+
+            if (data.emoji)
+                objData.emoji = data.emoji
+
+            if (data.description)
+                objData.description = data.description
+
+            selectMenuObject.components[0].options.push(objData)
+        }
+
+        selectMenuObject.components[0].options.push({
+            label: 'Refresh',
+            emoji: '🔄',
+            description: 'Atualize o reaction role',
+            value: 'refreshReactionRole'
+        })
+
+        return channel.send({ components: [selectMenuObject] })
+            .then(async () => {
+                return await interaction.reply({
+                    content: `✅ | Reaction role atualizado com sucesso!`,
+                    ephemeral: true
+                })
+            })
+            .catch(async err => {
+                return await interaction.reply({
+                    content: `❌ | Erro ao atualizar o reaction role: \`${err}\``,
+                    ephemeral: true
+                })
+            })
+    }
+
+    async function deleteReaction(roleId) {
+        return await Database.Guild.updateOne(
+            { id: guild.id },
+            {
+                $pull: {
+                    ReactionRole: {
+                        roleId: roleId
+                    }
+                }
+            }
+        )
+    }
 }
 
 module.exports = selectMenuFunctions
