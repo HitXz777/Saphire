@@ -2,29 +2,43 @@ const Database = require('../../../modules/classes/Database'),
     { Emojis: e, Config: config } = Database,
     { eightyYears, Now, getUser, day } = require('../plugins/modalPlugins')
 
-async function submitModalFunctions(interaction, client) {
-
-    const { customId, fields, user, channel, guild } = interaction,
-        guildData = await Database.Guild.findOne({ id: guild.id }, 'Prefix'),
-        prefix = guildData?.Prefix || client.prefix
-
-    switch (customId) {
-        case 'setStatusModal': setStatusModal(); break;
-        case 'forcaChooseWord': forcaChooseWord(); break;
-        case 'BugModalReport': BugModalReport(); break;
-        case 'editProfile': editProfile(); break;
-        case 'newLetter': newLetter(); break;
-        case 'newReminder': newReminder(); break;
-        case 'createNewGiveaway': createNewGiveaway(); break;
-        case 'lettersReport': lettersReport(); break;
-        case 'reactionRoleCreateModal': reactionRoleCreateModal(); break;
-        default:
-            break;
+class submitModals {
+    constructor(interaction, client) {
+        this.interaction = interaction
+        this.client = client
+        this.customId = interaction.customId
+        this.fields = interaction.fields
+        this.user = interaction.user
+        this.guild = interaction.guild
+        this.channel = interaction.channel
     }
 
-    return
+    submitModalFunctions = async () => {
 
-    async function editProfile() {
+        const { customId, guild } = this,
+            guildData = await Database.Guild.findOne({ id: guild.id }, 'Prefix')
+
+        this.prefix = guildData?.Prefix || client.prefix
+
+        switch (customId) {
+            case 'setStatusModal': this.setStatusModal(this); break;
+            case 'forcaChooseWord': this.forcaChooseWord(this); break;
+            case 'BugModalReport': this.BugModalReport(this); break;
+            case 'editProfile': this.editProfile(this); break;
+            case 'newLetter': this.newLetter(this); break;
+            case 'newReminder': this.newReminder(this); break;
+            case 'createNewGiveaway': this.createNewGiveaway(this); break;
+            case 'lettersReport': this.lettersReport(this); break;
+            case 'reactionRoleCreateModal': this.reactionRoleCreateModal(this); break;
+            case 'trasactionsModalReport': this.trasactionsModalReport(); break;
+            default:
+                break;
+        }
+
+        return
+    }
+
+    editProfile = async ({ interaction, fields, user } = this) => {
 
         let data = await Database.User.findOne({ id: user.id }, 'Perfil'),
             moment = require('moment'), title = undefined,
@@ -73,7 +87,7 @@ async function submitModalFunctions(interaction, client) {
 
     }
 
-    async function newReminder() {
+    newReminder = async ({ interaction, client, fields, user, channel } = this) => {
 
         const moment = require('moment')
         const time = fields.getTextInputValue('time')
@@ -215,7 +229,7 @@ async function submitModalFunctions(interaction, client) {
 
     }
 
-    async function setStatusModal() {
+    setStatusModal = async ({ interaction, fields, user } = this) => {
 
         const newStatus = fields.getTextInputValue('newStatus')
 
@@ -232,13 +246,10 @@ async function submitModalFunctions(interaction, client) {
         })
     }
 
-    async function forcaChooseWord() {
+    forcaChooseWord = async ({ interaction, client, fields, user, channel, prefix } = this) => {
         const Forca = require('../../commands/games/classes/forca')
         const word = fields.getTextInputValue('componentOne')
         const { MessageEmbed } = require('discord.js')
-
-        let data = await Database.Guild.findOne({ id: interaction.guildId }, 'Prefix'),
-            prefix = data?.Prefix || Database.Config.Prefix
 
         let validate = /^[a-z ]+$/i
 
@@ -256,13 +267,12 @@ async function submitModalFunctions(interaction, client) {
         return new Forca().game(client, false, [], prefix, MessageEmbed, Database, word?.toLowerCase(), user, channel)
     }
 
-    async function createNewGiveaway() {
+    createNewGiveaway = async ({ interaction, client, fields, user, channel, guild, prefix } = this) => {
 
         const moment = require('moment'),
             Data = require('../../../modules/functions/plugins/data')
 
         let data = await Database.Guild.findOne({ id: guild.id }, 'GiveawayChannel Prefix'),
-            prefix = data?.Prefix || '-',
             ChannelId = data?.GiveawayChannel,
             WinnersAmount = parseInt(fields.getTextInputValue('winners')),
             Time = fields.getTextInputValue('timing'),
@@ -536,7 +546,7 @@ async function submitModalFunctions(interaction, client) {
 
     }
 
-    async function reactionRoleCreateModal() {
+    reactionRoleCreateModal = async ({ interaction, fields, user, channel, guild, prefix } = this) => {
 
         const roleData = fields.getTextInputValue('roleData'),
             title = fields.getTextInputValue('roleTitle'),
@@ -620,12 +630,12 @@ async function submitModalFunctions(interaction, client) {
             )
 
             return msg.edit({
-                content: `${e.Check} | O cargo ${role} foi adicionado com sucesso a lista de reaction roles!\n${e.Info} | Para executar o novo reaction role, use o comando \`${prefix}reactionrole\` e clique em "Throw".\n${e.QuestionMark} | Configurou o cargo errado? Delete ele usando o comando \`${prefix}reactionrole\` na opção "Delete".\n${e.Stonks} | Agora, ${guild.name} possui ${data.ReactionRole?.length || 0} reaction roles!`
+                content: `${e.Check} | O cargo ${role} foi adicionado com sucesso a lista de reaction roles!\n${e.Info} | Para executar o novo reaction role, use o comando \`${prefix}reactionrole\` e clique em "Throw".\n${e.QuestionMark} | Configurou o cargo errado? Delete ele usando o comando \`${prefix}reactionrole\` na opção "Delete".\n${e.Stonks} | Agora, ${guild.name} possui ${(data.ReactionRole?.length || 0) + 1} reaction roles!`
             }).catch(() => { })
         }
     }
 
-    async function BugModalReport() {
+    BugModalReport = async ({ interaction, client, fields, user, channel, guild } = this) => {
 
         const textExplain = fields.getTextInputValue('bugTextInfo')
         const commandWithError = fields.getTextInputValue('commandBuggued') || 'Nenhum'
@@ -673,7 +683,7 @@ async function submitModalFunctions(interaction, client) {
 
     }
 
-    async function newLetter() {
+    newLetter = async ({ interaction, client, fields, user, guild, prefix } = this) => {
 
         let usernameData = fields.getTextInputValue('username')
         let anonymous = fields.getTextInputValue('anonymous')
@@ -790,10 +800,7 @@ async function submitModalFunctions(interaction, client) {
 
     }
 
-    async function lettersReport() {
-
-        let data = await Database.Guild.findOne({ id: guild.id }, 'Prefix'),
-            prefix = data.Prefix || client.prefix
+    lettersReport = async ({ interaction, client, fields, user, prefix } = this) => {
 
         let letterId = fields.getTextInputValue('letterId'),
             reason = fields.getTextInputValue('reason')
@@ -830,6 +837,43 @@ async function submitModalFunctions(interaction, client) {
         })
     }
 
+    trasactionsModalReport = async () => {
+
+        let problemText = this.fields.getTextInputValue('text'),
+            channel = this.client.channels.cache.get(config.BugsChannelId),
+            messageResponde = `✅ | Reporte enviado com sucesso! Muito obrigado por reportar erros.`
+
+        if (!channel) return await this.interaction.reply({
+            content: `❌ | Erro ao contactar o canal de reportes.`,
+            ephemeral: trueF
+        })
+
+        channel.send({
+            embeds: [{
+                color: this.client.red,
+                title: '📢 Reporte de Bugs | TRANSACTIONS COMMAND',
+                fields: [
+                    {
+                        name: '👤 Usuário',
+                        value: `> ${this.user.tag || 'NOT FOUND'} - \`${this.user.id}\``
+                    },
+                    {
+                        name: '📝 Conteúdo do Reporte',
+                        value: `\`\`\`txt\n${problemText}\n\`\`\``
+                    }
+                ]
+            }]
+        }).catch(() => { 
+            messageResponde = '❌ | Erro ao enviar o reporte ao canal principal.'
+        })
+
+        return await this.interaction.reply({
+            content: messageResponde,
+            ephemeral: true
+        })
+
+    }
 }
 
-module.exports = submitModalFunctions
+
+module.exports = submitModals

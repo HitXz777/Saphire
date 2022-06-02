@@ -235,7 +235,7 @@ async function buttonsFunctions(interaction, client) {
                         {
                             type: 4,
                             custom_id: "commandBuggued",
-                            label: "Qual é o comando?",
+                            label: "Qual é o comando/sistema?",
                             placeholder: "Balance, Giveaway, AFk, Hug...",
                             style: 1,
                             max_length: 50

@@ -242,15 +242,6 @@ Transactions.prototype.execute = async (client, message, args, prefix, MessageEm
             }
 
             return
-
-            // function refreshComponents(length = 0) {
-
-            //     if (length > 1)
-            //         return msg.edit({ components: [buttons, selectMenuObject] })
-
-            //     if (length === 1)
-            //         return msg.edit({ components: [selectMenuObject] })
-            // }
         })
 
         .on('end', () => {

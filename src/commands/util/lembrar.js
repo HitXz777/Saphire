@@ -69,9 +69,9 @@ module.exports = {
         let msg = await message.reply({
             embeds: [embed],
             components: buttons
-        })
+        }), collected = false
 
-    let collector = msg.createMessageComponentCollector({
+        let collector = msg.createMessageComponentCollector({
             filter: int => int.user.id === message.author.id,
             idle: 60000,
             errors: ['idle']
@@ -81,7 +81,10 @@ module.exports = {
                 let { customId } = interaction
 
                 if (customId === 'menu') customId = interaction.values[0]
-                if (customId === 'newReminder') return msg.edit({ content: `${e.Check} | Solicitação aceita.`, components: [], embeds: [] })
+                if (customId === 'newReminder') {
+                    collected = true
+                    return msg.edit({ content: `${e.Check} | Solicitação aceita.`, components: [], embeds: [] })
+                }
 
                 interaction.deferUpdate().catch(() => { })
                 if (customId === 'delete') return deleteReminder()
@@ -98,6 +101,7 @@ module.exports = {
             })
             .on('end', () => {
 
+                if (collected) return
                 let embed = msg.embeds[0]
 
                 if (!embed) return msg.edit({ components: [], embeds: [], content: `${e.Deny} | Comando cancelado.` }).catch(() => { })

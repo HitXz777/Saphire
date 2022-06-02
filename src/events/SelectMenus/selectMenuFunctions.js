@@ -285,10 +285,29 @@ async function selectMenuFunctions(interaction, client) {
 
     async function reportTransactions() {
 
-        return await interaction.reply({
-            content: 'Esta função está em construção.',
-            ephemeral: true
-        })
+        const modal = {
+                    title: "Transactions Report Center",
+                    custom_id: "trasactionsModalReport",
+                    components: [
+                        {
+                            type: 1,
+                            components: [
+                                {
+                                    type: 4,
+                                    custom_id: "text",
+                                    label: "Explique o que aconteceu",
+                                    style: 2,
+                                    min_length: 10,
+                                    max_length: 1024,
+                                    placeholder: "Na data [xx/xx/xxxx xx:xx] está escrito undefined.",
+                                    required: true
+                                }
+                            ]
+                        } // MAX: 5 Fields
+                    ]
+                }
+
+        return await interaction.showModal(modal)
 
     }
 
