@@ -3,7 +3,7 @@ const Database = require('../../../modules/classes/Database'),
     { eightyYears, Now, getUser, day } = require('../plugins/modalPlugins')
 
 class submitModals {
-    constructor(interaction, client) {
+    constructor(interaction, client, adicionalData = null) {
         this.interaction = interaction
         this.client = client
         this.customId = interaction.customId
@@ -11,6 +11,8 @@ class submitModals {
         this.user = interaction.user
         this.guild = interaction.guild
         this.channel = interaction.channel
+        this.data = adicionalData
+        this.info = {}
     }
 
     submitModalFunctions = async () => {
@@ -30,7 +32,8 @@ class submitModals {
             case 'createNewGiveaway': this.createNewGiveaway(this); break;
             case 'lettersReport': this.lettersReport(this); break;
             case 'reactionRoleCreateModal': this.reactionRoleCreateModal(this); break;
-            case 'trasactionsModalReport': this.trasactionsModalReport(); break;
+            case 'transactionsModalReport': this.transactionsModalReport(); break;
+            case 'collectorReactionRoles': this.collectorReactionRoles(); break;
             default:
                 break;
         }
@@ -561,10 +564,11 @@ class submitModals {
                 ephemeral: true
             })
 
-        if (roleArray.find(data => data.roleId === role.id))
-            return await interaction.reply({
-                content: `❌ | O cargo ${role} já foi configurado como reaction role.`
-            })
+        for (let collection of roleArray)
+            if (collection?.rolesData?.find(data => data.roleId === role.id))
+                return await interaction.reply({
+                    content: `❌ | O cargo ${role} já foi configurado como reaction role.`
+                })
 
         if (!role.editable)
             return await interaction.reply({
@@ -579,6 +583,10 @@ class submitModals {
                 return await interaction.reply({
                     content: `❌ | O cargo ${role} possui a permissão **${config.Perms[perm]}** ativada. Não vou prosseguir com a adição deste cargo, isso pode prejudicar o seu servidor.`
                 })
+
+        this.info.title = title
+        this.info.description = description
+        this.info.role = role
 
         await interaction.reply({ content: '✅ | Tudo certo! Agora é hora de escolher qual o emoji do Reaction Role!', ephemeral: true })
         let msg = await channel.send({
@@ -595,7 +603,7 @@ class submitModals {
 
                 let { emoji } = reaction
 
-                if (emoji.name === '❌') return registerReactionRole(null, msg)
+                if (emoji.name === '❌') return this.chooseColletion(null, msg, roleArray)
 
                 let emojiData = emoji.id || emoji.name
 
@@ -604,35 +612,108 @@ class submitModals {
 
                 collected = true
                 collector.stop()
-                return registerReactionRole(emojiData, msg)
+                return this.chooseColletion(emojiData, msg, roleArray)
             })
-
             .on('end', () => {
                 if (collected) return
                 return msg.edit(`${e.Deny} | Criação do Reaction Role cancelado por falta de respota.`).catch(() => { })
             })
+    }
 
-        async function registerReactionRole(emoji = null, msg) {
-            msg.reactions.removeAll().catch(() => { })
+    registerReactionRole = async (emoji = null, msg, collectionName) => {
+        msg.reactions.removeAll().catch(() => { })
 
-            let objData = { roleId: role.id, title: title }
+        let { role, title, description } = this.info
 
-            if (emoji)
-                objData.emoji = emoji
+        let objData = { roleId: role.id, title: title }
 
-            if (description)
-                objData.description = description
+        if (emoji)
+            objData.emoji = emoji
 
+        if (description)
+            objData.description = description
 
-            let data = await Database.Guild.findOneAndUpdate(
-                { id: guild.id },
-                { $push: { ReactionRole: objData } }
-            )
+        let data = await Database.Guild.findOneAndUpdate(
+            { id: this.guild.id, ['ReactionRole.name']: collectionName },
+            { $push: { [`ReactionRole.$.rolesData`]: objData } }
+        )
 
-            return msg.edit({
-                content: `${e.Check} | O cargo ${role} foi adicionado com sucesso a lista de reaction roles!\n${e.Info} | Para executar o novo reaction role, use o comando \`${prefix}reactionrole\` e clique em "Throw".\n${e.QuestionMark} | Configurou o cargo errado? Delete ele usando o comando \`${prefix}reactionrole\` na opção "Delete".\n${e.Stonks} | Agora, ${guild.name} possui ${(data.ReactionRole?.length || 0) + 1} reaction roles!`
-            }).catch(() => { })
+        return msg.edit({
+            content: `${e.Check} | O cargo ${role} foi adicionado com sucesso a lista de reaction roles!\n${e.Info} | Para executar o novo reaction role, use o comando \`${this.prefix}reactionrole\` e clique em "Throw".\n${e.QuestionMark} | Configurou o cargo errado? Delete ele usando o comando \`${this.prefix}reactionrole\` na opção "Delete".\n${e.Stonks} | Agora, ${this.guild.name} possui ${(data.ReactionRole?.length || 0) + 1} reaction roles!`,
+            components: []
+        }).catch(() => { })
+    }
+
+    chooseColletion = async (emojiData = null, msg, roleArray) => {
+
+        let selectMenuObject = {
+            type: 1,
+            components: [{
+                type: 3,
+                maxValues: 1,
+                minValues: 1,
+                custom_id: 'registerReactionRole',
+                placeholder: 'Escolher uma seleção',
+                options: []
+            }]
+        }, collected = false
+        await build()
+
+        msg.edit({
+            content: `${e.Loading} | Para qual seleção é este cargo?`,
+            embeds: [],
+            components: [selectMenuObject]
+        })
+
+        let collector = msg.createMessageComponentCollector({
+            filter: int => int.user.id === this.user.id,
+            idle: 60000,
+            errors: ['idle']
+        })
+            .on('collect', async int => {
+
+                let collections = int.values,
+                    collectionName = collections[0]
+
+                let collection = roleArray.find(d => d.name === collectionName)
+
+                if (!collection)
+                    return msg.edit({
+                        content: '❌ | Coleção não encontrada.',
+                        components: [selectMenuObject]
+                    }).catch(() => { })
+
+                if (collection?.rolesData?.length >= 24)
+                    return msg.edit({
+                        content: '❌ | O limite é de 24 Reaction Roles por coleção.',
+                        components: [selectMenuObject]
+                    }).catch(() => { })
+
+                collected = true
+                collector.stop()
+                return this.registerReactionRole(emojiData, msg, collectionName)
+            })
+            .on('end', () => {
+                if (collected) return
+                return msg.edit({
+                    content: `${e.Deny} | Comando cancelado por falta de respota.`,
+                    embeds: [],
+                    components: []
+                }).catch(() => { })
+            })
+
+        function build() {
+            for (let data of roleArray)
+                selectMenuObject.components[0].options.push({
+                    label: data.name,
+                    description: `Cargos registrados: ${data.rolesData.length}`,
+                    emoji: e.Database,
+                    value: data.name
+                })
+
+            return
         }
+
     }
 
     BugModalReport = async ({ interaction, client, fields, user, channel, guild } = this) => {
@@ -837,7 +918,7 @@ class submitModals {
         })
     }
 
-    trasactionsModalReport = async () => {
+    transactionsModalReport = async () => {
 
         let problemText = this.fields.getTextInputValue('text'),
             channel = this.client.channels.cache.get(config.BugsChannelId),
@@ -869,6 +950,37 @@ class submitModals {
 
         return await this.interaction.reply({
             content: messageResponde,
+            ephemeral: true
+        })
+
+    }
+
+    collectorReactionRoles = async () => {
+
+        let collectionName = this.fields.getTextInputValue('name')
+
+        let guildData = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
+            rolesData = guildData?.ReactionRole || []
+
+        let has = rolesData.find(data => data.name === collectionName)
+
+        if (has)
+            return await this.interaction.reply({
+                content: `❌ | Já existe uma coleção com o nome \`${collectionName}\``,
+                ephemeral: true
+            })
+
+        await Database.Guild.updateOne({ id: this.guild.id }, {
+            $push: {
+                ReactionRole: {
+                    name: collectionName,
+                    rolesData: []
+                }
+            }
+        })
+
+        return await this.interaction.reply({
+            content: `✅ | Nova coleção de Reaction Roles criada com sucesso!`,
             ephemeral: true
         })
 

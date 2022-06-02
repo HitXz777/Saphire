@@ -17,6 +17,7 @@ async function selectMenuFunctions(interaction, client) {
         case 'report': letterReport(); break;
         case 'reportTransactions': reportTransactions(); break;
         case 'newReactionRole': newReactionRole(); break;
+        case 'newCollectionReactionRole': newCollectionReactionRole(); break;
         default: break;
     }
 
@@ -237,7 +238,7 @@ async function selectMenuFunctions(interaction, client) {
                             required: true
                         }
                     ]
-                }, // MAX: 5 Fields
+                },
                 {
                     type: 1,
                     components: [
@@ -252,7 +253,7 @@ async function selectMenuFunctions(interaction, client) {
                             required: true
                         }
                     ]
-                }, // MAX: 5 Fields
+                },
                 {
                     type: 1,
                     components: [
@@ -266,18 +267,20 @@ async function selectMenuFunctions(interaction, client) {
                             placeholder: "Novidades e Notificações | Sorteios e Prêmios"
                         }
                     ]
-                }, // MAX: 5 Fields
+                }
             ]
         }
 
         let guildData = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
-            roles = guildData?.ReactionRole || []
+            collections = guildData?.ReactionRole || [],
+            collection = collections.find(d => d.name === value)
 
-        if (roles.length >= 24)
+        if (!collections || collections.length === 0)
             return await interaction.reply({
-                content: '❌ | O limite é de 24 Reaction Roles por servidor.',
-                ephemeral: true
-            })
+                content: `${e.Deny} | Este servidor não possui nenhuma coleção de reaction role. Você pode criar uma clicando em "Collection" no menu abaixo.`,
+                embeds: [],
+                components: [selectMenuPrincipal]
+            }).catch(() => { })
 
         return await interaction.showModal(modal)
 
@@ -286,26 +289,26 @@ async function selectMenuFunctions(interaction, client) {
     async function reportTransactions() {
 
         const modal = {
-                    title: "Transactions Report Center",
-                    custom_id: "trasactionsModalReport",
+            title: "Transactions Report Center",
+            custom_id: "trasactionsModalReport",
+            components: [
+                {
+                    type: 1,
                     components: [
                         {
-                            type: 1,
-                            components: [
-                                {
-                                    type: 4,
-                                    custom_id: "text",
-                                    label: "Explique o que aconteceu",
-                                    style: 2,
-                                    min_length: 10,
-                                    max_length: 1024,
-                                    placeholder: "Na data [xx/xx/xxxx xx:xx] está escrito undefined.",
-                                    required: true
-                                }
-                            ]
-                        } // MAX: 5 Fields
+                            type: 4,
+                            custom_id: "text",
+                            label: "Explique o que aconteceu",
+                            style: 2,
+                            min_length: 10,
+                            max_length: 1024,
+                            placeholder: "Na data [xx/xx/xxxx xx:xx] está escrito undefined.",
+                            required: true
+                        }
                     ]
-                }
+                } // MAX: 5 Fields
+            ]
+        }
 
         return await interaction.showModal(modal)
 
@@ -518,6 +521,34 @@ async function selectMenuFunctions(interaction, client) {
             }
         )
     }
+
+    async function newCollectionReactionRole() {
+
+        const modal = {
+            title: "New Reaction Roles Collection",
+            custom_id: "collectorReactionRoles",
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "name",
+                            label: "Qual o nome da sua nova coleção?",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 20,
+                            placeholder: "Cores",
+                            required: true
+                        }
+                    ]
+                }// MAX: 5 Fields
+            ]
+        }
+
+        return await interaction.showModal(modal)
+    }
+
 }
 
 module.exports = selectMenuFunctions

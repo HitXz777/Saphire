@@ -15,6 +15,53 @@ module.exports = {
         let data = await Database.Guild.findOne({ id: message.guild.id }, 'ReactionRole'),
             ReactionRoleData = data?.ReactionRole || []
 
+        let selectMenuPrincipal = {
+            type: 1,
+            components: [{
+                type: 3,
+                custom_id: 'createNewReactionRole',
+                placeholder: 'Escolha uma opção',
+                options: [
+                    {
+                        label: 'Create',
+                        emoji: '🆕',
+                        description: 'Adicionar um cargo a uma coleção',
+                        value: 'newReactionRole',
+                    },
+                    {
+                        label: 'Collection',
+                        emoji: '🆕',
+                        description: 'Crie uma nova coleção de Reaction Roles',
+                        value: 'newCollectionReactionRole',
+                    },
+                    {
+                        label: 'Throw',
+                        emoji: '📨',
+                        description: 'Lançe o sistema de reaction role neste chat',
+                        value: 'throwReactionRole',
+                    },
+                    {
+                        label: 'Edit',
+                        emoji: '📝',
+                        description: 'Edite um reaction role',
+                        value: 'editReactionRole',
+                    },
+                    {
+                        label: 'Delete',
+                        emoji: e.Trash,
+                        description: 'Delete um ou mais reaction roles',
+                        value: 'delete',
+                    },
+                    {
+                        label: 'Cancelar',
+                        emoji: '❌',
+                        description: 'Force o encerramento deste comando',
+                        value: 'cancel',
+                    }
+                ]
+            }]
+        }
+
         let msg = await message.reply({
             embeds: [{
                 color: client.blue,
@@ -40,46 +87,7 @@ module.exports = {
                 ],
                 footer: { text: 'Limite de 24 cargos por servidor' }
             }],
-            components: [{
-                type: 1,
-                components: [{
-                    type: 3,
-                    custom_id: 'createNewReactionRole',
-                    placeholder: 'Escolha uma opção',
-                    options: [
-                        {
-                            label: 'Create',
-                            emoji: '🆕',
-                            description: 'Criar um novo reaction role',
-                            value: 'newReactionRole',
-                        },
-                        {
-                            label: 'Throw',
-                            emoji: '📨',
-                            description: 'Lançe o sistema de reaction role neste chat',
-                            value: 'throwReactionRole',
-                        },
-                        {
-                            label: 'Edit',
-                            emoji: '📝',
-                            description: 'Edite um reaction role',
-                            value: 'editReactionRole',
-                        },
-                        {
-                            label: 'Delete',
-                            emoji: e.Trash,
-                            description: 'Delete um ou mais reaction roles',
-                            value: 'delete',
-                        },
-                        {
-                            label: 'Cancelar',
-                            emoji: '❌',
-                            description: 'Force o encerramento deste comando',
-                            value: 'cancel',
-                        }
-                    ]
-                }]
-            }]
+            components: [selectMenuPrincipal]
         }), collected = true
 
         let collector = msg.createMessageComponentCollector({
@@ -91,9 +99,11 @@ module.exports = {
                 const { values, customId } = interaction,
                     value = values[0]
 
+                if (['newReactionRole'].includes(value)) return
+
                 if (customId !== 'createNewReactionRole') return
 
-                if (value === 'newReactionRole') {
+                if (['newReactionRole', 'newCollectionReactionRole'].includes(value)) {
                     collected = true
                     return msg.edit({
                         content: `${e.Check} | Request aceita!`,
@@ -109,9 +119,12 @@ module.exports = {
                     embeds: [],
                     components: []
                 }).catch(() => { })
+
                 if (value === 'delete') return deleteReactionRole(msg)
                 if (value === 'cancel') return collector.stop()
                 if (value === 'throwReactionRole') return throwReactionRole()
+
+                if (ReactionRoleData.find(d => d.name === value)) return registerNewReactionRole(value)
             })
             .on('end', () => {
                 if (collected) return
