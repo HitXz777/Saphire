@@ -166,7 +166,6 @@ Database.prototype.addGamingPoint = async (userId, type, value) => {
 
     if (!userId || !type || isNaN(value)) return
 
-    // TODO: Adicionar o Flag Gaming no ranking
     await Database.User.updateOne(
         { id: userId },
         { $inc: { [`GamingCount.${type}`]: value } },

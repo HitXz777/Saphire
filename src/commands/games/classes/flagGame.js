@@ -310,7 +310,7 @@ class flagGame {
 
             let msg = await message.reply({ embeds: [embeds[0]] })
             if (embeds.length === 1) return
-            let emojis = ['⏪', '⬅️', '➡️', '⏩', '❌'] // TODO: Trade to buttons
+            let emojis = ['⏪', '⬅️', '➡️', '⏩', '❌']
 
             for (let i of emojis) msg.react(i).catch(() => { })
             let collector = msg.createReactionCollector({

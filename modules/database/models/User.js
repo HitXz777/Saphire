@@ -23,8 +23,6 @@ module.exports = model("User", new Schema({
     GamingCount: {
         FlagCount: Number,
         AnimeThemeCount: Number
-        // TODO: Adicionar o Flag Gaming no ranking
-        // TODO: Juntar as pontuações de todos os  games dentro deste Object
     },
     Timeouts: {
         Bug: Number,

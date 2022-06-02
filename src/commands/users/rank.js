@@ -188,7 +188,7 @@ module.exports = {
             return msg.edit({
                 content: `${e.Info} | Painel inicial.`,
                 embeds: [
-                    new MessageEmbed() // TODO: Unificar as 2 embeds principais em 1 única variável
+                    new MessageEmbed()
                         .setColor('#246FE0')
                         .setTitle(`🏆 | ${client.user.username} Global Ranking System`)
                         .setDescription('Aqui você pode ver os top 10 em cada classe')
