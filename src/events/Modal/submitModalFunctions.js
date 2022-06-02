@@ -863,7 +863,7 @@ class submitModals {
                     }
                 ]
             }]
-        }).catch(() => { 
+        }).catch(() => {
             messageResponde = '❌ | Erro ao enviar o reporte ao canal principal.'
         })
 
@@ -874,6 +874,5 @@ class submitModals {
 
     }
 }
-
 
 module.exports = submitModals
