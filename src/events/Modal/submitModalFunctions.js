@@ -17,7 +17,7 @@ class submitModals {
 
     submitModalFunctions = async () => {
 
-        const { customId, guild } = this,
+        const { customId, guild, client } = this,
             guildData = await Database.Guild.findOne({ id: guild.id }, 'Prefix')
 
         this.prefix = guildData?.Prefix || client.prefix
@@ -633,13 +633,20 @@ class submitModals {
         if (description)
             objData.description = description
 
-        let data = await Database.Guild.findOneAndUpdate(
+        await Database.Guild.findOneAndUpdate(
             { id: this.guild.id, ['ReactionRole.name']: collectionName },
             { $push: { [`ReactionRole.$.rolesData`]: objData } }
         )
 
+        let data = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
+            collections = data.ReactionRole || [],
+            count = 0, collectionsCount = collections.length
+
+        for (let collection of collections)
+            count += collection?.rolesData?.length || 0
+
         return msg.edit({
-            content: `${e.Check} | O cargo ${role} foi adicionado com sucesso a lista de reaction roles!\n${e.Info} | Para executar o novo reaction role, use o comando \`${this.prefix}reactionrole\` e clique em "Throw".\n${e.QuestionMark} | Configurou o cargo errado? Delete ele usando o comando \`${this.prefix}reactionrole\` na opção "Delete".\n${e.Stonks} | Agora, ${this.guild.name} possui ${(data.ReactionRole?.length || 0) + 1} reaction roles!`,
+            content: `${e.Check} | O cargo ${role} foi adicionado com sucesso na coleção **${collectionName}**!\n${e.Info} | Para executar o novo reaction role, use o comando \`${this.prefix}reactionrole\` e clique em "Throw".\n${e.QuestionMark} | Configurou o cargo errado? Delete ele usando o comando \`${this.prefix}reactionrole\` na opção "Delete".\n${e.Stonks} | Agora, ${this.guild.name} possui ${count} reaction roles em ${collectionsCount} coleções!`,
             components: []
         }).catch(() => { })
     }

@@ -25,7 +25,10 @@ async function selectMenuFunctions(interaction, client) {
 
     async function reactionRole() {
 
-        if (value === 'refreshReactionRole' || values.includes('refreshReactionRole')) return refreshReactionRole()
+        if (value.includes('refreshReactionRole')) return refreshReactionRole(value)
+
+        for (let val of values)
+            if (val.includes('refreshReactionRole')) return refreshReactionRole(val)
 
         let permsArray = guild.me.permissions.toArray() || []
 
@@ -78,10 +81,12 @@ async function selectMenuFunctions(interaction, client) {
 
         }
 
-        return await interaction.reply({
+        await interaction.update({}) // By: 793343792048635924 & 196679829800747017
+        return await interaction.followUp({
             content: msgConfirmation,
             ephemeral: true
         })
+
     }
 
     async function newGiveaway() {
@@ -272,12 +277,11 @@ async function selectMenuFunctions(interaction, client) {
         }
 
         let guildData = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
-            collections = guildData?.ReactionRole || [],
-            collection = collections.find(d => d.name === value)
+            collections = guildData?.ReactionRole || []
 
         if (!collections || collections.length === 0)
             return await interaction.reply({
-                content: `${e.Deny} | Este servidor não possui nenhuma coleção de reaction role. Você pode criar uma clicando em "Collection" no menu abaixo.`,
+                content: '❌ | Este servidor não possui nenhuma coleção de reaction role. Você pode criar uma clicando em "Collection" no menu abaixo.',
                 embeds: [],
                 components: [selectMenuPrincipal]
             }).catch(() => { })
@@ -439,7 +443,7 @@ async function selectMenuFunctions(interaction, client) {
 
     }
 
-    async function refreshReactionRole() {
+    async function refreshReactionRole(val) {
 
         let member = guild.members.cache.get(user.id)
         if (!member) return
@@ -454,13 +458,26 @@ async function selectMenuFunctions(interaction, client) {
 
         message.delete().catch(() => { })
 
+        let value = val.replace(/refreshReactionRole /g, '')
+
         let data = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
-            ReactionRoleData = data?.ReactionRole || []
+            ReactionRoleData = data?.ReactionRole || [],
+            collection = ReactionRoleData?.find(coll => coll.name === value)
 
         if (!ReactionRoleData || ReactionRoleData.length === 0)
             return await interaction.reply({
-                content: `${e.Deny} | Este servidor não possui nenhuma reaction role configurada.`,
+                content: '❌ | Este servidor não possui nenhuma coleção de reaction role.',
                 ephemeral: true
+            })
+
+        if (!collection)
+            return await interaction.reply({
+                content: `❌ | Coleção não encontrada`
+            })
+
+        if (!collection?.rolesData || collection?.rolesData?.length === 0)
+            return await interaction.reply({
+                content: `❌ | Esta coleção não possui nenhum cargo configurado.`
             })
 
         let selectMenuObject = {
@@ -469,12 +486,12 @@ async function selectMenuFunctions(interaction, client) {
                 type: 3,
                 minValues: 1,
                 custom_id: 'reactionRole',
-                placeholder: 'Escolher cargos',
+                placeholder: `Coleção: ${value}`,
                 options: []
             }]
         }
 
-        for (let data of ReactionRoleData) {
+        for (let data of collection.rolesData) {
 
             let objData = { label: data.title, value: data.roleId }
 
@@ -491,7 +508,7 @@ async function selectMenuFunctions(interaction, client) {
             label: 'Refresh',
             emoji: '🔄',
             description: 'Atualize o reaction role',
-            value: 'refreshReactionRole'
+            value: `refreshReactionRole ${value}`
         })
 
         return channel.send({ components: [selectMenuObject] })
@@ -523,6 +540,15 @@ async function selectMenuFunctions(interaction, client) {
     }
 
     async function newCollectionReactionRole() {
+
+        let data = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
+            collections = data?.ReactionRole || []
+
+        if (collections?.length >= 20)
+            return await interaction.reply({
+                content: '❌ | O limite é de 20 coleções de reaction roles por servidor. *(Por enquanto)*',
+                ephemeral: true
+            })
 
         const modal = {
             title: "New Reaction Roles Collection",
