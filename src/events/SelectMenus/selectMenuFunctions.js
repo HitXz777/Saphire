@@ -510,7 +510,7 @@ async function selectMenuFunctions(interaction, client) {
         return message.edit({ components: [selectMenuObject], embeds: [embed] })
             .then(async () => {
                 return await interaction.followUp({
-                    content: '✅ | Lançamento efetuado.',
+                    content: '✅ | Refresh realizado com sucesso!',
                     embeds: [],
                     components: [],
                     ephemeral: true
