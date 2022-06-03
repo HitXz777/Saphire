@@ -146,7 +146,7 @@ module.exports = {
                     collector.stop()
                     return throwReactionRole()
                 }
-                
+
                 return
             })
             .on('end', () => {
@@ -219,11 +219,6 @@ module.exports = {
                             content: `${e.Deny} | Coleção não encontrada.`
                         }).catch(() => { })
 
-                    if (rolesData.length === 0)
-                        return msg.edit({
-                            content: `${e.Deny} | A coleção \`${value}\` não possui nenhum cargo configurado.`
-                        }).catch(() => { })
-
                     collected = true
                     collector.stop()
                     return selectRolesInCollection(collection)
@@ -249,17 +244,18 @@ module.exports = {
                     }]
                 }
 
-                for (let data of collection.rolesData) {
-                    let objData = { label: data.title, value: data.roleId }
+                if (collection.rolesData.length > 0)
+                    for (let data of collection.rolesData) {
+                        let objData = { label: data.title, value: data.roleId }
 
-                    if (data.emoji)
-                        objData.emoji = data.emoji
+                        if (data.emoji)
+                            objData.emoji = data.emoji
 
-                    if (data.description)
-                        objData.description = data.description
+                        if (data.description)
+                            objData.description = data.description
 
-                    selectMenuObject.components[0].options.push(objData)
-                }
+                        selectMenuObject.components[0].options.push(objData)
+                    }
 
                 selectMenuObject.components[0].options.push({
                     label: 'Refresh',
@@ -278,7 +274,7 @@ module.exports = {
 
                 let mapResult = collection.rolesData.map(data => `${message.guild.emojis.cache.get(data.emoji) || data.emoji} ${message.guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
 
-                embed.description = mapResult || 'Nenhum cargo foi encontrado'
+                embed.description = mapResult || '> *Esta coleção não possui nenhum cargo*'
 
                 return message.channel.send({ components: [selectMenuObject], embeds: [embed] })
                     .then(() => {

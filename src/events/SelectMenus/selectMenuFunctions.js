@@ -443,14 +443,14 @@ async function selectMenuFunctions(interaction, client) {
     }
 
     async function refreshReactionRole(val) {
-
+        await interaction.update({})
         let member = guild.members.cache.get(user.id)
         if (!member) return
 
         let perms = member.permissions.toArray() || []
 
         if (!perms.includes('MANAGE_ROLES') && !perms.includes('ADMINISTRATOR'))
-            return await interaction.reply({
+            return await interaction.followUp({
                 content: '❌ | Você não tem permissão para mexer no sistema de reaction roles.',
                 ephemeral: true
             })
@@ -462,16 +462,13 @@ async function selectMenuFunctions(interaction, client) {
             collection = ReactionRoleData?.find(coll => coll.name === value)
 
         if (!ReactionRoleData || ReactionRoleData.length === 0)
-            return await interaction.reply({
+            return await interaction.followUp({
                 content: '❌ | Este servidor não possui nenhuma coleção de reaction role.',
                 ephemeral: true
             })
 
         if (!collection)
-            return await interaction.reply({ content: `❌ | Coleção não encontrada` })
-
-        if (!collection?.rolesData || collection?.rolesData?.length === 0)
-            return await interaction.reply({ content: `❌ | Esta coleção não possui nenhum cargo configurado.` })
+            return await interaction.followUp({ content: `❌ | Coleção não encontrada` })
 
         let selectMenuObject = {
             type: 1,
@@ -508,11 +505,11 @@ async function selectMenuFunctions(interaction, client) {
 
         let mapResult = collection.rolesData.map(data => `${guild.emojis.cache.get(data.emoji) || data.emoji} ${guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
 
-        embed.description = mapResult || 'Nenhum cargo foi encontrado'
+        embed.description = mapResult || '> *Esta coleção não possui nenhum cargo*'
 
         return message.edit({ components: [selectMenuObject], embeds: [embed] })
             .then(async () => {
-                return await interaction.reply({
+                return await interaction.followUp({
                     content: '✅ | Lançamento efetuado.',
                     embeds: [],
                     components: [],
@@ -520,7 +517,7 @@ async function selectMenuFunctions(interaction, client) {
                 }).catch(() => { })
             })
             .catch(async err => {
-                return await interaction.reply({
+                return await interaction.followUp({
                     content: `❌ | O lançamento falhou.\n> \`${err}\``,
                     embeds: [],
                     components: [],
