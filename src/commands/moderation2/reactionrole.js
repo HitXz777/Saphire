@@ -69,30 +69,42 @@ module.exports = {
                 description: `${e.Info} Antes de tudo. Você sabe o que é Reaction Role?\n> *Reaction Role é um metódo criados pelos criadores de Bots para automatizar a entrega de cargos para os membros. O membro reage e ganha um cargo pré-selecionado pela Staff do servidor.*`,
                 fields: [
                     {
-                        name: `${e.QuestionMark} Como usar esse sistema?`,
-                        value: `Aqui, você faz tudo pela barrinha de opções. De um jeito fácil e intuitivo.`
+                        name: `${e.Database} Coleções`,
+                        value: `Uma coleção de reaction role é uma conjunto de cargos do mesmo tipo. Por exemplo, você quer um reaction role de cores? Crie um coleção de Cores. Fácil, não?`
                     },
                     {
-                        name: `${e.QuestionMark} Adicionei um cargo, como ativo?`,
-                        value: 'Clique na barrinha de opções e escolha a opção "\`Throw\`". Eu vou jogar a barra de reaction role no chat.'
+                        name: `${e.Gear} Como usar esse sistema`,
+                        value: `Aqui, você faz tudo pela barrinha de opções. De um jeito fácil e intuitivo. Primeiro você cria as coleções que você precisa, depois, adiciona os cargos nelas.`
                     },
                     {
-                        name: `${e.QuestionMark} Adicionei/Deletei um cargo, como atualizar?`,
-                        value: `Dentro do reaction role lançado pelo "\`Throw\`", existe uma opção chamada "\`Refresh\`". Alí, você pode atualizar todas as alterações feitas.`
+                        name: '⏫ Adicionei um cargo, como ativo?',
+                        value: 'Clique na barrinha de opções e escolha a opção "\`Throw\`". Logo após, só escolher a coleção que você quer iniciar o reaction role.'
                     },
                     {
-                        name: `${e.QuestionMark} A nãão! Adicionei errado, e agora? (Construindo)`,
-                        value: `Você pode usar a função "\`Edit\`" para alterar o título, emoji e a descrição do reaction role.`
+                        name: '🔄 Adicionei/Deletei um cargo, como atualizar?',
+                        value: `Dentro da coleção lançada pelo "\`Throw\`", existe uma opção chamada "\`Refresh\`". Alí, você pode atualizar todas as alterações feitas.`
+                    },
+                    {
+                        name: `${e.SaphireWhat} A nãão! Criei errado, e agora?`,
+                        value: `Você pode usar a função "\`Edit - (Construindo)\`" ou "\`Deletar\`" para alterar o título, emoji e a descrição do reaction role ou simplesmente deletar uma coleção inteira ou um cargo.`
+                    },
+                    {
+                        name: `${e.ReminderBook} Limites são necessários`,
+                        value: `Cada servidor tem o direito de **24 coleções** e **24 cargos** por coleção. Liberando assim **576 cargos** no reaction role.`
+                    },
+                    {
+                        name: `${e.OwnerCrow} Development Note`,
+                        value: `> *A Saphire's Team e o Desenvolvedor da ${client.user} está pensando em novos meios de facilitar a vida dos mod/adms dos servidores. Caso você tenha alguma ideia/crítica para implementar neste sistema, por favor, envie atráves do comando \`${prefix}bug\`. A Saphire's agradece o seu apoio 💖*`
                     }
                 ],
-                footer: { text: 'Limite de 24 cargos por servidor' }
+                footer: { text: `${client.user.username}'s Advanced Systems` }
             }],
             components: [selectMenuPrincipal]
-        }), collected = true
+        }), collected = false
 
         let collector = msg.createMessageComponentCollector({
             filter: int => int.user.id === message.author.id,
-            time: 60000
+            time: 180000
         })
             .on('collect', interaction => {
 
@@ -113,11 +125,15 @@ module.exports = {
 
                 interaction.deferUpdate().catch(() => { })
 
-                if (value === 'editReactionRole') return msg.edit({
-                    content: `${e.Loading} | Este recurso está em construção.`,
-                    embeds: [],
-                    components: []
-                }).catch(() => { })
+                if (value === 'editReactionRole') {
+                    collected = true
+                    collector.stop()
+                    return msg.edit({
+                        content: `${e.Loading} | Este recurso está em construção.`,
+                        embeds: [],
+                        components: []
+                    }).catch(() => { })
+                }
 
                 if (value === 'delete') {
                     collected = true
@@ -134,7 +150,7 @@ module.exports = {
                 return
             })
             .on('end', () => {
-                if (collected) return
+                if (collected) return collected = false
                 return msg.edit({
                     content: `${e.Deny} | Comando encerrado.`,
                     embeds: [],
