@@ -495,7 +495,7 @@ module.exports = {
                         new MessageEmbed()
                             .setColor('YELLOW')
                             .setTitle(`👑 Ranking - Global Money`)
-                            .setDescription(`Próxima atualizão em ${timing}\n \n${rank}`)
+                            .setDescription(`Próxima atualização em ${timing}\n \n${rank}`)
                             .setFooter({ text: `Seu ranking: ${AuthorRank} | Rank Base: Saldo` })
                     ]
                 }).catch(() => { })

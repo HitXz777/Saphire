@@ -281,9 +281,8 @@ async function selectMenuFunctions(interaction, client) {
 
         if (!collections || collections.length === 0)
             return await interaction.reply({
-                content: '❌ | Este servidor não possui nenhuma coleção de reaction role. Você pode criar uma clicando em "Collection" no menu abaixo.',
-                embeds: [],
-                components: [selectMenuPrincipal]
+                content: '❌ | Este servidor não possui nenhuma coleção de reaction role. Você pode criar uma clicando em "Collection" no menu de opções.',
+                ephemeral: true
             }).catch(() => { })
 
         return await interaction.showModal(modal)
@@ -456,8 +455,6 @@ async function selectMenuFunctions(interaction, client) {
                 ephemeral: true
             })
 
-        message.delete().catch(() => { })
-
         let value = val.replace(/refreshReactionRole /g, '')
 
         let data = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
@@ -471,14 +468,10 @@ async function selectMenuFunctions(interaction, client) {
             })
 
         if (!collection)
-            return await interaction.reply({
-                content: `❌ | Coleção não encontrada`
-            })
+            return await interaction.reply({ content: `❌ | Coleção não encontrada` })
 
         if (!collection?.rolesData || collection?.rolesData?.length === 0)
-            return await interaction.reply({
-                content: `❌ | Esta coleção não possui nenhum cargo configurado.`
-            })
+            return await interaction.reply({ content: `❌ | Esta coleção não possui nenhum cargo configurado.` })
 
         let selectMenuObject = {
             type: 1,
@@ -486,7 +479,7 @@ async function selectMenuFunctions(interaction, client) {
                 type: 3,
                 minValues: 1,
                 custom_id: 'reactionRole',
-                placeholder: `Coleção: ${value}`,
+                placeholder: `Escolher cargos da coleção ${collection.name}`,
                 options: []
             }]
         }
@@ -511,18 +504,28 @@ async function selectMenuFunctions(interaction, client) {
             value: `refreshReactionRole ${value}`
         })
 
-        return channel.send({ components: [selectMenuObject] })
+        let embed = { color: client.blue, title: collection.embedTitle || `Cargos da Coleção ${collection.name}` }
+
+        let mapResult = collection.rolesData.map(data => `${guild.emojis.cache.get(data.emoji) || data.emoji} ${guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
+
+        embed.description = mapResult || 'Nenhum cargo foi encontrado'
+
+        return message.edit({ components: [selectMenuObject], embeds: [embed] })
             .then(async () => {
                 return await interaction.reply({
-                    content: `✅ | Reaction role atualizado com sucesso!`,
+                    content: '✅ | Lançamento efetuado.',
+                    embeds: [],
+                    components: [],
                     ephemeral: true
-                })
+                }).catch(() => { })
             })
             .catch(async err => {
                 return await interaction.reply({
-                    content: `❌ | Erro ao atualizar o reaction role: \`${err}\``,
+                    content: `❌ | O lançamento falhou.\n> \`${err}\``,
+                    embeds: [],
+                    components: [],
                     ephemeral: true
-                })
+                }).catch(() => { })
             })
     }
 
@@ -552,7 +555,7 @@ async function selectMenuFunctions(interaction, client) {
 
         const modal = {
             title: "New Reaction Roles Collection",
-            custom_id: "collectorReactionRoles",
+            custom_id: "newCollectionReactionRoles",
             components: [
                 {
                     type: 1,
@@ -565,6 +568,21 @@ async function selectMenuFunctions(interaction, client) {
                             min_length: 1,
                             max_length: 20,
                             placeholder: "Cores",
+                            required: true
+                        }
+                    ]
+                }, // MAX: 5 Fields
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "embedTitle",
+                            label: "Título de apresentação",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 256,
+                            placeholder: "Selecione a cor do seu nome",
                             required: true
                         }
                     ]

@@ -6,7 +6,7 @@ require('dotenv').config()
 
 const SaphireClientConfiguration = {
     intents: 2047,
-    disableMentions: { parse: ['everyone'] },
+    allowedMentions: { parse: ['users'] },
     partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION']
 }
 

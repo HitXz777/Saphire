@@ -19,12 +19,14 @@ async function Error(message, err) {
      * 500 - Internal Server Error
      * 50013 - DiscordAPIError: Missing Permissions
      * 50035 - message_reference - Invalid Form Body
+     * 'message_reference: Unknown message' - Mensagens apagadas antes da respostas
      */
-    
+
     // if (err?.code === 50035)
     //     return message?.channel?.send(`${e.Warn} | A mensagem original é desconhecida. Verifique se alguém ou algo está apagando a mensagem dos comandos.`)
 
     if (err.code === 50013 && !message) return
+    if (err.message === 'Invalid Form Body\nmessage_reference: Unknown message') return message?.channel?.send(`${e.Deny} | Hey! Eu não consegui ver qual é a mensagem do comando... Tenta não apagar a mensagem, ok?`)
 
     if (err?.code === 50013)
         return message?.channel?.send(`${e.Warn} | Eu não tenho permissão suficiente para prosseguir com este comando.`)
@@ -92,7 +94,7 @@ async function Error(message, err) {
 
         Database.PushTransaction(message.author.id, `${e.gain} Recebeu 1000 Safiras por descobrir um bug`)
 
-        return message.channel.send(`${e.Warn} Ocorreu um erro neste comando. Mas não se preocupe! Eu já avisei meu criador e ele vai arrumar isso rapidinho.\n${e.PandaProfit} +1000 ${await Moeda(message)}`).catch(() => { })
+        return message.channel.send(`${e.Warn} | Ocorreu um erro neste comando. Mas não se preocupe! Eu já avisei meu criador e ele vai arrumar isso rapidinho.\n${e.PandaProfit} +1000 ${await Moeda(message)}`).catch(() => { })
     }
 }
 

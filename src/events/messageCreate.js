@@ -142,6 +142,7 @@ client.on('messageCreate', async message => {
     return await command.execute(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
 
 })
+
 async function BlockCommandsBot(message, clientId, Blockchannels) {
 
     if (!message || !Blockchannels) return

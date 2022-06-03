@@ -29,7 +29,7 @@ module.exports = {
                 helicopter: '🚁 Helicóptero de Guerra',
             },
             labels = [
-                { label: 'Homen', emoji: emojis[0], value: 'man', defined: valuesToProfile.man },
+                { label: 'Homem', emoji: emojis[0], value: 'man', defined: valuesToProfile.man },
                 { label: 'Mulher', emoji: emojis[1], value: 'woman', defined: valuesToProfile.woman },
                 { label: 'LGBTQIA+', emoji: emojis[2], value: 'lgbt', defined: valuesToProfile.LGBT },
                 { label: 'Indefinido', emoji: emojis[3], value: 'indefinido', defined: valuesToProfile.indefinido },

@@ -33,7 +33,7 @@ class submitModals {
             case 'lettersReport': this.lettersReport(this); break;
             case 'reactionRoleCreateModal': this.reactionRoleCreateModal(this); break;
             case 'transactionsModalReport': this.transactionsModalReport(); break;
-            case 'collectorReactionRoles': this.collectorReactionRoles(); break;
+            case 'newCollectionReactionRoles': this.newCollectionReactionRoles(); break;
             default:
                 break;
         }
@@ -560,7 +560,7 @@ class submitModals {
 
         if (!role)
             return await interaction.reply({
-                content: `❌ | Não existe nenhum cargo no servidor com o ID ou nome fornecido. \`${roleData}\`.\n \n> Não sabe pegar o ID do cargo? Olhe esse tópico do suporte do Discord: https://support.discord.com/hc/pt-br/articles/206346498-Onde-posso-encontrar-minhas-IDs-de-Usu%C3%A1rio-Servidor-Mensagem-`,
+                content: `❌ | Não existe nenhum cargo no servidor com o ID ou nome fornecido: \`${roleData}\`.\n \n> Não sabe pegar o ID do cargo? Olhe esse tópico do suporte do Discord: https://support.discord.com/hc/pt-br/articles/206346498-Onde-posso-encontrar-minhas-IDs-de-Usu%C3%A1rio-Servidor-Mensagem-`,
                 ephemeral: true
             })
 
@@ -962,9 +962,10 @@ class submitModals {
 
     }
 
-    collectorReactionRoles = async () => {
+    newCollectionReactionRoles = async () => {
 
-        let collectionName = this.fields.getTextInputValue('name')
+        let collectionName = this.fields.getTextInputValue('name'),
+            embedTitle = this.fields.getTextInputValue('embedTitle')
 
         let guildData = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
             rolesData = guildData?.ReactionRole || []
@@ -981,6 +982,7 @@ class submitModals {
             $push: {
                 ReactionRole: {
                     name: collectionName,
+                    embedTitle: embedTitle,
                     rolesData: []
                 }
             }

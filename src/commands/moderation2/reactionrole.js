@@ -49,7 +49,7 @@ module.exports = {
                     {
                         label: 'Delete',
                         emoji: e.Trash,
-                        description: 'Delete um ou mais reaction roles',
+                        description: 'Delete coleções ou cargos',
                         value: 'delete',
                     },
                     {
@@ -99,8 +99,6 @@ module.exports = {
                 const { values, customId } = interaction,
                     value = values[0]
 
-                if (['newReactionRole'].includes(value)) return
-
                 if (customId !== 'createNewReactionRole') return
 
                 if (['newReactionRole', 'newCollectionReactionRole'].includes(value)) {
@@ -116,7 +114,7 @@ module.exports = {
                 interaction.deferUpdate().catch(() => { })
 
                 if (value === 'editReactionRole') return msg.edit({
-                    content: `${e.Loading} | Esta recurso está em construção.`,
+                    content: `${e.Loading} | Este recurso está em construção.`,
                     embeds: [],
                     components: []
                 }).catch(() => { })
@@ -132,8 +130,8 @@ module.exports = {
                     collector.stop()
                     return throwReactionRole()
                 }
-
-                if (ReactionRoleData.find(d => d.name === value)) return registerNewReactionRole(value)
+                
+                return
             })
             .on('end', () => {
                 if (collected) return
@@ -157,7 +155,7 @@ module.exports = {
                 components: [{
                     type: 3,
                     custom_id: 'collections',
-                    placeholder: 'Escolher uma seleção para lançamento',
+                    placeholder: 'Escolher uma coleção para lançamento',
                     options: []
                 }]
             }, collected = false
@@ -212,7 +210,7 @@ module.exports = {
 
                     collected = true
                     collector.stop()
-                    return selectRolesInCollection(rolesData, value)
+                    return selectRolesInCollection(collection)
                 })
                 .on('end', () => {
                     if (collected) return
@@ -222,7 +220,7 @@ module.exports = {
                     }).catch(() => { })
                 })
 
-            function selectRolesInCollection(rolesData, collectionName) {
+            function selectRolesInCollection(collection) {
 
                 let selectMenuObject = {
                     type: 1,
@@ -230,12 +228,12 @@ module.exports = {
                         type: 3,
                         minValues: 1,
                         custom_id: 'reactionRole',
-                        placeholder: `Coleção: ${collectionName}`,
+                        placeholder: `Escolher cargos da coleção ${collection.name}`,
                         options: []
                     }]
                 }
 
-                for (let data of rolesData) {
+                for (let data of collection.rolesData) {
                     let objData = { label: data.title, value: data.roleId }
 
                     if (data.emoji)
@@ -251,7 +249,7 @@ module.exports = {
                     label: 'Refresh',
                     emoji: '🔄',
                     description: 'Atualize o reaction role',
-                    value: `refreshReactionRole ${collectionName}`
+                    value: `refreshReactionRole ${collection.name}`
                 })
 
                 msg.edit({
@@ -260,9 +258,9 @@ module.exports = {
                     components: []
                 }).catch(() => { })
 
-                let embed = { color: client.blue, title: `Cargos da Coleção ${collectionName}` }
+                let embed = { color: client.blue, title: collection.embedTitle || `Cargos da Coleção ${collection.name}` }
 
-                let mapResult = rolesData.map(data => `${message.guild.emojis.cache.get(data.emoji) || data.emoji} ${message.guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
+                let mapResult = collection.rolesData.map(data => `${message.guild.emojis.cache.get(data.emoji) || data.emoji} ${message.guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
 
                 embed.description = mapResult || 'Nenhum cargo foi encontrado'
 
@@ -345,11 +343,11 @@ module.exports = {
 
                     if (customId === 'cancel') return collector.stop()
                     interaction.deferUpdate().catch(() => { })
-                    
+
                     collected = true
                     collector.stop()
                     switch (customId) {
-                        case 'collection': deleteCollection(); break;
+                        case 'collection': chooseACollectionToDelete(); break;
                         case 'role': deleteRole(); break;
                         case 'all': deleteAll(); break;
 
@@ -440,87 +438,262 @@ module.exports = {
                 return
             }
 
-            // let selectMenu = build()
-            // let collector = msg.createMessageComponentCollector({
-            //     filter: int => int.user.id === message.author.id && int.customId === 'reactionRoleDelete',
-            //     time: 60000,
-            //     max: 1,
-            //     errors: ['time', 'max']
-            // })
-            //     .on('collect', interaction => {
-            //         interaction.deferUpdate().catch(() => { })
+            async function deleteRole() {
 
-            //         const { values } = interaction,
-            //             value = values[0]
+                let selectMenuObject = {
+                    type: 1,
+                    components: [{
+                        type: 3,
+                        custom_id: 'menu',
+                        placeholder: 'Escolher uma coleção',
+                        options: []
+                    }]
+                }, collected = false
 
-            //         if (value === 'cancelDelete') return collector.stop()
+                for (let collection of ReactionRoleData)
+                    selectMenuObject.components[0].options.push({
+                        label: collection.name,
+                        emoji: e.Database,
+                        description: `Esta coleção possui ${collection.rolesData.length} cargos`,
+                        value: collection.name
+                    })
 
-            //         collected = true
-            //         for (let id of values)
-            //             deleteReaction(id.substring(0, 18))
+                selectMenuObject.components[0].options.push({
+                    label: 'Cancelar',
+                    emoji: e.Deny,
+                    description: `Cancela a exclusão de cargos`,
+                    value: 'cancel'
+                })
 
-            //         let beaut = values.length === 1
-            //             ? '1 cargo foi deletado do reaction role.'
-            //             : `Todos os ${values.length} cargos foram deletados do reaction role.`
+                msg = await msg.edit({
+                    content: `${e.QuestionMark} | De qual coleção é o cargo que você quer deletar?`,
+                    embeds: [],
+                    components: [selectMenuObject]
+                })
 
-            //         return msg.edit({
-            //             content: `${e.Check} | ${beaut}`,
-            //             components: []
-            //         }).catch(() => { })
-            //     })
-            //     .on('end', () => {
-            //         if (collected) return
-            //         return msg.edit(`${e.Deny} | Comando encerrado.`).catch(() => { })
-            //     })
+                let collector = msg.createMessageComponentCollector({
+                    filter: int => int.user.id === message.author.id,
+                    time: 60000
+                })
+                    .on('collect', interaction => {
 
-            // async function deleteReaction(roleId) {
-            //     return await Database.Guild.updateOne(
-            //         { id: message.guild.id },
-            //         {
-            //             $pull: {
-            //                 ReactionRole: {
-            //                     roleId: roleId
-            //                 }
-            //             }
-            //         }
-            //     )
-            // }
+                        const { values } = interaction,
+                            value = values[0]
 
-            // function build() {
-            //     let selectMenuObject = {
-            //         type: 1,
-            //         components: [{
-            //             type: 3,
-            //             minValues: 1,
-            //             custom_id: 'reactionRoleDelete',
-            //             placeholder: 'Escolher cargos',
-            //             options: []
-            //         }]
-            //     }
+                        if (value === 'cancel') return collector.stop()
+                        interaction.deferUpdate().catch(() => { })
 
-            //     for (let data of ReactionRoleData) {
+                        let collection = ReactionRoleData.find(d => d.name === value)
 
-            //         let objData = { label: data.title, value: `${data.roleId}0` }
+                        if (!collection)
+                            return msg.edit({ content: `${e.Deny} | Coleção não encontrada.` }).catch(() => { })
 
-            //         if (data.emoji)
-            //             objData.emoji = data.emoji
+                        collected = true
+                        collector.stop()
+                        return deleteRoleFromCollection(collection)
 
-            //         if (data.description)
-            //             objData.description = data.description
+                    })
+                    .on('end', () => {
+                        if (collected) return
+                        return msg.edit({
+                            content: `${e.Deny} | Exclusão de coleção cancelada.`,
+                            embeds: [],
+                            components: []
+                        }).catch(() => { })
+                    })
 
-            //         selectMenuObject.components[0].options.push(objData)
-            //     }
+                async function deleteRoleFromCollection(collection) {
 
-            //     selectMenuObject.components[0].options.push({
-            //         label: 'Cancelar',
-            //         emoji: '❌',
-            //         description: 'Cancelar exclução',
-            //         value: 'cancelDelete'
-            //     })
+                    let selectMenuObject = {
+                        type: 1,
+                        components: [{
+                            type: 3,
+                            maxValues: 1,
+                            custom_id: 'toDelete',
+                            placeholder: 'Escolher um cargo para deletar',
+                            options: []
+                        }]
+                    }, collected = false
 
-            //     return selectMenuObject
-            // }
-            return
+                    for (let data of collection.rolesData) {
+
+                        let objData = { label: data.title, value: data.roleId }
+
+                        if (data.emoji)
+                            objData.emoji = data.emoji
+
+                        if (data.description)
+                            objData.description = data.description
+
+                        selectMenuObject.components[0].options.push(objData)
+                    }
+
+                    selectMenuObject.components[0].options.push({
+                        label: 'Cancelar',
+                        emoji: e.Deny,
+                        description: 'Cancelar exclusão',
+                        value: 'cancel'
+                    })
+
+                    msg.edit({
+                        content: `${e.QuestionMark} | Qual cargo você deseja deletar?`,
+                        emebds: [], components: [selectMenuObject]
+                    })
+
+                    let collector = msg.createMessageComponentCollector({
+                        filter: int => int.user.id === message.author.id,
+                        time: 60000
+                    })
+                        .on('collect', interaction => {
+
+                            const { values } = interaction,
+                                value = values[0]
+
+                            if (value === 'cancel') return collector.stop()
+                            interaction.deferUpdate().catch(() => { })
+
+                            collected = true
+
+                            if (!collection.rolesData.find(r => r.roleId === value))
+                                return msg.edit({ content: `${e.Deny} | Cargo não encontrado nesta coleção.` })
+
+                            collector.stop()
+                            return deleteRoleFromCollectionX(collection, value)
+                        })
+                        .on('end', () => {
+                            if (collected) return
+                            return msg.edit({
+                                content: `${e.Deny} | Exclusão de cargo cancelado.`,
+                                embeds: [], components: []
+                            }).catch(() => { })
+                        })
+                }
+
+                async function deleteRoleFromCollectionX(collection, roleId) {
+
+                    await Database.Guild.findOneAndUpdate(
+                        { id: message.guild.id, ['ReactionRole.name']: collection.name },
+                        { $pull: { [`ReactionRole.$.rolesData`]: { roleId: roleId } } }
+                    )
+
+                    let role = message.guild.roles.cache.get(roleId) || '`Not Found`'
+                    return msg.edit({
+                        content: `${e.Check} | O cargo ${role} - \`${roleId}\` foi deletado com sucesso da coleção **${collection.name}**. Possuindo assim, ${collection.rolesData.length - 1} ${(collection.rolesData.length - 1) === 1 ? 'cargo disponível' : 'cargos disponíveis'}.`,
+                        embeds: [], components: []
+                    })
+                }
+
+            }
+
+            async function chooseACollectionToDelete() {
+
+                let selectMenuObject = {
+                    type: 1,
+                    components: [{
+                        type: 3,
+                        custom_id: 'menu',
+                        placeholder: 'Escolher uma coleção',
+                        options: []
+                    }]
+                }, collected = false
+
+                for (let collection of ReactionRoleData)
+                    selectMenuObject.components[0].options.push({
+                        label: collection.name,
+                        emoji: e.Database,
+                        description: `Esta coleção possui ${collection.rolesData.length} cargos`,
+                        value: collection.name
+                    })
+
+                selectMenuObject.components[0].options.push({
+                    label: 'Cancelar',
+                    emoji: e.Deny,
+                    description: `Cancela a exclusão de coleção`,
+                    value: 'cancel'
+                })
+
+                msg = await msg.edit({
+                    content: `${e.QuestionMark} | Qual coleção você deseja deletar?`,
+                    embeds: [],
+                    components: [selectMenuObject]
+                })
+
+                let collector = msg.createMessageComponentCollector({
+                    filter: int => int.user.id === message.author.id,
+                    time: 60000
+                })
+                    .on('collect', interaction => {
+
+                        const { values } = interaction,
+                            value = values[0]
+
+                        if (value === 'cancel') return collector.stop()
+                        interaction.deferUpdate().catch(() => { })
+
+                        let collection = ReactionRoleData.find(d => d.name === value)
+
+                        if (!collection)
+                            return msg.edit({ content: `${e.Deny} | Coleção não encontrada.` }).catch(() => { })
+
+                        collected = true
+                        collector.stop()
+                        return deleteCollectionConfimation(collection)
+
+                    })
+                    .on('end', () => {
+                        if (collected) return
+                        return msg.edit({
+                            content: `${e.Deny} | Exclusão de coleção cancelada.`,
+                            embeds: [],
+                            components: []
+                        }).catch(() => { })
+                    })
+
+                async function deleteCollectionConfimation(collection) {
+
+                    msg.edit({
+                        content: `${e.QuestionMark} | Você realmente deseja deletar a coleção **${collection.name}** do sistema de Reaction Roles?`,
+                        emebds: [], components: []
+                    })
+
+                    let emojis = ['✅', '❌'], coll = false
+
+                    for (let i of emojis) msg.react(i).catch(() => { })
+
+                    return msg.createReactionCollector({
+                        filter: (r, u) => emojis.includes(r.emoji.name) && u.id === message.author.id,
+                        time: 60000,
+                        max: 1,
+                        errors: ['max', 'time']
+                    })
+                        .on('collect', (reaction) => {
+
+                            const { emoji } = reaction
+
+                            if (emoji.name === emojis[1]) return
+
+                            coll = true
+                            return deleteCollection(collection.name)
+                        })
+                        .on('end', () => {
+                            if (coll) return
+                            return msg.edit({
+                                content: `${e.Deny} | Comando de exclusão cancelado.`
+                            })
+                        })
+                }
+
+                async function deleteCollection(collectionName) {
+
+                    await Database.Guild.findOneAndUpdate(
+                        { id: message.guild.id },
+                        { $pull: { ReactionRole: { name: collectionName } } }
+                    )
+
+                    return msg.edit({ content: `${e.Check} | A coleção **${collectionName}** foi deletada com sucesso!` })
+                }
+
+            }
         }
 
         return
