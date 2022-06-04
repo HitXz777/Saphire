@@ -1,10 +1,10 @@
 const Database = require('../../../modules/classes/Database'),
-    { Config: config, Emojis: e } = Database,
-    { newReminder } = require('../plugins/modalPlugins')
+    { Config: config } = Database,
+    { newReminder, getEmoji } = require('../plugins/eventPlugins')
 
 async function selectMenuFunctions(interaction, client) {
 
-    const { customId, values, message, user, guild, channel } = interaction
+    const { customId, values, message, user, guild } = interaction
 
     let value = values[0]
 
@@ -38,21 +38,42 @@ async function selectMenuFunctions(interaction, client) {
                 ephemeral: true
             })
 
-        let msgConfirmation = 'ℹ | Feedback'
+        let msgConfirmation = 'ℹ | Feedback', collection = {}
 
-        for (let roleId of values)
-            await addRole(roleId)
+        let data = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole')
+        let ReactionRole = data?.ReactionRole || []
 
-        function addRole(roleId) {
+        collection = ReactionRole.find(d => d.rolesData?.find(x => x.roleId === value))
+
+        if (collection?.uniqueSelection) {
+
+            let rolesId = []
+
+            collection.rolesData.map(d => rolesId.push(d.roleId))
+
+            rolesId = rolesId.filter(id => id !== value)
+
+            await addRole(value, rolesId)
+        }
+        else
+            for (let roleId of values)
+                await addRole(roleId)
+
+        async function addRole(roleId, toRemoveRolesId = []) {
 
             let role = guild.roles.cache.get(roleId),
                 member = guild.members.cache.get(user.id)
+
+            for (let id of toRemoveRolesId)
+                if (member.roles.cache.has(id))
+                    await member.roles.remove(id)
+                        .then(() => msgConfirmation += `\n⚠️ | ${guild.roles.cache.get(id)} - **REMOVIDO**`)
+                        .catch(() => msgConfirmation += `\n❌ | ${guild.roles.cache.get(id) || 'Not Found'} - **Erro ao remover o cargo**`)
 
             if (!role)
                 return msgConfirmation += `\n⚠️ | ${role?.name || 'NOT FOUND'} - **ERRO**`
 
             if (!role.editable) {
-                deleteReaction(roleId)
                 return msgConfirmation += `\n⚠️ | ${role?.name || 'NOT FOUND'} - **Não posso manusear este cargo.**`
             }
 
@@ -60,7 +81,7 @@ async function selectMenuFunctions(interaction, client) {
                 BlockPermissionsArray = ['KICK_MEMBERS', 'BAN_MEMBERS', 'MANAGE_GUILD', 'MANAGE_MESSAGES', 'MUTE_MEMBERS', 'DEAFEN_MEMBERS', 'MOVE_MEMBERS', 'MANAGE_NICKNAMES', 'MANAGE_ROLES', 'ADMINISTRATOR', 'MODERATE_MEMBERS']
 
             if (member.roles.cache.has(roleId)) {
-                member.roles.remove(role)
+                member.roles.remove(roleId)
                     .catch(() => msgConfirmation += `\n⚠️ | ${role || 'NOT FOUND'} - **ERRO**`)
 
                 return msgConfirmation += `\n❌ | ${role || 'NOT FOUND'} - **REMOVIDO**`
@@ -69,11 +90,11 @@ async function selectMenuFunctions(interaction, client) {
 
                 for (const perm of RolePermissions)
                     if (BlockPermissionsArray.includes(perm)) {
-                        deleteReaction(roleId)
+                        deleteReaction(roleId, collection?.name)
                         return msgConfirmation += `\n❌ | ${role || 'NOT FOUND'} - Este cargo possui a permissão **${config.Perms[perm]}** ativada. Adição ignorada.`
                     }
 
-                member.roles.add(role)
+                await member.roles.add(roleId)
                     .catch(() => msgConfirmation += `\n⚠️ | ${role || 'NOT FOUND'} - **ERRO**`)
 
                 return msgConfirmation += `\n✅ | ${role || 'NOT FOUND'} - **ADICIONADO**`
@@ -474,12 +495,14 @@ async function selectMenuFunctions(interaction, client) {
             type: 1,
             components: [{
                 type: 3,
-                minValues: 1,
                 custom_id: 'reactionRole',
                 placeholder: `Escolher cargos da coleção ${collection.name}`,
                 options: []
             }]
         }
+
+        if (!collection.uniqueSelection)
+            selectMenuObject.components[0].minValues = 1
 
         for (let data of collection.rolesData) {
 
@@ -503,7 +526,7 @@ async function selectMenuFunctions(interaction, client) {
 
         let embed = { color: client.blue, title: collection.embedTitle || `Cargos da Coleção ${collection.name}` }
 
-        let mapResult = collection.rolesData.map(data => `${guild.emojis.cache.get(data.emoji) || data.emoji} ${guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
+        let mapResult = collection.rolesData.map(data => `${getEmoji(data.emoji, guild)}${guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
 
         embed.description = mapResult || '> *Esta coleção não possui nenhum cargo*'
 
@@ -526,16 +549,12 @@ async function selectMenuFunctions(interaction, client) {
             })
     }
 
-    async function deleteReaction(roleId) {
-        return await Database.Guild.updateOne(
-            { id: guild.id },
-            {
-                $pull: {
-                    ReactionRole: {
-                        roleId: roleId
-                    }
-                }
-            }
+    async function deleteReaction(roleId, collectionName) {
+        if (!collectionName || !roleId) return
+
+        await Database.Guild.updateOne(
+            { id: guild.id, ['ReactionRole.name']: collectionName },
+            { $pull: { [`ReactionRole.$.rolesData`]: { roleId: roleId } } }
         )
     }
 
@@ -583,7 +602,22 @@ async function selectMenuFunctions(interaction, client) {
                             required: true
                         }
                     ]
-                }// MAX: 5 Fields
+                },
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "uniqueSelection",
+                            label: "Esta coleção pode entregar mais de 1 cargo?",
+                            style: 1,
+                            min_length: 3,
+                            max_length: 3,
+                            placeholder: "sim | não",
+                            required: true
+                        }
+                    ]
+                } // MAX: 5 Fields
             ]
         }
 

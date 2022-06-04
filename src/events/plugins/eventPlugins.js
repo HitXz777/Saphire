@@ -94,11 +94,23 @@ async function newReminder(interaction) {
     return await interaction.showModal(modal)
 }
 
+function getEmoji(emojiData, guild) {
+    if (!emojiData || !guild) return ''
+    let emoji = guild.emojis.cache.get(emojiData)
+
+    return emoji
+        ? `${emoji} `
+        : emojiData
+            ? `${emojiData} `
+            : ''
+}
+
 module.exports = {
     eightyYears,
     Now,
     FormatNumber,
     getUser,
     day,
-    newReminder
+    newReminder,
+    getEmoji
 }

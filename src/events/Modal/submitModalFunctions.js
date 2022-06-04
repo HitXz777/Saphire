@@ -1,6 +1,6 @@
 const Database = require('../../../modules/classes/Database'),
     { Emojis: e, Config: config } = Database,
-    { eightyYears, Now, getUser, day } = require('../plugins/modalPlugins')
+    { eightyYears, Now, getUser, day } = require('../plugins/eventPlugins')
 
 class submitModals {
     constructor(interaction, client, adicionalData = null) {
@@ -17,12 +17,12 @@ class submitModals {
 
     submitModalFunctions = async () => {
 
-        const { customId, guild, client } = this,
-            guildData = await Database.Guild.findOne({ id: guild.id }, 'Prefix')
+        const guildData = await Database.Guild.findOne({ id: this.guild.id }, 'Prefix')
 
-        this.prefix = guildData?.Prefix || client.prefix
+        this.prefix = guildData?.Prefix || this.client.prefix
+        this.member = this.guild.members.cache.get(this.user.id)
 
-        switch (customId) {
+        switch (this.customId) {
             case 'setStatusModal': this.setStatusModal(this); break;
             case 'forcaChooseWord': this.forcaChooseWord(this); break;
             case 'BugModalReport': this.BugModalReport(this); break;
@@ -549,7 +549,7 @@ class submitModals {
 
     }
 
-    reactionRoleCreateModal = async ({ interaction, fields, user, channel, guild, prefix } = this) => {
+    reactionRoleCreateModal = async ({ interaction, fields, user, channel, guild } = this) => {
 
         const roleData = fields.getTextInputValue('roleData'),
             title = fields.getTextInputValue('roleTitle'),
@@ -561,6 +561,14 @@ class submitModals {
         if (!role)
             return await interaction.reply({
                 content: `❌ | Não existe nenhum cargo no servidor com o ID ou nome fornecido: \`${roleData}\`.\n \n> Não sabe pegar o ID do cargo? Olhe esse tópico do suporte do Discord: https://support.discord.com/hc/pt-br/articles/206346498-Onde-posso-encontrar-minhas-IDs-de-Usu%C3%A1rio-Servidor-Mensagem-`,
+                ephemeral: true
+            })
+
+        let overRole = role.comparePositionTo(this.member.roles.highest) > -1 && guild.ownerId !== user.id
+
+        if (overRole)
+            return await interaction.reply({
+                content: `❌ |  O cargo ${role} é superior ao seu cargo mais alto, portanto você não tem acesso a ele.`,
                 ephemeral: true
             })
 
@@ -633,7 +641,7 @@ class submitModals {
         if (description)
             objData.description = description
 
-        await Database.Guild.findOneAndUpdate(
+        await Database.Guild.updateOne(
             { id: this.guild.id, ['ReactionRole.name']: collectionName },
             { $push: { [`ReactionRole.$.rolesData`]: objData } }
         )
@@ -965,7 +973,8 @@ class submitModals {
     newCollectionReactionRoles = async () => {
 
         let collectionName = this.fields.getTextInputValue('name'),
-            embedTitle = this.fields.getTextInputValue('embedTitle')
+            embedTitle = this.fields.getTextInputValue('embedTitle'),
+            uniqueSelection = this.fields.getTextInputValue('uniqueSelection')?.toLowerCase() === 'não' ? true : false
 
         let guildData = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
             rolesData = guildData?.ReactionRole || []
@@ -983,6 +992,7 @@ class submitModals {
                 ReactionRole: {
                     name: collectionName,
                     embedTitle: embedTitle,
+                    uniqueSelection: uniqueSelection,
                     rolesData: []
                 }
             }

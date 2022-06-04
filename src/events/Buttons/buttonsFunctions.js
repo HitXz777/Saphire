@@ -1,6 +1,6 @@
 const Database = require('../../../modules/classes/Database'),
     { Emojis: e } = Database,
-    { newReminder } = require('../plugins/modalPlugins')
+    { newReminder } = require('../plugins/eventPlugins')
 
 async function buttonsFunctions(interaction, client) {
 

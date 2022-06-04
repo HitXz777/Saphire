@@ -1,3 +1,5 @@
+const { getEmoji } = require('../../events/plugins/eventPlugins')
+
 module.exports = {
     name: 'reactionrole',
     aliases: ['reaction', 'rr'],
@@ -70,7 +72,7 @@ module.exports = {
                 fields: [
                     {
                         name: `${e.Database} Coleções`,
-                        value: `Uma coleção de reaction role é uma conjunto de cargos do mesmo tipo. Por exemplo, você quer um reaction role de cores? Crie um coleção de Cores. Fácil, não?`
+                        value: `Uma coleção de reaction role é um conjunto de cargos do mesmo tipo. Por exemplo, você quer um reaction role de cores? Crie um coleção de Cores. Fácil, não?`
                     },
                     {
                         name: `${e.Gear} Como usar esse sistema`,
@@ -143,8 +145,7 @@ module.exports = {
                 if (value === 'cancel') return collector.stop()
                 if (value === 'throwReactionRole') {
                     collected = true
-                    collector.stop()
-                    return throwReactionRole()
+                    return throwReactionRole(collector)
                 }
 
                 return
@@ -158,13 +159,15 @@ module.exports = {
                 }).catch(() => { })
             })
 
-        async function throwReactionRole() {
+        async function throwReactionRole(collector) {
 
             if (!ReactionRoleData || ReactionRoleData.length === 0)
                 return msg.edit({
                     content: `${e.Deny} | Este servidor não tem nenhuma coleção de reaction role configurada.`,
                     embeds: []
                 }).catch(() => { })
+
+            collector.stop()
 
             let selectMenuObjectCollections = {
                 type: 1,
@@ -198,7 +201,7 @@ module.exports = {
                 components: [selectMenuObjectCollections]
             }).catch(() => { })
 
-            let collector = msg.createMessageComponentCollector({
+            collector = msg.createMessageComponentCollector({
                 filter: int => int.user.id === message.author.id,
                 idle: 60000,
             })
@@ -211,8 +214,7 @@ module.exports = {
 
                     interaction.deferUpdate().catch(() => { })
 
-                    let collection = ReactionRoleData.find(coll => coll.name === value),
-                        rolesData = collection?.rolesData || []
+                    let collection = ReactionRoleData.find(coll => coll.name === value)
 
                     if (!collection)
                         return msg.edit({
@@ -237,12 +239,14 @@ module.exports = {
                     type: 1,
                     components: [{
                         type: 3,
-                        minValues: 1,
                         custom_id: 'reactionRole',
                         placeholder: `Escolher cargos da coleção ${collection.name}`,
                         options: []
                     }]
                 }
+
+                if (!collection.uniqueSelection)
+                    selectMenuObject.components[0].minValues = 1
 
                 if (collection.rolesData.length > 0)
                     for (let data of collection.rolesData) {
@@ -272,7 +276,7 @@ module.exports = {
 
                 let embed = { color: client.blue, title: collection.embedTitle || `Cargos da Coleção ${collection.name}` }
 
-                let mapResult = collection.rolesData.map(data => `${message.guild.emojis.cache.get(data.emoji) || data.emoji} ${message.guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
+                let mapResult = collection.rolesData.map(data => `${getEmoji(data.emoji, message.guild)}${message.guild.roles.cache.get(data.roleId) || 'Not Found'}` || '\`Cargo não encontrado\`').join('\n')
 
                 embed.description = mapResult || '> *Esta coleção não possui nenhum cargo*'
 
@@ -300,7 +304,7 @@ module.exports = {
             if (!ReactionRoleData || ReactionRoleData.length === 0)
                 return msg.edit({
                     content: `${e.Deny} | Este servidor não tem nenhuma coleção de reaction roles.`,
-                    embeds: []
+                    embeds: [], components: []
                 })
 
             let buttons = [
@@ -583,7 +587,7 @@ module.exports = {
 
                 async function deleteRoleFromCollectionX(collection, roleId) {
 
-                    await Database.Guild.findOneAndUpdate(
+                    await Database.Guild.updateOne(
                         { id: message.guild.id, ['ReactionRole.name']: collection.name },
                         { $pull: { [`ReactionRole.$.rolesData`]: { roleId: roleId } } }
                     )

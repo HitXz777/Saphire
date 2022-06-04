@@ -27,9 +27,10 @@ module.exports = {
                     const url = `https://cdn.discordapp.com/emojis/${parsedEmoji.id + extension}`
                     message.guild.emojis.create(url, parsedEmoji.name)
                         .then((emoji) => message.reply(`${emoji} | Emoji adicionado com sucesso!`))
-                        .catch(err => message.reply(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji}) | Ou isso não é um emoji customizado ou o servidor já atingiu o limite de emojis.`))
+                        .catch(() => message.reply(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji}) | Ou isso não é um emoji customizado ou o servidor já atingiu o limite de emojis.`))
                     continue
-                } else { message.reply(`${e.QuestionMark} | Isso é mesmo um emoji customizado? (${rawEmoji})`) }
+                }
+                message.reply(`${e.QuestionMark} | Isso é mesmo um emoji customizado? (${rawEmoji})`)
             }
 
             return
