@@ -1,4 +1,4 @@
-const { getEmoji } = require('../../events/plugins/eventPlugins')
+const { getEmoji, registerCollectionID } = require('../../events/plugins/eventPlugins')
 
 module.exports = {
     name: 'reactionrole',
@@ -130,11 +130,7 @@ module.exports = {
                 if (value === 'editReactionRole') {
                     collected = true
                     collector.stop()
-                    return msg.edit({
-                        content: `${e.Loading} | Este recurso está em construção.`,
-                        embeds: [],
-                        components: []
-                    }).catch(() => { })
+                    return editReactionRole(msg)
                 }
 
                 if (value === 'delete') {
@@ -184,7 +180,7 @@ module.exports = {
                     label: collection.name,
                     emoji: e.Database,
                     description: `Cargos na coleção: ${collection.rolesData.length}`,
-                    value: collection.name
+                    value: collection.collectionID || collection.name
                 })
             }
 
@@ -214,7 +210,7 @@ module.exports = {
 
                     interaction.deferUpdate().catch(() => { })
 
-                    let collection = ReactionRoleData.find(coll => coll.name === value)
+                    let collection = ReactionRoleData.find(coll => coll.collectionID === value || coll.name === value)
 
                     if (!collection)
                         return msg.edit({
@@ -233,7 +229,7 @@ module.exports = {
                     }).catch(() => { })
                 })
 
-            function selectRolesInCollection(collection) {
+            async function selectRolesInCollection(collection) {
 
                 let selectMenuObject = {
                     type: 1,
@@ -261,11 +257,13 @@ module.exports = {
                         selectMenuObject.components[0].options.push(objData)
                     }
 
+                let collectionID = collection.collectionID || await registerCollectionID(Database, collection, message.guild)
+
                 selectMenuObject.components[0].options.push({
                     label: 'Refresh',
                     emoji: '🔄',
                     description: 'Atualize o reaction role',
-                    value: `refreshReactionRole ${collection.name}`
+                    value: `refreshReactionRole ${collectionID}`
                 })
 
                 msg.edit({
@@ -710,6 +708,156 @@ module.exports = {
                 }
 
             }
+        }
+
+        async function editReactionRole(msg) {
+
+            let data = await Database.Guild.findOne({ id: message.guild.id }, 'ReactionRole'),
+                reactionData = data?.ReactionRole || []
+
+            if (!data || !reactionData || reactionData.length === 0)
+                return msg.edit({
+                    content: `${e.Deny} | Este servidor não possui nenhuma coleção criada. Portanto, a função *edit* está bloqueada.`,
+                    components: [], embeds: []
+                })
+
+            let buttons = [{
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        label: 'Uma Coleção',
+                        emoji: e.Database,
+                        custom_id: 'collection',
+                        style: 'PRIMARY'
+                    },
+                    {
+                        type: 2,
+                        label: 'Um Cargo',
+                        emoji: '💠',
+                        custom_id: 'role',
+                        style: 'PRIMARY'
+                    },
+                    {
+                        type: 2,
+                        label: 'Cancelar',
+                        emoji: '❌',
+                        custom_id: 'cancel',
+                        style: 'DANGER'
+                    }
+                ]
+            }], collected = false
+
+            msg.edit({
+                content: `${e.Loading} | Ok, editar. O que você quer editar?`,
+                embeds: [],
+                components: buttons
+            }).catch(() => { })
+
+            let collector = msg.createMessageComponentCollector({
+                filter: int => int.user.id === message.author.id,
+                time: 60000,
+                errors: ['time']
+            })
+                .on('collect', interaction => {
+
+                    const { customId } = interaction
+
+                    if (customId === 'cancel') return collector.stop()
+
+                    collected = true
+                    collector.stop()
+
+                    interaction.deferUpdate().catch(() => { })
+                    if (customId === 'collection') return chooseCollectionToEdit()
+                    if (customId === 'role') return editRole()
+                    return
+                })
+                .on('end', () => {
+                    if (collected) return
+                    return msg.edit({
+                        content: `${e.Deny} | Edição cancelada.`,
+                        components: []
+                    })
+                })
+
+            return
+
+            async function chooseCollectionToEdit() {
+
+                let selectMenu = await buildSelectMenu(), collected = false
+
+                msg.edit({
+                    content: `${e.QuestionMark} | Qual coleção você quer editar?`,
+                    components: [selectMenu]
+                }).catch(() => { })
+
+                let collector = msg.createMessageComponentCollector({
+                    filter: int => int.user.id === message.author.id,
+                    time: 60000,
+                    errors: ['time']
+                })
+                    .on('collect', interaction => {
+
+                        const { values } = interaction,
+                            value = values[0]
+
+                        if (value === 'cancel') return collector.stop()
+
+                        collected = true
+                        collector.stop()
+
+                        if (ReactionRoleData.find(d => d.collectionID === value))
+                            return msg.edit({
+                                content: `${e.Check} | Request aceita!`, components: [], embeds: []
+                            }).catch(() => { })
+
+                        return msg.edit({
+                            content: `${e.Deny} | Nenhuma coleção foi encontrada. \`Collection ID: ${value}\``, components: [], embeds: []
+                        }).catch(() => { })
+                    })
+                    .on('end', () => {
+                        if (collected) return
+                        return msg.edit({
+                            content: `${e.Deny} | Edição de coleção cancelada.`,
+                            components: []
+                        })
+                    })
+
+                async function buildSelectMenu() {
+
+                    let selectMenuObject = {
+                        type: 1,
+                        components: [{
+                            type: 3,
+                            custom_id: 'collectionEdit',
+                            placeholder: 'Coleções',
+                            options: []
+                        }]
+                    }
+
+                    for (let collection of reactionData)
+                        selectMenuObject.components[0].options.push({
+                            label: collection.name,
+                            emoji: e.Database,
+                            description: `${collection.rolesData.length} Cargos | Reação única: ${collection.uniqueSelection ? 'Sim' : 'Não'}`,
+                            value: collection.collectionID || await registerCollectionID(Database, collection, message.guild)
+                        })
+
+                    selectMenuObject.components[0].options.push({
+                        label: 'Cancelar',
+                        emoji: '❌',
+                        description: 'Cancelar edição',
+                        value: 'cancel'
+                    })
+
+                    return selectMenuObject
+                }
+
+                return
+            }
+
+
         }
 
         return

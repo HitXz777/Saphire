@@ -1,6 +1,7 @@
 const Database = require('../../../modules/classes/Database'),
     { Emojis: e, Config: config } = Database,
-    { eightyYears, Now, getUser, day } = require('../plugins/eventPlugins')
+    { eightyYears, Now, getUser, day } = require('../plugins/eventPlugins'),
+    passCode = require('../../../modules/functions/plugins/PassCode')
 
 class submitModals {
     constructor(interaction, client, adicionalData = null) {
@@ -17,10 +18,12 @@ class submitModals {
 
     submitModalFunctions = async () => {
 
-        const guildData = await Database.Guild.findOne({ id: this.guild.id }, 'Prefix')
+        const guildData = await Database.Guild.findOne({ id: this.guild.id }, 'Prefix ReactionRole')
 
         this.prefix = guildData?.Prefix || this.client.prefix
         this.member = this.guild.members.cache.get(this.user.id)
+
+        if (guildData?.ReactionRole?.find(d => d.name === this.customId)) return this.newCollectionReactionRoles()
 
         switch (this.customId) {
             case 'setStatusModal': this.setStatusModal(this); break;
@@ -972,34 +975,36 @@ class submitModals {
 
     newCollectionReactionRoles = async () => {
 
-        let collectionName = this.fields.getTextInputValue('name'),
+        let collectionName = this.fields.getTextInputValue('name') || this.customId,
             embedTitle = this.fields.getTextInputValue('embedTitle'),
             uniqueSelection = this.fields.getTextInputValue('uniqueSelection')?.toLowerCase() === 'não' ? true : false
 
         let guildData = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
-            rolesData = guildData?.ReactionRole || []
-
-        let has = rolesData.find(data => data.name === collectionName)
-
-        if (has)
-            return await this.interaction.reply({
-                content: `❌ | Já existe uma coleção com o nome \`${collectionName}\``,
-                ephemeral: true
-            })
-
-        await Database.Guild.updateOne({ id: this.guild.id }, {
-            $push: {
-                ReactionRole: {
+            collections = guildData?.ReactionRole || [],
+            collection = collections.find(d => [this.customId, collectionName].includes(d.name)),
+            rolesData = collection?.rolesData ? [...collection.rolesData] : [],
+            newCollection = [
+                ...collections.filter(c => c.name !== collection?.name),
+                {
                     name: collectionName,
                     embedTitle: embedTitle,
                     uniqueSelection: uniqueSelection,
-                    rolesData: []
+                    rolesData: rolesData,
+                    collectionID: collection?.collectionID || passCode(5)
+                }
+            ]
+
+        await Database.Guild.updateOne(
+            { id: this.guild.id },
+            {
+                $set: {
+                    ReactionRole: [...newCollection]
                 }
             }
-        })
+        )
 
         return await this.interaction.reply({
-            content: `✅ | Nova coleção de Reaction Roles criada com sucesso!`,
+            content: `✅ | Coleção de Reaction Roles registrada com sucesso!`,
             ephemeral: true
         })
 

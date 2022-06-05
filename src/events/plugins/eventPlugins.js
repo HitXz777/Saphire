@@ -105,6 +105,19 @@ function getEmoji(emojiData, guild) {
             : ''
 }
 
+async function registerCollectionID(Database, collection, guild) {
+
+    let passCode = require('../../../modules/functions/plugins/PassCode')
+    let newID = passCode(5)
+
+    await Database.Guild.updateOne(
+        { id: guild.id, 'ReactionRole.name': collection.name },
+        { $set: { 'ReactionRole.$.collectionID': newID } }
+    )
+
+    return newID
+}
+
 module.exports = {
     eightyYears,
     Now,
@@ -112,5 +125,6 @@ module.exports = {
     getUser,
     day,
     newReminder,
-    getEmoji
+    getEmoji,
+    registerCollectionID
 }

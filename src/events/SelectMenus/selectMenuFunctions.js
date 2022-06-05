@@ -1,6 +1,6 @@
 const Database = require('../../../modules/classes/Database'),
     { Config: config } = Database,
-    { newReminder, getEmoji } = require('../plugins/eventPlugins')
+    { newReminder, getEmoji, registerCollectionID } = require('../plugins/eventPlugins')
 
 async function selectMenuFunctions(interaction, client) {
 
@@ -18,32 +18,38 @@ async function selectMenuFunctions(interaction, client) {
         case 'reportTransactions': reportTransactions(); break;
         case 'newReactionRole': newReactionRole(); break;
         case 'newCollectionReactionRole': newCollectionReactionRole(); break;
-        default: break;
+        default: checkEditReactionRole(); break;
     }
 
     return
 
     async function reactionRole() {
 
-        if (value.includes('refreshReactionRole')) return refreshReactionRole(value)
+        if (value.includes('refreshReactionRole') || value.length === 5) return refreshReactionRole(value)
 
         for (let val of values)
             if (val.includes('refreshReactionRole')) return refreshReactionRole(val)
 
+        await interaction.update({}) // By: 793343792048635924 & 196679829800747017
         let permsArray = guild.me.permissions.toArray() || []
 
         if (!permsArray.includes('MANAGE_ROLES') && !permsArray.includes('ADMINISTRATOR'))
-            return await interaction.reply({
+            return await interaction.followUp({
                 content: '❌ | Eu não tenho a permissão **Gerenciar Cargos** ativada. A adição de cargo está suspensa.',
                 ephemeral: true
             })
 
-        let msgConfirmation = 'ℹ | Feedback', collection = {}
+        let msgConfirmation = 'ℹ | Feedback'
 
         let data = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole')
-        let ReactionRole = data?.ReactionRole || []
+        let ReactionRole = data?.ReactionRole || [],
+            collection = ReactionRole.find(d => d.rolesData?.find(x => x.roleId === value))
 
-        collection = ReactionRole.find(d => d.rolesData?.find(x => x.roleId === value))
+        if (!collection || !collection?.collectionID)
+            return await interaction.followUp({
+                content: '⚠ | Esta coleção necessita ser atualizada. Peça para um Administrador clicar em "Refresh".',
+                ephemeral: true
+            })
 
         if (collection?.uniqueSelection) {
 
@@ -102,7 +108,6 @@ async function selectMenuFunctions(interaction, client) {
 
         }
 
-        await interaction.update({}) // By: 793343792048635924 & 196679829800747017
         return await interaction.followUp({
             content: msgConfirmation,
             ephemeral: true
@@ -465,6 +470,7 @@ async function selectMenuFunctions(interaction, client) {
 
     async function refreshReactionRole(val) {
         await interaction.update({})
+
         let member = guild.members.cache.get(user.id)
         if (!member) return
 
@@ -476,11 +482,11 @@ async function selectMenuFunctions(interaction, client) {
                 ephemeral: true
             })
 
-        let value = val.replace(/refreshReactionRole /g, '')
+        let collectionID = val.replace(/refreshReactionRole /g, '')
 
         let data = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
             ReactionRoleData = data?.ReactionRole || [],
-            collection = ReactionRoleData?.find(coll => coll.name === value)
+            collection = ReactionRoleData?.find(coll => coll.collectionID === collectionID || coll.name === value)
 
         if (!ReactionRoleData || ReactionRoleData.length === 0)
             return await interaction.followUp({
@@ -489,7 +495,7 @@ async function selectMenuFunctions(interaction, client) {
             })
 
         if (!collection)
-            return await interaction.followUp({ content: `❌ | Coleção não encontrada` })
+            return await interaction.followUp({ content: '❌ | Coleção não encontrada' })
 
         let selectMenuObject = {
             type: 1,
@@ -517,11 +523,13 @@ async function selectMenuFunctions(interaction, client) {
             selectMenuObject.components[0].options.push(objData)
         }
 
+        let newID = collection.collectionID || await registerCollectionID(Database, collection, guild)
+
         selectMenuObject.components[0].options.push({
             label: 'Refresh',
             emoji: '🔄',
             description: 'Atualize o reaction role',
-            value: `refreshReactionRole ${value}`
+            value: `refreshReactionRole ${newID}`
         })
 
         let embed = { color: client.blue, title: collection.embedTitle || `Cargos da Coleção ${collection.name}` }
@@ -622,6 +630,78 @@ async function selectMenuFunctions(interaction, client) {
         }
 
         return await interaction.showModal(modal)
+    }
+
+    async function checkEditReactionRole() {
+
+        let guildData = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
+            collections = guildData?.ReactionRole || [],
+            collection = collections?.find(d => d.collectionID === value)
+
+        if (collection)
+            return collectionEdit(collection)
+        else return
+
+    }
+
+    async function collectionEdit(collection) {
+
+        const modal = {
+            title: "Edit Reaction Role Collection",
+            custom_id: collection.name,
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "name",
+                            label: "Trocar o nome da coleção?",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 20,
+                            placeholder: collection.name
+                        }
+                    ]
+                },
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "embedTitle",
+                            label: "Título de apresentação",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 256,
+                            placeholder: 'Nenhum título encontrado',
+                            required: true,
+                            value: collection.embedTitle || null
+                        }
+                    ]
+                },
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "uniqueSelection",
+                            label: "Esta coleção pode entregar mais de 1 cargo?",
+                            style: 1,
+                            min_length: 3,
+                            max_length: 3,
+                            required: true,
+                            value: collection.uniqueSelection ? 'não' : 'sim'
+                        }
+                    ]
+                } // MAX: 5 Fields
+            ]
+        }
+
+        return await interaction.showModal(modal)
+            .catch(err => {
+                if (err.code === 40060) return
+            })
     }
 
 }
