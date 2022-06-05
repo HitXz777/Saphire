@@ -172,7 +172,6 @@ class Click {
 
             let collector = msg.createMessageComponentCollector({
                 filter: int => [message.author.id, user.id].includes(int.user.id),
-                max: 1,
                 time: 60000,
                 errors: ['max', 'time']
             })
