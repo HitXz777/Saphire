@@ -482,11 +482,15 @@ async function selectMenuFunctions(interaction, client) {
                 ephemeral: true
             })
 
-        let collectionID = val.replace(/refreshReactionRole /g, '')
+        let collectionID = val.replace(/refreshReactionRole /g, ''),
+            placeholder = interaction.message?.components[0]?.components[0]?.placeholder?.replace(/Escolher cargos da coleção /g, '') || ''
 
         let data = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
             ReactionRoleData = data?.ReactionRole || [],
-            collection = ReactionRoleData?.find(coll => coll.collectionID === collectionID || coll.name === value)
+            collection = ReactionRoleData?.find(coll =>
+                coll.collectionID === collectionID
+                || [value, placeholder].includes(coll.name)
+            )
 
         if (!ReactionRoleData || ReactionRoleData.length === 0)
             return await interaction.followUp({
@@ -495,7 +499,7 @@ async function selectMenuFunctions(interaction, client) {
             })
 
         if (!collection)
-            return await interaction.followUp({ content: '❌ | Coleção não encontrada' })
+            return await interaction.followUp({ content: '❌ | Coleção não encontrada', ephemeral: true })
 
         let selectMenuObject = {
             type: 1,
