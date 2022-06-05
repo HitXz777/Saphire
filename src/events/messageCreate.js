@@ -22,7 +22,7 @@ client.on('messageCreate', async message => {
 
     if (clientData?.Blacklist?.Guilds?.some(data => data?.id === message.guild.id)) {
         message.channel.send(`${e.Deny} | Este servidor está na blacklist. Bye bye, estou me retirando.`)
-        message.guild.leave()
+        message.guild.leave().catch(() => { })
         return
     }
 
