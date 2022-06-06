@@ -51,7 +51,7 @@ module.exports = {
                 return message.reply(`${e.Info} | Forneça um nome para o sticker. \`${prefix}sticker new linkDoSticker.com/algumaCoisa nomeDoSticker\``)
 
             return message.guild.stickers.create(url, stickerName, 'SaphireAddStickerSystem')
-                .then(sticker => message.reply(`${e.Check} | O sticker foi adicionado com sucesso com o nome \`${sticker.name}\`.\n${sticker}`))
+                .then(sticker => message.reply(`${e.Check} | O sticker foi adicionado com sucesso com o nome \`${sticker.name}\`.`))
                 .catch(err => reportError(err))
 
             function addImageAsSticker() {

@@ -79,7 +79,7 @@ module.exports = {
 
                         if (json.status === 'error') {
 
-                            msg.edit(`${e.Deny} | Não foi possível iniciar o reboot.\n${e.Warn} Error Message: \`${json.message}\``)
+                            msg.edit(`${e.Deny} | Não foi possível iniciar o reboot.\n${e.Warn} | Error Message: \`${json.message}\``)
 
                             await Database.Client.updateOne(
                                 { id: client.user.id },

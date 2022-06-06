@@ -15,6 +15,26 @@ module.exports = {
 
         if (!args[0]) return message.reply({ embeds: [new MessageEmbed().setColor('#246FE0').setTitle('📋 Comandos Exclusivos de Delete (OWNER)').setDescription('Com este comando, o meu criador torna possível a opção de Deletar qualquer item de qualquer pessoa.').addField('Comando', '`' + prefix + 'del Item @user`').setFooter({ text: `${prefix}itens` })] })
 
+
+        if (['servers', 'servidores', 'guilds'].includes(args[0]?.toLowerCase())) {
+
+            let amount = parseInt(args[1]), servers = 0, leaved = 0
+
+            if (isNaN(amount)) return message.reply(`${e.Deny} | Informe a quantidade máxima de usuários no servidor para remoção.`)
+
+            let msg = await message.reply(`${e.Loading} | Saindo de todos os servidores com até ${amount} membros.`)
+
+            client.guilds.cache.forEach(guild => {
+                servers++
+                if (guild.members.cache.size <= amount && guild.id !== message.guild.id) {
+                    leaved++
+                    guild.leave().catch(() => { })
+                }
+            })
+
+            return msg.edit(`${e.Check} | Eu saí de ${leaved}/${servers} servidores que tinham menos de ${amount} membros.`).catch(() => { })
+        }
+
         let user = message.mentions.users.first() || message.mentions.repliedUser || await client.users.cache.get(args[1])
         if (!user) return message.reply(`${e.Deny} | Não achei ninguém.`)
 
