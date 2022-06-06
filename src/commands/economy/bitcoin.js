@@ -1,6 +1,7 @@
 const { e } = require('../../../JSON/emojis.json'),
     ms = require('parse-ms'),
-    Moeda = require('../../../modules/functions/public/moeda')
+    Moeda = require('../../../modules/functions/public/moeda'),
+    Reminder = require('../../../modules/classes/Reminder')
 
 module.exports = {
     name: 'bitcoin',
@@ -38,7 +39,7 @@ module.exports = {
 
             const BitEmbed = new MessageEmbed()
                 .setColor('#FF8C00')
-                .setAuthor({ name: message.author.username, iconURL: message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 })})
+                .setAuthor({ name: message.author.username, iconURL: message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }) })
                 .addField('BitCoins', `${e.BitCoin} ${BitCoins || 0}`, true)
                 .addField('BitFarm', `${e.BitCoin} \`${Bits}/1000\``, true)
 
@@ -81,7 +82,24 @@ module.exports = {
                 { upsert: true }
             )
 
-            return message.reply(`${e.BitCoin} | +1 | \`${Bits + 1}/1000\` | Reset em \`1h 59m 59s\``).catch(() => { })
+            let msg = await message.reply(`${e.BitCoin} | +1 | \`${Bits + 1}/1000\` | Reset em \`${client.GetTimeout(7200000, Date.now())}\``).catch(() => { })
+
+            const dateNow = Date.now()
+
+            return new Reminder(msg, {
+                time: 7200000, // 24 hours
+                user: message.author,
+                client: client,
+                confirmationMessage: `⏰ | Tudo bem, ${message.author}! Eu vou te avisar de minerar bitcoins quando o tempo acabar. Pode ficar de boas ${e.SaphireOk} - \`ReplaceTIMER\``,
+                reminderData: {
+                    userId: message.author.id,
+                    RemindMessage: 'AUTOMATIC REMINDER | Bitcoin Disponível',
+                    Time: 7200000,
+                    DateNow: dateNow,
+                    isAutomatic: true,
+                    ChannelId: message.channel.id
+                }
+            }).showButton()
         }
 
     }

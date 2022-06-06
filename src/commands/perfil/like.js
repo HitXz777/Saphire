@@ -1,4 +1,5 @@
-const { e } = require('../../../JSON/emojis.json')
+const { e } = require('../../../JSON/emojis.json'),
+    Reminder = require('../../../modules/classes/Reminder')
 
 module.exports = {
     name: 'like',
@@ -37,7 +38,24 @@ module.exports = {
         Database.addItem(user.id, 'Likes', 1)
         Database.SetTimeout(message.author.id, 'Timeouts.Rep')
 
-        return message.reply(`${e.Check} | Você deu um like para ${user.username}.\nAgora, ${user.username} possui um total de ${e.Like} ${data.userLikes + 1} likes.`)
+        let msg = await message.reply(`${e.Check} | Você deu um like para ${user.username}.\nAgora, ${user.username} possui um total de ${e.Like} ${data.userLikes + 1} likes.`)
+        
+        const dateNow = Date.now()
+
+        return new Reminder(msg, {
+            time: 1800000, // 24 hours
+            user: message.author,
+            client: client,
+            confirmationMessage: `⏰ | Entendido, ${message.author}! O seu próximo like é daqui \`ReplaceTIMER\`. Então, vou te avisar aqui quando esse tempo acabar, ok?`,
+            reminderData: {
+                userId: message.author.id,
+                RemindMessage: 'AUTOMATIC REMINDER | Like Disponível',
+                Time: 1800000,
+                DateNow: dateNow,
+                isAutomatic: true,
+                ChannelId: message.channel.id
+            }
+        }).showButton()
 
     }
 }

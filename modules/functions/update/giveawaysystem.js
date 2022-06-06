@@ -75,7 +75,8 @@ async function start(MessageId, Guild, ChannelId) {
         embedToEdit.color = client.red
         embedToEdit.description = null
         embedToEdit.title += ' | Sorteio encerrado'
-        embedToEdit.footer.text += ` | ${Participantes.length} Participantes`
+        embedToEdit.timestamp = new Date(),
+        embedToEdit.footer.text = `Giveaway ID: ${MessageId} | ${Participantes.length} Participantes | Sorteado em`
         message.edit({ embeds: [embedToEdit], components: [] }).catch(() => { })
 
         if (Participantes.length === 0) {

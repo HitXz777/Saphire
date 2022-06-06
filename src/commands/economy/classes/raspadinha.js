@@ -82,10 +82,7 @@ class Raspadinha {
             }).catch(() => { })
 
             return msg.createMessageComponentCollector({
-                filter: int => {
-                    if (int.channel.id !== message.channel.id) return false
-                    return int.user.id === message.author.id
-                },
+                filter: int => int.channel.id === message.channel.id && int.user.id === message.author.id,
                 idle: 20000,
                 erros: ['idle']
             })
@@ -102,10 +99,11 @@ class Raspadinha {
 
                     let buttom = buttons[buttonIndex].components.find(data => data.custom_id === customId)
 
-                    buttom.emoji = getRandomEmoji()
+                    buttom.emoji = await getRandomEmoji()
                     buttom.disabled = true
                     buttom.style = 'PRIMARY'
                     await checkButtons()
+
                     return msg.edit({ components: buttons }).catch(() => { })
                 })
                 .on('end', () => {
@@ -166,9 +164,7 @@ class Raspadinha {
                 disableAllButtons([a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4])
                 return lose()
             }
-
             return
-
         }
 
         function win(emoji) {

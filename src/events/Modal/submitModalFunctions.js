@@ -93,7 +93,7 @@ class submitModals {
 
     }
 
-    newReminder = async ({ interaction, client, fields, user, channel } = this) => {
+    async newReminder({ interaction, client, fields, user, channel } = this) {
 
         const moment = require('moment')
         const time = fields.getTextInputValue('time')
@@ -502,11 +502,6 @@ class submitModals {
                         value: `> ${Prize}`
                     },
                     {
-                        name: '⏱️ Data de Término',
-                        value: `> \`${Data(TimeMs)}\``,
-                        inline: true
-                    },
-                    {
                         name: `${e.ModShield} Patrocinado por`,
                         value: `> ${user}`,
                         inline: true
@@ -520,9 +515,9 @@ class submitModals {
                 image: {
                     url: imageURL || null,
                 },
-                timestamp: new Date(),
+                timestamp: new Date(Date.now() + TimeMs),
                 footer: {
-                    text: `Giveaway ID: ${msg?.id}`
+                    text: `Giveaway ID: ${msg?.id} | Sorteio em`
                 }
             }
 

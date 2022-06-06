@@ -35,6 +35,7 @@ async function reminderStart(user, data) {
     let RemindMessage = data.RemindMessage.slice(0, 3500),
         Time = data.Time,
         DateNow = data.DateNow,
+        isAutomatic = data.isAutomatic,
         TimeOver = client.Timeout(Time, DateNow),
         Channel = client.channels.cache.get(data.ChannelId)
 
@@ -47,8 +48,11 @@ async function reminderStart(user, data) {
             { Alerted: true }
         )
 
-        let msg = await Channel.send(`${e.Notification} | ${user}, lembrete pra você.\n🗒️ | **${RemindMessage}**`).catch(() => { return NotifyUser() }),
-            emojis = ['📅', '🗑️'],
+        let msg = await Channel.send(`${e.Notification} | ${user}, lembrete pra você.\n🗒️ | **${RemindMessage}**`).catch(() => { return NotifyUser() })
+
+        if (isAutomatic) return deleteReminders(data.id)
+        
+        let emojis = ['📅', '🗑️'],
             validate = false
 
         for (let i of emojis) msg.react(i).catch(() => { })
@@ -58,7 +62,6 @@ async function reminderStart(user, data) {
             idle: 600000,
             errors: ['idle']
         })
-
             .on('collect', (reaction) => {
 
                 validate = true
@@ -83,7 +86,6 @@ async function reminderStart(user, data) {
                 deleteReminders(data.id)
                 return msg.edit(`${e.Notification} | ${user}, lembrete pra você.\n🗒️ | **${RemindMessage}**\n${e.Info} | Lembrete deletado.`)
             })
-
 
         function NotifyUser() {
             deleteReminders(data.id)

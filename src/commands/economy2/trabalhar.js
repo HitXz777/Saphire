@@ -1,6 +1,7 @@
 const { e } = require('../../../JSON/emojis.json'),
     Moeda = require('../../../modules/functions/public/moeda'),
-    Vip = require('../../../modules/functions/public/vip')
+    Vip = require('../../../modules/functions/public/vip'),
+    Reminder = require('../../../modules/classes/Reminder')
 
 module.exports = {
     name: 'trabalhar',
@@ -57,7 +58,24 @@ module.exports = {
             )
         }
 
-        return message.reply(`${hasVip}Você trabalhou ${job ? `como **${job}**` : ''} e ganhou ${work} ${moeda} e ${xp} ${e.RedStar}XP${gorjetaAdded}\n${vip ? '' : `${e.SaphireObs} | Sabia que Vips ganham bônus? \`${prefix}vip\``}`)
+        let msg = await message.reply(`${hasVip}Você trabalhou ${job ? `como **${job}**` : ''} e ganhou ${work} ${moeda} e ${xp} ${e.RedStar}XP${gorjetaAdded}\n${vip ? '' : `${e.SaphireObs} | Sabia que Vips ganham bônus? \`${prefix}vip\``}`)
+
+        const dateNow = Date.now()
+
+        return new Reminder(msg, {
+            time: 66400000, // 24 hours
+            user: message.author,
+            client: client,
+            confirmationMessage: `⏰ | Okay okay, ${message.author}! Quando o tempo acabar daqui \`ReplaceTIMER\`, eu vou te lembrar de trabalhar de novo.`,
+            reminderData: {
+                userId: message.author.id,
+                RemindMessage: 'AUTOMATIC REMINDER | Work Disponível',
+                Time: 66400000,
+                DateNow: dateNow,
+                isAutomatic: true,
+                ChannelId: message.channel.id
+            }
+        }).showButton()
 
     }
 }

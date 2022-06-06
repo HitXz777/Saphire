@@ -309,16 +309,28 @@ module.exports = {
                             .setDescription(`Aqui ficam informações da última atualização que eu recebi. Caso queria ver as atualizações antigas, acesse [meu servidor](${config.SupportServerLink}).`)
                             .addFields(
                                 {
-                                    name: '🆕 Novidades',
-                                    value: `**${prefix}quiz** Reword e novo modo *Anime Theme*\nAlguns comandos receberam os seus Modals: \`${prefix}forca | ${prefix}reminder | ${prefix}bug\` entre outros...`
+                                    name: `🆕 Reaction Role`,
+                                    value: `Meu novo sistema de reaction role está 90% pronto. Você já pode ativa-lo usando \`${prefix}reactionrole\` ou apenas \`${prefix}rr\``
                                 },
-                                // {
-                                //     name: '⛔ Remoção',
-                                //     value: ''
-                                // },
+                                {
+                                    name: `🆕 Comando Quiz | ${prefix}quiz`,
+                                    value: 'Rework e novo modo *Anime Theme*'
+                                },
+                                {
+                                    name: '🆕 Modals',
+                                    value: `Alguns comandos receberam os seus Modals: \`${prefix}forca | ${prefix}reminder | ${prefix}bug | ${prefix}giveaway\` foram uns deles`
+                                },
+                                {
+                                    name: '🆕 Auto Lembrete',
+                                    value: `Alguns comandos receberam um botão com um ⏰. Ao clicar neste relógio, a ${client.user} vai te avisar assim que o timeout do comando acabar.\nAlguns deles foram o \`${prefix}daily\` & \`${prefix}bitcoin\``
+                                },
+                                {
+                                    name: '⛔ Remoção',
+                                    value: 'A data do término dos sorteios foi movido para a parte de baixo da embed. Ficando assim, mais prático e dinâmico.'
+                                },
                                 {
                                     name: `${e.bug} Bugs`,
-                                    value: `QUIZ - Logical Skip End - ${e.Check} Fixed | \`03/03/2022\`\nLEVEL - Infinity Loading - ${e.Check} Fixed | \`09/05/2022\`\nCLICK - Delay Response - ${e.Check} Fixed | \`22/05/2022\`\nRASPADINHA - Multiple Channels Interactions - ${e.Check} Fixed | \`22/05/2022\``
+                                    value: `RASPADINHA - Multiple Channels Interactions - ${e.Check} Fixed | \`22/05/2022\``
                                 }
                             )
                     ],
