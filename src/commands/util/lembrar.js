@@ -208,7 +208,7 @@ module.exports = {
                     {
                         label: 'DELETAR TUDO',
                         emoji: e.Trash || '🗑️',
-                        description: 'Deletar todos os lembrete de um só vez',
+                        description: 'Deletar todos os lembretes de uma só vez',
                         value: 'deleteAll'
                     })
             }

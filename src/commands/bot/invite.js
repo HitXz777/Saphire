@@ -12,18 +12,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        const invite = client.generateInvite(
-            {
-                scopes: ['bot', 'applications.commands'],
-                permissions: [
-                    Permissions.FLAGS.SEND_MESSAGES,
-                    Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
-                    Permissions.FLAGS.ADD_REACTIONS,
-                    Permissions.FLAGS.ADMINISTRATOR,
-                    Permissions.FLAGS.USE_APPLICATION_COMMANDS
-                ]
-            }
-        )
+        const invite = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot%20applications.commands&permissions=2146958847`
 
         return message.reply({
             embeds: [

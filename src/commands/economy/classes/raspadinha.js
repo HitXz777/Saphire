@@ -136,16 +136,21 @@ class Raspadinha {
                 d3 = buttons[3].components[2],
                 d4 = buttons[3].components[3]
 
+            // a1 a2 a3 a4
+            // b1 b2 b3 b4
+            // c1 c2 c3 c4
+            // d1 d2 d3 d4
+
             const winCondicionals = [
                 [a1, a2, a3], [a1, b1, c1], [a1, b2, c3],
                 [a2, a3, a4], [a2, b2, c2], [a2, b3, c4],
                 [a3, b3, c3], [a3, b2, c1],
                 [a4, b4, c4], [a4, b3, c2],
                 [b1, b2, b3], [b1, c1, d1], [b1, c2, d3],
-                [b2, c2, d2], [b2, c3, d4], [b2, b3, b4],
+                [b2, c2, d2], [b2, b3, b4], [b2, c3, d4],
                 [b3, c3, d3], [b3, c2, d1],
                 [b4, c4, d4], [b4, c3, d2],
-                [c1, c2, c3],
+                [c1, c2, c3], [c2, c3, c4],
                 [d1, d2, d3],
                 [d2, d3, d4]
             ]
@@ -164,6 +169,7 @@ class Raspadinha {
                 disableAllButtons([a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4])
                 return lose()
             }
+
             return
         }
 
