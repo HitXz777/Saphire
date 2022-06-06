@@ -9,12 +9,13 @@ client.on('guildBanAdd', async ban => {
     if (!ban.guild.available) return
     if (!ban.guild || !ban.guild.me.permissions.has(Permissions.FLAGS.VIEW_AUDIT_LOG)) return
 
-    let guild = await Database.Guild.findOne({ id: ban.guild.id })
+    let guild = await Database.Guild.findOne({ id: ban.guild.id }, 'LogChannel banGif'),
+        { LogChannel, banGif } = guild
 
     if (!guild)
         return Database.registerServer(ban.guild, client)
 
-    const channel = await ban.guild.channels.cache.get(guild?.LogChannel)
+    const channel = await ban.guild.channels.cache.get(LogChannel)
     if (!channel) return
 
     const fetchedLogs = await ban.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_BAN_ADD', }),
@@ -35,8 +36,9 @@ client.on('guildBanAdd', async ban => {
             { name: '📝 Razão', value: `${reason || 'Sem motivo informado'}` },
             { name: '📅 Data', value: `${Data()}` }
         )
+        .setImage(banGif || null)
         .setThumbnail(ban.user.displayAvatarURL({ dynamic: true }))
         .setFooter({ text: ban.guild.name, iconURL: ban.guild.iconURL({ dynamic: true }) })
 
-    return channel ? channel.send({ embeds: [embed] }).catch(() => { }) : ''
+    channel.send({ embeds: [embed] }).catch(() => { })
 })

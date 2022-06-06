@@ -11,6 +11,7 @@ module.exports = model("Guild", new Schema({
     Autorole: Array,
     ConfessChannel: String,
     AntLink: Boolean,
+    banGif: String,
     AfkSystem: Array,
     GiveawayChannel: String,
     CommandBlocks: Array,

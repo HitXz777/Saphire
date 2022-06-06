@@ -76,7 +76,7 @@ async function start(MessageId, Guild, ChannelId) {
         embedToEdit.description = null
         embedToEdit.title += ' | Sorteio encerrado'
         embedToEdit.timestamp = new Date(),
-        embedToEdit.footer.text = `Giveaway ID: ${MessageId} | ${Participantes.length} Participantes | Sorteado em`
+        embedToEdit.footer.text = `Giveaway ID: ${MessageId} | ${Participantes.length} Participantes | Terminou`
         message.edit({ embeds: [embedToEdit], components: [] }).catch(() => { })
 
         if (Participantes.length === 0) {
@@ -93,7 +93,7 @@ async function start(MessageId, Guild, ChannelId) {
             return
         }
 
-        let vencedoresMapped = vencedores.map(memberId => `${GetMember(Guild, memberId, MessageId)}`)
+        let vencedoresMapped = vencedores.map(async memberId => `${await GetMember(Guild, memberId, MessageId)}`)
 
         Channel.send({
             content: `${e.Notification} | ${[Sponsor, ...vencedores].map(id => Channel.guild.members.cache.get(id)).join(', ').slice(0, 4000)}`,
@@ -175,10 +175,10 @@ async function GetWinners(WinnersArray, Amount = 0, MessageId) {
     return Winners
 }
 
-function GetMember(guild, memberId, MessageId) {
-    const member = guild.members.cache.get(memberId)
+async function GetMember(guild, memberId, MessageId) {
+    const member = await guild.members.cache.get(memberId)
 
-    return member?.user?.tag
+    return member
         ? `${member} *\`${member?.id || '0'}\`*`
         : (async () => {
 

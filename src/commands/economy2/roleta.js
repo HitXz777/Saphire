@@ -7,7 +7,7 @@ module.exports = {
     aliases: ['rol', 'roletar', 'r'],
     category: 'economy',
     ClientPermissions: ['ADD_REACTIONS'],
-    emoji: '🎟️',
+    emoji: '🎰',
     usage: '<rol> [quantia/all]',
     description: 'Roleta é um jogo que te faz enlouquecer',
 

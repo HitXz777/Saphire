@@ -13,7 +13,7 @@ module.exports = {
 
         const { Config: config } = Database        
 
-        let moonGuild = client.guilds.cache.get(config.MoonGuildId).name || 'Not Found'
+        let moonGuild = client.guilds.cache.get(config.ghostServerId).name || 'Not Found'
 
         return message.reply({
             embeds: [

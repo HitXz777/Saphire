@@ -6,9 +6,8 @@ module.exports = {
     name: 'soco',
     aliases: ['punch', 'socar'],
     category: 'interactions',
-    
     ClientPermissions: ['EMBED_LINKS', 'ADD_REACTIONS'],
-    emoji: `${e.SaphireQ}`,
+    emoji: '👊',
     usage: '<soco> [@user]',
     description: 'Dê um soco em quem merece',
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {

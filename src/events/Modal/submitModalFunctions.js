@@ -517,7 +517,7 @@ class submitModals {
                 },
                 timestamp: new Date(Date.now() + TimeMs),
                 footer: {
-                    text: `Giveaway ID: ${msg?.id} | Sorteio em`
+                    text: `Giveaway ID: ${msg?.id} | Resultado`
                 }
             }
 

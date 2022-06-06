@@ -15,6 +15,8 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let SaphireInviteLink = `https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=applications.commands%20bot`,
+            ghostServer = client.guilds.cache.get(config.ghostServerId),
+            serverInvite = ghostServer ? ` ou quem sabe entrar na [${ghostServer.name}](${config.MoonServerLink}) para se divertir?` : '',
             PrincipalEmbed = new MessageEmbed()
                 .setColor('#246FE0')
                 .setTitle(`${e.BlueHeart} Centralzinha de Ajuda da ${client.user.username}`)
@@ -22,7 +24,7 @@ module.exports = {
                 .setImage('https://media.discordapp.net/attachments/893361065084198954/939681589724598282/teste.png?width=720&height=223')
                 .addField(`${e.Info} Perguntas frequentes`, `Está com alguma dúvida? \`${prefix}faq\``)
                 .addField('🛰️ Global System Notification', `Ative o \`${prefix}logs\` no servidor e aproveite do meu sistema avançado de notificação. Eu vou te avisar desde os bans/kicks até Autoroles com permissões editadas.`)
-                .addField(`${e.SaphireTimida} Saphire`, `Você pode [me adicionar](${SaphireInviteLink}) no seu servidor e também pode entrar no [meu servidor de suporte](${config.SupportServerLink}) pra tirar algumas dúvida ou quem sabe entrar na [Moon](${config.MoonServerLink}) para se divertir?.`)
+                .addField(`${e.SaphireTimida} Saphire`, `Você pode [me adicionar](${SaphireInviteLink}) no seu servidor e também pode entrar no [meu servidor de suporte](${config.SupportServerLink}) pra tirar algumas dúvidas${serverInvite}`)
                 .addField(`${e.CoroaDourada} Premium Stage`, `Tem interesse em desbloquear comandos únicos? Use \`${prefix}premium\` e descubra mais.`)
                 .addField('⭐ Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
                 .addField(`${e.Stonks} New Reaction Role System`, `Siiiim! Agora eu possuo um sistema de Reaction Role! Vem dar uma olhada! \`${prefix}reactionrole\``)
