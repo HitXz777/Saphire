@@ -35,6 +35,11 @@ module.exports = {
             return msg.edit(`${e.Check} | Eu saí de ${leaved}/${servers} servidores que tinham menos de ${amount} membros.`).catch(() => { })
         }
 
+        if (['logs', 'logregister'].includes(args[0]?.toLowerCase())) {
+            await Database.LogRegister.remove({})
+            return message.reply(`${e.Check} | LogRegister excluído com sucesso!`)
+        }
+
         let user = message.mentions.users.first() || message.mentions.repliedUser || await client.users.cache.get(args[1])
         if (!user) return message.reply(`${e.Deny} | Não achei ninguém.`)
 
