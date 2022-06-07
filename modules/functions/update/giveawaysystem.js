@@ -76,7 +76,7 @@ async function start(MessageId, Guild, ChannelId) {
         embedToEdit.description = null
         embedToEdit.title += ' | Sorteio encerrado'
         embedToEdit.timestamp = new Date(),
-        embedToEdit.footer.text = `Giveaway ID: ${MessageId} | ${Participantes.length} Participantes | Terminou`
+            embedToEdit.footer.text = `Giveaway ID: ${MessageId} | ${Participantes.length} Participantes | Terminou`
         message.edit({ embeds: [embedToEdit], components: [] }).catch(() => { })
 
         if (Participantes.length === 0) {
@@ -93,7 +93,7 @@ async function start(MessageId, Guild, ChannelId) {
             return
         }
 
-        let vencedoresMapped = vencedores.map(async memberId => `${await GetMember(Guild, memberId, MessageId)}`)
+        let vencedoresMapped = vencedores.map(memberId => `${GetMember(Guild, memberId)}`)
 
         Channel.send({
             content: `${e.Notification} | ${[Sponsor, ...vencedores].map(id => Channel.guild.members.cache.get(id)).join(', ').slice(0, 4000)}`,
@@ -127,8 +127,7 @@ async function start(MessageId, Guild, ChannelId) {
             ]
         }).catch(() => Database.deleteGiveaway(MessageId))
 
-        if (sorteio) {
-
+        if (sorteio)
             await Database.Giveaway.updateOne(
                 { MessageID: MessageId },
                 {
@@ -138,8 +137,6 @@ async function start(MessageId, Guild, ChannelId) {
                     TimeEnding: data(sorteio?.TimeMs)
                 }
             )
-
-        }
     }
 
     return
@@ -175,20 +172,12 @@ async function GetWinners(WinnersArray, Amount = 0, MessageId) {
     return Winners
 }
 
-async function GetMember(guild, memberId, MessageId) {
-    const member = await guild.members.cache.get(memberId)
+function GetMember(guild, memberId) {
+    const member = guild.members.cache.get(memberId)
 
     return member
         ? `${member} *\`${member?.id || '0'}\`*`
-        : (async () => {
-
-            await Database.Giveaway.updateOne(
-                { MessageID: MessageId },
-                { $pull: { Participants: memberId } }
-            )
-
-            return `${e.Deny} Usuário não encontrado.`
-        })()
+        : `${e.Deny} Usuário não encontrado.`
 }
 
 function CheckAndDeleteGiveaway(TimeToDelete = 0, MessageId = '') {
