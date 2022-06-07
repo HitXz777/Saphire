@@ -1,12 +1,12 @@
 const client = require('../../index'),
-    submitModals = require('./Modal/submitModalFunctions'),
-    buttonsFunctions = require('./Buttons/buttonsFunctions'),
-    selectMenuFunctions = require('./SelectMenus/selectMenuFunctions')
+    SubmitModalInteraction = require('./Modal/SubmitModalInteraction'),
+    ButtonInteraction = require('./Button/ButtonInteraction'),
+    SelectMenuInteraction = require('./SelectMenu/SelectMenuInteraction')
 
 client.on('interactionCreate', async interaction => {
 
-    if (interaction.isModalSubmit()) return new submitModals(interaction, client).submitModalFunctions()
-    if (interaction.isButton()) return buttonsFunctions(interaction, client)
-    if (interaction.isSelectMenu()) return selectMenuFunctions(interaction, client)
+    if (interaction.isModalSubmit()) return new SubmitModalInteraction(interaction, client).submitModalFunctions()
+    if (interaction.isButton()) return new ButtonInteraction(interaction, client).execute()
+    if (interaction.isSelectMenu()) return new SelectMenuInteraction(interaction).filterAndChooseFunction()
     return
 })

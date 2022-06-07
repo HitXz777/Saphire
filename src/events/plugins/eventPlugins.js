@@ -35,11 +35,10 @@ function FormatNumber(data) {
 function getUser(nameOrId, client) {
 
     return client.users.cache.find(data => {
-        return data.username === nameOrId
-            || data.tag === nameOrId
-            || data.id === nameOrId
+        return data.username?.toLowerCase() === nameOrId?.toLowerCase()
+            || data.tag?.toLowerCase() === nameOrId?.toLowerCase()
+            || data.id === nameOrId?.toLowerCase()
     })
-
 }
 
 function day(tomorrow = false) {
