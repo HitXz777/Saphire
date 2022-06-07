@@ -46,14 +46,22 @@ module.exports = {
             .setFooter({ text: `${prefix}ideia` })
             .setTimestamp()
 
-        let messageSended = await channel.send({ embeds: [IdeiaEmbed] }).catch(err => {
-            return message.channel.send(`${e.Warn} | Ocorreu um erro ao enviar a mensagem. Caso não saiba resolver o problema, use o comando \`${prefix}bug\` ou entre no meu servidor abrindo meu perfil e reporte o bug.\n\`${err}\``)
-        })
+        return await channel.send({ embeds: [IdeiaEmbed] })
+            .then(messageSended => {
+                message.reply(`${e.Check} | A sua ideia foi enviada com sucesso no canal ${channel}`)
+                for (let i of [`${e.Upvote}`, `${e.DownVote}`, `${e.QuestionMark}`]) messageSended.react(i).catch(() => { })
+                return
+            })
+            .catch(err => {
 
-        message.reply(`${e.Check} | A sua ideia foi enviada com sucesso no canal ${channel}`)
+                if (err.code === 50013)
+                    return message.reply(`${e.Deny} | Eu não tenho permissão suficiente para enviar mensagem no canal ${channel}`)
 
-        for (let i of [`${e.Upvote}`, `${e.DownVote}`, `${e.QuestionMark}`]) messageSended.react(i).catch(() => { })
-        return
+                if (err.code === 50001)
+                    return message.reply(`${e.Deny} | Eu não consigo enviar mensagem no canal ${channel}. Eu nem consigo chegar até lá...`)
+
+                return message.channel.send(`${e.Warn} | Ocorreu um erro ao enviar a mensagem. Caso não saiba resolver o problema, use o comando \`${prefix}bug\` ou entre no meu servidor abrindo meu perfil e reporte o bug.\n\`${err}\``)
+            })
 
     }
 }

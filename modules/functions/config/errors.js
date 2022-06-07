@@ -22,9 +22,6 @@ async function Error(message, err) {
      * 'message_reference: Unknown message' - Mensagens apagadas antes da respostas
      */
 
-    // if (err?.code === 50035)
-    //     return message?.channel?.send(`${e.Warn} | A mensagem original é desconhecida. Verifique se alguém ou algo está apagando a mensagem dos comandos.`)
-
     if (err.code === 50013 && !message) return
     if (err.message === 'Invalid Form Body\nmessage_reference: Unknown message') return message?.channel?.send(`${e.Deny} | Hey! Eu não consegui ver qual é a mensagem do comando... Tenta não apagar a mensagem, ok?`)
 
