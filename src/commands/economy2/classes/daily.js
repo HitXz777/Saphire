@@ -7,9 +7,12 @@ const { DatabaseObj: { config } } = require('../../../../modules/functions/plugi
     Reminder = require('../../../../modules/classes/Reminder')
 
 class Daily {
+
     async execute(client, message, args, prefix, MessageEmbed, Database) {
 
         let authorData = await Database.User.findOne({ id: message.author.id }, 'Timeouts DailyCount'),
+            clientData = await Database.Client.findOne({ id: client.user.id }, 'Titles.BugHunter PremiumServers'),
+            bugHunters = clientData?.Titles.BugHunter || [],
             dailyTimeout = authorData?.Timeouts?.Daily || 0,
             count = authorData?.DailyCount || 0
 
@@ -43,7 +46,25 @@ class Daily {
             let xpBonus = bonusCalculate(xp, 0.5)
             prize.money += moneyBonus
             prize.xp += xpBonus
-            data.fields.push({ name: '🏡 Servidor Principal', value: `${moneyBonus} ${moeda} | ${xpBonus} ${e.RedStar} Experiência` })
+            data.fields.push({ name: '🏡 Servidor Principal', value: `+${moneyBonus} ${moeda} | +${xpBonus} ${e.RedStar} Experiência` })
+        }
+
+        if (bugHunters.includes(message.author.id)) {
+
+            let moneyBonus = bonusCalculate(money, 0.3)
+            let xpBonus = bonusCalculate(xp, 0.3)
+            prize.money += moneyBonus
+            prize.xp += xpBonus
+            data.fields.push({ name: `${e.Gear} Bug Hunter`, value: `+${moneyBonus} ${moeda} | +${xpBonus} ${e.RedStar} Experiência` })
+        }
+
+        if (clientData?.PremiumServers?.includes(message.guild.id)) {
+
+            let moneyBonus = bonusCalculate(money, 0.6)
+            let xpBonus = bonusCalculate(xp, 0.6)
+            prize.money += moneyBonus
+            prize.xp += xpBonus
+            data.fields.push({ name: `${e.Star} Servidor Premium`, value: `+${moneyBonus} ${moeda} | +${xpBonus} ${e.RedStar} Experiência` })
         }
 
         if (isVip) {
@@ -51,15 +72,15 @@ class Daily {
             let xpBonus = bonusCalculate(xp, 0.7)
             prize.money += moneyBonus
             prize.xp += xpBonus
-            data.fields.push({ name: `${e.VipStar} Adicional Vip`, value: `${moneyBonus} ${moeda} | ${xpBonus} ${e.RedStar} Experiência` })
+            data.fields.push({ name: `${e.VipStar} Adicional Vip`, value: `+${moneyBonus} ${moeda} | +${xpBonus} ${e.RedStar} Experiência` })
         }
 
         if (message.member.premiumSinceTimestamp) {
-            let moneyBonus = bonusCalculate(money, 0.6)
-            let xpBonus = bonusCalculate(xp, 0.6)
+            let moneyBonus = bonusCalculate(money, 0.35)
+            let xpBonus = bonusCalculate(xp, 0.35)
             prize.money += moneyBonus
             prize.xp += xpBonus
-            data.fields.push({ name: `${e.Boost} Adicional Boost`, value: `${moneyBonus} ${moeda} | ${xpBonus} ${e.RedStar} Experiência` })
+            data.fields.push({ name: `${e.Boost} Server Booster`, value: `+${moneyBonus} ${moeda} | +${xpBonus} ${e.RedStar} Experiência` })
         }
 
         let days = dailyPrizes.map(data => data.day),
@@ -158,6 +179,7 @@ class Daily {
         }
 
     }
+
 }
 
 module.exports = Daily

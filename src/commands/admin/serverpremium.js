@@ -3,7 +3,7 @@ const Notify = require('../../../modules/functions/plugins/notify')
 
 module.exports = {
     name: 'serverpremium',
-    aliases: ['addpremium', 'spremium'],
+    aliases: ['addpremium', 'spremium', 'premiumserver'],
     category: 'admin',
     admin: true,
     emoji: e.Admin,
