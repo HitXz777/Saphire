@@ -1,6 +1,46 @@
 {
     "Flags": [
         {
+            "flag": "🇰🇿",
+            "country": "cazaquistão",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/983552640774455326/unknown.png?width=944&height=473"
+        },
+        {
+            "flag": "🇧🇫",
+            "country": "burkina faso",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/983552872224542750/unknown.png?width=710&height=473"
+        },
+        {
+            "flag": "🇧🇯",
+            "country": "benin",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/983552352411856996/unknown.png"
+        },
+        {
+            "flag": "🇲🇳",
+            "country": "mongólia",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/983552006050443274/unknown.png?width=948&height=473"
+        },
+        {
+            "flag": "🇧🇩",
+            "country": "bangladesh",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/983551851892994120/unknown.png?width=790&height=473"
+        },
+        {
+            "flag": "🇹🇭",
+            "country": "tailândia",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/983551682166280242/unknown.png"
+        },
+        {
+            "flag": "🇪🇷",
+            "country": "eritreia",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980974938573922344/unknown.png"
+        },
+        {
+            "flag": "🇲🇼",
+            "country": "malawi",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980997680782250014/unknown.png?width=710&height=473"
+        },
+        {
             "flag": "🇹🇱",
             "country": "timor-leste",
             "image": "https://media.discordapp.net/attachments/975974003229474846/980997045642997760/unknown.png"
@@ -461,11 +501,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976075549615226900/d5a36a80c29fabfcaf79fcea3e5f2c85.jpg"
         },
         {
-            "flag": "🇰🇿",
-            "country": "cazaquistão",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976075412213997628/ba88db85b8676b82d983f4c9815d033d.jpg"
-        },
-        {
             "flag": "🇶🇦",
             "country": "catar",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976075333541449788/d0e69951ab55898eb63ee458d0f78765.jpg"
@@ -519,11 +554,6 @@
             "flag": "🇧🇧",
             "country": "barbados",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976073037814321182/14411d1f7181e4239572c24ae63523c2.jpg"
-        },
-        {
-            "flag": "🇧🇩",
-            "country": "bangladesh",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976072963042467870/736219cffaaead6af23a85f3f1fb8114.jpg"
         },
         {
             "flag": "🇩🇿",
@@ -584,11 +614,6 @@
             "flag": "🇿🇦",
             "country": "áfrica do sul",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976071435825053746/088f23928f46a01f46c6518dcdc3b1c7.jpg?width=729&height=418"
-        },
-        {
-            "flag": "🇧🇯",
-            "country": "benin",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976073387296321606/2c4e6b5ac9d608290602f8eb4def2388.jpg"
         },
         {
             "flag": "🇧🇮",
@@ -664,11 +689,6 @@
             "flag": "🇲🇩",
             "country": "moldávia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976083268069916742/8f8c023b9975ea13f5486f1cc60c77fe.jpg?width=705&height=353"
-        },
-        {
-            "flag": "🇲🇳",
-            "country": "mongólia",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976083829909491712/7a30ddc4b800cd34fc327814657bd24f.jpg?width=672&height=473"
         },
         {
             "flag": "🇷🇴",
@@ -811,11 +831,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976239730926710834/15f2d793795479eb9b043b78bfd42fcb.jpg"
         },
         {
-            "flag": "🇹🇭",
-            "country": "tailândia",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976239970656338020/f40ba91096dad132099fa56789002fe8.jpg"
-        },
-        {
             "flag": "🇹🇼",
             "country": "taiwan",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976240100637810708/8619bd81d56be6c66e34cf65df591d90.jpg?width=705&height=469"
@@ -881,11 +896,6 @@
             "image": "https://media.discordapp.net/attachments/975974003229474846/976244961282494475/93eab524588c76e1e791d95d2ae62934.jpg?width=430&height=430"
         },
         {
-            "flag": "🇪🇷",
-            "country": "eritreia",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976245137262923786/5553c6ede10a90c0a548e23d34bdaebe.jpg?width=646&height=430"
-        },
-        {
             "flag": "🇸🇿",
             "country": "suazilândia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976245947694731324/Flag-Eswatini.jpg?width=645&height=430"
@@ -909,11 +919,6 @@
             "flag": "🇩🇯",
             "country": "djibuti",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976247447280050216/c273087e9bb38d532e58340428ef59d0.jpg?width=646&height=430"
-        },
-        {
-            "flag": "🇲🇼",
-            "country": "malawi",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976248335960772718/f492faa688cb82a80494a2dd257ec99b.jpg?width=646&height=430"
         },
         {
             "flag": "🇲🇨",
@@ -954,11 +959,6 @@
             "flag": "🇧🇲",
             "country": "bermudas",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976253608750370846/766dad117279dc833848454352bad156.jpg?width=705&height=353"
-        },
-        {
-            "flag": "🇧🇫",
-            "country": "burkina faso",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976074020342607892/7f6a983344ee5814bbf7248d929f6fc9.jpg?width=646&height=430"
         },
         {
             "flag": "🇦🇨",
