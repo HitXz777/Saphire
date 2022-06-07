@@ -23,7 +23,7 @@ class ButtonInteraction extends Modals {
             case 'newGiveaway': this.newGiveaway(); break;
             case 'newProof': this.newProof(); break;
             case 'closeProof': this.newProof(true); break;
-            case 'newReminder': newReminder(interaction); break;
+            case 'newReminder': newReminder(this.interaction); break;
             default:
                 break;
         }
