@@ -2,7 +2,7 @@ const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'report',
-    aliases: ['reporte', 'denunciar', 'denuncia', 'rpt'],
+    aliases: ['reporte', 'denunciar', 'denuncia', 'rpt', 'reports', 'reportes'],
     category: 'servidor',
     ClientPermissions: ['MANAGE_MESSAGES'],
     emoji: `${e.Loud}`,

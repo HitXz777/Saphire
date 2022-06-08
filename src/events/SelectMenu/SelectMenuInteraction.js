@@ -20,6 +20,7 @@ class SelectMenuInteraction extends Modals {
     filterAndChooseFunction() {
 
         if (this.customId === 'reactionRole') return this.reactionRole()
+        if (this.customId === 'toEdit') return this.toEditReactionRole()
 
         switch (this.value) {
             case 'newGiveaway': this.newGiveaway(); break;
@@ -381,6 +382,16 @@ class SelectMenuInteraction extends Modals {
 
         return await interaction.showModal(this.letter)
 
+    }
+
+    async toEditReactionRole() {
+
+        let guildData = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
+            collections = guildData?.ReactionRole || [],
+            collection = collections.find(coll => coll.rolesData.find(role => role.roleId === this.value)),
+            roleData = collection.rolesData.find(role => role.roleId === this.value)
+
+        await this.interaction.showModal(this.editReactionRole(roleData))
     }
 
 }

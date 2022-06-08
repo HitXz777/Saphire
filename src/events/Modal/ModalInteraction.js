@@ -25,6 +25,8 @@ class ModalInteraction {
 
         if (guildData?.ReactionRole?.find(d => d.name === this.customId)) return this.newCollectionReactionRoles()
 
+        if (this.customId.length === 18 && !isNaN(this.customId)) return this.editRoleInReactionRole()
+
         switch (this.customId) {
             case 'setStatusModal': this.setStatusModal(this); break;
             case 'forcaChooseWord': this.forcaChooseWord(this); break;
@@ -1004,6 +1006,73 @@ class ModalInteraction {
         })
 
     }
+
+    editRoleInReactionRole = async () => {
+
+        const { fields } = this
+
+        let title = fields.getTextInputValue('roleTitle'),
+            description = fields.getTextInputValue('roleDescription') || null,
+            roleId = this.customId,
+            guildData = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
+            collections = guildData?.ReactionRole || [],
+            collection = collections.find(coll => coll.rolesData.find(role => role.roleId === roleId)),
+            rolesData = collection.rolesData || [],
+            data = collection.rolesData.find(role => role.roleId === roleId),
+            i = collection.rolesData.findIndex(role => role.roleId === roleId)
+
+        await this.interaction.update({})
+
+        let msg = await this.channel.send({
+            content: `${e.Loading} | Você vai querer editar o emoji? Se sim, escolha um emoji **\`do discord ou deste servidor\`**. Não? Então clique no x.`
+        }), collected = false
+
+        if (data.emoji) msg.react(data.emoji).catch(() => { })
+        msg.react('❌').catch(() => { })
+
+        let collector = msg.createReactionCollector({
+            filter: (r, u) => u.id === this.user.id,
+            time: 120000,
+            errors: ['time']
+        })
+            .on('collect', (reaction) => {
+
+                let { emoji } = reaction
+                let emojiData = emoji.id || emoji.name
+
+                if (emoji.id && !this.guild.emojis.cache.has(emoji.id))
+                    return msg.edit(`${msg.content}\n \n❌ | Este emoji não pertence a este servidor. Por favor, escolha um emoji deste servidor ou do Discord.`)
+
+                collected = true
+                collector.stop()
+                return refreshData(emojiData, this.guild)
+            })
+            .on('end', () => {
+                if (collected) return
+                return msg.edit(`${e.Deny} | Edição do Reaction Role cancelado por falta de respota.`).catch(() => { })
+            })
+
+        async function refreshData(emoji = undefined, guild) {
+
+            rolesData.splice(i, 1, {
+                roleId: data.roleId,
+                title: title || data.title,
+                emoji: emoji === '❌' ? null : data.emoji || null,
+                description: description === 'null' ? null : data.description || null
+            })
+
+            await Database.Guild.updateOne(
+                { id: guild.id, 'ReactionRole.name': collection.name },
+                { $set: { 'ReactionRole.$.rolesData': [...rolesData] } }
+            )
+
+            msg.reactions.removeAll().catch(() => { })
+            return await msg.edit({
+                content: `${e.Check} | Cargo editado com sucesso! Já tem a coleção **${collection.name}** lançada no servidor? Vá até ela e clique em \`Refresh\`. Eu faço todo o resto pra você.`
+            }).catch(() => { })
+        }
+    }
+
 }
 
 module.exports = ModalInteraction

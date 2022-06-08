@@ -48,20 +48,22 @@ module.exports = {
 
                     if (reaction.emoji.name === '✅') {
 
-                        return message.guild.bans.create(ID).then(ban => {
-                            return IdChannel ?
-                                (() => {
-                                    Notify(ban, true)
-                                    message.reply(`${e.Check} | Prontinho! Eu mandei as informações no canal <#${IdChannel}>`)
-                                })()
-                                : message.reply(`${e.Check} | Prontinho! Eu não achei o canal de logs no servidor :( Ativa ele ou apenas veja do que ele é capaz -> \`-logs\``)
-                        }).catch(err => {
+                        return message.guild.bans.create(ID)
+                            .then(ban => {
+                                return IdChannel ?
+                                    (() => {
+                                        Notify(ban, true)
+                                        msg.edit(`${e.Check} | Prontinho! Eu mandei as informações no canal <#${IdChannel}>`).catch(() => { })
+                                    })()
+                                    : msg.edit(`${e.Check} | Prontinho! Eu não achei o canal de logs no servidor :( Ativa ele ou apenas veja do que ele é capaz -> \`-logs\``).catch(() => { })
+                            })
+                            .catch(err => {
 
-                            if (err.code === 10013) return message.reply(`${e.Info} | Este id não confere com nenhum usuário do Discord.`)
-                            if (err.code === 50013) return message.reply(`${e.Info} | Não tenho permissão o suficiente para forçar o ban deste usuário.`)
+                                if (err.code === 10013) return msg.edit(`${e.Info} | Este id não confere com nenhum usuário do Discord.`).catch(() => { })
+                                if (err.code === 50013) return msg.edit(`${e.Info} | Não tenho permissão o suficiente para forçar o ban deste usuário.`).catch(() => { })
 
-                            return message.channel.send(`${e.Warn} | Opa! Deu um erro aqui.\n\`${err}\``)
-                        })
+                                return msg.edit(`${e.Warn} | Opa! Deu um erro aqui.\n\`${err}\``).catch(() => { })
+                            })
                     }
 
                     return msg.edit(`${e.Check} | Request FORCEBAN abortada`)

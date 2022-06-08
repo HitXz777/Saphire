@@ -259,7 +259,6 @@ class Modals {
                         custom_id: "roleDescription",
                         label: "Descrição da Reaction Role",
                         style: 1,
-                        min_length: 0,
                         max_length: 50,
                         placeholder: "Novidades e Notificações | Sorteios e Prêmios"
                     }
@@ -472,6 +471,48 @@ class Modals {
                 ]
             }
         ]
+    }
+
+    editReactionRole = (roleData) => {
+        return {
+            title: "Edit Role in Reaction Role",
+            custom_id: roleData.roleId,
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "roleTitle",
+                            label: "Título do cargo",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 25,
+                            placeholder: "Sem título",
+                            required: true,
+                            value: roleData.title || null
+                        }
+                    ]
+                }, // MAX: 5 Fields
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 4,
+                            custom_id: "roleDescription",
+                            label: "Descrição do Cargo",
+                            style: 1,
+                            min_length: 0,
+                            max_length: 50,
+                            placeholder: "Escreva \"null\" para remover a descrição",
+                            required: true,
+                            value: roleData.description || null
+                        }
+                    ]
+                }
+            ]
+        }
+
     }
 
 }

@@ -21,14 +21,14 @@ module.exports = {
 
         if (user.presence?.activities?.length === 1) status = user.presence?.activities[0]
         if (user.presence?.activities?.length > 1) status = user.presence?.activities[1]
-        // Spotify command necessita dessa intent para o funcionamento
+
         if (!status || user.presence?.activities?.length === 0 || status.name !== "Spotify" && status.type !== "LISTENING")
             return message.reply(`${e.Deny} | Essa pessoa não está ouvindo nada no Spotify ou não vinculou o Spotify com o Discord`)
 
         if (status !== null && status.type === "LISTENING" && status.name === "Spotify" && status.assets !== null) {
 
             let image = `https://i.scdn.co/image/${status.assets.largeImage.slice(8)}`,
-                url = `https:/open.spotify.com/track/${status.syncID}`,
+                url = `https://open.spotify.com/track/${status.syncId}`,
                 name = status.details,
                 artist = status.state,
                 album = status.assets.largeText,
@@ -41,7 +41,7 @@ module.exports = {
                 embed = new MessageEmbed()
                     .setColor(0x1ED768)
                     .setAuthor({ name: `${user.user.username} está escutando...`, iconURL: avatar })
-                    .setDescription(`**Nome:**\n[${name}](${url})`)
+                    .setDescription(`**Nome**\n[${name}](${url})`)
                     .setThumbnail(image)
                     .addField("Duração", time, true)
                     .addField("Artista", artist, false)
@@ -85,6 +85,10 @@ module.exports = {
                 embed.setColor('RED').setFooter({ text: 'Sessao expirada por: Tempo de interação execido' })
                 return msg.edit({ embeds: [embed] }).catch(() => { })
             })
+
+            return
         }
+
+        return message.reply(`${e.Deny} | Não achei nada por aqui.`)
     }
 }

@@ -88,7 +88,7 @@ module.exports = {
                     },
                     {
                         name: `${e.SaphireWhat} A nãão! Criei errado, e agora?`,
-                        value: `Você pode usar a função "\`Edit - (Construindo)\`" ou "\`Deletar\`" para alterar o título, emoji e a descrição do reaction role ou simplesmente deletar uma coleção inteira ou um cargo.`
+                        value: `Você pode usar a função "\`Edit\`" ou "\`Deletar\`" para alterar o título, emoji e a descrição do reaction role ou simplesmente deletar uma coleção inteira ou um cargo.`
                     },
                     {
                         name: `${e.ReminderBook} Limites são necessários`,
@@ -303,7 +303,7 @@ module.exports = {
                 return msg.edit({
                     content: `${e.Deny} | Este servidor não tem nenhuma coleção de reaction roles.`,
                     embeds: [], components: []
-                })
+                }).catch(() => { })
 
             let buttons = [
                 {
@@ -431,7 +431,7 @@ module.exports = {
                         return msg.edit({
                             content: `${e.Deny} | Exclusão cancelada.`,
                             components: []
-                        })
+                        }).catch(() => { })
                     })
 
                 async function deleteAllData() {
@@ -446,7 +446,7 @@ module.exports = {
                     return msg.edit({
                         content: `${e.Check} | Todo o sistema de reaction role foi deletado com sucesso! Por favor, clique em "Refresh" em todos os reactions roles ativados neste servidor. *(se tiver algum)*`,
                         components: []
-                    })
+                    }).catch(() => { })
                 }
 
                 return
@@ -475,7 +475,7 @@ module.exports = {
                 selectMenuObject.components[0].options.push({
                     label: 'Cancelar',
                     emoji: e.Deny,
-                    description: `Cancela a exclusão de cargos`,
+                    description: `Cancelar a exclusão de cargos`,
                     value: 'cancel'
                 })
 
@@ -483,7 +483,7 @@ module.exports = {
                     content: `${e.QuestionMark} | De qual coleção é o cargo que você quer deletar?`,
                     embeds: [],
                     components: [selectMenuObject]
-                })
+                }).catch(() => { })
 
                 let collector = msg.createMessageComponentCollector({
                     filter: int => int.user.id === message.author.id,
@@ -552,7 +552,7 @@ module.exports = {
                     msg.edit({
                         content: `${e.QuestionMark} | Qual cargo você deseja deletar?`,
                         emebds: [], components: [selectMenuObject]
-                    })
+                    }).catch(() => { })
 
                     let collector = msg.createMessageComponentCollector({
                         filter: int => int.user.id === message.author.id,
@@ -569,7 +569,7 @@ module.exports = {
                             collected = true
 
                             if (!collection.rolesData.find(r => r.roleId === value))
-                                return msg.edit({ content: `${e.Deny} | Cargo não encontrado nesta coleção.` })
+                                return msg.edit({ content: `${e.Deny} | Cargo não encontrado nesta coleção.` }).catch(() => { })
 
                             collector.stop()
                             return deleteRoleFromCollectionX(collection, value)
@@ -594,7 +594,7 @@ module.exports = {
                     return msg.edit({
                         content: `${e.Check} | O cargo ${role} - \`${roleId}\` foi deletado com sucesso da coleção **${collection.name}**. Possuindo assim, ${collection.rolesData.length - 1} ${(collection.rolesData.length - 1) === 1 ? 'cargo disponível' : 'cargos disponíveis'}.`,
                         embeds: [], components: []
-                    })
+                    }).catch(() => { })
                 }
 
             }
@@ -630,7 +630,7 @@ module.exports = {
                     content: `${e.QuestionMark} | Qual coleção você deseja deletar?`,
                     embeds: [],
                     components: [selectMenuObject]
-                })
+                }).catch(() => { })
 
                 let collector = msg.createMessageComponentCollector({
                     filter: int => int.user.id === message.author.id,
@@ -668,7 +668,7 @@ module.exports = {
                     msg.edit({
                         content: `${e.QuestionMark} | Você realmente deseja deletar a coleção **${collection.name}** do sistema de Reaction Roles?`,
                         emebds: [], components: []
-                    })
+                    }).catch(() => { })
 
                     let emojis = ['✅', '❌'], coll = false
 
@@ -693,7 +693,7 @@ module.exports = {
                             if (coll) return
                             return msg.edit({
                                 content: `${e.Deny} | Comando de exclusão cancelado.`
-                            })
+                            }).catch(() => { })
                         })
                 }
 
@@ -704,7 +704,7 @@ module.exports = {
                         { $pull: { ReactionRole: { name: collectionName } } }
                     )
 
-                    return msg.edit({ content: `${e.Check} | A coleção **${collectionName}** foi deletada com sucesso!` })
+                    return msg.edit({ content: `${e.Check} | A coleção **${collectionName}** foi deletada com sucesso!` }).catch(() => { })
                 }
 
             }
@@ -719,7 +719,7 @@ module.exports = {
                 return msg.edit({
                     content: `${e.Deny} | Este servidor não possui nenhuma coleção criada. Portanto, a função *edit* está bloqueada.`,
                     components: [], embeds: []
-                })
+                }).catch(() => { })
 
             let buttons = [{
                 type: 1,
@@ -770,7 +770,7 @@ module.exports = {
 
                     interaction.deferUpdate().catch(() => { })
                     if (customId === 'collection') return chooseCollectionToEdit()
-                    if (customId === 'role') return editRole()
+                    if (customId === 'role') return chooseCollectionToEditRole()
                     return
                 })
                 .on('end', () => {
@@ -778,7 +778,7 @@ module.exports = {
                     return msg.edit({
                         content: `${e.Deny} | Edição cancelada.`,
                         components: []
-                    })
+                    }).catch(() => { })
                 })
 
             return
@@ -821,7 +821,7 @@ module.exports = {
                         return msg.edit({
                             content: `${e.Deny} | Edição de coleção cancelada.`,
                             components: []
-                        })
+                        }).catch(() => { })
                     })
 
                 async function buildSelectMenu() {
@@ -857,6 +857,138 @@ module.exports = {
                 return
             }
 
+            async function chooseCollectionToEditRole() {
+
+                let selectMenu = {
+                    type: 1,
+                    components: [{
+                        type: 3,
+                        custom_id: 'editARole',
+                        placeholder: 'Escolher coleção do cargo',
+                        options: []
+                    }]
+                }, collected = false
+
+                for (let collection of ReactionRoleData)
+                    selectMenu.components[0].options.push({
+                        label: collection.name,
+                        emoji: e.Database,
+                        description: `Esta coleção possui ${collection.rolesData.length} cargos`,
+                        value: collection.name
+                    })
+
+                selectMenu.components[0].options.push({
+                    label: 'Cancelar',
+                    emoji: e.Deny,
+                    description: 'Cancelar a exclusão de cargos',
+                    value: 'cancel'
+                })
+
+                msg.edit({
+                    content: `${e.QuestionMark} | Em qual coleção o cargo que você quer editar está?`,
+                    components: [selectMenu]
+                }).catch(() => { })
+
+                return msg.createMessageComponentCollector({
+                    filter: int => int.user.id === message.author.id,
+                    time: 60000,
+                    max: 1,
+                    errors: ['time']
+                })
+                    .on('collect', interaction => {
+
+                        const { values } = interaction,
+                            value = values[0]
+
+                        if (value === 'cancel') return
+
+                        collected = true
+                        interaction.deferUpdate().catch(() => { })
+
+                        let collection = ReactionRoleData.find(d => d.name === value)
+
+                        if (!collection)
+                            return msg.edit({
+                                content: `${e.Deny} | Esta coleção é estranha... Eu não achei ela.`,
+                                components: []
+                            }).catch(() => { })
+
+                        return editRole(collection)
+
+                    })
+                    .on('end', () => {
+                        if (collected) return
+                        return msg.edit({ content: `${e.Deny} | Edição de cargo cancelada.`, components: [] }).catch(() => { })
+                    })
+
+                async function editRole(collection) {
+
+                    let selectMenuObject = {
+                        type: 1,
+                        components: [{
+                            type: 3,
+                            maxValues: 1,
+                            custom_id: 'toEdit',
+                            placeholder: 'Escolher um cargo para editar',
+                            options: []
+                        }]
+                    }, collected = false
+
+                    for (let data of collection.rolesData) {
+
+                        let objData = { label: data.title, value: data.roleId }
+
+                        if (data.emoji)
+                            objData.emoji = data.emoji
+
+                        if (data.description)
+                            objData.description = data.description
+
+                        selectMenuObject.components[0].options.push(objData)
+                    }
+
+                    selectMenuObject.components[0].options.push({
+                        label: 'Cancelar',
+                        emoji: e.Deny,
+                        description: 'Cancelar edição',
+                        value: 'cancel'
+                    })
+
+                    msg.edit({
+                        content: `${e.QuestionMark} | Qual cargo você deseja editar?`,
+                        emebds: [], components: [selectMenuObject]
+                    }).catch(() => { })
+
+                    let collector = msg.createMessageComponentCollector({
+                        filter: int => int.user.id === message.author.id,
+                        time: 60000
+                    })
+                        .on('collect', interaction => {
+
+                            const { values } = interaction,
+                                value = values[0]
+
+                            if (value === 'cancel') return collector.stop()
+
+                            collected = true
+
+                            if (!collection.rolesData.find(r => r.roleId === value))
+                                return msg.edit({ content: `${e.Deny} | Cargo não encontrado nesta coleção.`, components: [] }).catch(() => { })
+
+                            collector.stop()
+                            return msg.edit({ content: `${e.Check} | Solicitação aceita.`, components: [] }).catch(() => { })
+                        })
+                        .on('end', () => {
+                            if (collected) return
+                            return msg.edit({
+                                content: `${e.Deny} | Edição de cargo cancelado.`,
+                                embeds: [], components: []
+                            }).catch(() => { })
+                        })
+                    return
+                }
+
+            }
 
         }
 
