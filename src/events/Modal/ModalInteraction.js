@@ -3,7 +3,7 @@ const Database = require('../../../modules/classes/Database'),
     { eightyYears, Now, getUser, day } = require('../plugins/eventPlugins'),
     passCode = require('../../../modules/functions/plugins/PassCode')
 
-class SubmitModalInteraction {
+class ModalInteraction {
     constructor(interaction, client, adicionalData = null) {
         this.interaction = interaction
         this.client = client
@@ -1006,4 +1006,4 @@ class SubmitModalInteraction {
     }
 }
 
-module.exports = SubmitModalInteraction
+module.exports = ModalInteraction
