@@ -218,7 +218,7 @@ module.exports = {
                 memberData.onwer = (message.guild.ownerId === user.id) ? '\`Sim\`' : '\`Não\`'
                 memberData.adm = member.permissions.toArray().includes('ADMINISTRATOR') ? '\`Sim\`' : '\`Não\`'
                 memberData.associado = member.pending ? '\`Não\`' : '\`Sim\`'
-                memberData.premiumSince = member.premiumSinceTimestamp ? `\n<a:boost:937713593187704903> Booster há: \`${client.formatTimestamp(member.premiumSinceTimestamp)}\`` : ''
+                memberData.premiumSince = member.premiumSinceTimestamp ? `\n${e.Boost} Booster há: \`${client.formatTimestamp(member.premiumSinceTimestamp)}\`` : ''
                 memberData.roles = member.roles.cache.filter(r => r.name !== '@everyone').map(r => `\`${r.name}\``).join(', ') || '\`Nenhum cargo\`'
                 memberData.permissions = (() => {
 
