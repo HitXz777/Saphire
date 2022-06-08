@@ -40,6 +40,11 @@ module.exports = {
             return message.reply(`${e.Check} | LogRegister excluído com sucesso!`)
         }
 
+        if (['cache'].includes(args[0]?.toLowerCase())) {
+            await Database.Cache.clear({})
+            return message.reply(`${e.Check} | Cache excluído com sucesso!`)
+        }
+
         let user = message.mentions.users.first() || message.mentions.repliedUser || await client.users.cache.get(args[1])
         if (!user) return message.reply(`${e.Deny} | Não achei ninguém.`)
 
