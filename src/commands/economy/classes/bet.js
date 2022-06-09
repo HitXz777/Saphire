@@ -954,23 +954,3 @@ Bet.prototype.betWithUser = async (client, message, args, prefix, MessageEmbed, 
 }
 
 module.exports = Bet
-
-function a() {
-
-    let emojisInDB = Object.entries(e)
-
-    let guild = client.guilds.cache.get('980891407659196567')
-    let supportEmojis = guild.emojis.cache
-
-    supportEmojis.forEach(emoji => {
-        let dbEmoji = emojisInDB.find(data => data[1].includes(emoji.name))
-
-        if (dbEmoji)
-            trade(dbEmoji[0], `<${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`)
-    })
-
-    function trade(nameInDb, emoteDATA) {
-        Database.EmojisJSON.set(nameInDb, emoteDATA)
-    }
-
-}

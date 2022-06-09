@@ -13,7 +13,7 @@ module.exports = {
 
         let member = client.getUser(client, message, args, 'member')
 
-        if (member && !parseInt(args[0])) return new Bet().betWithUser(client, message, args, prefix, MessageEmbed, member)
+        if (member && !['global', 'init'].includes(args[0]?.toLowerCase())) return new Bet().betWithUser(client, message, args, prefix, MessageEmbed, member)
 
         return new Bet().execute(client, message, args, prefix, MessageEmbed)
 
