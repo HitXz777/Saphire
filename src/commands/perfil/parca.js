@@ -13,7 +13,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0]),
+        let user = client.getUser(client, message, args, 'member') || message.guild.members.cache.get(args[0]),
             color = await Colors(message.author.id),
             Embed = new MessageEmbed().setColor(color),
             data = {}

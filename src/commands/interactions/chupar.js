@@ -13,7 +13,7 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Chupar[Math.floor(Math.random() * g.Chupar.length)],
-            user = message.mentions.members.first() || message.mentions.repliedUser
+        user = client.getUser(client, message, args, 'member')
 
         if (!user) return message.reply(`${e.Info} | Marca alguém.`)
 

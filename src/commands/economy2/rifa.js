@@ -11,7 +11,7 @@ module.exports = {
     description: 'Compre seus números e boa sorte!',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-        
+
         let moeda = await Moeda(message)
         if (!args[0] || ['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return rifaInfo()
 
@@ -127,7 +127,7 @@ module.exports = {
                 let control = rifa?.filter(data => data.MemberId === user.id) || []
 
                 if (!control || control.length === 0)
-                    return message.reply(`${e.Deny} | Nenhum ticket da rifa foi comprado.`)
+                    return loadingMessage.edit(`${e.Deny} | Nenhum ticket da rifa foi comprado.`).catch(() => { })
 
                 for (const data of control)
                     arrayValidation.push(data.id)

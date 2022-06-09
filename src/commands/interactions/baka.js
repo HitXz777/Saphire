@@ -16,7 +16,7 @@ module.exports = {
 
     let avatar = message.author.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }),
       rand = g.Baka[Math.floor(Math.random() * g.Baka.length)],
-      user = message.mentions.members.first() || message.mentions.repliedUser
+      user = client.getUser(client, message, args, 'member')
 
     if (!user) return message.reply(`${e.Info} | Marca alguém, ||baka||.`)
 

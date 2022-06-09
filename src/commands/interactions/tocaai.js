@@ -13,7 +13,7 @@ module.exports = {
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
         let rand = g.Tocaai[Math.floor(Math.random() * g.Tocaai.length)],
-            user = message.mentions.members.first() || message.mentions.repliedUser
+            user = client.getUser(client, message, args, 'member')
         if (!user) return message.reply(`${e.Info} | Marca alguém.`)
 
         if (user.id === client.user.id) return message.reply({

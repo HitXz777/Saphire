@@ -109,3 +109,17 @@ module.exports = {
         message.reply({ embeds: [embed] })
     }
 }
+
+// async function addRole() {
+
+//     let ids = [], i = 0
+//     let members = await message.guild.members.fetch()
+
+//     members.forEach(m => {
+//         i++
+//         m.roles.add('981175372467019816')
+//     })
+
+//     return message.channel.send(`${i}`)
+// }
+// addRole()

@@ -16,7 +16,7 @@ module.exports = {
         let guildData = await Database.Guild.findOne({ id: message.guild.id }, 'ReportChannel'),
             canalDB = guildData?.ReportChannel,
             channel = message.guild.channels.cache.get(canalDB),
-            user = message.mentions.members.first() || message.mentions.repliedUser
+            user = client.getUser(client, message, args, 'member')
 
         if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return message.channel.send({
             embeds: [

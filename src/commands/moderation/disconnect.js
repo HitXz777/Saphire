@@ -12,7 +12,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0]) || message.member
+        let user = client.getUser(client, message, args, 'member') || message.guild.members.cache.get(args[0]) || message.member
         if (user.id === message.author.id) return AutoDisconnect()
         if (!message.member.permissions.has(Permissions.FLAGS.MOVE_MEMBERS)) return message.reply(`${e.Deny} | Permissão necessária: **\`MOVER MEMBROS\`**`)
 

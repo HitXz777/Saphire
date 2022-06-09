@@ -12,8 +12,8 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let rand = g.Beijar[Math.floor(Math.random() * g.Beijar.length)]
-        let user = message.mentions.users.first() || message.mentions.repliedUser
+        let rand = g.Beijar[Math.floor(Math.random() * g.Beijar.length)],
+        user = client.getUser(client, message, args, 'member')
 
         if (!user) return message.reply(`${e.Info} | Você precisa marcar quem você quer beijar.`)
         if (user.id === client.user.id) return message.reply(`${e.SaphireTimida} | Beija eu naaaum.`)

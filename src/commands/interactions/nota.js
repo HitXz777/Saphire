@@ -9,7 +9,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[1]) || message.author
+        let user = client.getUser(client, message, args, 'member') || message.guild.members.cache.get(args[1]) || message.author
         if (!user) return message.reply(`${e.Info} | @Marca, fale o ID ou responda a mensagem de alguém usando este comando.`)
 
         if (user.id === config.ownerId)

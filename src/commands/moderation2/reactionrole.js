@@ -1,10 +1,10 @@
-const { getEmoji, registerCollectionID } = require('../../events/plugins/eventPlugins')
+const { getEmoji, registerCollectionID } = require('../../events/plugins/eventPlugins'),
+    blockPerms = ['KICK_MEMBERS', 'BAN_MEMBERS', 'MANAGE_GUILD', 'MANAGE_MESSAGES', 'MUTE_MEMBERS', 'DEAFEN_MEMBERS', 'MOVE_MEMBERS', 'MANAGE_NICKNAMES', 'MANAGE_ROLES', 'ADMINISTRATOR', 'MODERATE_MEMBERS']
 
 module.exports = {
     name: 'reactionrole',
     aliases: ['reaction', 'rr'],
     category: 'moderation',
-    UserPermissions: ['MANAGE_ROLES'],
     ClientPermissions: ['MANAGE_ROLES', 'ADD_REACTIONS'],
     emoji: '⚒️',
     usage: '<reactionRole>',
@@ -12,7 +12,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        const { Emojis: e } = Database
+        const { Emojis: e, Config: config } = Database
 
         let data = await Database.Guild.findOne({ id: message.guild.id }, 'ReactionRole'),
             ReactionRoleData = data?.ReactionRole || []
@@ -32,7 +32,7 @@ module.exports = {
                     },
                     {
                         label: 'Collection',
-                        emoji: '🆕',
+                        emoji: e.Database,
                         description: 'Crie uma nova coleção de Reaction Roles',
                         value: 'newCollectionReactionRole',
                     },
@@ -55,6 +55,12 @@ module.exports = {
                         value: 'delete',
                     },
                     {
+                        label: 'Info',
+                        emoji: e.Info,
+                        description: 'Informações do Reaction Role System',
+                        value: 'info',
+                    },
+                    {
                         label: 'Cancelar',
                         emoji: '❌',
                         description: 'Force o encerramento deste comando',
@@ -64,98 +70,14 @@ module.exports = {
             }]
         }
 
-        let msg = await message.reply({
-            embeds: [{
-                color: client.blue,
-                title: `${e.Stonks} ${client.user.username}'s Reaction Role`,
-                description: `${e.Info} Antes de tudo. Você sabe o que é Reaction Role?\n> *Reaction Role é um metódo criados pelos criadores de Bots para automatizar a entrega de cargos para os membros. O membro reage e ganha um cargo pré-selecionado pela Staff do servidor.*`,
-                fields: [
-                    {
-                        name: `${e.Database} Coleções`,
-                        value: `Uma coleção de reaction role é um conjunto de cargos do mesmo tipo. Por exemplo, você quer um reaction role de cores? Crie um coleção de Cores. Fácil, não?`
-                    },
-                    {
-                        name: `${e.Gear} Como usar esse sistema`,
-                        value: `Aqui, você faz tudo pela barrinha de opções. De um jeito fácil e intuitivo. Primeiro você cria as coleções que você precisa, depois, adiciona os cargos nelas.`
-                    },
-                    {
-                        name: '⏫ Adicionei um cargo, como ativo?',
-                        value: 'Clique na barrinha de opções e escolha a opção "\`Throw\`". Logo após, só escolher a coleção que você quer iniciar o reaction role.'
-                    },
-                    {
-                        name: '🔄 Adicionei/Deletei um cargo, como atualizar?',
-                        value: `Dentro da coleção lançada pelo "\`Throw\`", existe uma opção chamada "\`Refresh\`". Alí, você pode atualizar todas as alterações feitas.`
-                    },
-                    {
-                        name: `${e.SaphireWhat} A nãão! Criei errado, e agora?`,
-                        value: `Você pode usar a função "\`Edit\`" ou "\`Deletar\`" para alterar o título, emoji e a descrição do reaction role ou simplesmente deletar uma coleção inteira ou um cargo.`
-                    },
-                    {
-                        name: `${e.ReminderBook} Limites são necessários`,
-                        value: `Cada servidor tem o direito de **24 coleções** e **24 cargos** por coleção. Liberando assim **576 cargos** no reaction role.`
-                    },
-                    {
-                        name: `${e.OwnerCrow} Development Note`,
-                        value: `> *A Saphire's Team e o Desenvolvedor da ${client.user} está pensando em novos meios de facilitar a vida dos mod/adms dos servidores. Caso você tenha alguma ideia/crítica para implementar neste sistema, por favor, envie atráves do comando \`${prefix}bug\`. A Saphire's agradece o seu apoio 💖*`
-                    }
-                ],
-                footer: { text: `${client.user.username}'s Advanced Systems` }
-            }],
-            components: [selectMenuPrincipal]
-        }), collected = false
+        if (['info', 'ajuda', 'help'].includes(args[0]?.toLowerCase())) return reactionRoleInfo()
 
-        let collector = msg.createMessageComponentCollector({
-            filter: int => int.user.id === message.author.id,
-            time: 180000
-        })
-            .on('collect', interaction => {
+        if (!message.member.permissions.toArray().includes('MANAGE_ROLES'))
+            return message.reply(`${e.Hmmm} | Você não tem permissão para usar este comando.\n${e.Info} | Permissão*(ões)* necessária*(s)*: **\`Gerenciar Cargos\`**`)
 
-                const { values, customId } = interaction,
-                    value = values[0]
+        return initReactionRoleCommand()
 
-                if (customId !== 'createNewReactionRole') return
-
-                if (['newReactionRole', 'newCollectionReactionRole'].includes(value)) {
-                    collected = true
-                    collector.stop()
-                    return msg.edit({
-                        content: `${e.Check} | Request aceita!`,
-                        embeds: [],
-                        components: []
-                    }).catch(() => { })
-                }
-
-                interaction.deferUpdate().catch(() => { })
-
-                if (value === 'editReactionRole') {
-                    collected = true
-                    collector.stop()
-                    return editReactionRole(msg)
-                }
-
-                if (value === 'delete') {
-                    collected = true
-                    collector.stop()
-                    return deleteReactionRole(msg)
-                }
-                if (value === 'cancel') return collector.stop()
-                if (value === 'throwReactionRole') {
-                    collected = true
-                    return throwReactionRole(collector)
-                }
-
-                return
-            })
-            .on('end', () => {
-                if (collected) return collected = false
-                return msg.edit({
-                    content: `${e.Deny} | Comando encerrado.`,
-                    embeds: [],
-                    components: []
-                }).catch(() => { })
-            })
-
-        async function throwReactionRole(collector) {
+        async function throwReactionRole(collector, msg) {
 
             if (!ReactionRoleData || ReactionRoleData.length === 0)
                 return msg.edit({
@@ -992,6 +914,242 @@ module.exports = {
 
         }
 
-        return
+        async function reactionRoleInfo(msg) {
+
+            let infoSelectMenu = {
+                type: 1,
+                components: [{
+                    type: 3,
+                    custom_id: 'infoSelectMenu',
+                    placeholder: 'Tipos de informações',
+                    options: [
+                        {
+                            label: 'What is this?',
+                            emoji: e.QuestionMark,
+                            description: 'Afinal, o que é Reaction Role?',
+                            value: 'whatIsThis',
+                        },
+                        {
+                            label: 'Create',
+                            emoji: '🆕',
+                            description: 'Como faço isso? Dá um help!',
+                            value: 'create',
+                        },
+                        {
+                            label: 'Collection',
+                            emoji: e.Database,
+                            description: 'Coleção? O que é isso?',
+                            value: 'collection',
+                        },
+                        {
+                            label: 'Throw',
+                            emoji: '📨',
+                            description: 'O que caralhos é Throw?',
+                            value: 'throw',
+                        },
+                        {
+                            label: 'Edit',
+                            emoji: '📝',
+                            description: 'Quero editar, como faço isso?',
+                            value: 'edit',
+                        },
+                        {
+                            label: 'Delete',
+                            emoji: e.Trash,
+                            description: 'Quero deletar! Socorro!',
+                            value: 'delete',
+                        },
+                        {
+                            label: 'Security',
+                            emoji: e.ModShield,
+                            description: 'Relaxa que a Saph protege.',
+                            value: 'security',
+                        },
+                        {
+                            label: 'Cancel',
+                            emoji: '❌',
+                            description: 'Deixa pra lá. Cancela tudo.',
+                            value: 'cancel',
+                        }
+                    ]
+                }]
+            }
+
+            if (message.member.permissions.toArray().includes('MANAGE_ROLES'))
+                infoSelectMenu.components[0].options.push({
+                    label: 'Beginning',
+                    emoji: '🔄',
+                    description: 'Espera. Volta tudo do começo.',
+                    value: 'beginning',
+                })
+
+            msg = msg ?
+                await msg.edit({
+                    content: `${e.QuestionMark} | Qual tipo de informação sobre o reaction role você quer?`,
+                    components: [infoSelectMenu]
+                }).catch(() => { })
+                : await message.reply({
+                    content: `${e.QuestionMark} | Qual tipo de informação sobre o reaction role você quer?`,
+                    components: [infoSelectMenu]
+                }).catch(() => { })
+
+            let collector = msg.createMessageComponentCollector({
+                filter: int => int.user.id === message.author.id && int.customId === 'infoSelectMenu',
+                idle: 120000,
+                errors: ['idle']
+            })
+                .on('collect', interaction => {
+
+                    const { values } = interaction,
+                        value = values[0],
+                        embed = { color: client.blue, title: `${e.Stonks} ${client.user.username}'s Reaction Role Interative Information` }
+
+                    if (value === 'cancel') return collector.stop()
+                    if (value === 'beginning') {
+                        msg.delete().catch(() => { })
+                        return initReactionRoleCommand()
+                    }
+
+                    interaction.deferUpdate().catch(() => { })
+
+                    switch (value) {
+                        case 'whatIsThis':
+                            embed.description = `> Reaction Role é um termo criado pelos desenvolvedores de bot para um sistema de entrega de cargos automático para membros do servidor atráves de cliques em emojis. Você reage a um emoji e o bot te entrega o cargo configurado para aquele emoji. Por isso o nome, "Reaction Role -> Cargo por Reação".\n \n${e.SaphireOk} Porém, aqui não tem nada de emojis. Você ganha seus cargos atráves de interações, selecionando o cargo ou os cargos que você quer por meio da barrinha de seleção.`
+                            embed.image = { url: 'https://media.discordapp.net/attachments/893361065084198954/984256307378929704/unknown.png' }
+                            break;
+                        case 'create':
+                            embed.description = 'Você cria um cargo clicando na opção **"🆕 Create"**. Após a seleção, irá aparecer o painel abaixo para você.'
+                            embed.fields = [
+                                {
+                                    name: '📝 *ID OU NOME EXATO DO CARGO (1 - 100 Caracteres)',
+                                    value: `Neste campo, você escreve o ID ou o nome cargo que você quer adicionar ao reaction role.\n*Se você não sabe pegar o ID das coisas, veja este [artigo do Discord](${'https://support.discord.com/hc/pt-br/articles/206346498-Onde-posso-encontrar-minhas-IDs-de-Usu%C3%A1rio-Servidor-Mensagem-'}).*`
+                                },
+                                {
+                                    name: '📝 *TÍTULO PARA O CARGO (1 - 25 Caracteres)',
+                                    value: 'Este é o título do seu cargo dentro da seleção de cargos. O que você colocar neste campo, é como eu apresentarei o cargo para todo mundo.'
+                                },
+                                {
+                                    name: '📝 DESCRIÇÃO DA REACTION ROLE (1 - 50 Caracteres)',
+                                    value: 'Fale em poucas palavras para o que é o cargo, para que os demais saibam o motivo para o cargo estar disponível.'
+                                },
+                            ]
+                            embed.footer = { text: '* Campos obrigatórios ' }
+                            embed.image = { url: 'https://media.discordapp.net/attachments/893361065084198954/984257986908262450/unknown.png' }
+                            break;
+                        case 'collection':
+                            embed.description = `As coleções são um tipo de "caixinha" onde você coloca os cargos para os outros pegarem. As coleções estão limitas em **24 por servidor** e cada coleção suporta um total de **24 cargos**, totalizando, **576 cargos** possíveis no reaction role. No Discord, o limite é de 250 cargos dentro do servidor, logo, você pode colocar todos os cargos dentro do meu sistema que ainda vai sobrar muito espaço ${e.SaphireOk}\n \nJá ia esquecendo. Na criação da sua coleção, você também pode escolher se eu posso ou não entregar vários cargos de uma só vez.`
+                            embed.image = { url: 'https://media.discordapp.net/attachments/893361065084198954/984264241064345650/unknown.png' }
+                            break;
+                        case 'throw':
+                            embed.description = 'A função **📨 Throw** não é nada mais que pegar uma das suas coleções criadas e lançar no chat.\nThrow, vem do inglês "lançar". E com essa opção fica simples e fácil de ativar de vez o seu reaction role. Legal, né?\nClique no throw e escolha a sua coleção. Se não tiver nenhuma, crie a sua.'
+                            embed.image = { url: 'https://media.discordapp.net/attachments/893361065084198954/984266928090664981/unknown.png' }
+                            break;
+                        case 'edit':
+                            embed.description = 'A função **📝 Edit** permite você editar as informações já criadas. Dando total liberdade para alterar o *Nome, Título, Descrição e Mult-Cargos* das coleções e *Nome, Emoji, Descrição e Coleção* dos cargos.'
+                            embed.image = { url: 'https://media.discordapp.net/attachments/893361065084198954/984268001320787988/unknown.png' }
+                            break;
+                        case 'delete':
+                            embed.description = 'Esse aqui é tão simples que nem precisa de ajuda. Você apenas escolhe o que quer ser deletado. Uma coleção ou um cargo.'
+                            embed.image = { url: 'https://media.discordapp.net/attachments/893361065084198954/984273312832184330/unknown.png' }
+                            break;
+                        case 'security':
+                            embed.description = 'Desde a criação até a adição do cargo no membro. Todos os passos são analisados e checados pelos meus sistemas de seguraça de cargos impedindo que algo de errado aconteça.'
+                            embed.fields = [
+                                {
+                                    name: `${e.Reference} Permissões Negadas`,
+                                    value: `${blockPerms.map(perm => `\`${config.Perms[perm]}\``).join(', ')}`
+                                }
+                            ]
+                            break;
+                        default:
+                            embed.description = 'Nenhum dado foi reconhecido.'
+                            break;
+                    }
+
+                    return msg.edit({ embeds: [embed] }).catch(() => { })
+                })
+                .on('end', () => {
+                    return msg.edit({
+                        content: `${e.Deny} | O painel interativo do reaction role foi desativado.`,
+                        embeds: [], components: []
+                    })
+                })
+
+        }
+
+        async function initReactionRoleCommand() {
+
+            let msg = await message.reply({
+                content: `${e.QuestionMark} | Eai! O que quer pra hoje?`,
+                embeds: [{
+                    color: client.blue,
+                    title: `${e.Stonks} ${client.user.username}'s Reaction Role System`,
+                    description: `> Em caso de alguma dúvida, use a função "${e.Info} Info".`,
+                    fields: [{
+                        name: `${e.Reference} Security`,
+                        value: `As permissões a seguir não são aceitas neste sistema.\n> ${blockPerms.map(perm => `\`${config.Perms[perm]}\``).join(', ')}`
+                    }]
+                }],
+                components: [selectMenuPrincipal]
+            }), collected = false
+
+            let collector = msg.createMessageComponentCollector({
+                filter: int => int.user.id === message.author.id,
+                time: 180000
+            })
+                .on('collect', interaction => {
+
+                    const { values, customId } = interaction,
+                        value = values[0]
+
+                    if (customId !== 'createNewReactionRole') return
+
+                    if (['newReactionRole', 'newCollectionReactionRole'].includes(value)) {
+                        collected = true
+                        collector.stop()
+                        return msg.edit({
+                            content: `${e.Check} | Request aceita!`,
+                            embeds: [],
+                            components: []
+                        }).catch(() => { })
+                    }
+
+                    interaction.deferUpdate().catch(() => { })
+
+                    if (value === 'editReactionRole') {
+                        collected = true
+                        collector.stop()
+                        return editReactionRole(msg)
+                    }
+
+                    if (value === 'info') {
+                        collected = true
+                        collector.stop()
+                        return reactionRoleInfo(msg)
+                    }
+
+                    if (value === 'delete') {
+                        collected = true
+                        collector.stop()
+                        return deleteReactionRole(msg)
+                    }
+                    if (value === 'cancel') return collector.stop()
+                    if (value === 'throwReactionRole') {
+                        collected = true
+                        return throwReactionRole(collector, msg)
+                    }
+
+                    return
+                })
+                .on('end', () => {
+                    if (collected) return collected = false
+                    return msg.edit({
+                        content: `${e.Deny} | Comando encerrado.`,
+                        embeds: [],
+                        components: []
+                    }).catch(() => { })
+                })
+
+        }
     }
 }

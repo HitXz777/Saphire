@@ -21,7 +21,7 @@ module.exports = {
 
     if (!args[0]) { return message.reply({ embeds: [clearembed] }) }
 
-    let user = message.mentions.members.first() || message.mentions.repliedUser || message.guild.members.cache.get(args[0])
+    let user = client.getUser(client, message, args, 'member') || message.guild.members.cache.get(args[0])
 
     if (user) return BulkDeleteUser()
     if (['bot', "bots"].includes(args[0]?.toLowerCase())) return BulkDeleteBots()
