@@ -2,8 +2,8 @@ const Moeda = require('../../../modules/functions/public/moeda'),
     { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
 
 module.exports = {
-    name: 'tickets',
-    aliases: ['ticket', 'loteria', 'lotery'],
+    name: 'loteria',
+    aliases: ['lotery'],
     category: 'economy',
     emoji: '🎫',
     usage: '<tickets> [@user/id]',

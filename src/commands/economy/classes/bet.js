@@ -675,7 +675,6 @@ Bet.prototype.execute = async (client, message, args, prefix, MessageEmbed) => {
 
     async function confirmGlobalBetExec(betId, betValue, betAuthor) {
 
-        deleteBetFromDatabase(betId)
         Database.subtract(message.author.id, betValue)
 
         let emojis = ['✅', '❌'],
@@ -695,6 +694,7 @@ Bet.prototype.execute = async (client, message, args, prefix, MessageEmbed) => {
                     return collector.stop()
 
                 started = true
+                deleteBetFromDatabase(betId)
                 return startGlobalBet(msg, betId, betValue, betAuthor)
             })
             .on('end', () => {
@@ -720,7 +720,7 @@ Bet.prototype.execute = async (client, message, args, prefix, MessageEmbed) => {
 
     function registerTransactions(betValue, winner, loser) {
 
-        Database.add(winner.id, betValue)
+        Database.add(winner.id, parseInt(betValue * 2))
 
         Database.PushTransaction(
             winner.id,
