@@ -1,10 +1,11 @@
 const Database = require('../../../modules/classes/Database'),
     { Emojis: e, Config: config } = Database,
     { eightyYears, Now, getUser, day } = require('../plugins/eventPlugins'),
-    passCode = require('../../../modules/functions/plugins/PassCode')
-
-class ModalInteraction {
+    passCode = require('../../../modules/functions/plugins/PassCode'),
+    Modals = require('./Modals')
+class ModalInteraction extends Modals {
     constructor(interaction, client, adicionalData = null) {
+        super()
         this.interaction = interaction
         this.client = client
         this.customId = interaction.customId
@@ -39,6 +40,8 @@ class ModalInteraction {
             case 'reactionRoleCreateModal': this.reactionRoleCreateModal(this); break;
             case 'transactionsModalReport': this.transactionsModalReport(); break;
             case 'newCollectionReactionRoles': this.newCollectionReactionRoles(); break;
+            case 'newTicketCreation': this.newTicketCreation(); break;
+            case 'confirmationTicketCreate': this.createNewTicket(); break;
             default:
                 break;
         }
@@ -1071,6 +1074,143 @@ class ModalInteraction {
                 content: `${e.Check} | Cargo editado com sucesso! Já tem a coleção **${collection.name}** lançada no servidor? Vá até ela e clique em \`Refresh\`. Eu faço todo o resto pra você.`
             }).catch(() => { })
         }
+    }
+
+    newTicketCreation = async () => {
+
+        const { guild, fields, interaction, channel, info } = this
+
+        let idOrNameCategory = fields.getTextInputValue('nameOrIdToCategory')
+        let title = fields.getTextInputValue('title')
+        let description = fields.getTextInputValue('description') || null
+
+        let filterCategories = guild.channels.cache
+            .filter(
+                channel => channel.type === 'GUILD_CATEGORY'
+                    && channel.name?.toLowerCase()?.includes(idOrNameCategory?.toLowerCase())
+            )
+
+        if (filterCategories.size === 0)
+            return await interaction.reply({
+                content: `❌ | Nenhuma categoria com a informação \`${idOrNameCategory}\` foi encontrada.`,
+                ephemeral: true
+            })
+
+        let categoriesData = filterCategories.map(category => {
+            return {
+                id: category.id,
+                name: category.name,
+                channels: this.getChannels(category.id)
+            }
+        }) || []
+
+        if (categoriesData.length > 24)
+            return await interaction.reply({
+                content: `❌ | Com as informações passadas, eu encontrei **${categoriesData.length} categorias**. Por favor, forneça uma informação mais precisa para que eu possa selecionar menos opções.`
+            })
+
+        return categoriesData.length === 1
+            ? this.validadeCreation(null, categoriesData[0].id, title, description)
+            : selectOneOption()
+
+        async function selectOneOption() {
+
+            let selectMenuObject = {
+                type: 1,
+                components: [{
+                    type: 3,
+                    custom_id: 'selectAOption',
+                    placeholder: 'Escolher uma categoria',
+                    options: []
+                }]
+            }
+
+            for (let category of categoriesData)
+                selectMenuObject.components[0].options.push({
+                    label: category.name,
+                    emoji: '🗂️',
+                    description: `${category.channels || 0} canais`,
+                    value: category.id,
+                })
+
+            selectMenuObject.components[0].options.push({
+                label: 'Cancelar',
+                emoji: e.Deny,
+                description: 'Cancelar criação',
+                value: 'cancel',
+            })
+
+            let msg = await channel.send({
+                content: '❓ | Eu achei mais de uma categoria. Qual é a categoria que você quer?',
+                components: [selectMenuObject]
+            })
+
+            await interaction.deferUpdate().catch(() => { })
+            return msg.createMessageComponentCollector({
+                filter: int => int.user.id === this.user.id,
+                time: 60000,
+                max: 1,
+                errors: ['time', 'max']
+            })
+                .on('collect', int => {
+
+                    const { values } = int,
+                        value = values[0]
+
+                    if (value === 'cancel') return
+
+                    info.collected = true
+                    return validadeCreation(msg, value, title, description)
+
+                })
+                .on('end', () => {
+                    if (info.collected) return
+                    return msg.edit({
+                        content: `${e.Deny} | Criação de Ticket cancelada.`,
+                        components: []
+                    }).catch(() => { })
+                })
+
+        }
+
+    }
+
+    async validadeCreation(msg, categoryId, title, description, emoji = null) {
+        // TODO: Definir o emoji
+
+        let category = this.guild.channels.cache.filter(channel => channel.type === 'GUILD_CATEGORY' && channel.id === categoryId).first()
+
+
+
+        await Database.Guild.updateOne(
+            { id: this.guild.id },
+            {
+                $push: {
+                    TicketSystem: {
+                        categoryId: categoryId,
+                        title: title,
+                        description: description,
+                        emoji: emoji
+                    }
+                }
+            }
+        )
+
+        return msg
+            ? await msg.edit({
+                content: `${e.Check} | ${this.user}, a categoria **${category.name}** foi configurada como **${title}** com sucesso!`
+            }).catch(() => { })
+            : await this.interaction.reply({
+                content: `✅ | ${this.user}, a categoria **${category.name}** foi configurada como **${title}** com sucesso!`
+            })
+    }
+
+    createNewTicket() {
+
+    }
+
+    getChannels(categoryId) {
+        return this.guild.channels.cache.filter(channel => channel.parentId === categoryId)?.size || 0
     }
 
 }
