@@ -24,6 +24,7 @@ class ButtonInteraction extends Modals {
             case 'newProof': this.newProof(); break;
             case 'closeProof': this.newProof(true); break;
             case 'newReminder': newReminder(this.interaction); break;
+            case 'newTicketTheme': this.newTicketCreation(); break;
             default:
                 break;
         }
@@ -171,6 +172,8 @@ class ButtonInteraction extends Modals {
 
         return await this.interaction.showModal(modal)
     }
+
+    newTicketCreation = async () => await this.interaction.showModal(this.newTicketCreate)
 }
 
 module.exports = ButtonInteraction

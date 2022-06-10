@@ -515,6 +515,55 @@ class Modals {
 
     }
 
+    newTicketCreate = {
+        title: "New Ticket Theme Create",
+        custom_id: "newTicketCreation",
+        components: [
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 4,
+                        custom_id: "nameOrIdToCategory",
+                        label: "ID ou NOME da categoria",
+                        style: 1,
+                        min_length: 1,
+                        max_length: 100,
+                        placeholder: "Tickets de Denúncias | Tickets de Dúvidas",
+                        required: true
+                    }
+                ]
+            },
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 4,
+                        custom_id: "title",
+                        label: "Qual o título deste Ticket?",
+                        style: 1,
+                        min_length: 1,
+                        max_length: 25,
+                        placeholder: "Ticket de Ajuda | Ticket de Denúncias",
+                        required: true
+                    }
+                ]
+            }, // MAX: 5 Fields
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 4,
+                        custom_id: "description",
+                        label: "Descrição deste ticket",
+                        style: 1,
+                        max_length: 50,
+                        placeholder: "Abra este ticket para sanar suas dúvidas"
+                    }
+                ]
+            } // MAX: 5 Fields
+        ]
+    }
 }
 
 module.exports = Modals
