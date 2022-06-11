@@ -318,7 +318,7 @@ module.exports = {
                     {
                         color: client.blue,
                         title: `📨 ${client.user.username}'s Letters System`,
-                        description: `ℹ Esta carta foi enviada por: ${letter.anonymous ? '\`Usuário anônimo\`' : `${userSended.tag || `\`Not Found\``} - ${letter.from}`}`,
+                        description: `ℹ Esta carta foi enviada por: ${letter.anonymous ? '\`Usuário anônimo\`' : `${userSended.tag || `\`Not Found\``} - \`${letter.from}\``}`,
                         fields: [{
                             name: `📝 Conteúdo da carta`,
                             value: `\`\`\`txt\n${letter.content}\n\`\`\``
@@ -328,7 +328,7 @@ module.exports = {
                     {
                         color: client.blue,
                         title: `🔍 ${client.user.username} Letters System Info`,
-                        description: `De: ${userSended?.tag || `\`Not Found\``} - ${letter.from}\nPara: ${userRecieved?.tag || `\`Not Found\``} - ${userId}\nDo servidor: ${serverSended?.name || `\`Not Found\``} - ${letter.guildId}\nEnviado em: \`${Data(letter.date)}\``
+                        description: `De: ${userSended?.tag || `\`Not Found\``} - \`${letter.from}\`\nPara: ${userRecieved?.tag || `\`Not Found\``} - \`${userId}\`\nDo servidor: ${serverSended?.name || `\`Not Found\``} - \`${letter.guildId}\`\nEnviado a: \`${client.formatTimestamp(letter.date)}\`\nEnviado em: \`${Data(letter.date - Date.now())}\``
                     }
                 ]
             })

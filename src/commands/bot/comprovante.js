@@ -22,7 +22,7 @@ module.exports = {
         let channel = await message.guild.channels.create(message.author.tag, {
             type: 'GUILD_TEXT',
             topic: `${message.author.id}`,
-            parent: '893307009246580746',
+            parent: null,
             reason: `Pedido feito por: ${message.author.tag}`,
             permissionOverwrites: [
                 {

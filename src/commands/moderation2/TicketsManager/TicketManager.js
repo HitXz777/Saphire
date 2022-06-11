@@ -129,6 +129,10 @@ class TicketManager {
         }).catch(() => { })
     }
 
+    dropTicket() {
+        
+    }
+
 }
 
 module.exports = TicketManager

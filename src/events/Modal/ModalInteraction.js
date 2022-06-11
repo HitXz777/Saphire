@@ -4,7 +4,7 @@ const Database = require('../../../modules/classes/Database'),
     passCode = require('../../../modules/functions/plugins/PassCode'),
     Modals = require('./Modals')
 class ModalInteraction extends Modals {
-    constructor(interaction, client, adicionalData = null) {
+    constructor(interaction, client) {
         super()
         this.interaction = interaction
         this.client = client
@@ -13,8 +13,7 @@ class ModalInteraction extends Modals {
         this.user = interaction.user
         this.guild = interaction.guild
         this.channel = interaction.channel
-        this.data = adicionalData
-        this.info = {}
+        this.data = {}
     }
 
     submitModalFunctions = async () => {
@@ -595,9 +594,9 @@ class ModalInteraction extends Modals {
                     content: `❌ | O cargo ${role} possui a permissão **${config.Perms[perm]}** ativada. Não vou prosseguir com a adição deste cargo, isso pode prejudicar o seu servidor.`
                 })
 
-        this.info.title = title
-        this.info.description = description
-        this.info.role = role
+        this.data.title = title
+        this.data.description = description
+        this.data.role = role
 
         await interaction.reply({ content: '✅ | Tudo certo! Agora é hora de escolher qual o emoji do Reaction Role!', ephemeral: true })
         let msg = await channel.send({
@@ -634,7 +633,7 @@ class ModalInteraction extends Modals {
     registerReactionRole = async (emoji = null, msg, collectionName) => {
         msg.reactions.removeAll().catch(() => { })
 
-        let { role, title, description } = this.info
+        let { role, title, description } = this.data
 
         let objData = { roleId: role.id, title: title }
 
@@ -1078,7 +1077,7 @@ class ModalInteraction extends Modals {
 
     newTicketCreation = async () => {
 
-        const { guild, fields, interaction, channel, info } = this
+        const { guild, fields, interaction } = this
 
         let idOrNameCategory = fields.getTextInputValue('nameOrIdToCategory')
         let title = fields.getTextInputValue('title')
@@ -1088,6 +1087,7 @@ class ModalInteraction extends Modals {
             .filter(
                 channel => channel.type === 'GUILD_CATEGORY'
                     && channel.name?.toLowerCase()?.includes(idOrNameCategory?.toLowerCase())
+                    || channel.id === idOrNameCategory
             )
 
         if (filterCategories.size === 0)
@@ -1109,104 +1109,160 @@ class ModalInteraction extends Modals {
                 content: `❌ | Com as informações passadas, eu encontrei **${categoriesData.length} categorias**. Por favor, forneça uma informação mais precisa para que eu possa selecionar menos opções.`
             })
 
+        this.data.title = title
+        this.data.description = description
+
         return categoriesData.length === 1
-            ? this.validadeCreation(null, categoriesData[0].id, title, description)
-            : selectOneOption()
-
-        async function selectOneOption() {
-
-            let selectMenuObject = {
-                type: 1,
-                components: [{
-                    type: 3,
-                    custom_id: 'selectAOption',
-                    placeholder: 'Escolher uma categoria',
-                    options: []
-                }]
-            }
-
-            for (let category of categoriesData)
-                selectMenuObject.components[0].options.push({
-                    label: category.name,
-                    emoji: '🗂️',
-                    description: `${category.channels || 0} canais`,
-                    value: category.id,
-                })
-
-            selectMenuObject.components[0].options.push({
-                label: 'Cancelar',
-                emoji: e.Deny,
-                description: 'Cancelar criação',
-                value: 'cancel',
-            })
-
-            let msg = await channel.send({
-                content: '❓ | Eu achei mais de uma categoria. Qual é a categoria que você quer?',
-                components: [selectMenuObject]
-            })
-
-            await interaction.deferUpdate().catch(() => { })
-            return msg.createMessageComponentCollector({
-                filter: int => int.user.id === this.user.id,
-                time: 60000,
-                max: 1,
-                errors: ['time', 'max']
-            })
-                .on('collect', int => {
-
-                    const { values } = int,
-                        value = values[0]
-
-                    if (value === 'cancel') return
-
-                    info.collected = true
-                    return validadeCreation(msg, value, title, description)
-
-                })
-                .on('end', () => {
-                    if (info.collected) return
-                    return msg.edit({
-                        content: `${e.Deny} | Criação de Ticket cancelada.`,
-                        components: []
-                    }).catch(() => { })
-                })
-
-        }
-
+            ? this.validadeCreation(null, categoriesData[0].id)
+            : this.selectOneOption(categoriesData)
     }
 
-    async validadeCreation(msg, categoryId, title, description, emoji = null) {
+    async selectOneOption(categoriesData) {
+
+        let selectMenuObject = {
+            type: 1,
+            components: [{
+                type: 3,
+                custom_id: 'selectAOption',
+                placeholder: 'Escolher uma categoria',
+                options: []
+            }]
+        }
+
+        for (let category of categoriesData)
+            selectMenuObject.components[0].options.push({
+                label: category.name,
+                emoji: '🗂️',
+                description: `${category.channels || 0} canais`,
+                value: category.id,
+            })
+
+        selectMenuObject.components[0].options.push({
+            label: 'Cancelar',
+            emoji: e.Deny,
+            description: 'Cancelar criação',
+            value: 'cancel',
+        })
+
+        let msg = await this.channel.send({
+            content: '❓ | Eu achei mais de uma categoria. Qual é a categoria que você quer?',
+            components: [selectMenuObject]
+        })
+
+        await this.interaction.deferUpdate().catch(() => { })
+        let collector = msg.createMessageComponentCollector({
+            filter: int => int.user.id === this.user.id,
+            time: 60000,
+            errors: ['time', 'max']
+        })
+            .on('collect', int => {
+
+                const { values } = int,
+                    value = values[0]
+
+                if (value === 'cancel') return collector.stop()
+                
+                this.data.collected = true
+                return this.validadeCreation(msg, value, int)
+            })
+            .on('end', () => {
+                if (this.data.collected) return this.data.collected = false
+                return msg.edit({
+                    content: `${e.Deny} | Criação de Ticket cancelada.`,
+                    components: []
+                }).catch(() => { })
+            })
+        return
+    }
+
+    async validadeCreation(msg, categoryId, int) {
         // TODO: Definir o emoji
 
         let category = this.guild.channels.cache.filter(channel => channel.type === 'GUILD_CATEGORY' && channel.id === categoryId).first()
 
+        if (!category)
+            return await msg
+                ? msg.edit({
+                    content: `${e.Deny} | Nenhuma categoria com as informações dadas foi encontrada.`,
+                    components: []
+                }).catch(() => { })
+                : this.interaction.reply({
+                    content: '❌ | Nenhuma categoria com as informações dadas foi encontrada.',
+                    ephemeral: true
+                })
 
+        let guildData = await Database.Guild.findOne({ id: this.guild.id }, 'TicketSystem'),
+            tickets = guildData?.TicketSystem || []
+
+        if (tickets.find(data => data.categoryId === category.id)) {
+            int.update({}).catch(() => { })
+            this.data.collected = false
+            return this.channel.send({ content: `❌ | A categoria **${category.name}** já foi registrada.`, components: [] })
+        }
+
+        await this.interaction.deferUpdate().catch(() => { })
+        msg = msg
+            ? await msg.edit({
+                content: `${e.QuestionMark} | Hora de definir um emoji bacana para essse ticket. Esse emoji vai ficar na seleção de tickets.\nClique no ❌ para não escolher nenhum emoji.`,
+                components: []
+            }).catch(() => { })
+            : await this.channel.send({
+                content: `${e.QuestionMark} | Hora de definir um emoji bacana para essse ticket. Esse emoji vai ficar na seleção de tickets.\nClique no ❌ para não escolher nenhum emoji.`,
+                components: []
+            }).catch(() => { })
+
+        msg.react('❌').catch(() => { })
+
+        let collector = msg.createReactionCollector({
+            filter: (r, u) => u.id === this.user.id,
+            time: 60000
+        })
+            .on('collect', (reaction) => {
+
+                const { emoji } = reaction
+                let emojiData = emoji.id || emoji.name
+
+                if (emoji.id && !this.guild.emojis.cache.get(emoji.id))
+                    return msg.edit({
+                        content: `${e.QuestionMark} | Hora de definir um emoji bacana para essse ticket. Esse emoji vai ficar na seleção de tickets.\nClique no ❌ para não escolher nenhum emoji.\n \n${e.Deny} | Este emoji não pertence a este servidor.`,
+                    }).catch(() => { })
+
+                if (emojiData === '❌') emojiData = null
+
+                this.data.collected = true
+                this.data.emoji = emojiData
+                collector.stop()
+                return this.saveNewTicket(msg, category)
+            })
+            .on('end', () => {
+                if (this.data.collected) return
+                return msg.edit({
+                    content: `${e.Deny} | Comando cancelado por falta de resposta.`
+                }).catch(() => { })
+            })
+
+    }
+
+    async saveNewTicket(msg, category) {
 
         await Database.Guild.updateOne(
             { id: this.guild.id },
             {
                 $push: {
                     TicketSystem: {
-                        categoryId: categoryId,
-                        title: title,
-                        description: description,
-                        emoji: emoji
+                        categoryId: category.id,
+                        title: this.data.title,
+                        description: this.data.description,
+                        emoji: this.data.emoji
                     }
                 }
             }
         )
 
-        return msg
-            ? await msg.edit({
-                content: `${e.Check} | ${this.user}, a categoria **${category.name}** foi configurada como **${title}** com sucesso!`
+        msg.reactions.removeAll().catch(() => { })
+        return msg.edit({
+                content: `${e.Check} | ${this.user}, a categoria **${category.name}** foi configurada como **${this.data.title}** com sucesso!`
             }).catch(() => { })
-            : await this.interaction.reply({
-                content: `✅ | ${this.user}, a categoria **${category.name}** foi configurada como **${title}** com sucesso!`
-            })
-    }
-
-    createNewTicket() {
-
     }
 
     getChannels(categoryId) {
