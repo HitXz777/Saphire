@@ -13,7 +13,7 @@ class SlashCommand {
     async execute(guildData, clientData, member) {
 
         const command = this.client.slashCommands.get(this.interaction.commandName);
-        if (!command) return;
+        if (!command) return
 
         return await command.execute({
             interaction: this.interaction,
