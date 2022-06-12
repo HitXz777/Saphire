@@ -2,7 +2,7 @@ module.exports = {
     name: 'bug',
     description: '[bot] Report bugs para o meu criador',
     dm_permission: false,
-    type: 1, // 'CHAT_INPUT',
+    type: 1,
     options: [
         {
             name: 'report',
