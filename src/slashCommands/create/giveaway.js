@@ -45,7 +45,7 @@ module.exports = {
 
         const momemt = require('moment'),
             Data = require('../../../modules/functions/plugins/data'),
-            { day } = require('../../events/plugins/eventsPlugins')
+            { day } = require('../../events/plugins/eventPlugins')
 
         const { options, guild, user, channel: intChannel } = interaction
 
