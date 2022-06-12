@@ -5,7 +5,7 @@ class SlashCommand {
         this.guild = interaction.guild
         this.channel = interaction.channel
         this.client = client
-        this.error = require('../functions/config/errors')
+        this.error = require('../functions/config/interactionError')
         this.Database = require('./Database')
         this.e = this.Database.Emojis
     }
@@ -24,7 +24,8 @@ class SlashCommand {
             guildData: guildData,
             clientData: clientData,
             member: member
-        }).catch(async () => {
+        }).catch(async err => {
+            this.error(this.interaction, err)
             return await this.interaction.reply({
                 content: "❌ | Ocorreu um erro ao executar este comando.",
                 ephemeral: true,

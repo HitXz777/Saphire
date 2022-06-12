@@ -1,6 +1,7 @@
 module.exports = {
   name: 'first',
   description: 'Meu primeiro comando em Slash Command',
+  dm_permission: false,
   type: 1,
   async execute({ interaction: interaction, client: client }) {
     await interaction.reply({

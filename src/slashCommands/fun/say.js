@@ -2,6 +2,7 @@ module.exports = {
     name: "say",
     type: 1,
     description: "Fale algo atráves de mim",
+    dm_permission: false,
     options: [
         {
             name: 'mensagem',
