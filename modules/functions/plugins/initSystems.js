@@ -3,11 +3,13 @@ const
     GiveawaySystem = require('../update/giveawaysystem'),
     TopGlobalRanking = require('../update/TopGlobalRanking'),
     boostReward = require('../server/boostReward'),
-    RaffleSystem = require('../update/rifasystem')
+    RaffleSystem = require('../update/rifasystem'),
+    slashCommandsHandler = require('../../../src/structures/slashCommand')
 
-function init() {
+function init(client) {
     
     TopGlobalRanking()
+    slashCommandsHandler(client)
     console.log('Systems Intervals | OK!')
 
     setInterval(() => {

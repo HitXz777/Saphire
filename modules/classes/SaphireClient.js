@@ -16,6 +16,7 @@ class Saphire extends Client {
         this.prefix = '-'
         this.commands = new Collection()
         this.aliases = new Collection()
+        this.slashCommands = new Collection()
         this.blue = '#246FE0'
         this.red = '#ED4245'
         this.green = '#57f287'

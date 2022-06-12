@@ -7,7 +7,7 @@ const
 
 client.on("ready", async () => {
 
-    console.log('Event Ready | OK!')
+    console.log('Event Ready | Actived')
 
     await Database.MongoConnect(client)
 
@@ -37,8 +37,8 @@ client.on("ready", async () => {
 
     const msg = await client.channels.cache.get(config.LogChannelId)?.send(`⏱️ Initial Ping: \`${client.ws.ping}ms\`\n${e.Check} Login: \`${Data()}\``)
 
-    init()
-    console.log('Inicialização concluída com sucesso!')
+    init(client)
+    console.log('Event Ready | OK!')
 
     setTimeout(() => msg?.delete().catch(() => { }), 3000)
     return

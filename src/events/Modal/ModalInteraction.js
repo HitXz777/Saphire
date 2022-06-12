@@ -3,6 +3,7 @@ const Database = require('../../../modules/classes/Database'),
     { eightyYears, Now, getUser, day } = require('../plugins/eventPlugins'),
     passCode = require('../../../modules/functions/plugins/PassCode'),
     Modals = require('./Modals')
+    
 class ModalInteraction extends Modals {
     constructor(interaction, client) {
         super()
