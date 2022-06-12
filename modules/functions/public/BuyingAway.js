@@ -152,7 +152,6 @@ async function BuyingAway(message, prefix, args, money, color, moeda, user) {
                 Database.subtract(message.author.id, i * 10)
                 AddLoteria(moneyToLotery)
                 Database.resetLoteryUsers(client.user.id)
-                Database.closeLotery(client.user.id)
                 Database.pushUsersLotery(TicketsArray, client.user.id)
 
                 msg.edit(`${e.Check} | Você comprou +${i} 🎫 \`Tickets da Loteria\` aumentando o prêmio da loteria para **${(lotery.Prize || 0) + moneyToLotery} ${moeda}**.\n${feedBack}`).catch(() => { })

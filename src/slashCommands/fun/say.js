@@ -1,7 +1,10 @@
+const client = require('../../../index')
+
 module.exports = {
     name: "say",
     type: 1,
     description: "Fale algo atráves de mim",
+    default_member_permissions: client.perms.MANAGE_MESSAGES,
     dm_permission: false,
     options: [
         {

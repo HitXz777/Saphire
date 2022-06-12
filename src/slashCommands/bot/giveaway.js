@@ -1,8 +1,10 @@
+const client = require('../../../index')
+
 module.exports = {
     name: 'giveaway',
     description: 'Crie sorteios no servidor',
     type: 1, // 'CHAT_INPUT',
-    default_member_permissions: 0x0000000000000010, // 'MANAGE_CHANNELS'
+    default_member_permissions: client.perms.MANAGE_CHANNELS,
     dm_permission: false,
     options: [
         {
@@ -39,7 +41,7 @@ module.exports = {
             type: 3
         }
     ],
-    async execute({ interaction: interaction, database: Database, emojis: e, client: client }) {
+    async execute({ interaction: interaction, database: Database, emojis: e }) {
 
         const momemt = require('moment'),
             Data = require('../../../modules/functions/plugins/data')

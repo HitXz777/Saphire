@@ -1,5 +1,6 @@
 const Moeda = require('../../../modules/functions/public/moeda'),
-    { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database')
+    { DatabaseObj: { e, config } } = require('../../../modules/functions/plugins/database'),
+    NewLoteryGiveaway = require('../../../modules/functions/update/newlotery')
 
 module.exports = {
     name: 'loteria',
@@ -15,6 +16,7 @@ module.exports = {
         if (message.author.id === config.ownerId) {
             if (['lock', 'fechar', 'travar', 'close'].includes(args[0]?.toLowerCase())) return LockLotery()
             if (['unlock', 'abrir', 'destravar', 'open'].includes(args[0]?.toLowerCase())) return UnlockLotery()
+            if (['sortear'].includes(args[0]?.toLowerCase())) return NewLoteryGiveaway(message)
         }
 
         let u = message.mentions.users.first() || message.repliedUser || client.users.cache.find(data => data.username?.toLowerCase() === args.join(' ')?.toLowerCase() || data.tag?.toLowerCase() === args[0]?.toLowerCase() || data.discriminator === args[0] || data.id === args[0]) || message.author,

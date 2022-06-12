@@ -26,8 +26,9 @@ module.exports = {
                 .addField('🛰️ Global System Notification', `Ative o \`${prefix}logs\` no servidor e aproveite do meu sistema avançado de notificação. Eu vou te avisar desde os bans/kicks até Autoroles com permissões editadas.`)
                 .addField(`${e.SaphireTimida} Saphire`, `Você pode [me adicionar](${SaphireInviteLink}) no seu servidor e também pode entrar no [meu servidor de suporte](${config.SupportServerLink}) pra tirar algumas dúvidas${serverInvite}`)
                 .addField(`${e.CoroaDourada} Premium Stage`, `Tem interesse em desbloquear comandos únicos? Use \`${prefix}premium\` e descubra mais.`)
-                .addField('⭐ Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
+                .addField('🆕 Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
                 .addField(`${e.Stonks} New Reaction Role System`, `Siiiim! Agora eu possuo um sistema de Reaction Role! Vem dar uma olhada! \`${prefix}reactionrole\``)
+                .addField(`⭐ Slash Commands`, `\`${prefix}giveaway\` & \`${prefix}reminder\` ganharam seus Slash Commands.`)
                 .setFooter({ text: 'Este painel se fechará após 1 minuto de inatividade' }),
             // .addField(`${e.TopGG} Top.gg`, `[Votar](${config.TopGGLink}/vote) na ${client.user.username}.`),
             painel = new MessageActionRow()
@@ -312,7 +313,7 @@ module.exports = {
                             .addFields(
                                 {
                                     name: `🆕 Reaction Role`,
-                                    value: `Meu novo sistema de reaction role está 90% pronto. Você já pode ativa-lo usando \`${prefix}reactionrole\` ou apenas \`${prefix}rr\``
+                                    value: `Meu novo sistema de reaction role. Você pode ativa-lo usando \`${prefix}reactionrole\` ou apenas \`${prefix}rr\``
                                 },
                                 {
                                     name: `🆕 Comando Quiz | ${prefix}quiz`,
@@ -325,6 +326,10 @@ module.exports = {
                                 {
                                     name: '🆕 Auto Lembrete',
                                     value: `Alguns comandos receberam um botão com um ⏰. Ao clicar neste relógio, a ${client.user} vai te avisar assim que o timeout do comando acabar.\nAlguns deles foram o \`${prefix}daily\` & \`${prefix}bitcoin\``
+                                },
+                                {
+                                    name: '⭐ Slash Commands',
+                                    value: 'O Slash Command está começando a crescer nos sistemas da Saphire. Que tal dar uma olhada? Utilize \`/\`.'
                                 },
                                 {
                                     name: '⛔ Remoção',
