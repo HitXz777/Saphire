@@ -10,9 +10,16 @@ module.exports = {
             required: true
         }
     ],
-    async execute({ interaction: interaction, client: client, database: Database, data: data }) {
+    async execute({ interaction: interaction, guildData: guildData, member: member, emojis: e }) {
 
         let content = interaction.options.getString('mensagem')
+
+        if (guildData?.AntLink && !member?.permissions?.toArray()?.includes('ADMINISTRATOR') && content.replace(/ /g, '').includes('discord.gg')) {
+            return interaction.reply({
+                content: `${e.antlink} | O sistema de antilink está ativado neste servidor.`,
+                ephemeral: true
+            })
+        }
 
         if (content.length > 1500)
             return await interaction.reply({
