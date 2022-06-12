@@ -18,8 +18,14 @@ module.exports = {
 
         try {
 
-            const headers = { 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36' };
-            const result = await axios.get(`https://instagram.com/${username}/feed/?__a=1`, { headers }).then(res => res.data);
+            const result = await axios.get(
+                `https://instagram.com/${username}/feed/?__a=1`,
+                {
+                    headers: {
+                        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36'
+                    }
+                }
+            ).then(res => res.data)
             const account = result.graphql.user
 
             return interaction.reply({
