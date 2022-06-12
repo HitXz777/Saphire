@@ -32,7 +32,8 @@ module.exports = {
         }
 
         let Args = when.trim().split(/ +/g),
-            DefinedTime = 0
+            DefinedTime = 0,
+            { day } = require('../../events/plugins/eventPlugins')
 
         if (Args[0].includes('/') || Args[0].includes(':') || ['hoje', 'today', 'tomorrow', 'amanhã'].includes(Args[0]?.toLowerCase())) {
 
