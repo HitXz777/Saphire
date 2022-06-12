@@ -19,9 +19,9 @@ module.exports = {
       .setDescription("Use o comando para fazer aquela limpa nas mensagens")
       .addField('Comandos do Clear', `\`${prefix}clear 1~100\` Apague até 100 mensagens\n\`${prefix}clear images\` Apague imagens\n\`${prefix}clear bots\` Apague mensagens de bots\n\`${prefix}clear @user\` Apague mensagens de alguém\n\`${prefix}clear nuke\` Apague as últimas 1 mil mensagens`)
 
-    if (!args[0]) { return message.reply({ embeds: [clearembed] }) }
+    if (!args[0]) return message.reply({ embeds: [clearembed] })
 
-    let user = client.getUser(client, message, args, 'member') || message.guild.members.cache.get(args[0])
+    let user = searchMember() || message.guild.members.cache.get(args[0])
 
     if (user) return BulkDeleteUser()
     if (['bot', "bots"].includes(args[0]?.toLowerCase())) return BulkDeleteBots()
@@ -197,5 +197,31 @@ module.exports = {
         return message.reply(`${e.Deny} | Estou sem a permissão "Gerenciar Mensagens".`)
       })
     }
+
+    function searchMember() {
+      return message.mentions.members.first()
+        || message.guild.members.cache.get(args[0])
+        || message.guild.members.cache.get(args[1])
+        || message.guild.members.cache.get(message.mentions.repliedUser?.id)
+        || message.guild.members.cache.find(member => {
+          return member.displayName?.toLowerCase() == args[0]?.toLowerCase()
+            || member.user.username.toLowerCase() == args[0]?.toLowerCase()
+            || member.user.tag.toLowerCase() == args[0]?.toLowerCase()
+            || member.user.discriminator === args[0]
+            || member.user.id === args[0]
+            || member.user.username.toLowerCase() == args.join(' ')?.toLowerCase()
+            || member.user.tag.toLowerCase() == args.join(' ')?.toLowerCase()
+            || member.displayName?.toLowerCase() == args.join(' ')?.toLowerCase()
+            || member.user.username.toLowerCase() == args[1]?.toLowerCase()
+            || member.user.tag.toLowerCase() == args[1]?.toLowerCase()
+            || member.displayName?.toLowerCase() == args[1]?.toLowerCase()
+            || member.user.id === args[1]
+            || member.user.discriminator === args[1]
+            || member.user.username.toLowerCase() == args.slice(1).join(' ')?.toLowerCase()
+            || member.user.tag.toLowerCase() == args.slice(1).join(' ')?.toLowerCase()
+            || member.displayName.toLowerCase() == args.slice(1).join(' ')?.toLowerCase()
+        })
+    }
+
   }
 }
