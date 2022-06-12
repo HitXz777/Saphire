@@ -66,12 +66,6 @@ module.exports = {
                 ephemeral: true
             })
 
-        if (member.id === authorMember.id)
-            return await interaction.reply({
-                content: `${e.Deny} | Você não pode adicionar cargos para você mesmo.`,
-                ephemeral: true
-            })
-
         if (!role.editable)
             return await interaction.reply({
                 content: `${e.Deny} | Eu não tenho permissão para gerenciar o cargo ${role}.`,
