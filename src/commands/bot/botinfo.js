@@ -34,6 +34,7 @@ module.exports = {
       CommandStats = stripIndent`
           Comandos          :  ${client.commands.size}
           Atalhos           :  ${client.aliases.size}
+          Slash Commands    :  ${client.slashCommands.size}
           Comandos Usados   :  ${clientData?.ComandosUsados || 0}
           Comandos In Data  :  ${InDataCommands + 1}
         `,

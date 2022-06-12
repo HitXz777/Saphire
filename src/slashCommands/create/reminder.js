@@ -1,6 +1,6 @@
 module.exports = {
     name: 'lembrete',
-    description: 'Crie um novo lembrete',
+    description: '[create] Crie um novo lembrete',
     dm_permission: false,
     type: 1,
     options: [
