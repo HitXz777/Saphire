@@ -4,7 +4,7 @@ const Moeda = require('../../../modules/functions/public/moeda'),
 
 module.exports = {
     name: 'loteria',
-    aliases: ['lotery'],
+    aliases: ['lotery', 'ticket', 'tickets'],
     category: 'economy',
     emoji: '🎫',
     usage: '<tickets> [@user/id]',

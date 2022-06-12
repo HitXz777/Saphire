@@ -14,7 +14,6 @@ module.exports = model("Guild", new Schema({
     banGif: String,
     AfkSystem: Array,
     GiveawayChannel: String,
-    TicketSystem: Array,
     CommandBlocks: Array,
     Antifake: Boolean,
     LockdownChannels: Array,
