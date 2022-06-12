@@ -1,6 +1,11 @@
 {
     "Flags": [
         {
+            "flag": "🇭🇺",
+            "country": "hungria",
+            "image": "https://media.discordapp.net/attachments/975974003229474846/980977032718606347/unknown.png"
+        },
+        {
             "flag": "🇰🇿",
             "country": "cazaquistão",
             "image": "https://media.discordapp.net/attachments/975974003229474846/983552640774455326/unknown.png?width=944&height=473"
@@ -419,11 +424,6 @@
             "flag": "🇮🇳",
             "country": "índia",
             "image": "https://media.discordapp.net/attachments/975974003229474846/976079946961285170/13254b6f9309444e40f6baa9ae7d6d61.jpg?width=705&height=469"
-        },
-        {
-            "flag": "🇭🇺",
-            "country": "hungria",
-            "image": "https://media.discordapp.net/attachments/975974003229474846/976079760591552562/8cff0e98cfa460ba8f5a7791671645df.jpg"
         },
         {
             "flag": "🇬🇹",
