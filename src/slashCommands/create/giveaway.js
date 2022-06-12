@@ -44,7 +44,8 @@ module.exports = {
     async execute({ interaction: interaction, database: Database, emojis: e }) {
 
         const momemt = require('moment'),
-            Data = require('../../../modules/functions/plugins/data')
+            Data = require('../../../modules/functions/plugins/data'),
+            { day } = require('../../events/plugins/eventsPlugins')
 
         const { options, guild, user, channel: intChannel } = interaction
 
