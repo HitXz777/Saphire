@@ -3,7 +3,7 @@ const client = require('../../../index')
 module.exports = {
     name: 'giveaway',
     description: 'Crie sorteios no servidor',
-    type: 1, // 'CHAT_INPUT',
+    type: 1,
     default_member_permissions: client.perms.MANAGE_CHANNELS,
     dm_permission: false,
     options: [
