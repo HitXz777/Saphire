@@ -2,7 +2,7 @@ module.exports = {
     name: 'lembrete',
     description: 'Crie um novo lembrete',
     dm_permission: false,
-    type: 1, // 'CHAT_INPUT',
+    type: 1,
     options: [
         {
             name: 'mensagem',
