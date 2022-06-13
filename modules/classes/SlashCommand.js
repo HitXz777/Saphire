@@ -15,7 +15,7 @@ class SlashCommand {
         const command = this.client.slashCommands.get(this.interaction.commandName);
         if (!command) return
 
-        return await command.execute({
+        await command.execute({
             interaction: this.interaction,
             emojis: this.e,
             database: this.Database,
@@ -32,6 +32,7 @@ class SlashCommand {
             })
         })
 
+        return this.registerCommand()
     }
 
     async CheckBeforeExecute() {
@@ -60,6 +61,13 @@ class SlashCommand {
         return this.execute(guildData, clientData, member)
     }
 
+    async registerCommand() {
+        return await this.Database.Client.updateOne(
+            { id: this.client.user.id },
+            { $inc: { ComandosUsados: 1 } },
+            { upsert: true }
+        )
+    }
 }
 
 module.exports = SlashCommand
