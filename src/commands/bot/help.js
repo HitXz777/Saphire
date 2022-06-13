@@ -222,11 +222,11 @@ module.exports = {
             function Afk() {
                 return msg.edit({
                     embeds: [
-                        new MessageEmbed()
-                            .setColor('#246FE0')
-                            .setTitle(`${e.Planet} Afk Global System`)
-                            .setDescription('Utilize este comando para avisar que você está offline.')
-                            .addFields(
+                        {
+                            color: client.blue,
+                            title: `${e.Planet} Afk Global System`,
+                            description: 'Utilize este comando para avisar que você está offline.',
+                            fields: [
                                 {
                                     name: '🏠 Servidor',
                                     value: 'Avisarei apenas neste servidor que você está offline.'
@@ -243,7 +243,8 @@ module.exports = {
                                     name: `${e.Warn} | Atenção!`,
                                     value: '> 1. O \`Modo Global\` é desativado quando você mandar uma mensagem em qualquer servidor comigo.\n> 2. O \`Modo Servidor\` será desativado apenas se você mandar mensagem no servidor em que o sistema foi ativado.\n> 3. O \`Modo Global\` sobre põe o modo local.'
                                 }
-                            )
+                            ]
+                        }
                     ],
                     components: [painel]
                 }).catch(() => { })
@@ -291,11 +292,12 @@ module.exports = {
                 if (cots.includes(x.toLowerCase()))
                     return msg.edit({
                         embeds: [
-                            new MessageEmbed()
-                                .setColor('#246FE0')
-                                .setTitle(`Classe: ${x.charAt(0).toUpperCase() + x.slice(1)}`)
-                                .setDescription(`Use \`${prefix}help [comando]\` para obter mais informações.`)
-                                .addFields(catts)
+                            {
+                                color: client.blue,
+                                title: `Classe: ${x.charAt(0).toUpperCase() + x.slice(1)}`,
+                                description: `Use \`${prefix}help [comando]\` para obter mais informações.`,
+                                fields: catts
+                            }
                         ],
                         components: [painel]
                     }).catch(() => { })
@@ -306,11 +308,12 @@ module.exports = {
             function atualization() {
                 return msg.edit({
                     embeds: [
-                        new MessageEmbed()
-                            .setColor(client.blue)
-                            .setTitle(`⭐ Notas da Última Atualização`)
-                            .setDescription(`Aqui ficam informações da última atualização que eu recebi. Caso queria ver as atualizações antigas, acesse [meu servidor](${config.SupportServerLink}).`)
-                            .addFields(
+                        {
+                            color: client.blue,
+                            title: `⭐ Notas da Última Atualização`,
+                            description: `Aqui ficam informações da última atualização que eu recebi. Caso queria ver as atualizações antigas, acesse [meu servidor](${config.SupportServerLink}).`,
+                            fields: [
+
                                 {
                                     name: `🆕 Reaction Role`,
                                     value: `Meu novo sistema de reaction role. Você pode ativa-lo usando \`${prefix}reactionrole\` ou apenas \`${prefix}rr\``
@@ -320,8 +323,8 @@ module.exports = {
                                     value: 'Rework e novo modo *Anime Theme*'
                                 },
                                 {
-                                    name: '🆕 Modals',
-                                    value: `Alguns comandos receberam os seus Modals: \`${prefix}forca | ${prefix}reminder | ${prefix}bug | ${prefix}giveaway\` foram uns deles`
+                                    name: '📝 Modals & ⭐ Slash Commands',
+                                    value: `Alguns comandos receberam seus adicionais: \`${prefix}reminder | ${prefix}bug | ${prefix}giveaway\` foram uns deles`
                                 },
                                 {
                                     name: '🆕 Auto Lembrete',
@@ -333,14 +336,14 @@ module.exports = {
                                 },
                                 {
                                     name: '⛔ Remoção',
-                                    value: 'A data do término dos sorteios foi movido para a parte de baixo da embed. Ficando assim, mais prático e dinâmico.'
+                                    value: `\`${prefix}forca\` -> Movido para Slash Command \`/forca\``
                                 },
                                 {
                                     name: `${e.bug} Bugs`,
                                     value: `RASPADINHA - Multiple Channels Interactions - ${e.Check} Fixed | \`22/05/2022\``
                                 }
-                            )
-                    ],
+                            ]
+                        }],
                     components: [painel]
                 }).catch(() => { })
             }
@@ -353,10 +356,10 @@ module.exports = {
 
             return message.reply({
                 embeds: [
-                    new MessageEmbed()
-                        .setColor('#246FE0')
-                        .setTitle(`Detalhes do Comando: ${command.name ? `${command.name}` : "Sem nome definido."}`)
-                        .addFields(
+                    {
+                        color: client.blue,
+                        title: `Detalhes do Comando: ${command.name ? `${command.name}` : "Sem nome definido."}`,
+                        fields: [
                             {
                                 name: 'Comando:',
                                 value: command.name ? `\`${prefix}${command.name}\`` : "Sem nome definido.",
@@ -364,7 +367,7 @@ module.exports = {
                             },
                             {
                                 name: 'Atalhos',
-                                value: command.aliases ? `\`${command.aliases?.map(data => `${prefix}${data}`)?.join(', ')}\`` : "Sem atalhos definido.",
+                                value: command.aliases ? `${command.aliases?.map(data => `\`${prefix}${data}\``)?.join(', ')}` : "Sem atalhos definido.",
                                 inline: true
                             },
                             {
@@ -375,8 +378,8 @@ module.exports = {
                                 name: 'Descrição',
                                 value: command.description ? command.description : "Sem descrição definida"
                             }
-
-                        )
+                        ]
+                    }
                 ]
             })
         }

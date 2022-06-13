@@ -17,7 +17,6 @@ class ButtonInteraction extends Modals {
 
         switch (this.customId) {
             case 'setStatusChange': this.setStatusCommand(); break;
-            case 'forcaChooseWord': this.forcaChooseWord(); break;
             case 'bugReport': this.bugReportSend(); break;
             case 'editProfile': this.editProfile(); break;
             case 'newGiveaway': this.newGiveaway(); break;
@@ -32,7 +31,6 @@ class ButtonInteraction extends Modals {
     }
 
     bugReportSend = async () => await this.interaction.showModal(this.reportBug)
-    forcaChooseWord = async () => await this.interaction.showModal(this.chooseWordForca)
 
     async setStatusCommand() {
 

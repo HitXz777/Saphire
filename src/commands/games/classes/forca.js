@@ -2,14 +2,15 @@ const { formatWord } = require('../plugins/gamePlugins')
 
 class Forca {
 
-    async game(client, message, args, prefix, MessageEmbed, Database, isInteraction, author, channel) {
+    async game(client, Database, theWord, interaction, isRandom) {
 
+        const { MessageEmbed } = require('discord.js')
         let e = Database.Emojis
 
-        if (['info', 'help', 'ajuda'].includes(args[0]?.toLowerCase())) return forcaInfo()
+        let { user, channel } = interaction
 
         let control = { verified: false, endedCollector: true, blocked: false, resend: 0, authorWord: 0 },
-            word = isInteraction || getWord()
+            word = isRandom ? getWord() : theWord
 
         if (control.blocked) return
         control.trass = formatWord(word)
@@ -17,59 +18,10 @@ class Forca {
         let wordFormated = control.trass.join(''),
             status = 0, msg, embed, lettersUsed = []
 
-        if (isInteraction) {
-            control.authorWord = author.id
-            return init()
-        }
+        if (!isRandom)
+            control.authorWord = user.id
 
-        let buttons = [
-            {
-                type: 1,
-                components: [
-                    {
-                        type: 2,
-                        label: 'Palavra aleatória',
-                        custom_id: 'randomWord',
-                        style: 'PRIMARY'
-                    },
-                    {
-                        type: 2,
-                        label: 'Dizer uma palavra',
-                        custom_id: 'forcaChooseWord',
-                        style: 'PRIMARY'
-                    }
-                ]
-            }
-        ]
-
-        let Message = await message.reply({
-            content: `${e.Loading} | Qual opção do game?`,
-            components: buttons
-        })
-
-        return Message.createMessageComponentCollector({
-            filter: int => int.user.id === message.author.id,
-            time: 60000
-        })
-            .on('collect', interaction => {
-
-                const { customId } = interaction
-
-                Message.delete().catch(() => { })
-
-                if (customId === 'randomWord') {
-                    args[0] = null
-                    return init()
-                }
-
-                if (customId === 'forcaChooseWord') return
-            })
-            .on('end', () => {
-                return Message.edit({
-                    content: `${e.Deny} | Comando cancelado.`,
-                    components: []
-                })
-            })
+        return init()
 
         function getWord() {
 
@@ -87,7 +39,11 @@ class Forca {
             let channelsBlocked = Database.Cache.get('GameChannels.Forca') || []
 
             if (channelsBlocked.includes(channel.id))
-                return channel.send(`${e.Deny} | Já tem uma forca rolando nesse chat.\n${e.Info} | Se a mensagem for apagada, dentro de 20 segundos esse canal será liberado.`)
+                return await interaction.reply({
+                    content: `${e.Deny} | Já tem uma forca rolando nesse chat.\n${e.Info} | Se a mensagem for apagada, dentro de 20 segundos esse canal será liberado.`,
+                    ephemeral: true
+                })
+
             Database.registerChannelControl('push', 'Forca', channel.id)
 
             embed = new MessageEmbed()
@@ -95,13 +51,16 @@ class Forca {
                 .setTitle(`${e.duvida} Forca Game - ${status}/7`)
                 .setDescription(`\`\`\`txt\n${wordFormated}\n\`\`\``)
 
-            msg = await channel.send({ content: `${e.Info} | Essa palavra possui **${word.length} letras.**${control.authorWord === author.id ? `\n✏️ | Essa palavra foi enviada por ${author}. *(Claro, ele/a não participa dessa rodada)*` : ''}`, embeds: [embed] })
+            msg = await interaction.reply({
+                content: `${e.Info} | Essa palavra possui **${word.length} letras.**${control.authorWord === user.id ? `\n✏️ | Essa palavra foi enviada por ${user}. *(Claro, ele/a não participa dessa rodada)*` : ''}`,
+                embeds: [embed],
+                fetchReply: true
+            })
 
             let collector = channel.createMessageCollector({
                 filter: m => true,
                 idle: 20000
             })
-
                 .on('collect', async Message => {
 
                     if (control.authorWord === Message.author.id) return
@@ -215,30 +174,6 @@ class Forca {
 
             wordFormated = control.trass.join('')
             return wordFormated
-        }
-
-        function forcaInfo() {
-            return message.reply({
-                embeds: [
-                    new MessageEmbed()
-                        .setColor(client.blue)
-                        .setTitle(`${e.duvida} Forca Game Info`)
-                        .addFields(
-                            {
-                                name: `${e.QuestionMark} Como mandar uma palavra?`,
-                                value: `Você pode começar um jogo com qualquer palavra utilizando \`${prefix}forca\`\n> *Lembrando: Palavras com acentos e caracteres não alfabéticos não são aceitos aqui. Apenas letras de A~Z*`
-                            },
-                            {
-                                name: `${e.Check} Comece um jogo`,
-                                value: `Use apenas \`${prefix}forca\``
-                            },
-                            {
-                                name: `${e.Info} Informações`,
-                                value: `Fale apenas uma letra por vez para sua letra ser validada. As regras são as mesma do jogo da forca que todos conhecem.\nApenas 1 jogo por canal é válido.`
-                            }
-                        )
-                ]
-            })
         }
 
     }

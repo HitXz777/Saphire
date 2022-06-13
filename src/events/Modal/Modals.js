@@ -380,28 +380,6 @@ class Modals {
         ]
     }
 
-    chooseWordForca = {
-        title: "Hangman Game",
-        custom_id: "forcaChooseWord",
-        components: [
-            {
-                type: 1,
-                components: [
-                    {
-                        type: 4,
-                        custom_id: "componentOne",
-                        label: "Diga sua palavra",
-                        style: 1,
-                        min_length: 3,
-                        max_length: 25,
-                        placeholder: "Discord",
-                        required: true
-                    }
-                ]
-            } // MAX: 5 Fields
-        ]
-    }
-
     setNewStatus = {
         title: "Set Status Command",
         custom_id: "setStatusModal",

@@ -30,7 +30,6 @@ class ModalInteraction extends Modals {
 
         switch (this.customId) {
             case 'setStatusModal': this.setStatusModal(this); break;
-            case 'forcaChooseWord': this.forcaChooseWord(this); break;
             case 'BugModalReport': this.BugModalReport(this); break;
             case 'editProfile': this.editProfile(this); break;
             case 'newLetter': this.newLetter(this); break;
@@ -253,27 +252,6 @@ class ModalInteraction extends Modals {
             content: `✅ | Novo status definido com sucesso!\n📝 | ${newStatus}`,
             ephemeral: true
         })
-    }
-
-    forcaChooseWord = async ({ interaction, client, fields, user, channel, prefix } = this) => {
-        const Forca = require('../../commands/games/classes/forca')
-        const word = fields.getTextInputValue('componentOne')
-        const { MessageEmbed } = require('discord.js')
-
-        let validate = /^[a-z ]+$/i
-
-        if (!validate.test(word))
-            return await interaction.reply({
-                content: '❌ | O texto informado contém acentos ou números.',
-                ephemeral: true
-            })
-
-        await interaction.reply({
-            content: '✅ | Ok! Palavra coletada com sucesso!',
-            fetchReply: true
-        })
-
-        return new Forca().game(client, false, [], prefix, MessageEmbed, Database, word?.toLowerCase(), user, channel)
     }
 
     createNewGiveaway = async ({ interaction, client, fields, user, channel, guild, prefix } = this) => {
