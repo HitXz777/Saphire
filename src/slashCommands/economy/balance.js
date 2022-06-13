@@ -13,6 +13,11 @@ module.exports = {
             name: 'search',
             description: 'Pesquise alguém pelo nome ou ID',
             type: 3
+        },
+        {
+            name: 'hide',
+            description: 'Esconder a mensagem de resposta',
+            type: 5
         }
     ],
     async execute({ interaction: interaction, client: client, database: Database, guildData: guildData, emojis: e }) {
@@ -21,19 +26,20 @@ module.exports = {
 
         const { options } = interaction
 
+        let hide = options.getBoolean('hide') || false
         let user = await getUser(options.getString('search')) || client.users.cache.get(options.getMember('user')?.id) || interaction.user
 
         if (user.id === client.user.id)
             return await interaction.reply({
                 content: `👝 | ${user.username} possui **∞ ${MoedaCustom}**`,
-                ephemeral: true
+                ephemeral: hide
             })
 
         let userData = await Database.User.findOne({ id: user.id }, 'Balance Perfil')
 
         if (!userData) return await interaction.reply({
             content: `${e.Database} | DATABASE | Não foi possível obter os dados de **${user?.tag}** *\`${user.id}\`*`,
-            ephemeral: true
+            ephemeral: hide
         })
 
         let bal = parseInt(userData?.Balance) || 0,
@@ -43,7 +49,7 @@ module.exports = {
 
         return await interaction.reply({
             content: `👝 | ${NameOrUsername} **${balance}**`,
-            ephemeral: true
+            ephemeral: hide
         })
 
         function getUser(dataResource) {
