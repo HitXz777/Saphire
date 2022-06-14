@@ -12,6 +12,9 @@ async function GiveawaySystem() {
 
     for (const gwData of GiveawaysAllData) {
 
+        if (!gwData?.GuildId)
+            return await Database.Giveaway.deleteOne({ _id: gwData._id })
+
         let Guild = client.guilds.cache.get(gwData?.GuildId)
 
         if (!Guild) {
