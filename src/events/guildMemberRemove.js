@@ -56,10 +56,10 @@ client.on('guildMemberRemove', async (member) => {
 
         if (!LeaveChannel) return unset()
 
-        let emoji = guild.LeaveChannel.Emoji || e.Leave,
-            mensagem = guild.LeaveChannel.Mensagem || 'saiu do servidor.'
+        let Mensagem = guild.LeaveChannel.Mensagem || '$member saiu do servidor.',
+            newMessage = Mensagem.replace('$member', member).replace('$servername', member.guild.name)
 
-        return LeaveChannel?.send(`${emoji} | ${member.user.username} ${mensagem}`).catch(() => unset())
+        return LeaveChannel?.send(`${newMessage}`).catch(() => unset())
     }
 
     async function unset() {

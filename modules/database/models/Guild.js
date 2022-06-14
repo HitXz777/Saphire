@@ -28,7 +28,6 @@ module.exports = model("Guild", new Schema({
     },
     LeaveChannel: {
         Canal: String,
-        Emoji: String,
         Mensagem: String,
     },
     WelcomeChannel: {
