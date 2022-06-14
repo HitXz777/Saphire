@@ -33,7 +33,6 @@ module.exports = model("Guild", new Schema({
     },
     WelcomeChannel: {
         Canal: String,
-        Emoji: String,
         Mensagem: String,
     },
     Blockchannels: {

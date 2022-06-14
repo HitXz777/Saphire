@@ -1,4 +1,3 @@
-const { Permissions } = require('discord.js')
 const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {

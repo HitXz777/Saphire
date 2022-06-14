@@ -56,8 +56,7 @@ client.on('guildMemberAdd', async (member) => {
         prefix = guild.Prefix || config.prefix,
         RolesId = guild?.Autorole || [],
         CanalDB = guild?.WelcomeChannel?.Canal,
-        Emoji = guild?.WelcomeChannel?.Emoji || e.Join,
-        Mensagem = guild?.WelcomeChannel?.Mensagem || 'entrou no servidor.',
+        Mensagem = guild?.WelcomeChannel?.Mensagem || `$member entrou no servidor.`,
         Canal = member?.guild.channels.cache.get(guild?.WelcomeChannel?.Canal)
 
     Welcome()
@@ -126,8 +125,9 @@ client.on('guildMemberAdd', async (member) => {
             return Notify(member.guild.id, 'Sem permissão', `Eu não tenho permissão para enviar mensagens de boas-vindas no canal ${Canal}. Eu desativei este sistema até que corrijam este problema.`)
         }
 
-        return Canal.send(`${Emoji} | ${member} ${Mensagem}`).catch(async err => {
+        let newMessage = Mensagem.replace('$member', member).replace('$servername', member.guild.name)
 
+        return Canal.send(`${newMessage}`).catch(async err => {
             DelWelcomeSystem()
             return client.users.cache.get(config.ownerId).send(`${e.Warn} | Erro no evento "guildMemberAdd"\n\`${err}\``)
         })
