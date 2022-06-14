@@ -9,7 +9,7 @@ module.exports = {
     options: [
         {
             name: 'mensagem',
-            description: 'Qual a mensagem que você quer enviar?',
+            description: '[moderation] Qual a mensagem que você quer enviar?',
             type: 3,
             required: true
         }

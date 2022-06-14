@@ -1,6 +1,6 @@
 module.exports = {
     name: 'balance',
-    description: 'Confira suas finanças',
+    description: '[economy] Confira suas finanças',
     dm_permission: false,
     type: 1,
     options: [

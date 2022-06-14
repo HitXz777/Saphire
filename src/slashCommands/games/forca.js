@@ -1,17 +1,17 @@
 module.exports = {
     name: 'forca',
-    description: 'Jogo da forca com palavra personalizada',
+    description: '[games] Jogo da forca com palavra personalizada',
     dm_permission: false,
     type: 1,
     options: [
         {
             name: 'random',
-            description: 'Palavras aleatórias',
+            description: '[games] Palavras aleatórias',
             type: 1
         },
         {
             name: 'choose',
-            description: 'Escolher uma palavra personalizada',
+            description: '[games] Escolher uma palavra personalizada',
             type: 1,
             options: [
                 {

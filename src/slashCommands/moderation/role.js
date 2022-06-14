@@ -9,7 +9,7 @@ module.exports = {
     options: [
         {
             name: 'add',
-            description: 'Adicione um cargo a um membro',
+            description: '[moderation] Adicione um cargo a um membro',
             type: 1,
             options: [
                 {
@@ -28,7 +28,7 @@ module.exports = {
         },
         {
             name: 'remove',
-            description: 'Remova um cargo de um membro',
+            description: '[moderation] Remova um cargo de um membro',
             type: 1,
             options: [
                 {

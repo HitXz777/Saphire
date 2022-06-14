@@ -27,7 +27,7 @@ const gifData = [
 
 const data = {
     name: 'interactions',
-    description: 'Interações gerais',
+    description: '[interaction] Interações gerais',
     dm_permission: false,
     type: 1,
     options: [
