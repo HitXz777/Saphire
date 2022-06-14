@@ -21,7 +21,6 @@ module.exports = {
 
         // NO USERS
         if (['commands', 'comandos', 'comando', 'cmd', 'cmds', 'commands'].includes(args[0]?.toLowerCase())) return AddCommands()
-        if (['reactionrole'].includes(args[0]?.toLowerCase())) return newRole()
         if (['comprovante'].includes(args[0]?.toLowerCase())) return newComprovante()
 
         if (!user) return message.channel.send(`${e.Deny} | Usuário não encontrado.`)
@@ -235,97 +234,6 @@ module.exports = {
                 Error(message, err)
             })
             return message.channel.send(`${e.Check} | ${user.username} agora é um Developer!`)
-        }
-
-        function newRole() {
-
-            let selectMenuObject = {
-                type: 1,
-                components: [{
-                    type: 3,
-                    minValues: 1,
-                    custom_id: 'reactionRole',
-                    placeholder: 'Selecionar cargos',
-                    options: [
-                        {
-                            label: 'Giveaways & Drops',
-                            emoji: '🎉',
-                            description: 'Quero receber todas as notificações de sorteios.',
-                            value: '981361980000596028',
-                        },
-                        {
-                            label: 'Maior de Idade',
-                            emoji: '🍺',
-                            description: 'Opa! Sou maior de idade.',
-                            value: '981029147918884924',
-                        },
-                        {
-                            label: 'Menor de Idade',
-                            emoji: '🍼',
-                            description: 'Sim, eu sou menor de idade.',
-                            value: '981029157251211274',
-                        },
-                        {
-                            label: 'Homem',
-                            emoji: '♂️',
-                            description: 'Sou um Machão!',
-                            value: '981029191162163220',
-                        },
-                        {
-                            label: 'Mulher',
-                            emoji: '♀️',
-                            description: 'Sou uma Mina Fod#!',
-                            value: '981029201018753055',
-                        },
-                        {
-                            label: 'Sul',
-                            emoji: '🌐',
-                            value: '981029231033217074',
-                        },
-                        {
-                            label: 'Sudeste',
-                            emoji: '🌐',
-                            value: '981029244077490206',
-                        },
-                        {
-                            label: 'Leste',
-                            emoji: '🌐',
-                            value: '981029259269255259',
-                        },
-                        {
-                            label: 'Nordeste',
-                            emoji: '🌐',
-                            value: '981029271126560779',
-                        },
-                        {
-                            label: 'Norte',
-                            emoji: '🌐',
-                            value: '981029285647237182',
-                        },
-                        {
-                            label: 'Noroeste',
-                            emoji: '🌐',
-                            value: '981363934026154014',
-                        },
-                        {
-                            label: 'Oeste',
-                            emoji: '🌐',
-                            value: '981364015542444073',
-                        },
-                        {
-                            label: 'Sudoeste',
-                            emoji: '🌐',
-                            value: '981364165765644309',
-                        }
-                    ]
-                }]
-            }
-
-            return message.channel.send({
-                content: `${e.Info} | Clique no cargo que você quer receber. Para remover, basta clicar novamente na mesma opção.`,
-                components: [selectMenuObject]
-            })
-
         }
 
         async function AddNewSixthStar() {
