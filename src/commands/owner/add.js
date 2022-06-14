@@ -1,6 +1,4 @@
 const { e } = require('../../../JSON/emojis.json')
-const Moeda = require('../../../modules/functions/public/moeda')
-const Error = require('../../../modules/functions/config/errors')
 const ms = require('ms')
 const Vip = require('../../../modules/functions/public/vip')
 

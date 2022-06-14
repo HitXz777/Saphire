@@ -12,6 +12,6 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        return message.reply(a).catch(err => { Error(message, err) })
+        return message.reply(a).catch(err => Error(message, err))
     }
 }
