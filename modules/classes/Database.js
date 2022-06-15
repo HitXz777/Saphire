@@ -306,6 +306,21 @@ Database.prototype.registerUser = async (user, blocked) => {
     if (u || u?.id === user.id) return
 
     new Database.User({ id: user.id }).save()
+        
+    await Database.User.updateOne(
+        { id: user.id },
+        {
+            $unset: {
+                PrivateChannel: 1,
+                Walls: 1,
+                Perfil: 1,
+                Letters: 1,
+                Transactions: 1
+            }
+        },
+        { upsert: true }
+    )
+    
     return
 }
 
@@ -323,6 +338,22 @@ Database.prototype.registerServer = async (guild, client) => {
     new Database.Guild({ id: guild.id }).save()
 
     await client?.channels?.cache?.get(Database.Config.LogChannelId)?.send(`${Database.Emojis.Database} | DATABASE | O servidor **${guild.name}** foi registrado com sucesso!`).catch(() => { })
+
+    await Database.Guild.updateOne(
+        { id: guild.id },
+        {
+            $unset: {
+                Blockchannels: 1,
+                ReactionRole: 1,
+                LockdownChannels: 1,
+                CommandBlocks: 1,
+                AfkSystem: 1,
+                Autorole: 1
+            }
+        },
+        { upsert: true }
+    )
+
     return true
 }
 

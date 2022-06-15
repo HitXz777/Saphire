@@ -45,11 +45,11 @@ client.on('messageCreate', async message => {
     if (message.content.startsWith(prefix) && clientData.Rebooting?.ON)
         return message.reply(`${e.Loading} | Reiniciando em breve...\n${e.BookPages} | ${clientData.Rebooting?.Features || 'Nenhum dado fornecido'}`)
 
-    if (!guild) Database.registerServer(message.guild, client)
     BlockCommandsBot(message, client.user.id, guild?.Blockchannels)
 
     if (message.author.bot) return
 
+    if (!guild) Database.registerServer(message.guild, client)
     Database.registerUser(message.author)
     xp(message)
     AfkSystem(message)
