@@ -106,7 +106,7 @@ function getEmoji(emojiData, guild) {
 
 async function registerCollectionID(Database, collection, guild) {
 
-    let passCode = require('../../../modules/functions/plugins/PassCode')
+    let passCode = require('./PassCode')
     let newID = passCode(5)
 
     await Database.Guild.updateOne(

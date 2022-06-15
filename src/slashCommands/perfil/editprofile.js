@@ -28,7 +28,7 @@ module.exports = {
     async execute({ interaction: interaction, database: Database, emojis: e }) {
 
         const { options, user } = interaction
-        const { eightyYears, Now } = require('../../events/plugins/eventPlugins')
+        const { eightyYears, Now } = require('../../../modules/functions/plugins/eventPlugins')
 
         let data = await Database.User.findOne({ id: user.id }, 'Perfil'),
             moment = require('moment'), title = undefined,

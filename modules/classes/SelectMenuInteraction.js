@@ -1,8 +1,8 @@
-const Database = require('../../../modules/classes/Database'),
+const Database = require('./Database'),
     { Config: config } = Database,
-    { getEmoji } = require('../plugins/eventPlugins'),
-    client = require('../../../index'),
-    Modals = require('../Modal/Modals')
+    { getEmoji } = require('../functions/plugins/eventPlugins'),
+    client = require('../../index'),
+    Modals = require('./Modals')
 
 class SelectMenuInteraction extends Modals {
     constructor(interaction) {

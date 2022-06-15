@@ -116,7 +116,7 @@ module.exports = {
 
         const moment = require('moment'),
             Data = require('../../../modules/functions/plugins/data'),
-            { day } = require('../../events/plugins/eventPlugins')
+            { day } = require('../../../modules/functions/plugins/eventPlugins')
 
         const { options, guild, user, channel: intChannel } = interaction
 
@@ -149,9 +149,9 @@ module.exports = {
 
         async function createGiveaway() {
 
-            if (Channel.type !== 'GUILD_TEXT')
+            if (!['GUILD_NEWS', 'GUILD_TEXT'].includes(Channel.type))
                 return await interaction.reply({
-                    content: '❌ | O canal selecionado não é um canal de texto.',
+                    content: `${e.Deny} | Apenas canais de textos e anúncios são válidos aqui.`,
                     ephemeral: true
                 })
 

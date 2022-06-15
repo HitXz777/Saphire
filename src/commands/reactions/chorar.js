@@ -14,7 +14,7 @@ module.exports = {
   execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
     
-    let rand = g.Cry[Math.floor(Math.random() * g.Cry.length)]
+    let rand = g.Chorar[Math.floor(Math.random() * g.Chorar.length)]
     let texto = args.join(" ")
     if (!texto) texto = `${message.author} está chorando`
     if (texto.length > 1000) return message.reply(`${e.Deny} | Não diga coisas acima de 1000 caracteres, pelo bem do meu coração de códigos :(`)
@@ -28,7 +28,7 @@ module.exports = {
 
       let filter = (reaction, user) => { return reaction.emoji.name === '🔄' && user.id === message.author.id }; let Collector = msg.createReactionCollector({ filter: filter, time: 15000, errors: ['time'] })
       let filter2 = (reaction, user) => { return reaction.emoji.name === '❌' && user.id === message.author.id }; let Collector2 = msg.createReactionCollector({ filter: filter2, max: 1, time: 30000, errors: ['time', 'max'] })
-      Collector.on('collect', (reaction, user) => { embed.setImage(g.Cry[Math.floor(Math.random() * g.Cry.length)]); msg.edit({ embeds: [embed] }).catch(() => { }) })
+      Collector.on('collect', (reaction, user) => { embed.setImage(g.Chorar[Math.floor(Math.random() * g.Chorar.length)]); msg.edit({ embeds: [embed] }).catch(() => { }) })
       Collector.on('end', (reaction, user) => { ; embed.setColor('RED').setFooter({ text: `Sessão Expirada | ${message.author.id}` }); msg.reactions.removeAll().catch(() => { }); msg.edit({ embeds: [embed] }).catch(() => { }) })
 
       Collector2.on('collect', (reaction, user) => { embed.setColor('RED').setFooter({ text: `Comando Expirado | ${message.author.id}` }); msg.reactions.removeAll().catch(() => { }); msg.edit({ embeds: [embed] }).catch(() => { }) })

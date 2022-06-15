@@ -4,7 +4,7 @@ const { e } = require('../../../../JSON/emojis.json'),
 
 class flagGame {
 
-    async init(client, message, args, prefix, MessageEmbed, Database,) {
+    async init(client, message, args, prefix, MessageEmbed, Database) {
 
         let flags = Database.Flags.get('Flags') || [],
             control = { atualFlag: {}, usersPoints: [], rounds: 0, collected: false, winners: [], alreadyAnswer: [], wrongAnswers: [] },

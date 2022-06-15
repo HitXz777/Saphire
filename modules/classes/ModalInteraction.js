@@ -1,9 +1,9 @@
-const Database = require('../../../modules/classes/Database'),
+const Database = require('./Database'),
     { Emojis: e, Config: config } = Database,
-    { eightyYears, Now, getUser, day } = require('../plugins/eventPlugins'),
-    passCode = require('../../../modules/functions/plugins/PassCode'),
+    { eightyYears, Now, getUser, day } = require('../functions/plugins/eventPlugins'),
+    passCode = require('../functions/plugins/PassCode'),
     Modals = require('./Modals')
-    
+
 class ModalInteraction extends Modals {
     constructor(interaction, client) {
         super()

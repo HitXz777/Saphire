@@ -166,12 +166,12 @@ module.exports = {
         let channel = options.getChannel('channel'),
             subCommandGroup = options.getSubcommandGroup(),
             subCommand = options.getSubcommand(),
-            receptionMessage = options.getString('message'),
             disable = options.getString('disable'),
             info = options.getString('info'),
+            receptionMessage = options.getString('message') || `$member ${subCommandGroup === 'welcome' ? 'entrou no' : 'saiu do'} servidor`,
             route = '', welcomeOrLeave = '', isWelcome = false
 
-        if (isWelcome) {
+        if (subCommandGroup === 'welcome') {
             route = 'WelcomeChannel'
             welcomeOrLeave = 'boas-vindas'
             isWelcome = true
@@ -401,14 +401,13 @@ module.exports = {
                 })
             }
 
-
         }
 
         async function SetWelcomeChannel() {
 
-            if (channel.type !== 'GUILD_TEXT')
+            if (!['GUILD_NEWS', 'GUILD_TEXT'].includes(channel.type))
                 return await interaction.reply({
-                    content: `${e.Deny} | Apenas canais de textos são válidos neste sistema.`,
+                    content: `${e.Deny} | Apenas canais de textos e anúncios são válidos aqui.`,
                     ephemeral: true
                 })
 

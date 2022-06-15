@@ -1,4 +1,4 @@
-const { getEmoji, registerCollectionID } = require('../../events/plugins/eventPlugins'),
+const { getEmoji, registerCollectionID } = require('../../../modules/functions/plugins/eventPlugins'),
     blockPerms = ['KICK_MEMBERS', 'BAN_MEMBERS', 'MANAGE_GUILD', 'MANAGE_MESSAGES', 'MUTE_MEMBERS', 'DEAFEN_MEMBERS', 'MOVE_MEMBERS', 'MANAGE_NICKNAMES', 'MANAGE_ROLES', 'ADMINISTRATOR', 'MODERATE_MEMBERS']
 
 module.exports = {

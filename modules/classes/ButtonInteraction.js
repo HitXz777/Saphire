@@ -1,7 +1,7 @@
-const Database = require('../../../modules/classes/Database'),
+const Database = require('./Database'),
     { Emojis: e } = Database,
-    { newReminder } = require('../plugins/eventPlugins'),
-    Modals = require('../Modal/Modals')
+    { newReminder } = require('../functions/plugins/eventPlugins'),
+    Modals = require('./Modals')
 
 class ButtonInteraction extends Modals {
     constructor(interaction) {
@@ -12,7 +12,7 @@ class ButtonInteraction extends Modals {
         this.channel = interaction.channel
         this.guild = interaction.guild
     }
-
+    
     execute() {
 
         switch (this.customId) {
