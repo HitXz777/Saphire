@@ -1,12 +1,12 @@
 module.exports = {
-    name: 'owner',
-    description: '[owner] Comandos privados para meu criador',
+    name: 'admin',
+    description: '[administration] Comandos privados para meus administradores',
     dm_permission: false,
     type: 1,
     options: [
         {
             name: 'add',
-            description: '[owner] Adicionar valores',
+            description: '[administration] Adicionar valores',
             type: 1,
             options: [
                 {
@@ -34,7 +34,7 @@ module.exports = {
                     ]
                 },
                 {
-                    name: 'value',
+                    name: 'quantity',
                     description: '[add] Valor a ser adicionado',
                     type: 4,
                     required: true
@@ -53,7 +53,7 @@ module.exports = {
         },
         {
             name: 'subtract',
-            description: '[owner] Remover valores',
+            description: '[administration] Subtrair valores',
             type: 1,
             options: [
                 {
@@ -77,7 +77,7 @@ module.exports = {
                     ]
                 },
                 {
-                    name: 'value',
+                    name: 'quantity',
                     description: '[remove] Valor a ser removido',
                     type: 4,
                     required: true
@@ -96,7 +96,7 @@ module.exports = {
         },
         {
             name: 'set',
-            description: '[owner] Definir valores',
+            description: '[administration] Definir valores',
             type: 1,
             options: [
                 {
@@ -156,6 +156,14 @@ module.exports = {
                         {
                             name: 'estrela6',
                             value: 'estrela6'
+                        },
+                        {
+                            name: 'level',
+                            value: 'levelSet'
+                        },
+                        {
+                            name: 'experience',
+                            value: 'xpSet'
                         }
                     ]
                 },
@@ -168,24 +176,26 @@ module.exports = {
                     name: 'id',
                     description: '[set] By Id',
                     type: 3,
+                },
+                {
+                    name: 'quantity',
+                    description: '[set] Quantidade a ser configurada',
+                    type: 4,
                 }
             ]
         },
         {
-            name: 'delete',
-            description: '[owner] Deletar valores',
+            name: 'remove',
+            description: '[administration] Remover valores',
             type: 1,
             options: [
                 {
                     name: 'function',
-                    description: '[delete] Função a ser executada',
+                    description: '[remove] Função a ser executada',
                     type: 3,
                     required: true,
                     choices: [
-                        {
-                            name: 'developer',
-                            value: 'developerRemove'
-                        },
+
                         {
                             name: 'administrator',
                             value: 'admRemove'
@@ -211,39 +221,113 @@ module.exports = {
                             value: 'bgacessRemove'
                         },
                         {
+                            name: 'servers',
+                            value: 'serversRemove'
+                        },
+                        {
+                            name: 'blacklist',
+                            value: 'blacklistRemove'
+                        },
+                        {
                             name: 'estrela1',
-                            value: 'estrelaDel1'
+                            value: 'estrelaRemove1'
                         },
                         {
                             name: 'estrela2',
-                            value: 'estrelaDel2'
+                            value: 'estrelaRemove2'
                         },
                         {
                             name: 'estrela3',
-                            value: 'estrelaDel3'
+                            value: 'estrelaRemove3'
                         },
                         {
                             name: 'estrela4',
-                            value: 'estrelaDel4'
+                            value: 'estrelaRemove4'
                         },
                         {
                             name: 'estrela5',
-                            value: 'estrelaDel5'
+                            value: 'estrelaRemove5'
                         },
                         {
                             name: 'estrela6',
-                            value: 'estrelaDel6'
+                            value: 'estrelaRemove6'
+                        },
+                        {
+                            name: 'developer',
+                            value: 'developerRemove'
+                        },
+                    ]
+                },
+                {
+                    name: 'quantity',
+                    description: '[remove] Valor a ser removido',
+                    type: 4
+                },
+                {
+                    name: 'mention',
+                    description: '[remove] By Mention',
+                    type: 6,
+                },
+                {
+                    name: 'id',
+                    description: '[remove] By Id',
+                    type: 3,
+                }
+            ]
+        },
+        {
+            name: 'delete',
+            description: '[administration] Deletar valores',
+            type: 1,
+            options: [
+                {
+                    name: 'function',
+                    description: '[delete] Função a ser executada',
+                    type: 3,
+                    required: true,
+                    choices: [
+                        {
+                            name: 'logregister',
+                            value: 'logregisterDelete'
+                        },
+                        {
+                            name: 'cache',
+                            value: 'cacheDelete'
+                        },
+                        {
+                            name: 'user',
+                            value: 'userDelete'
+                        },
+                        {
+                            name: 'timeout',
+                            value: 'timeoutDelete'
+                        },
+                        {
+                            name: 'profile',
+                            value: 'profileDelete'
+                        },
+                        {
+                            name: 'clan',
+                            value: 'clanDelete'
+                        },
+                        {
+                            name: 'vip',
+                            value: 'vipDelete'
+                        },
+                        {
+                            name: 'bits',
+                            value: 'bitsDelete'
                         }
                     ]
                 },
                 {
                     name: 'mention',
-                    description: '[set] By Mention',
+                    description: '[delete] By Mention',
                     type: 6,
                 },
                 {
                     name: 'id',
-                    description: '[set] By Id',
+                    description: '[delete] By Id',
                     type: 3,
                 }
             ]
@@ -251,27 +335,28 @@ module.exports = {
     ],
     async execute({ interaction: interaction, client: client, database: Database, emojis: e, clientData: clientData }) {
 
+        const { options } = interaction
         const { Config: config } = Database
+        const adms = clientData?.Administradores || []
 
-        if (interaction.user.id !== config.ownerId)
+        if (!adms.includes(interaction.user.id) && interaction.user.id !== config.ownerId)
             return await interaction.reply({
-                content: `${e.OwnerCrow} | Este é um comando privado para meu desenvolvedor.`,
+                content: `${e.OwnerCrow} | Este é um comando privado para os meus administradores.`,
                 ephemeral: true
             })
 
-        let func = interaction.options.getString('function')
-        let userMention = interaction.options.getUser('mention')
-        let userId = interaction.options.getString('id')
-        let user = client.users.cache.get(userId) || userMention
-        let amount = interaction.options.getInteger('value')
+        let func = options.getString('function')
+        let id = options.getString('id')
+        let user = client.users.cache.get(id) || options.getUser('mention')
+        let amount = options.getInteger('quantity')
 
-        if (!user)
+        if (!user && !['serversRemove', 'logregisterDelete', 'cacheDelete', 'clanDelete'].includes(func))
             return await interaction.reply({
                 content: `${e.Deny} | Nenhum usuário encontrado.`,
                 ephemeral: true
             })
 
-        if (func.includes('estrelaDel')) return delete_estrela()
+        if (func.includes('estrelaRemove')) return delete_estrela()
         if (func.includes('estrela')) return set_estrela()
 
         switch (func) {
@@ -291,14 +376,27 @@ module.exports = {
             case 'bgacess': set_BgAcess(); break;
             case 'developer': set_Developer(); break;
             case 'designer': set_Designer(); break;
+            case 'levelSet': set_Level(); break;
+            case 'xpSet': set_Xp(); break;
 
-            case 'admRemove': delete_Administrator(); break;
-            case 'modRemove': delete_Moderator(); break;
-            case 'bughunterRemove': delete_Bughunter(); break;
-            case 'bgacessRemove': delete_BgAcess(); break;
-            case 'halloweenRemove': delete_Halloween(); break;
-            case 'developerRemove': delete_Developer(); break;
-            case 'designerRemove': delete_Designer(); break;
+            case 'admRemove': remove_Administrator(); break;
+            case 'modRemove': remove_Moderator(); break;
+            case 'bughunterRemove': remove_Bughunter(); break;
+            case 'bgacessRemove': remove_BgAcess(); break;
+            case 'halloweenRemove': remove_Halloween(); break;
+            case 'developerRemove': remove_Developer(); break;
+            case 'designerRemove': remove_Designer(); break;
+            case 'serversRemove': remove_Servers(); break;
+            case 'blacklistRemove': remove_Blacklist(); break;
+
+            case 'logregisterDelete': delete_Logregister(); break;
+            case 'cacheDelete': delete_Cache(); break;
+            case 'userDelete': delete_User(); break;
+            case 'profileDelete': delete_Profile(); break;
+            case 'timeoutDelete': delete_Timeout(); break;
+            case 'vipDelete': delete_Vip(); break;
+            case 'clanDelete': delete_Clan(); break;
+            case 'bitsDelete': delete_Bits(); break;
 
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
@@ -366,37 +464,97 @@ module.exports = {
             })
         }
 
+        async function set_Level() {
+
+            if (!amount)
+                return await interaction.reply({
+                    content: `${e.Deny} | Informar um valor válido`,
+                    ephemeral: true
+                })
+
+            Database.updateUserData(user.id, 'Level', amount)
+            return await interaction.reply({
+                content: `${e.Check} | O level de **${user.tag} \`${user.id}\`** foi reconfigurado para ${amount}`,
+                ephemeral: true
+            })
+        }
+
+        async function delete_Bits() {
+            Database.delete(user.id, 'Perfil.Bits')
+            return await interaction.reply({
+                content: `${e.Check} | Os bits de ${user} foram deletados.`
+            })
+        }
+
+        async function delete_Clan() {
+
+            if (!id)
+                return await interaction.reply({
+                    content: `${e.Info} | Forneça um Clan-KeyCode para a exclução.`,
+                    ephemeral: true
+                })
+
+            let clan = await Database.Clan.findOne({ id: id })
+
+            if (!clan)
+                return await interaction.reply({
+                    content: `${e.Deny} | Este clan não existe.`,
+                    ephemeral: true
+                })
+
+            Database.Clan.deleteOne({ id: id })
+            return await interaction.reply({
+                content: `${e.Check} | O clan ${clan.Name || '**Nome não encontrado**'} foi deletado com sucesso!`,
+                ephemeral: true
+            })
+        }
+
+        async function set_Xp() {
+
+            if (!amount && amount !== 0)
+                return await interaction.reply({
+                    content: `${e.Deny} | Informar um valor válido`,
+                    ephemeral: true
+                })
+
+            Database.updateUserData(user.id, 'Xp', amount)
+            return await interaction.reply({
+                content: `${e.Check} | A experiência de **${user.tag} \`${user.id}\`** foi reconfigurado para ${amount}`,
+                ephemeral: true
+            })
+        }
+
         async function delete_estrela() {
 
             let estrelaData = {}
 
             switch (func) {
-                case 'estrelaDel1': estrelaData = {
+                case 'estrelaRemove1': estrelaData = {
                     route: 'Perfil.Estrela.Um',
                     userResponse: '1º Estrela',
                     number: 'Um'
                 }; break;
-                case 'estrelaDel2': estrelaData = {
+                case 'estrelaRemove2': estrelaData = {
                     route: 'Perfil.Estrela.Dois',
                     userResponse: '2º Estrela',
                     number: 'Dois'
                 }; break;
-                case 'estrelaDel3': estrelaData = {
+                case 'estrelaRemove3': estrelaData = {
                     route: 'Perfil.Estrela.Tres',
                     userResponse: '3º Estrela',
                     number: 'Tres'
                 }; break;
-                case 'estrelaDel4': estrelaData = {
+                case 'estrelaRemove4': estrelaData = {
                     route: 'Perfil.Estrela.Quatro',
                     userResponse: '4º Estrela',
                     number: 'Quatro'
                 }; break;
-                case 'estrelaDel5': estrelaData = {
+                case 'estrelaRemove5': estrelaData = {
                     route: 'Perfil.Estrela.Cinco',
                     userResponse: '5º Estrela',
                     number: 'Cinco'
                 }; break;
-                case 'estrelaDel6': estrelaData = {
+                case 'estrelaRemove6': estrelaData = {
                     route: 'Perfil.Estrela.Seis',
                     userResponse: '6º Estrela',
                     number: 'Seis'
@@ -426,6 +584,78 @@ module.exports = {
             })
         }
 
+        async function delete_User() {
+
+            let u = await Database.User.findOne({ id: user.id })
+
+            if (!u)
+                return await interaction.reply({
+                    content: `${e.Info} | Este usuário não existe na minha database.`,
+                    ephemeral: true
+                })
+
+            Database.deleteUser(user.id)
+            return await interaction.reply({
+                content: `${e.Check} | Todos os dados de ${user?.tag || '**Usuário não encontrado**'} foram deletados.`,
+                ephemeral: true
+            })
+        }
+
+        async function delete_Profile() {
+            Database.delete(user.id, 'Perfil')
+            return await interaction.reply({
+                content: `${e.Check} | O perfil de ${user.tag} foi deletado com sucesso!`,
+                ephemeral: true
+            })
+        }
+
+        async function delete_Vip() {
+
+            const Vip = require('../../../modules/functions/public/vip')
+            let isVip = await Vip(user.id)
+
+            if (!isVip)
+                return await interaction.reply({
+                    content: `${e.Deny} | Este usuário não é vip.`,
+                    ephemeral: true
+                })
+
+            Database.delete(user.id, 'Vip')
+            return await interaction.reply({
+                content: `${e.Check} | O vip de ${user} foi deletado.`,
+                ephemeral: true
+            })
+        }
+
+        async function delete_Timeout() {
+            Database.delete(user.id, 'Timeouts')
+            return await interaction.reply({
+                content: `${e.Check} | Todos os timeouts de ${user.tag} foram deletados com sucesso!`,
+                ephemeral: true
+            })
+        }
+
+        async function remove_Blacklist() {
+
+            let blacklist = clientData.Blacklist?.Users || []
+
+            if (!blacklist.includes(user.id))
+                return await interaction.reply({
+                    content: `${e.Deny} | Este usuário **${user.tag} \`${user.id}\`** não se encontra na blacklist.`,
+                    ephemeral: true
+                })
+
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                { $pull: { 'Blacklist.Users': user.id } }
+            )
+
+            return await interaction.reply({
+                content: `${e.Check} | O usuário **${user.tag} \`${user.id}\`** foi removido blacklist.`,
+                ephemeral: true
+            })
+        }
+
         async function set_Halloween() {
 
             let data = clientData.Titles?.Halloween || []
@@ -447,7 +677,7 @@ module.exports = {
             })
         }
 
-        async function delete_Halloween() {
+        async function remove_Halloween() {
 
             let data = clientData.Titles?.Halloween || []
 
@@ -466,6 +696,36 @@ module.exports = {
                 content: `${e.Check} | ${user.username} não possui mais o título **🎃 Halloween 2021**!`,
                 ephemeral: true
             })
+        }
+
+        async function delete_Logregister() {
+            await Database.LogRegister.remove({})
+            return await interaction.reply({
+                content: `${e.Check} | LogRegister excluído com sucesso!`
+            })
+        }
+
+        async function delete_Cache() {
+            await Database.Cache.clear({})
+            return await interaction.reply({
+                content: `${e.Check} | Cache excluído com sucesso!`
+            })
+        }
+
+        async function remove_Servers() {
+            let servers = 0, leaved = 0
+
+            await interaction.deferReply()
+
+            await client.guilds.cache.forEach(g => {
+                servers++
+                if (g.members.cache.size <= amount && !['980891407659196567', '888464632291917956', '882475447387054081'].includes(g.id)) {
+                    leaved++
+                    g.leave().catch(() => { })
+                }
+            })
+
+            return await interaction.editReply(`${e.Check} | Eu saí de **${leaved}/${servers} servidores** que tinham menos de **${amount} membros.**`).catch(() => { })
         }
 
         async function add_Level() {
@@ -497,7 +757,7 @@ module.exports = {
             })
         }
 
-        async function delete_Designer() {
+        async function remove_Designer() {
 
             let dataUsers = clientData.Titles?.OfficialDesigner || []
 
@@ -555,7 +815,7 @@ module.exports = {
             })
         }
 
-        async function delete_BgAcess() {
+        async function remove_BgAcess() {
 
             let bgData = clientData.BackgroundAcess || []
 
@@ -597,7 +857,7 @@ module.exports = {
             })
         }
 
-        async function delete_Developer() {
+        async function remove_Developer() {
 
             let dataUsers = clientData.Titles?.Developer || []
 
@@ -628,8 +888,6 @@ module.exports = {
 
         async function set_Administrator() {
 
-            let adms = clientData?.Administradores || []
-
             if (adms.includes(user.id))
                 return await interaction.reply({
                     content: `${e.Deny} | ${user.tag} já é um administrador.`,
@@ -650,9 +908,7 @@ module.exports = {
 
         }
 
-        async function delete_Administrator() {
-
-            let adms = clientData?.Administradores || []
+        async function remove_Administrator() {
 
             if (!adms.includes(user.id))
                 return await interaction.reply({
@@ -673,11 +929,11 @@ module.exports = {
 
         }
 
-        async function delete_Moderator() {
+        async function remove_Moderator() {
 
-            let adms = clientData?.Moderadores || []
+            let mods = clientData?.Moderadores || []
 
-            if (!adms.includes(user.id))
+            if (!mods.includes(user.id))
                 return await interaction.reply({
                     content: `${e.Deny} | ${user.tag} não é um moderador.`,
                     ephemeral: true
@@ -698,9 +954,9 @@ module.exports = {
 
         async function set_Moderator() {
 
-            let adms = clientData?.Moderadores || []
+            let mods = clientData?.Moderadores || []
 
-            if (adms.includes(user.id))
+            if (mods.includes(user.id))
                 return await interaction.reply({
                     content: `${e.Deny} | ${user.tag} já é um moderador.`,
                     ephemeral: true
@@ -719,7 +975,7 @@ module.exports = {
 
         }
 
-        async function delete_Bughunter() {
+        async function remove_Bughunter() {
 
             let dataUsers = clientData.Titles?.BugHunter || []
 

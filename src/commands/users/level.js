@@ -140,10 +140,11 @@ module.exports = {
 
             return message.reply({
                 embeds: [
-                    new MessageEmbed()
-                        .setColor(client.blue)
-                        .setTitle(`${e.ModShield} Background Free Acess`)
-                        .setDescription(`${format}`)
+                    {
+                        color: client.blue,
+                        title: `${e.ModShield} Background Free Acess`,
+                        description: format
+                    }
                 ]
             })
 
