@@ -35,8 +35,7 @@ module.exports = {
         if (banner)
             embeds.push({
                 color: client.blue,
-                description: `${e.Download} [Clique aqui](${banner}) para baixar o banner de ${member?.user?.tag || 'NomeDesconhecido'
-                    }`,
+                description: `${e.Download} [Clique aqui](${banner}) para baixar o banner de ${member?.user?.tag || 'NomeDesconhecido'}`,
                 image: { url: banner }
             })
 
