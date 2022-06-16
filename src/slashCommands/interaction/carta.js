@@ -39,6 +39,10 @@ module.exports = {
                             value: 'delete',
                         },
                         {
+                            name: 'carta',
+                            value: 'letter',
+                        },
+                        {
                             name: 'denúnciar',
                             value: 'report',
                         }
@@ -73,7 +77,7 @@ module.exports = {
                 userSearch = resultSearch || user,
                 letterId = options.getString('letter_id') || null,
                 staff = [...clientData.Moderadores, ...clientData.Administradores]//, config.ownerId,
-                invalid = search || letterId || func === 'delete'
+            invalid = search || letterId || ['delete', 'letter'].includes(func)
 
             if (search && !resultSearch && staff.includes(user.id))
                 return await interaction.reply({
@@ -92,6 +96,10 @@ module.exports = {
                 case 'report': reportModal(); break;
                 case 'block': blockAcess(); break;
                 case 'delete': deleteLetterUsers(); break;
+                case 'letter': await interaction.reply({
+                    content: `${e.Loading} | Comando em construção...`,
+                    ephemeral: true
+                }); break;
 
                 default:
                     break;
