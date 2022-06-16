@@ -148,7 +148,7 @@ module.exports = {
                         })
                 }
 
-                if (!control.atualEmbeds?.length)
+                if (control.atualEmbeds.length === 0)
                     return await interaction.editReply({
                         content: `${e.Deny} | ${userSearch.id === user.id ? `Você` : `${userSearch.tag}`} não tem nenhuma carta ${func === 'sended' ? 'enviada' : 'recebida'}.`
                     }).catch(() => { })
@@ -207,7 +207,7 @@ module.exports = {
 
             async function build() {
 
-                let userData = await Database.User.findOne({ id: user.id }, 'Letters')
+                let userData = await Database.User.findOne({ id: userSearch.id }, 'Letters')
                 let letters = {
                     Sended: userData.Letters?.Sended || [],
                     Recieved: userData.Letters?.Recieved || []
@@ -237,7 +237,7 @@ module.exports = {
                                     return `${e.Deny} Carta deletada por não conter um ID.`
                                 }
 
-                                return `🆔: \`${data.letterId || 'Not Found'}\`\n📨 To: ${client.users.cache.get(data.to)?.tag || `\`Not Found - ${data.to}\``}\n🛡️ From: ${client.guilds.cache.get(data.guildId)?.name || `\`Not Found - ${data.guildId}\``}\n🕵️ Anonymous: ${data.anonymous ? 'Sim' : 'Não'}\n💭 Content: ${data.content.length > 20 ? `${data.content.trim().slice(0, 20)}...` : data.content}\n📅 When: ${Data(data.date)}`
+                                return `🆔: \`${data.letterId || 'Not Found'}\`\n📨 To: ${client.users.cache.get(data.to)?.tag || `\`Not Found - ${data.to}\``}\n🛡️ From: ${client.guilds.cache.get(data.guildId)?.name || `\`Not Found - ${data.guildId}\``}\n🕵️ Anonymous: ${data.anonymous ? 'Sim' : 'Não'}\n💭 Content: ${data.content.length > 20 ? `${data.content.trim().slice(0, 20)}...` : data.content}\n📅 When: ${Data(data.date, false, false)}`
                             }).join('\n----------------------------------\n')
                             : current.sort((a, b) => b.date - a.date).map(data => {
 
@@ -246,7 +246,7 @@ module.exports = {
                                     return `${e.Deny} Carta deletada por não conter um ID.`
                                 }
 
-                                return `🆔: \`${data.letterId || 'Not Found'}\`\n📨 By: ${data.anonymous ? 'Anonymous 🕵️' : client.users.cache.get(data.from)?.tag || `\`Not Found - ${data.to}\``}\n🛡️ From: ${client.guilds.cache.get(data.guildId)?.name || `\`Not Found - ${data.guildId}\``}\n💭 Content: ${data.content.length > 20 ? `${data.content.trim().slice(0, 20)}...` : data.content}\n📅 When: ${Data(data.date)}`
+                                return `🆔: \`${data.letterId || 'Not Found'}\`\n📨 By: ${data.anonymous ? 'Anonymous 🕵️' : client.users.cache.get(data.from)?.tag || `\`Not Found - ${data.to}\``}\n🛡️ From: ${client.guilds.cache.get(data.guildId)?.name || `\`Not Found - ${data.guildId}\``}\n💭 Content: ${data.content.length > 20 ? `${data.content.trim().slice(0, 20)}...` : data.content}\n📅 When: ${Data(data.date, false, false)}`
                             }).join('\n----------------------------------\n'),
                         pageCount = length > 1 ? ` ${page}/${length}` : ''
 
