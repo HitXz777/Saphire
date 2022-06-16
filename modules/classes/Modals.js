@@ -287,7 +287,7 @@ class Modals {
                         max_length: 50
                     }
                 ]
-            }, // MAX: 5 Fields
+            },
             {
                 type: 1,
                 components: [

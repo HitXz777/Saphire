@@ -1,6 +1,5 @@
 const Database = require('./Database'),
     { Emojis: e } = Database,
-    { newReminder } = require('../functions/plugins/eventPlugins'),
     Modals = require('./Modals')
 
 class ButtonInteraction extends Modals {
@@ -17,20 +16,15 @@ class ButtonInteraction extends Modals {
 
         switch (this.customId) {
             case 'setStatusChange': this.setStatusCommand(); break;
-            case 'bugReport': this.bugReportSend(); break;
             case 'editProfile': this.editProfile(); break;
-            case 'newGiveaway': this.newGiveaway(); break;
             case 'newProof': this.newProof(); break;
             case 'closeProof': this.newProof(true); break;
-            case 'newReminder': newReminder(this.interaction); break;
             default:
                 break;
         }
 
         return
     }
-
-    bugReportSend = async () => await this.interaction.showModal(this.reportBug)
 
     async setStatusCommand() {
 

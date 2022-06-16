@@ -28,9 +28,9 @@ module.exports = {
                 .addField(`${e.CoroaDourada} Premium Stage`, `Tem interesse em desbloquear comandos únicos? Use \`${prefix}premium\` e descubra mais.`)
                 .addField('🆕 Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
                 .addField(`${e.Stonks} New Reaction Role System`, `Siiiim! Agora eu possuo um sistema de Reaction Role! Vem dar uma olhada! \`${prefix}reactionrole\``)
-                .addField(`⭐ Slash Commands`, `\`${prefix}giveaway\` & \`${prefix}reminder\` ganharam seus Slash Commands.`)
+                .addField(`⭐ Slash Commands`, 'Alguns comandos foram movidos para Slash Commands. Use `/help` e confira as alterações.')
                 .setFooter({ text: 'Este painel se fechará após 1 minuto de inatividade' }),
-            // .addField(`${e.TopGG} Top.gg`, `[Votar](${config.TopGGLink}/vote) na ${client.user.username}.`),
+
             painel = new MessageActionRow()
                 .addComponents(new MessageSelectMenu()
                     .setCustomId('menu')
@@ -313,36 +313,32 @@ module.exports = {
                             title: `⭐ Notas da Última Atualização`,
                             description: `Aqui ficam informações da última atualização que eu recebi. Caso queria ver as atualizações antigas, acesse [meu servidor](${config.SupportServerLink}).`,
                             fields: [
-
                                 {
-                                    name: `🆕 Reaction Role`,
+                                    name: `🆕 Reaction Role (07/06/2022)`,
                                     value: `Meu novo sistema de reaction role. Você pode ativa-lo usando \`${prefix}reactionrole\` ou apenas \`${prefix}rr\``
                                 },
                                 {
-                                    name: `🆕 Comando Quiz | ${prefix}quiz`,
+                                    name: `🆕 Comando Quiz | ${prefix}quiz (09/06/2022)`,
                                     value: 'Rework e novo modo *Anime Theme*'
                                 },
                                 {
-                                    name: '📝 Modals & ⭐ Slash Commands',
-                                    value: `Alguns comandos receberam seus adicionais: \`${prefix}reminder | ${prefix}bug | ${prefix}giveaway\` foram uns deles`
-                                },
-                                {
-                                    name: '🆕 Auto Lembrete',
+                                    name: '🆕 Auto Lembrete (10/06/2022)',
                                     value: `Alguns comandos receberam um botão com um ⏰. Ao clicar neste relógio, a ${client.user} vai te avisar assim que o timeout do comando acabar.\nAlguns deles foram o \`${prefix}daily\` & \`${prefix}bitcoin\``
                                 },
                                 {
-                                    name: '⭐ Slash Commands',
-                                    value: 'O Slash Command está começando a crescer nos sistemas da Saphire. Que tal dar uma olhada? Utilize \`/\`.'
+                                    name: '📝 Modals & Slash Commands ⭐ (11/06/2022)',
+                                    value: 'Você pode checar todas as novidades e transferências de comandos acessando `/help` em Slash Commands.'
                                 },
                                 {
-                                    name: '⛔ Remoção',
-                                    value: `\`${prefix}forca\` -> Movido para Slash Command \`/forca\``
+                                    name: '⛔ Remoção (11/06/2022)',
+                                    value: `Transferências de comandos com \`${prefix}\` para \`/\`. Verifique usando \`/help\``
                                 },
                                 {
-                                    name: `${e.bug} Bugs`,
-                                    value: `RASPADINHA - Multiple Channels Interactions - ${e.Check} Fixed | \`22/05/2022\``
+                                    name: `${e.bug} Bugs (22/05/2022)`,
+                                    value: 'Nenhum bug notável foi encontrado por enquanto.'
                                 }
-                            ]
+                            ],
+                            footer: { text: 'Painel atualizado em 11/06/2022 - 14:35' }
                         }],
                     components: [painel]
                 }).catch(() => { })

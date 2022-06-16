@@ -75,7 +75,7 @@ module.exports = {
                 search = options.getString('user') || null,
                 resultSearch = getUser(search) || null,
                 userSearch = resultSearch || user,
-                letterId = options.getString('letter_id') || null,
+                letterId = options.getString('letter_id')?.toUpperCase() || null,
                 staff = [...clientData.Moderadores, ...clientData.Administradores]//, config.ownerId,
             invalid = search || letterId || ['delete', 'letter'].includes(func)
 
@@ -96,10 +96,7 @@ module.exports = {
                 case 'report': reportModal(); break;
                 case 'block': blockAcess(); break;
                 case 'delete': deleteLetterUsers(); break;
-                case 'letter': await interaction.reply({
-                    content: `${e.Loading} | Comando em construção...`,
-                    ephemeral: true
-                }); break;
+                case 'letter': getLetter(); break;
 
                 default:
                     break;
@@ -298,52 +295,56 @@ module.exports = {
                 return
             }
 
-            // async function getLetter() {
+            async function getLetter() {
 
-            //     if (!args[1])
-            //         return message.reply(`${e.Deny} | Forneça o ID da carta para que eu possa buscar a carta.`)
+                if (!letterId)
+                    return await interaction.reply({
+                        content: `${e.Deny} | Forneça o ID da carta para que eu possa buscar a carta.`,
+                        ephemeral: true
+                    })
 
-            //     let letterId = args[1].toUpperCase()
+                if (letterId.length !== 7)
+                    return await interaction.reply({
+                        content: `${e.Deny} | O ID da carta possui 7 digitos.`,
+                        ephemeral: true
+                    })
 
-            //     if (letterId.length !== 7)
-            //         return message.reply(`${e.Deny} | O ID da carta possui 7 digitos.`)
+                await interaction.deferReply({ ephemeral: true })
+                let allDataUsers = await Database.User.find({}, 'id Letters.Recieved')
 
-            //     let msg = await message.reply(`${e.Loading} | Buscando...`)
-            //     let allDataUsers = await Database.User.find({}, 'id Letters.Recieved')
+                let search = allDataUsers.find(data => data.Letters.Recieved.find(arr => arr.letterId === letterId)),
+                    letter = search?.Letters?.Recieved?.find(data => data.letterId === letterId),
+                    userId = search?.id
 
-            //     let search = allDataUsers.find(data => data.Letters.Recieved.find(arr => arr.letterId === letterId)),
-            //         letter = search?.Letters?.Recieved?.find(data => data.letterId === letterId),
-            //         userId = search?.id
+                if (!letter)
+                    return await interaction.editReply({ content: `${e.Deny} | Nenhuma carta foi encontrada.` }).catch(() => { })
 
-            //     if (!letter)
-            //         return msg.edit(`${e.Deny} | Nenhuma carta foi encontrada.`).catch(() => { })
+                let userRecieved = client.users.cache.get(userId)
+                let userSended = client.users.cache.get(letter.from)
+                let serverSended = client.guilds.cache.get(letter.guildId)
 
-            //     let userRecieved = client.users.cache.get(userId)
-            //     let userSended = client.users.cache.get(letter.from)
-            //     let serverSended = client.guilds.cache.get(letter.guildId)
+                return await interaction.editReply({
+                    content: `${e.Check} | Carta encontrada com sucesso!`,
+                    embeds: [
+                        {
+                            color: client.blue,
+                            title: `📨 ${client.user.username}'s Letters System`,
+                            description: `ℹ Esta carta foi enviada por: ${letter.anonymous ? '\`Usuário anônimo\`' : `${userSended.tag || `\`Not Found\``} - \`${letter.from}\``}`,
+                            fields: [{
+                                name: `📝 Conteúdo da carta`,
+                                value: `\`\`\`txt\n${letter.content}\n\`\`\``
+                            }],
+                            footer: { text: `A ${client.user.username} não se responsabiliza pelo conteúdo presente nesta carta.` }
+                        },
+                        {
+                            color: client.blue,
+                            title: `🔍 ${client.user.username} Letters System Info`,
+                            description: `De: ${userSended?.tag || `\`Not Found\``} - \`${letter.from}\`\nPara: ${userRecieved?.tag || `\`Not Found\``} - \`${userId}\`\nDo servidor: ${serverSended?.name || `\`Not Found\``} - \`${letter.guildId}\`\nEnviado a: \`${client.formatTimestamp(letter.date)}\`\nEnviado em: \`${Data(letter.date - Date.now())}\``
+                        }
+                    ]
+                }).catch(() => { })
 
-            //     return msg.edit({
-            //         content: `${e.Check} | Carta encontrada com sucesso!`,
-            //         embeds: [
-            //             {
-            //                 color: client.blue,
-            //                 title: `📨 ${client.user.username}'s Letters System`,
-            //                 description: `ℹ Esta carta foi enviada por: ${letter.anonymous ? '\`Usuário anônimo\`' : `${userSended.tag || `\`Not Found\``} - \`${letter.from}\``}`,
-            //                 fields: [{
-            //                     name: `📝 Conteúdo da carta`,
-            //                     value: `\`\`\`txt\n${letter.content}\n\`\`\``
-            //                 }],
-            //                 footer: { text: `A ${client.user.username} não se responsabiliza pelo conteúdo presente nesta carta.` }
-            //             },
-            //             {
-            //                 color: client.blue,
-            //                 title: `🔍 ${client.user.username} Letters System Info`,
-            //                 description: `De: ${userSended?.tag || `\`Not Found\``} - \`${letter.from}\`\nPara: ${userRecieved?.tag || `\`Not Found\``} - \`${userId}\`\nDo servidor: ${serverSended?.name || `\`Not Found\``} - \`${letter.guildId}\`\nEnviado a: \`${client.formatTimestamp(letter.date)}\`\nEnviado em: \`${Data(letter.date - Date.now())}\``
-            //             }
-            //         ]
-            //     })
-
-            // }
+            }
 
             async function deleteLetterUsers() {
 
