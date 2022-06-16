@@ -25,7 +25,6 @@ class SelectMenuInteraction extends Modals {
         switch (this.value) {
             case 'newGiveaway': this.newGiveaway(); break;
             case 'newReminder': this.newReminder(this.interaction); break;
-            case 'sendNewLetter': this.sendNewLetter(); break;
             case 'report': this.letterReport(); break;
             case 'reportTransactions': this.reportTransactions(); break;
             case 'newReactionRole': this.newReactionRole(); break;
@@ -349,40 +348,6 @@ class SelectMenuInteraction extends Modals {
     }
 
     reportTransactions = async () => await this.interaction.showModal(this.transactionsReport)
-    letterReport = async () => await this.interaction.showModal(this.reportLetter)
-
-    async sendNewLetter() {
-
-        const { user, interaction } = this
-
-        let data = await Database.User.findOne({ id: user.id }, 'Balance Slot.Cartas Timeouts.Letter'),
-            cartas = data?.Slot?.Cartas || 0,
-            Timer = data?.Timeouts?.Letter || 0
-
-        if (!data) {
-            Database.registerUser(user)
-
-            return await interaction.reply({
-                content: '❌ | Nenhum dado foi encontrado no banco de dados. Tente novamente.',
-                ephemeral: true
-            })
-        }
-
-        if (cartas <= 0)
-            return await interaction.reply({
-                content: '❌ | Você não possui nenhuma carta. Que tal comprar umas na loja?',
-                ephemeral: true
-            })
-
-        if (client.Timeout(900000, Timer))
-            return await interaction.reply({
-                content: `⏱️ | Letters System Cooldown | Tempo restante para o envio de uma próxima carta: \`${client.GetTimeout(900000, Timer)}\``,
-                ephemeral: true
-            })
-
-        return await interaction.showModal(this.letter)
-
-    }
 
     async toEditReactionRole() {
 

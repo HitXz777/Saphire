@@ -1,6 +1,10 @@
 class Modals {
 
-    letter = {
+    get modals() {
+        return { ...this }
+    }
+
+    sendLetter = {
         title: 'New Letter',
         custom_id: "newLetter",
         components: [
@@ -414,7 +418,7 @@ class Modals {
         }
 
     }
-    
+
 }
 
 module.exports = Modals

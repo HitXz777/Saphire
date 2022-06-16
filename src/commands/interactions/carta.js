@@ -11,13 +11,15 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command. Use \`/carta\``)
+
         let user = client.getUser(client, message, args, 'user') || message.author,
             userData = await Database.User.findOne({ id: user.id }, 'Letters'),
             clientData = await Database.Client.findOne({ id: client.user.id }, 'Moderadores Administradores'),
             control = { collected: false, atualEmbeds: [], embedIndex: 0 },
-            mods = [...clientData.Moderadores, ...clientData.Administradores]
+            staff = [...clientData.Moderadores, ...clientData.Administradores]
 
-        if (user.id !== message.author.id && !mods.includes(message.author.id))
+        if (user.id !== message.author.id && !staff.includes(message.author.id))
             return message.reply(`${e.Deny} | Apenas moderadores do meu sistema podem acessar cartas de outros usuários.`)
 
         if (['block', 'bloquear'].includes(args[0]?.toLowerCase())) return blockAcess()

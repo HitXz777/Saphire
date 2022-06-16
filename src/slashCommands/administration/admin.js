@@ -888,6 +888,12 @@ module.exports = {
 
         async function set_Administrator() {
 
+            if (interaction.user.id !== config.ownerId)
+                return await interaction.reply({
+                    content: `${e.Deny} | Recurso privado ao meu desenvolvedor.`,
+                    ephemeral: true
+                })
+
             if (adms.includes(user.id))
                 return await interaction.reply({
                     content: `${e.Deny} | ${user.tag} já é um administrador.`,

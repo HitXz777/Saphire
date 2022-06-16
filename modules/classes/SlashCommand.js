@@ -1,5 +1,8 @@
-class SlashCommand {
+const Modals = require('./Modals')
+
+class SlashCommand extends Modals {
     constructor(interaction, client) {
+        super()
         this.interaction = interaction
         this.user = interaction.user
         this.guild = interaction.guild
@@ -21,6 +24,7 @@ class SlashCommand {
             database: this.Database,
             client: this.client,
             data: this,
+            modals: this.modals,
             guildData: guildData,
             clientData: clientData,
             member: member

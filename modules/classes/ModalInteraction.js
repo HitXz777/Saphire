@@ -214,9 +214,8 @@ class ModalInteraction extends Modals {
 
         async function CreateNewReminder(ReminderMessage, DefinedTime) {
 
-            const PassCode = require('../../../modules/functions/plugins/PassCode'),
-                ReminderCode = PassCode(7).toUpperCase(),
-                Data = require('../../../modules/functions/plugins/data')
+            const ReminderCode = passCode(7).toUpperCase(),
+                Data = require('../../modules/functions/plugins/data')
 
             new Database.Reminder({
                 id: ReminderCode,
@@ -490,12 +489,11 @@ class ModalInteraction extends Modals {
         let letterContent = fields.getTextInputValue('letterContent'),
             isError = false
 
-        let userLetted = getUser(usernameData, client),
-            passCode = require('../../../modules/functions/plugins/PassCode')
+        let userLetted = getUser(usernameData, client)
 
         if (!userLetted)
             return await interaction.reply({
-                content: `❌ | Não foi possível achar ninguém com o dado informado: "${usernameData}"`,
+                content: `❌ | Não foi possível achar ninguém com o dado informado. \`${usernameData}\``,
                 embeds: [{
                     color: client.blue,
                     title: '📝 Letter\'s Content',
