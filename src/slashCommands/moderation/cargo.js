@@ -190,7 +190,7 @@ module.exports = {
 
         if (!role.editable)
             return await interaction.reply({
-                content: `${e.Deny} | Eu não tenho permissão para gerenciar o cargo ${role}. Suba o meu cargo para cima dele que tudo dará certo.`,
+                content: `${e.Deny} | Eu não tenho permissão para gerenciar o cargo ${role}. Se este cargo não for **Servers Booster** ou de **outros bots**, Suba o meu cargo para cima dele que tudo dará certo.`,
                 ephemeral: true
             })
 
