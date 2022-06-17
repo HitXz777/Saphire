@@ -1,5 +1,6 @@
 const client = require('../../../index')
-const { config } = require('../../../JSON/config.json')
+
+const util = require('../../structures/util')
 
 const editObject = {
     name: 'edit',
@@ -136,15 +137,16 @@ const createRole = {
     ]
 }
 
-let colors = Object.keys(client.colors)
+let colors = Object.keys(util.Colors)
 colors.length = 25
+
 for (let data of colors) {
     editObject.options[2].choices.push({
-        name: config.Colors[data],
+        name: util.ColorsTranslate[data],
         value: data
     })
     createRole.options[1].choices.push({
-        name: config.Colors[data],
+        name: util.ColorsTranslate[data],
         value: data
     })
 }
@@ -304,7 +306,7 @@ module.exports = {
         async function createRole() {
 
             let newName = options.getString('nome')
-            let newColor = client.colors[options.getString('cor')]
+            let newColor = util.Colors[options.getString('cor')]
             let hoist = options.getInteger('visivel')
             let delPermissions = options.getInteger('delete_permissions')
             let mentionable = options.getInteger('mencionavel')
@@ -332,7 +334,7 @@ module.exports = {
 
             if (newColor !== null) {
                 newData.color = newColor
-                edited.push(`Cor: \`${config.Colors[options.getString('cor')]}\``)
+                edited.push(`Cor: \`${util.ColorsTranslate[options.getString('cor')]}\``)
             }
 
             if (mentionable !== null) {
@@ -410,7 +412,7 @@ module.exports = {
         async function editRole() {
 
             let newName = options.getString('nome')
-            let newColor = client.colors[options.getString('cor')]
+            let newColor = util.Colors[options.getString('cor')]
             let hoist = options.getInteger('visivel')
             let delPermissions = options.getInteger('delete_permissions')
             let mentionable = options.getInteger('mencionavel')
@@ -448,7 +450,7 @@ module.exports = {
 
             if (newColor !== null) {
                 newData.color = newColor
-                edited.push(`Cor: \`${config.Colors[options.getString('cor')]}\``)
+                edited.push(`Cor: \`${util.ColorsTranslate[options.getString('cor')]}\``)
             }
 
             if (mentionable !== null) {
@@ -476,7 +478,7 @@ module.exports = {
             await interaction.deferReply({ ephemeral: hide })
 
             let permissions = role.permissions.toArray() || [],
-                PermissionsFormated = permissions.map(perm => `\`${config.Perms[perm]}\``) || false,
+                PermissionsFormated = permissions.map(perm => `\`${util.Permissions[perm]}\``) || false,
                 RoleSize = role.members.size || 0,
                 RoleHoist = role.hoist ? `${e.Check} Sim` : `${e.Deny} Não`,
                 RoleMention = role.mentionable ? `${e.Check} Sim` : `${e.Deny} Não`,

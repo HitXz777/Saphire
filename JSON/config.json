@@ -63,38 +63,6 @@
             "CREATE_PRIVATE_THREADS": "Criar threads privadas",
             "CREATE_PUBLIC_THREADS": "Criar threads publicas",
             "MODERATE_MEMBERS": "Moderar membros"
-        },
-        "Colors": {
-            "Default": "Padrão",
-            "White": "Branco",
-            "Aqua": "Água",
-            "Green": "Verde",
-            "Blue": "Azul",
-            "Yellow": "Amarelo",
-            "Purple": "Roxo",
-            "LuminousVividPink": "Rosa Vívido Luminoso",
-            "Fuchsia": "Fuchsia",
-            "Gold": "Ouro",
-            "Orange": "Laranja",
-            "Red": "Vermelho",
-            "Grey": "Cinza",
-            "Navy": "Oceano Apagado",
-            "DarkAqua": "Água Escura",
-            "DarkGreen": "Verde Escuro",
-            "DarkBlue": "Azul Escuro",
-            "DarkPurple": "Roxo Escuro",
-            "DarkVividPink": "Rosa Vívido Escuro",
-            "DarkGold": "Ouro Escuro",
-            "DarkOrange": "Laranja Escuro",
-            "DarkRed": "Vermelho Escuro",
-            "DarkGrey": "Cinza Escuro",
-            "DarkerGrey": "Cinza Mais Escuro",
-            "LightGrey": "Cinza Claro",
-            "DarkNavy": "Oceano Escuro",
-            "Blurple": "Violeta",
-            "Greyple": "Verde Acinzentado",
-            "DarkButNotBlack": "Escuro, mas não preto",
-            "NotQuiteBlack": "Não tão preto"
-          }
+        }
     }
 }

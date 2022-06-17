@@ -20,7 +20,9 @@ function init(client) {
 
     setInterval(() => boostReward(), 60000)
     setInterval(() => TopGlobalRanking(), 1800000)
-
+    setInterval(() => {
+        client.user.setActivity(`${client.commands.size + client.slashCommands.size} comandos em ${client.guilds.cache.size} servidores`, { type: 'PLAYING' })
+    }, 300000)
 }
 
 module.exports = init

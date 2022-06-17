@@ -28,8 +28,8 @@ module.exports = async (client) => {
                 Routes.applicationCommands(client.user.id),
                 { body: commands },
             );
-            client.user.setActivity(`${client.commands.size + client.slashCommands.size} comandos em ${client.guilds.cache.size} servidores`, { type: 'PLAYING' })
-            client.user.setStatus('idle')
+            client.user.setActivity(`${client.commands.size + client.slashCommands.size} comandos em ${client.guilds.cache.size} servidores`, { type: 'PLAYING' });
+            client.user.setStatus('idle');
             console.log('Slash Commands | OK!');
         } catch (error) {
             console.error(error);
