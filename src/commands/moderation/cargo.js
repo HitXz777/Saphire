@@ -290,7 +290,7 @@ module.exports = {
 
                         if (err.code === 50028)
                             return message.reply(`${e.Deny} | Cargo Inválido`)
-                        message.channel.send(`${e.Warn} | Houve um erro ao editar este cargo.\n\`${err}\``)
+                        return message.channel.send(`${e.Warn} | Houve um erro ao editar este cargo.\n\`${err}\``)
                     })
             }
         }

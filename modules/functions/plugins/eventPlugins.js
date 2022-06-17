@@ -1,4 +1,3 @@
-
 function eightyYears(formatBr = false) {
 
     const date = new Date(Date.now() - 3155760000000)

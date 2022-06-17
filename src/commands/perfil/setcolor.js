@@ -1,5 +1,4 @@
 const { e } = require('../../../JSON/emojis.json')
-const Database = require('../../../modules/classes/Database')
 
 module.exports = {
     name: 'setcolor',
@@ -23,7 +22,7 @@ module.exports = {
         isHex(args[0]) ? setHex(args[0]) : InvalidHex(args[0])
 
         function isHex(value) {
-            return /^#[0-9A-F]{6}$/i.test(`${value}`) // True/False
+            return /^#[0-9A-F]{6}$/i.test(`${value}`) 
         }
 
         function InvalidHex(value) {

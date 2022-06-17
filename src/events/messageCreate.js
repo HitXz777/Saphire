@@ -55,7 +55,7 @@ client.on('messageCreate', async message => {
     AfkSystem(message)
 
     if (message.content?.toLowerCase() === '@saphire' || message.content?.toLowerCase() === 'saphire' || message.content === `<@${client.user.id}>` || message.content === `<@&${client.user.id}>`)
-        message.channel.send(`${e.SaphireHi} | \`${prefix}help\``)
+        message.channel.send(`${e.SaphireHi} | \`${prefix}help\`ou \`/\``)
 
     const
         args = message.content.slice(prefix.length).trim().split(/ +/g),
