@@ -30,7 +30,7 @@ module.exports = {
                     },
                     {
                         name: `⭐ Comandos movidos para Slash Commands`,
-                        value: `\`/bug\`, \`/forca\`, \`/carta\`, \`/autorole\`, \`/giveaway\`, \`/instagram\`\n\`/reception (${prefix}welcomechannel | ${prefix}leavechannel)\`\n\`/admin (${prefix}add | ${prefix}delete | ${prefix}subtract | ${prefix}set | ${prefix}remove)\``
+                        value: 'Vários comandos estão sendo movidos para Slash Commands por causa das quantidades de sub-comandos que estes comandos portavam. No Slash Commands, os sub-comandos ficam visíveis e muito mais fácil de mexer com os comandos.'
                     }
                 ],
                 footer: { text: 'Este painel se fechará após 1 minuto de inatividade' }

@@ -1,5 +1,5 @@
 const client = require('../../../index')
-const { config} = require('../../../JSON/config.json')
+const { config } = require('../../../JSON/config.json')
 
 const editObject = {
     name: 'edit',
@@ -22,7 +22,52 @@ const editObject = {
             description: 'Nova cor para o cargo',
             type: 3,
             choices: []
-        }
+        },
+        {
+            name: 'visivel',
+            description: 'Deixar o cargo visível para todos',
+            type: 4,
+            choices: [
+                {
+                    name: 'Mostrar este cargo para todos',
+                    value: 1
+                },
+                {
+                    name: 'Deixa esse cargo escondido',
+                    value: 2
+                }
+            ]
+        },
+        {
+            name: 'delete_permissions',
+            description: 'Desative todas as permissões',
+            type: 4,
+            choices: [
+                {
+                    name: 'Sim, deletar todas as permissões',
+                    value: 1
+                },
+                {
+                    name: 'Melhor não, deixa pra lá',
+                    value: 2
+                }
+            ]
+        },
+        {
+            name: 'mencionavel',
+            description: 'Deixar ou não qualquer um marcar este cargo?',
+            type: 4,
+            choices: [
+                {
+                    name: 'YEP! Todos podem marcar este cargo',
+                    value: 1
+                },
+                {
+                    name: 'Nop, nop! Não é para ninguém marcar este cargo.',
+                    value: 2
+                }
+            ]
+        },
     ]
 }
 
@@ -236,9 +281,13 @@ module.exports = {
         }
 
         async function editRole() {
-            
+
             let newName = options.getString('nome')
             let newColor = client.colors[options.getString('cor')]
+            let hoist = options.getInteger('visivel')
+            let delPermissions = options.getInteger('delete_permissions')
+            let mentionable = options.getInteger('mencionavel')
+            let edited = []
 
             if (newName?.length > 100)
                 return await interaction.reply({
@@ -246,30 +295,51 @@ module.exports = {
                     ephemeral: true
                 })
 
-            let newData = {}
-
-            if (newName && newName !== role.name)
-                newData.name = newName
-
-            if (newColor)
-                newData.color = newColor
-
-            if (!newName && !newColor)
+            if (!newName && !newColor && !hoist && !delPermissions && !mentionable)
                 return await interaction.reply({
-                    content: `${e.Deny} | Você deve dizer pelo menos o nome ou uma color para efetuar a edição do cargo.`,
+                    content: `${e.Deny} | Você deve dizer pelo menos um item das opções para efetuar a edição do cargo.`,
                     ephemeral: true
                 })
+
+            let newData = {}
+
+            if (newName !== null && newName !== role.name) {
+                newData.name = newName
+                edited.push(`Nome: ${newName}`)
+            }
+
+            if (hoist !== null) {
+                newData.hoist = hoist === 1 ? true : false
+                edited.push(`Exibir para outros membros: \`${newData.hoist ? 'Ativado' : 'Desativado'}\``)
+            }
+
+            if (delPermissions !== null) {
+                if (delPermissions === 1)
+                    newData.permissions = []
+                edited.push(`Permissões deletadas: \`${delPermissions === 1 ? 'Sim' : 'Não'}\``)
+            }
+
+            if (newColor !== null) {
+                newData.color = newColor
+                edited.push(`Cor: \`${config.Colors[options.getString('cor')]}\``)
+            }
+
+            if (mentionable !== null) {
+                newData.mentionable = mentionable === 1 ? true : false
+                edited.push(`Cargo mencionável: \`${newData.mentionable ? 'Sim' : 'Não'}\``)
+            }
 
             return role.edit(newData)
                 .then(async () => {
                     return await interaction.reply({
-                        content: `${e.Check} | O cargo foi atualizado com sucesso!`,
+                        content: `${e.Check} | O cargo foi atualizado com sucesso! Itens atualizados:\n${edited.map(x => `> ${x}`).join('\n')}`,
                         ephemeral: true
                     })
                 })
                 .catch(async err => {
                     return await interaction.reply({
-                        content: `${e.Warn} | Houve uma falha ao tentar editar o nome do cargo.\n> \`${err}\``
+                        content: `${e.Warn} | Houve uma falha ao tentar editar o cargo.\n> \`${err}\``,
+                        ephemeral: true
                     })
                 })
 
