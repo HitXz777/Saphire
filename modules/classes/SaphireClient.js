@@ -5,7 +5,7 @@ const { Client, Collection } = require('discord.js'),
 require('dotenv').config()
 
 const SaphireClientConfiguration = {
-    intents: 34343,
+    intents: 2047,
     allowedMentions: { parse: ['users'] },
     partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION']
 }

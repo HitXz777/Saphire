@@ -76,7 +76,7 @@ module.exports = {
                     let u = client.users.cache.get(data.Perfil.Marry.Conjugate)?.tag
                     if (!u) {
                         Database.delete(message.author.id, 'Perfil.Marry')
-                        Database.deleteUser(data.Marry.Conjugate, 'Perfil.Marry')
+                        Database.deleteUser(data.Marry?.Conjugate, 'Perfil.Marry')
                         message.channel.send(`${e.Database} | DATABASE | Eu não achei o usuário setado como seu cônjuge. Efetuei a separação.`)
                         return `${e.Deny} Usuário deletado`
                     }

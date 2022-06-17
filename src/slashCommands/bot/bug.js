@@ -14,7 +14,7 @@ module.exports = {
                 content: `${e.Loading} | Espere mais \`${client.GetTimeout(120000, timeout)}\` para fazer um novo report.`,
                 ephemeral: true
             })
-e
+
         return await interaction.showModal(modals.reportBug)
     }
 }
