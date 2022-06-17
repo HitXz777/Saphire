@@ -71,13 +71,83 @@ const editObject = {
     ]
 }
 
+const createRole = {
+    name: 'create',
+    description: '[moderation] Crie as novas informações do cargo',
+    type: 1,
+    options: [
+        {
+            name: 'nome',
+            description: 'Novo nome para o cargo',
+            required: true,
+            type: 3
+        },
+        {
+            name: 'cor',
+            description: 'Escolha um cor irada para o novo cargo',
+            type: 3,
+            choices: []
+        },
+        {
+            name: 'visivel',
+            description: 'Deixar o cargo visível para todos',
+            type: 4,
+            choices: [
+                {
+                    name: 'Mostrar este cargo para todos',
+                    value: 1
+                },
+                {
+                    name: 'Deixa esse cargo escondido',
+                    value: 2
+                }
+            ]
+        },
+        {
+            name: 'delete_permissions',
+            description: 'Desative todas as permissões',
+            type: 4,
+            choices: [
+                {
+                    name: 'Sim, deletar todas as permissões',
+                    value: 1
+                },
+                {
+                    name: 'Melhor não, deixa pra lá',
+                    value: 2
+                }
+            ]
+        },
+        {
+            name: 'mencionavel',
+            description: 'Deixar ou não qualquer um marcar este cargo?',
+            type: 4,
+            choices: [
+                {
+                    name: 'YEP! Todos podem marcar este cargo',
+                    value: 1
+                },
+                {
+                    name: 'Nop, nop! Não é para ninguém marcar este cargo.',
+                    value: 2
+                }
+            ]
+        },
+    ]
+}
+
 let colors = Object.keys(client.colors)
 colors.length = 25
-for (let data of colors)
+for (let data of colors) {
     editObject.options[2].choices.push({
         name: config.Colors[data],
         value: data
     })
+    createRole.options[1].choices.push({
+        name: config.Colors[data],
+        value: data
+    })
+}
 
 module.exports = {
     name: 'cargo',
@@ -86,6 +156,7 @@ module.exports = {
     default_member_permissions: client.perms.MANAGE_ROLES,
     type: 1,
     options: [
+        createRole,
         {
             name: 'add',
             description: '[moderation] Adicione um cargo a um membro',
@@ -136,11 +207,11 @@ module.exports = {
                     required: true,
                     choices: [
                         {
-                            name: 'deletar',
+                            name: 'Deletar um cargo',
                             value: 'delete'
                         },
                         {
-                            name: 'info',
+                            name: 'Ver as informações de um cargo',
                             value: 'info'
                         }
                     ]
@@ -157,11 +228,11 @@ module.exports = {
                     type: 3,
                     choices: [
                         {
-                            name: 'sim',
+                            name: 'Apenas eu quero ver a mensagem',
                             value: 'sim'
                         },
                         {
-                            name: 'não',
+                            name: 'Todos no chat podem ver a mensagem',
                             value: 'não'
                         }
                     ]
@@ -176,7 +247,7 @@ module.exports = {
 
         if (!guild.me.permissions.toArray().includes('MANAGE_ROLES'))
             return await interaction.reply({
-                content: `${e.Deny} | Para prosseguir com este comando, eu preciso do cargo **\`GERENCIAR CARGOS\`**`,
+                content: `${e.Deny} | Para prosseguir com este comando, eu preciso da permissão **\`GERENCIAR CARGOS\`**`,
                 ephemeral: true
             })
 
@@ -187,6 +258,7 @@ module.exports = {
         let hide = options.getString('hide') === 'sim' ? true : false
 
         if (subCommand === 'info') return roleInfo()
+        if (subCommand === 'create') return createRole()
 
         if (!role.editable)
             return await interaction.reply({
@@ -227,6 +299,61 @@ module.exports = {
                         content: `${e.Warn} | Erro ao adicionar o cargo.\n> ${err}`
                     })
                 })
+        }
+
+        async function createRole() {
+
+            let newName = options.getString('nome')
+            let newColor = client.colors[options.getString('cor')]
+            let hoist = options.getInteger('visivel')
+            let delPermissions = options.getInteger('delete_permissions')
+            let mentionable = options.getInteger('mencionavel')
+            let edited = []
+
+            if (newName?.length > 100)
+                return await interaction.reply({
+                    content: `${e.Deny} | O limite permitido em nomes de cargos são de 100 caracteres.`,
+                    ephemeral: true
+                })
+
+            let newData = { name: newName }
+            edited.push(`Nome: ${newName}`)
+
+            if (hoist !== null) {
+                newData.hoist = hoist === 1 ? true : false
+                edited.push(`Exibir para outros membros: \`${newData.hoist ? 'Ativado' : 'Desativado'}\``)
+            }
+
+            if (delPermissions !== null) {
+                if (delPermissions === 1)
+                    newData.permissions = []
+                edited.push(`Permissões deletadas: \`${delPermissions === 1 ? 'Sim' : 'Não'}\``)
+            }
+
+            if (newColor !== null) {
+                newData.color = newColor
+                edited.push(`Cor: \`${config.Colors[options.getString('cor')]}\``)
+            }
+
+            if (mentionable !== null) {
+                newData.mentionable = mentionable === 1 ? true : false
+                edited.push(`Cargo mencionável: \`${newData.mentionable ? 'Sim' : 'Não'}\``)
+            }
+
+            return guild.roles.create(newData)
+                .then(async () => {
+                    return await interaction.reply({
+                        content: `${e.Check} | O cargo foi criado com sucesso!\n${edited.map(x => `> ${x}`).join('\n')}`,
+                        ephemeral: true
+                    })
+                })
+                .catch(async err => {
+                    return await interaction.reply({
+                        content: `${e.Warn} | Houve uma falha ao criar o cargo.\n> \`${err}\``,
+                        ephemeral: true
+                    })
+                })
+
         }
 
         async function removeRole() {
