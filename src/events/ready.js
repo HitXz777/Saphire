@@ -7,8 +7,6 @@ const
 
 client.on("ready", async () => {
 
-    console.log('Event Ready | Actived')
-
     await Database.MongoConnect(client)
 
     Database.registerClient(client.user.id)
@@ -28,12 +26,6 @@ client.on("ready", async () => {
         if (msg)
             msg?.edit(`${e.Check} | Reboot concluído com sucesso!`).catch(() => { })
     }
-
-    let Array2 = ['Procurando Nemo', 'Vingadores', 'Bob Esponja', 'Barbie Girl'],
-        ActivityRandom = Array2[Math.floor(Math.random() * Array2.length)]
-
-    client.user.setActivity(`${ActivityRandom}`, { type: 'WATCHING' })
-    client.user.setStatus('idle')
 
     const msg = await client.channels.cache.get(config.LogChannelId)?.send(`⏱️ Initial Ping: \`${client.ws.ping}ms\`\n${e.Check} Login: \`${Data()}\``)
 
