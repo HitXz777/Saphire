@@ -81,6 +81,10 @@ module.exports = {
                         {
                             name: 'Level',
                             value: 'subtract_level'
+                        },
+                        {
+                            name: 'Likes',
+                            value: 'subtract_Likes'
                         }
                     ]
                 },
@@ -413,6 +417,7 @@ module.exports = {
             case 'subtract_money': subtract_Money(); break;
             case 'subtract_xp': subtract_Xp(); break;
             case 'subtract_level': subtract_Level(); break;
+            case 'subtract_Likes': subtract_Likes(); break;
 
             case 'adm': set_Administrator(); break;
             case 'mod': set_Moderator(); break;
@@ -499,6 +504,14 @@ module.exports = {
             })
 
 
+        }
+
+        async function subtract_Likes() {
+            Database.addItem(user.id, 'Likes', -amount)
+            return await interaction.reply({
+                content: `${e.RedStar} | ${amount} likes foram removidos de ${user.tag}.`,
+                ephemeral: true
+            })
         }
 
         async function get_stats() {
