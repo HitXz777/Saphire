@@ -482,7 +482,7 @@ module.exports = {
             const axios = require('axios')
 
             await interaction.deferReply({}),
-                terminal = (await axios.get(`https://discloud.app/api/v2/app/${client.user.id}/logs`, {
+                terminal = (await axios.get(`https://discloud.app/api/v2/app/912509487984812043/logs`, {
                     headers: { "api-token": process.env.DISCLOUD_API_TOKEN }
                 })).data
 
@@ -506,7 +506,7 @@ module.exports = {
             const axios = require('axios')
 
             await interaction.deferReply({}),
-                info = (await axios.get(`https://discloud.app/api/v2/app/${client.user.id}`, {
+                info = (await axios.get(`https://discloud.app/api/v2/app/912509487984812043`, {
                     headers: {
                         "api-token": process.env.DISCLOUD_API_TOKEN
                     }
@@ -576,7 +576,7 @@ module.exports = {
                 }
             )
 
-            fetch(`https://discloud.app/api/v2/app/${client.user.id}/restart`, {
+            fetch(`https://discloud.app/api/v2/app/912509487984812043/restart`, {
                 method: 'POST',
                 headers: {
                     "api-token": process.env.DISCLOUD_API_TOKEN

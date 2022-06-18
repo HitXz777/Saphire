@@ -453,7 +453,7 @@
             "Image": "https://cdn.discordapp.com/attachments/899493577623756801/922073597797867531/unknown.png",
             "Price": 15000,
             "Designer": "830226550116057149",
-            "Limit": 49
+            "Limit": 50
         },
         "bg26": {
             "Name": "Enrolados fundo Floresta Encantada - bg26",
@@ -555,7 +555,7 @@
             "Image": "https://cdn.discordapp.com/attachments/899493577623756801/979568322519658566/unknown.png",
             "Price": 100000,
             "DesignerId": "545189821245685781",
-            "Limit": 300,
+            "Limit": 299,
             "Designer": "545189821245685781"
         }
     }

@@ -1,7 +1,7 @@
 const { MessageActionRow } = require("discord.js");
 
 module.exports = {
-    name: 'caça-minas',
+    name: 'campo-minado',
     description: '[games] Cuidado com as bombas.',
     dm_permission: false,
     type: 1,
