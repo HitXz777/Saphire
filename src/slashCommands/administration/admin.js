@@ -342,6 +342,38 @@ module.exports = {
                     type: 3,
                 }
             ]
+        },
+        {
+            name: 'options',
+            description: '[administration] Outras opções',
+            type: 1,
+            options: [
+                {
+                    name: 'function',
+                    description: '[delete] Função a ser executada',
+                    type: 3,
+                    required: true,
+                    choices: [
+                        {
+                            name: 'Console Log',
+                            value: 'terminal'
+                        },
+                        {
+                            name: 'Host Bot Status',
+                            value: 'stats'
+                        },
+                        {
+                            name: 'Reboot',
+                            value: 'reboot'
+                        }
+                    ]
+                },
+                {
+                    name: 'input',
+                    description: 'Informações adicionais',
+                    type: 3
+                }
+            ]
         }
     ],
     async execute({ interaction: interaction, client: client, database: Database, emojis: e, clientData: clientData }) {
@@ -361,7 +393,7 @@ module.exports = {
         let user = client.users.cache.get(id) || options.getUser('mention')
         let amount = options.getInteger('quantity')
 
-        if (!user && !['serversRemove', 'logregisterDelete', 'cacheDelete', 'clanDelete'].includes(func))
+        if (!user && !['serversRemove', 'logregisterDelete', 'cacheDelete', 'clanDelete', 'terminal', 'stats', 'reboot'].includes(func))
             return await interaction.reply({
                 content: `${e.Deny} | Nenhum usuário encontrado.`,
                 ephemeral: true
@@ -412,6 +444,10 @@ module.exports = {
             case 'bitsDelete': delete_Bits(); break;
             case 'moneyDelete': delete_Money(); break;
 
+            case 'terminal': get_terminal(); break;
+            case 'stats': get_stats(); break;
+            case 'reboot': reboot(); break;
+
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
                 ephemeral: true
@@ -441,6 +477,133 @@ module.exports = {
 
         }
 
+        async function get_terminal() {
+
+            const axios = require('axios')
+
+            await interaction.deferReply({}),
+                terminal = (await axios.get(`https://discloud.app/api/v2/app/${client.user.id}/logs`, {
+                    headers: { "api-token": process.env.DISCLOUD_API_TOKEN }
+                })).data
+
+            return await interaction.editReply({
+                content: `${e.Check} Tudo certo!`,
+                embeds: [
+                    {
+                        color: client.blue,
+                        title: `${e.Reference} Discloud Logs ${terminal.bot_id}`,
+                        url: terminal.link,
+                        description: `\`\`\`txt\n${terminal.logs}\`\`\``
+                    }
+                ]
+            })
+
+
+        }
+
+        async function get_stats() {
+
+            const axios = require('axios')
+
+            await interaction.deferReply({}),
+                info = (await axios.get(`https://discloud.app/api/v2/app/${client.user.id}`, {
+                    headers: {
+                        "api-token": process.env.DISCLOUD_API_TOKEN
+                    }
+                })).data,
+                user = (await axios.get('https://discloud.app/api/v2/user', {
+                    headers: {
+                        "api-token": process.env.DISCLOUD_API_TOKEN
+                    }
+                })).data
+
+            return await interaction.editReply({
+                embeds: [
+                    {
+                        color: client.blue,
+                        title: 'Discloud Host Information',
+                        fields: [
+                            {
+                                name: `${e.SaphireOk} Bot Stats`,
+                                value: `**Bot:** \`${client.users.cache.get(info?.bot_id)?.tag || "Não encontrado"}\` \`${info?.bot_id || 'Indefinido'}\`\n**Plano:** \`${user.plan}\``
+                            },
+                            {
+                                name: `${e.Commands} Plan End date`,
+                                value: `\`${new Date(user.planDataEnd).toLocaleString('pt-br', { timeZone: 'America/Sao_Paulo' })}\``
+                            },
+                            {
+                                name: `${e.PlanetServer} Container`,
+                                value: `\`${info.container === 'Online' ? `🟢 Online` : `🔴 Offline`}\``
+                            },
+                            {
+                                name: `${e.Download} Cpu Usage`,
+                                value: `\`${info.cpu}\``
+                            },
+                            {
+                                name: `${e.Obs} Ram Memory Usage`,
+                                value: `\`${info.memory}\``
+                            },
+                            {
+                                name: `${e.PlanetServer} Last Discloud Restart`,
+                                value: `\`${info.last_restart?.replace(/a few seconds/g, 'A alguns segundos').replace(/a minute/g, 'Menos de um minuto').replace(/minutes/g, 'minutos').replace(/hours/g, 'horas').replace(/days/g, 'dias').replace(/a day/g, 'Por volta de um dia').replace(/an hour/g, '+/- 1 hora')}\``
+                            }
+                        ]
+                    }
+                ]
+            }).catch(() => { })
+        }
+
+        async function reboot() {
+
+            const reason = options.getString('input')
+            const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
+            const msg = await interaction.reply({
+                content: `${e.Loading} | Iniciando reboot...`,
+                fetchReply: true
+            })
+
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                {
+                    Rebooting: {
+                        ON: true,
+                        Features: reason || 'Nenhum dado fornecido.',
+                        ChannelId: interaction.channel.id,
+                        MessageId: msg.id
+                    },
+                    'Lotery.Close': true
+                }
+            )
+
+            fetch(`https://discloud.app/api/v2/app/${client.user.id}/restart`, {
+                method: 'POST',
+                headers: {
+                    "api-token": process.env.DISCLOUD_API_TOKEN
+                }
+            })
+                .then(info => info.json())
+                .then(async json => {
+
+                    if (json.status === 'error') {
+
+                        await Database.Client.updateOne(
+                            { id: client.user.id },
+                            {
+                                $unset: {
+                                    Rebooting: 1,
+                                    'Lotery.Close': 1
+                                }
+                            }
+                        )
+
+                        msg.edit({
+                            content: `${e.Deny} | Não foi possível iniciar o reboot.\n${e.Warn} | Error Message: \`${json.message}\``
+                        }).catch(() => { })
+                        return
+                    }
+                })
+        }
 
         async function set_estrela() {
 

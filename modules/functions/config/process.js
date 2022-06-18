@@ -21,11 +21,12 @@ process.on('unhandledRejection', async (reason) => {
 
     return await client.users.cache.get(`${config.ownerId}`)?.send({
         embeds: [
-            new MessageEmbed()
-                .setColor('RED')
-                .setTitle(`${e.Loud} Report de Erro | unhandledRejection`)
-                .setDescription(`\`\`\`js\n${reason.stack.slice(0, 2000)}\`\`\``)
-                .setFooter({ text: `Error Code: ${reason.code || 0}` })
+            {
+                color: 'RED',
+                title: `${e.Loud} Report de Erro | unhandledRejection`,
+                description: `\`\`\`js\n${reason.stack?.slice(0, 2000)}\`\`\``,
+                footer: { text: `Error Code: ${reason.code || 0}` }
+            }
         ]
     }).catch(() => console.log(reason))
 
