@@ -573,7 +573,6 @@ class flagGame {
                         msg.delete().catch(() => { })
 
                         return message.channel.send({ embeds: [embed] }).catch(() => { })
-
                     }
 
                     embed

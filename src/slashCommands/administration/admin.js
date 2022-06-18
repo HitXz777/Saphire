@@ -16,20 +16,28 @@ module.exports = {
                     required: true,
                     choices: [
                         {
-                            name: 'money',
+                            name: 'Balance',
                             value: 'money'
                         },
                         {
-                            name: 'bonus',
+                            name: 'Bônus',
                             value: 'bonus'
                         },
                         {
-                            name: 'experience',
+                            name: 'Experience',
                             value: 'xp'
                         },
                         {
-                            name: 'level',
+                            name: 'Level',
                             value: 'level'
+                        },
+                        {
+                            name: 'Likes',
+                            value: 'likes'
+                        },
+                        {
+                            name: 'Bits de Bitcoins',
+                            value: 'bits'
                         }
                     ]
                 },
@@ -63,15 +71,15 @@ module.exports = {
                     required: true,
                     choices: [
                         {
-                            name: 'money',
+                            name: 'Balance',
                             value: 'subtract_money'
                         },
                         {
-                            name: 'experience',
+                            name: 'Experience',
                             value: 'subtract_xp'
                         },
                         {
-                            name: 'level',
+                            name: 'Level',
                             value: 'subtract_level'
                         }
                     ]
@@ -106,63 +114,63 @@ module.exports = {
                     required: true,
                     choices: [
                         {
-                            name: 'developer',
+                            name: 'Developer',
                             value: 'developer'
                         },
                         {
-                            name: 'administrator',
+                            name: 'Administrator',
                             value: 'adm'
                         },
                         {
-                            name: 'moderator',
+                            name: 'Moderator',
                             value: 'mod'
                         },
                         {
-                            name: 'designer',
+                            name: 'Designer',
                             value: 'designer'
                         },
                         {
-                            name: 'halloween',
+                            name: 'Title Halloween',
                             value: 'halloween'
                         },
                         {
-                            name: 'bughunter',
+                            name: 'Title Bug Hunter',
                             value: 'bughunter'
                         },
                         {
-                            name: 'backgroundacess',
+                            name: 'Acess to Level Backgrounds',
                             value: 'bgacess'
                         },
                         {
-                            name: 'estrela1',
+                            name: 'Estrela 1',
                             value: 'estrela1'
                         },
                         {
-                            name: 'estrela2',
+                            name: 'Estrela 2',
                             value: 'estrela2'
                         },
                         {
-                            name: 'estrela3',
+                            name: 'Estrela 3',
                             value: 'estrela3'
                         },
                         {
-                            name: 'estrela4',
+                            name: 'Estrela 4',
                             value: 'estrela4'
                         },
                         {
-                            name: 'estrela5',
+                            name: 'Estrela 5',
                             value: 'estrela5'
                         },
                         {
-                            name: 'estrela6',
+                            name: 'Estrela 6',
                             value: 'estrela6'
                         },
                         {
-                            name: 'level',
+                            name: 'Level',
                             value: 'levelSet'
                         },
                         {
-                            name: 'experience',
+                            name: 'Experience',
                             value: 'xpSet'
                         }
                     ]
@@ -195,67 +203,66 @@ module.exports = {
                     type: 3,
                     required: true,
                     choices: [
-
                         {
-                            name: 'administrator',
+                            name: 'Developer',
+                            value: 'developerRemove'
+                        },
+                        {
+                            name: 'Administrator',
                             value: 'admRemove'
                         },
                         {
-                            name: 'moderator',
+                            name: 'Moderator',
                             value: 'modRemove'
                         },
                         {
-                            name: 'designer',
+                            name: 'Designer',
                             value: 'designerRemove'
                         },
                         {
-                            name: 'bughunter',
+                            name: 'Title Bug Hunter',
                             value: 'bughunterRemove'
                         },
                         {
-                            name: 'halloween',
+                            name: 'Title Halloween',
                             value: 'halloweenRemove'
                         },
                         {
-                            name: 'backgroundacess',
+                            name: 'Acess to Levels Backgrounds',
                             value: 'bgacessRemove'
                         },
                         {
-                            name: 'servers',
+                            name: 'Servers',
                             value: 'serversRemove'
                         },
                         {
-                            name: 'blacklist',
+                            name: 'Blacklist',
                             value: 'blacklistRemove'
                         },
                         {
-                            name: 'estrela1',
+                            name: 'Estrela 1',
                             value: 'estrelaRemove1'
                         },
                         {
-                            name: 'estrela2',
+                            name: 'Estrela 2',
                             value: 'estrelaRemove2'
                         },
                         {
-                            name: 'estrela3',
+                            name: 'Estrela 3',
                             value: 'estrelaRemove3'
                         },
                         {
-                            name: 'estrela4',
+                            name: 'Estrela 4',
                             value: 'estrelaRemove4'
                         },
                         {
-                            name: 'estrela5',
+                            name: 'Estrela 5',
                             value: 'estrelaRemove5'
                         },
                         {
-                            name: 'estrela6',
+                            name: 'Estrela 6',
                             value: 'estrelaRemove6'
-                        },
-                        {
-                            name: 'developer',
-                            value: 'developerRemove'
-                        },
+                        }
                     ]
                 },
                 {
@@ -287,35 +294,39 @@ module.exports = {
                     required: true,
                     choices: [
                         {
-                            name: 'logregister',
+                            name: 'Log Register',
                             value: 'logregisterDelete'
                         },
                         {
-                            name: 'cache',
+                            name: 'Cache Data',
                             value: 'cacheDelete'
                         },
                         {
-                            name: 'user',
+                            name: 'Balance',
+                            value: 'moneyDelete'
+                        },
+                        {
+                            name: 'Usuário',
                             value: 'userDelete'
                         },
                         {
-                            name: 'timeout',
+                            name: 'Timeouts',
                             value: 'timeoutDelete'
                         },
                         {
-                            name: 'profile',
+                            name: 'Perfil',
                             value: 'profileDelete'
                         },
                         {
-                            name: 'clan',
+                            name: 'Clan',
                             value: 'clanDelete'
                         },
                         {
-                            name: 'vip',
+                            name: 'Vip',
                             value: 'vipDelete'
                         },
                         {
-                            name: 'bits',
+                            name: 'Bits de Bitcoins',
                             value: 'bitsDelete'
                         }
                     ]
@@ -364,6 +375,8 @@ module.exports = {
             case 'bonus': add_Bonus(); break;
             case 'xp': add_Xp(); break;
             case 'level': add_Level(); break;
+            case 'bits': add_Bits(); break;
+            case 'likes': add_Likes(); break;
 
             case 'subtract_money': subtract_Money(); break;
             case 'subtract_xp': subtract_Xp(); break;
@@ -397,12 +410,37 @@ module.exports = {
             case 'vipDelete': delete_Vip(); break;
             case 'clanDelete': delete_Clan(); break;
             case 'bitsDelete': delete_Bits(); break;
+            case 'moneyDelete': delete_Money(); break;
 
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
                 ephemeral: true
             }); break;
         }
+
+        async function delete_Money() {
+
+            await Database.User.updateOne(
+                { id: user.id },
+                {
+                    $unset: {
+                        Balance: 1,
+                        Transactions: 1
+                    }
+                }
+            )
+
+            Database.PushTransaction(
+                user.id,
+                `${e.Admin} Teve seus dados econômicos deletados por um Administrador`
+            )
+            return await interaction.reply({
+                content: `${e.Check} | Os dados econônicos de **${user.tag} \`${user.id}\`** foram deletados com sucesso.`,
+                ephemeral: true
+            })
+
+        }
+
 
         async function set_estrela() {
 
@@ -732,6 +770,22 @@ module.exports = {
             Database.addItem(user.id, 'Level', amount)
             return await interaction.reply({
                 content: `${e.RedStar} | ${amount} níveis foram adicionados a ${user.tag}.`,
+                ephemeral: true
+            })
+        }
+
+        async function add_Bits() {
+            Database.addItem(user.id, 'Perfil.Bits', amount)
+            return await interaction.reply({
+                content: `${e.RedStar} | ${amount} bits foram adicionados a ${user.tag}.`,
+                ephemeral: true
+            })
+        }
+
+        async function add_Likes() {
+            Database.addItem(user.id, 'Likes', amount)
+            return await interaction.reply({
+                content: `${e.RedStar} | ${amount} likes foram adicionados a ${user.tag}.`,
                 ephemeral: true
             })
         }

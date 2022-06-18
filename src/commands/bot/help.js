@@ -29,6 +29,7 @@ module.exports = {
                 .addField('🆕 Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
                 .addField(`${e.Stonks} New Reaction Role System`, `Siiiim! Agora eu possuo um sistema de Reaction Role! Vem dar uma olhada! \`${prefix}reactionrole\``)
                 .addField(`⭐ Slash Commands`, 'Alguns comandos foram movidos para Slash Commands. Use `/help` e confira as alterações.')
+                .addField(`${e.bug} Discord Bugs`, 'Devido a uma instabilidade da API do Discord, a economia global da Saphire foi resetada. Um sistema de segurança já foi criado para que isso não aconteça novamente.')
                 .setFooter({ text: 'Este painel se fechará após 1 minuto de inatividade' }),
 
             painel = new MessageActionRow()
