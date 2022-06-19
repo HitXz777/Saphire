@@ -538,7 +538,7 @@ module.exports = {
                         fields: [
                             {
                                 name: `${e.SaphireOk} Bot Stats`,
-                                value: `**Bot:** \`${client.users.cache.get(info?.bot_id)?.tag || "Não encontrado"}\` \`${info?.bot_id || 'Indefinido'}\`\n**Plano:** \`${user.plan}\``
+                                value: `**Bot:** \`${client.user.username || "Não encontrado"}\` \`${client.user.id || 'Indefinido'}\`\n**Plano:** \`${user.plan}\``
                             },
                             {
                                 name: `${e.Commands} Plan End date`,
