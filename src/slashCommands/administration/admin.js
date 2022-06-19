@@ -367,6 +367,18 @@ module.exports = {
                             value: 'stats'
                         },
                         {
+                            name: 'Reboot Discloud',
+                            value: 'reboot'
+                        },
+                        {
+                            name: 'Sincronizar usuários Cache/Database',
+                            value: 'rebootUsers'
+                        },
+                        {
+                            name: 'Sincronizar servidores Cache/Database',
+                            value: 'rebootGuilds'
+                        },
+                        {
                             name: 'Reboot',
                             value: 'reboot'
                         },
@@ -463,6 +475,8 @@ module.exports = {
             case 'stats': get_stats(); break;
             case 'reboot': reboot(); break;
             case 'create_invite': createNewInvite(); break;
+            case 'rebootUsers': RebootUsersOnDatabase(); break;
+            case 'rebootGuilds': RebootGuildsOnDatabase(); break;
 
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
@@ -575,6 +589,44 @@ module.exports = {
                     }
                 ]
             }).catch(() => { })
+        }
+
+        async function RebootUsersOnDatabase() {
+
+            await interaction.deferReply({})
+
+            let users = await Database.User.find({}, 'id'),
+                usersDeleted = []
+
+            for (let user of users)
+                if (!client.users.cache.has(user?.id) || client.users.cache.get(user?.id)?.bot)
+                    usersDeleted.push(user.id)
+
+            if (usersDeleted.length > 0)
+                await Database.User.deleteMany({ id: { $in: usersDeleted } })
+
+            return await interaction.editReply({
+                content: `${e.Check} | Concluído! ${usersDeleted.length || 0} usuários que não estão em nenhum servidor comigo foram deletados do banco de dados.`
+            })
+        }
+
+        async function RebootGuildsOnDatabase() {
+
+            await interaction.deferReply({})
+
+            let guilds = await Database.Guild.find({}, 'id'),
+                guildsDeleted = []
+
+            for (let guild of guilds)
+                if (!client.guilds.cache.has(guild?.id))
+                    guildsDeleted.push(guild?.id)
+
+            if (guildsDeleted.length > 0)
+                await Database.Guild.deleteOne({ id: { $in: guildsDeleted } })
+
+            return await interaction.editReply({
+                content: `${e.Check} | Concluído! ${guildsDeleted.length || 0} servidores em que eu não estou foram deletados do banco de dados.`
+            })
         }
 
         async function reboot() {

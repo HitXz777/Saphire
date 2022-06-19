@@ -6,7 +6,7 @@ const
     init = require('../../modules/functions/plugins/initSystems')
 
 client.on("ready", async () => {
-
+    
     await Database.MongoConnect(client)
 
     Database.registerClient(client.user.id)

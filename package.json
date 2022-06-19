@@ -2,7 +2,7 @@
   "name": "saphire",
   "version": "1.0.0",
   "description": "A little giant bot",
-  "main": "shard.js",
+  "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "start": ".",
