@@ -496,7 +496,7 @@ module.exports = {
                 embeds: [
                     {
                         color: client.blue,
-                        title: `${e.Reference} Discloud Logs ${terminal.bot_id}`,
+                        title: `${e.Reference} Discloud Logs`,
                         url: terminal.link,
                         description: `\`\`\`txt\n${terminal.logs}\`\`\``
                     }

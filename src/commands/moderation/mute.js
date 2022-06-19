@@ -47,9 +47,11 @@ module.exports = {
 
         for (const i of emojis) msg.react(i).catch(() => { })
 
-        return msg.createReactionCollector({
+        let collector = msg.createReactionCollector({
             filter: (reaction, u) => emojis.includes(reaction.emoji.name) && u.id === message.author.id,
-            time: 30000
+            time: 30000,
+            max: 1,
+            erros: ['max', 'time']
         })
             .on('collect', (reaction) => {
 
@@ -58,23 +60,21 @@ module.exports = {
                 if (reaction.emoji.name === emojis[0]) {
 
                     try {
-
                         member.timeout(time, `Castigo efetuado por ${message.author.tag}`)
-
+                        collector.stop()
                         return msg.edit(`${e.Check} | Mute efetuado com sucesso!`).catch(() => message.channel.send(`${e.Check} | Mute efetuado com sucesso!`))
 
                     } catch (err) {
                         return msg.edit(`${e.Warn} | Falha ao executar o castigo.\n\`${err}\``).catch(() => `${e.Warn} | Falha ao executar o castigo.\n\`${err}\``)
                     }
 
-                } else {
-                    return msg.delete().catch(() => { })
                 }
 
+                return msg.edit(`${e.Deny} | Comando cancelado`).catch(() => { })
             })
 
-            .on('end', () => {
-
+            .on('end', (i, reason) => {
+                if (['max', 'time'].includes(reason)) return
                 if (validateReactionCollectorCancel)
                     return msg.edit(`${e.Deny} | Comando cancelado`).catch(() => { })
                 else return
