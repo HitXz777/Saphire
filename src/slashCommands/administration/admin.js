@@ -369,6 +369,10 @@ module.exports = {
                         {
                             name: 'Reboot',
                             value: 'reboot'
+                        },
+                        {
+                            name: 'Criar um convite', // Ideia parcial do comando: Dspofu#1648
+                            value: 'create_invite'
                         }
                     ]
                 },
@@ -394,10 +398,16 @@ module.exports = {
 
         let func = options.getString('function')
         let id = options.getString('id')
+        let input = options.getString('input')
         let user = client.users.cache.get(id) || options.getUser('mention')
+        let subCommand = options.getSubcommand()
         let amount = options.getInteger('quantity')
 
-        if (!user && !['serversRemove', 'logregisterDelete', 'cacheDelete', 'clanDelete', 'terminal', 'stats', 'reboot'].includes(func))
+        function check() {
+            return ['serversRemove', 'logregisterDelete', 'cacheDelete', 'clanDelete'].includes(func) || subCommand === 'options'
+        }
+
+        if (!user && !check())
             return await interaction.reply({
                 content: `${e.Deny} | Nenhum usuário encontrado.`,
                 ephemeral: true
@@ -452,6 +462,7 @@ module.exports = {
             case 'terminal': get_terminal(); break;
             case 'stats': get_stats(); break;
             case 'reboot': reboot(); break;
+            case 'create_invite': createNewInvite(); break;
 
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
@@ -568,7 +579,6 @@ module.exports = {
 
         async function reboot() {
 
-            const reason = options.getString('input')
             const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
             const msg = await interaction.reply({
@@ -581,7 +591,7 @@ module.exports = {
                 {
                     Rebooting: {
                         ON: true,
-                        Features: reason || 'Nenhum dado fornecido.',
+                        Features: input || 'Nenhum dado fornecido.',
                         ChannelId: interaction.channel.id,
                         MessageId: msg.id
                     },
@@ -716,7 +726,7 @@ module.exports = {
                     ephemeral: true
                 })
 
-            Database.Clan.deleteOne({ id: id })
+            await Database.Clan.deleteOne({ id: id })
             return await interaction.reply({
                 content: `${e.Check} | O clan ${clan.Name || '**Nome não encontrado**'} foi deletado com sucesso!`,
                 ephemeral: true
@@ -948,6 +958,40 @@ module.exports = {
                 content: `${e.RedStar} | ${amount} níveis foram adicionados a ${user.tag}.`,
                 ephemeral: true
             })
+        }
+
+        async function createNewInvite() {
+
+            let Guild = client.guilds.cache.get(input)
+
+            if (!Guild)
+                return await interaction.reply({
+                    content: `${e.Deny} | Servidor não encontrado`,
+                    ephemeral: true
+                })
+
+            let channel = await Guild.channels.cache.find(channel => channel.type === 'GUILD_TEXT' && channel.permissionsFor(channel.guild.me).has('CREATE_INSTANT_INVITE'))
+
+            if (!channel)
+                return await interaction.reply({
+                    content: `${e.Deny} | Nenhum canal foi encontrado para a criação do convite.`,
+                    ephemeral: true
+                })
+
+            return channel.createInvite({ maxAge: 0 })
+                .then(async invite => {
+                    return await interaction.reply({
+                        content: `${e.Check} | Convite criado com sucesso!\n🔗 | ${invite}`,
+                        ephemeral: true
+                    })
+                })
+                .catch(async err => {
+                    return await interaction.reply({
+                        content: `${e.Warn} | Erro ao criar o convite!\n> \`${err}\``,
+                        ephemeral: true
+                    })
+                })
+
         }
 
         async function add_Bits() {
@@ -1231,6 +1275,7 @@ module.exports = {
                 ephemeral: true
             })
         }
+
         async function set_Bughunter() {
 
             let dataUsers = clientData.Titles?.BugHunter || []
