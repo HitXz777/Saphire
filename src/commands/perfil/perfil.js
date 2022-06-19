@@ -207,13 +207,14 @@ module.exports = {
                 }
             )
             .setThumbnail(user.displayAvatarURL({ dynamic: true }))
+            .setFooter({ text: 'Você pode editar seu perfil usando /editprofile' })
 
         let warnData = await Database.Guild.findOne({ id: message.guild.id }, 'Warns.Users'),
             warnsFormat = warnData?.Warns?.Users || {},
             warns = Object.values(warnsFormat[`${user.id}`] || {})
 
-        warns.length > 0 ? Embed.setFooter({ text: `${warns.length} avisos neste servidor` }) : 0
-        // Ideia de warns no perfil de: joãozinho#0001
+        if (warns.length > 0)
+            Embed.setFooter({ text: `${warns.length} avisos neste servidor` })
 
         let buttons = [
             {

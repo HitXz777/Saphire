@@ -8,6 +8,6 @@ module.exports = {
     description: 'Selecione um cargo para todos que entrem no servidor.',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-        return message.reply(`${e.Info} | Este comando foi movido para Slash Command. Use \`/autorole\``)
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/autorole\``)
     }
 }

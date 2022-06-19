@@ -72,7 +72,7 @@ module.exports = {
         },
         {
             name: 'add_field',
-            description: 'Adicione um novo campo a uma embed',
+            description: '[moderation] Adicione um novo campo a uma embed',
             type: 1,
             options: [
                 {

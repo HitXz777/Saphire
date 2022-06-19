@@ -11,7 +11,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        return message.reply(`${e.Info} | Este comando foi movido para Slash Command. Use \`/carta\``)
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/carta\``)
 
         let user = client.getUser(client, message, args, 'user') || message.author,
             userData = await Database.User.findOne({ id: user.id }, 'Letters'),

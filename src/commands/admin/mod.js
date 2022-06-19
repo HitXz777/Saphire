@@ -10,6 +10,6 @@ module.exports = {
     description: 'Adiciona ou remove moderadores da Saphire\'s Team',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-        return message.reply(`${e.Info} | Este comando foi movido para Slash Command. Use \`/admin\``)
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/admin\``)
     }
 }

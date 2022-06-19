@@ -32,7 +32,10 @@ client.on('guildMemberRemove', async (member) => {
         const { executor, target, reason } = banLog
         if (!banLog || !executor) return
 
-        if (target.id === member.user.id) { ModAuthor = executor.tag } else { return }
+        if (target.id === member.user.id)
+            ModAuthor = executor.tag
+        else return
+
         if (target.id !== member.user.id) return
         if (ModAuthor === client.user.tag) return
 
@@ -57,7 +60,7 @@ client.on('guildMemberRemove', async (member) => {
         if (!LeaveChannel) return unset()
 
         let Mensagem = guild.LeaveChannel.Mensagem || '$member saiu do servidor.',
-            newMessage = Mensagem.replace('$member', member).replace('$servername', member.guild.name)
+            newMessage = Mensagem.replace('$member', member.user.tag).replace('$servername', member.guild.name)
 
         return LeaveChannel?.send(`${newMessage}`).catch(() => unset())
     }

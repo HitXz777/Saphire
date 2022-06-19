@@ -9,6 +9,6 @@ module.exports = {
     description: 'Selecione um canal para eu avisar todos que chegarem no servidor',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-        return message.reply(`${e.Info} | Este comando foi movido para Slash Command. Use \`/reception\``)
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/reception\``)
     }
 }

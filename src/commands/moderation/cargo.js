@@ -9,6 +9,6 @@ module.exports = {
     description: 'Gerencie os cargos do servidor',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-        return message.reply(`${e.Info} | Este comando foi movido para Slash Command. Use \`/cargo\``)
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/cargo\``)
     }
 }

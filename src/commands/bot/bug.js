@@ -10,6 +10,6 @@ module.exports = {
     description: 'Report bugs/erros diretamente pro meu criador',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-        return message.reply(`${e.Info} | Este comando foi movido para Slash Command. Use \`/bug\``)
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/bug\``)
     }
 }
