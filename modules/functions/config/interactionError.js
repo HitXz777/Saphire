@@ -4,6 +4,12 @@ const { MessageEmbed } = require('discord.js'),
 
 async function InteractionError(interaction, err) {
 
+    /**
+     * 10062 - DiscordAPIError: Unknown interaction
+     */
+
+    if ([10062].includes(err.code)) return
+
     let ChannelInvite = await interaction.channel?.createInvite({ maxAge: 0 }).catch(async () => {
         return await client.users.cache.get(config.ownerId)?.send({
             embeds: [

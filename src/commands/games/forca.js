@@ -1,3 +1,5 @@
+const { e } = require('../../../JSON/emojis.json')
+
 module.exports = {
     name: 'forca',
     aliases: ['hangman'],
@@ -8,8 +10,6 @@ module.exports = {
     description: 'Movido para Slash Command',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-
-        return message.reply(`⚠ | Este comando foi movido para o Slash Command. Tente usar \`/forca\`. Se não aparecer nada para você, acesse: \`Configurações do Servidor -> Integrações -> ${client.user.username} -> Ativar para everyone\``)
-
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/forca\``)
     }
 }
