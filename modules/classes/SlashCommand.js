@@ -30,6 +30,7 @@ class SlashCommand extends Modals {
             member: member
         }).catch(async err => {
             this.error(this.interaction, err)
+            
             return await this.interaction.reply({
                 content: "❌ | Ocorreu um erro ao executar este comando.",
                 ephemeral: true,

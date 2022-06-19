@@ -14,8 +14,8 @@ async function Error(message, err) {
      * Errors to ignore
      * 
      * !message - No message
-     * !err - No error
-     * 10008 - Unknown Message
+     * !err - No errorUn
+     * 10008 - known Message
      * 500 - Internal Server Error
      * 50013 - DiscordAPIError: Missing Permissions
      * 50035 - message_reference - Invalid Form Body
