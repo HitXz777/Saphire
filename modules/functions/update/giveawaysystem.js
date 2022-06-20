@@ -168,7 +168,7 @@ async function GetWinners(WinnersArray, Amount = 0, MessageId) {
     )
 
     function GetUserWinner() {
-        const Winner = WinnersArray[Math.floor(Math.random() * WinnersArray.length)]
+        const Winner = WinnersArray.random()
         return Winners.includes(Winner) ? GetUserWinner() : Winner
     }
 

@@ -1,10 +1,10 @@
-const client = require('../../../index')
+const util = require('../../structures/util')
 
 module.exports = {
     name: "say",
     type: 1,
     description: '[moderation] Fale algo atráves de mim',
-    default_member_permissions: client.perms.MANAGE_MESSAGES,
+    default_member_permissions: util.slashCommandsPermissions.MANAGE_MESSAGES,
     dm_permission: false,
     options: [
         {

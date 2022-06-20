@@ -255,7 +255,6 @@ module.exports = {
 
                 let cots = [],
                     catts = [],
-
                     clientData = await Database.Client.findOne({ id: client.user.id }, 'ComandosBloqueados'),
                     cmdsBlocked = clientData.ComandosBloqueados || [],
                     formatedBlock = cmdsBlocked.map(data => data.cmd)?.flat() || []

@@ -1,5 +1,4 @@
 const client = require('../../../index')
-
 const util = require('../../structures/util')
 
 const editObject = {
@@ -155,7 +154,7 @@ module.exports = {
     name: 'cargo',
     description: '[moderation] Adicione ou remova um cargo de um membro',
     dm_permission: false,
-    default_member_permissions: client.perms.MANAGE_ROLES,
+    default_member_permissions: util.slashCommandsPermissions.MANAGE_ROLES,
     type: 1,
     options: [
         createRole,

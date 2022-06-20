@@ -2,6 +2,7 @@ const client = require('../../../index')
 const passCode = require('../../../modules/functions/plugins/PassCode')
 const Database = require('../../../modules/classes/Database')
 const passWord = passCode(5).toUpperCase()
+const util = require('../../structures/util')
 
 Database.Cache.set('autoroleRemovePassword', passWord)
 
@@ -9,7 +10,7 @@ module.exports = {
     name: 'autorole',
     description: '[moderation] Sistema de Autorole',
     dm_permission: false,
-    default_member_permissions: client.perms.MANAGE_ROLES,
+    default_member_permissions: util.slashCommandsPermissions.MANAGE_ROLES,
     type: 1,
     options: [
         {

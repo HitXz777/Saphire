@@ -1,7 +1,7 @@
-const JSON = require('ark.db').Database,
+const { Database: JSON } = require('ark.db'),
     Models = require('../database/Models')
 
-class Database extends Models {
+    class Database extends Models {
     constructor() {
         super()
         this.BgLevel = new JSON('../../JSON/levelwallpapers.json')
@@ -36,355 +36,351 @@ class Database extends Models {
     static ConfigJSON = new JSON('../../JSON/config.json')
     static Config = Database.ConfigJSON.get('config')
 
-}
+    MongoConnect = async (client) => {
 
-Database.prototype.MongoConnect = async (client) => {
+        const { connect } = require('mongoose')
 
-    const { connect } = require('mongoose')
-
-    try {
-        await connect(process.env.MONGODB_LINK_CONNECTION, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        })
-        return console.log('Mongoose Database | OK!')
-    } catch (err) {
-        console.log('Mongoose Database | FAIL!\n--> ' + err)
-        client.users.cache.get(Database.Config.ownerId)?.send('Erro ao conectar a database.').catch(() => { })
-        return client.destroy()
+        try {
+            await connect(process.env.MONGODB_LINK_CONNECTION, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            })
+            return console.log('Mongoose Database | OK!')
+        } catch (err) {
+            console.log('Mongoose Database | FAIL!\n--> ' + err)
+            client.users.cache.get(Database.Config.ownerId)?.send('Erro ao conectar a database.').catch(() => { })
+            return client.destroy()
+        }
     }
-}
 
-Database.prototype.add = async (userId, amount) => {
+    add = async (userId, amount) => {
 
-    if (!userId || isNaN(amount)) return
+        if (!userId || isNaN(amount)) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $inc: { Balance: amount } },
-        { upsert: true }
-    )
-    return
-}
+        await Database.User.updateOne(
+            { id: userId },
+            { $inc: { Balance: amount } },
+            { upsert: true }
+        )
+        return
+    }
 
-Database.prototype.subtract = async (userId, amount) => {
+    subtract = async (userId, amount) => {
 
-    if (!userId || isNaN(amount)) return
+        if (!userId || isNaN(amount)) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $inc: { Balance: -amount } },
-        { upsert: true }
-    )
-    return
-}
+        await Database.User.updateOne(
+            { id: userId },
+            { $inc: { Balance: -amount } },
+            { upsert: true }
+        )
+        return
+    }
 
-Database.prototype.SetTimeout = async (userId, TimeoutRoute) => {
+    SetTimeout = async (userId, TimeoutRoute) => {
 
-    await Database.User.updateOne(
-        { id: userId },
-        { [TimeoutRoute]: Date.now() },
-        { upsert: true }
-    )
-    return
-}
+        await Database.User.updateOne(
+            { id: userId },
+            { [TimeoutRoute]: Date.now() },
+            { upsert: true }
+        )
+        return
+    }
 
-Database.prototype.pushUsersLotery = async (usersArray, clientId) => {
+    pushUsersLotery = async (usersArray, clientId) => {
 
-    await Database.Lotery.updateOne(
-        { id: clientId },
-        { $push: { Users: { $each: [...usersArray] } } }
-    )
-    return
+        await Database.Lotery.updateOne(
+            { id: clientId },
+            { $push: { Users: { $each: [...usersArray] } } }
+        )
+        return
 
-}
+    }
 
-Database.prototype.getGuild = async (guildId, params = null) => {
+    getGuild = async (guildId, params = null) => {
 
-    let data = await Database.Guild.findOne({ id: guildId }, params)
-    return data
+        let data = await Database.Guild.findOne({ id: guildId }, params)
+        return data
 
-}
+    }
 
-Database.prototype.closeLotery = async (clientId) => {
+    closeLotery = async (clientId) => {
 
-    await Database.Lotery.updateOne(
-        { id: clientId },
-        { Close: true },
-        { upsert: true }
-    )
-    return
+        await Database.Lotery.updateOne(
+            { id: clientId },
+            { Close: true },
+            { upsert: true }
+        )
+        return
 
-}
+    }
 
-Database.prototype.openLotery = async (clientId) => {
+    openLotery = async (clientId) => {
 
-    let data = await Database.Lotery.findOne({ id: clientId })
+        let data = await Database.Lotery.findOne({ id: clientId })
 
-    if (!data) return
+        if (!data) return
 
-    await Database.Lotery.updateOne(
-        { id: clientId },
-        { $unset: { Close: 1 } },
-        { upsert: true }
-    )
-    return
-}
+        await Database.Lotery.updateOne(
+            { id: clientId },
+            { $unset: { Close: 1 } },
+            { upsert: true }
+        )
+        return
+    }
 
-Database.prototype.resetLoteryUsers = async (clientId) => {
+    resetLoteryUsers = async (clientId) => {
 
-    await Database.Lotery.updateOne(
-        { id: clientId },
-        { $unset: { Users: 1 } },
-        { upsert: true }
-    )
-    return
+        await Database.Lotery.updateOne(
+            { id: clientId },
+            { $unset: { Users: 1 } },
+            { upsert: true }
+        )
+        return
 
-}
+    }
 
-Database.prototype.addItem = async (userId, ItemDB, amount) => {
+    addItem = async (userId, ItemDB, amount) => {
 
-    if (!userId || !ItemDB || isNaN(amount)) return
+        if (!userId || !ItemDB || isNaN(amount)) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $inc: { [ItemDB]: amount } },
-        { upsert: true }
-    )
+        await Database.User.updateOne(
+            { id: userId },
+            { $inc: { [ItemDB]: amount } },
+            { upsert: true }
+        )
 
-    return
-}
+        return
+    }
 
-Database.prototype.balance = async (userId) => {
+    balance = async (userId) => {
 
-    let data = await Database.User.findOne({ id: userId }, 'Balance')
-    return data ? parseInt(data.Balance) : 0
+        let data = await Database.User.findOne({ id: userId }, 'Balance')
+        return data?.Balance ? parseInt(data.Balance) : 0
 
-}
+    }
 
-Database.prototype.addGamingPoint = async (userId, type, value) => {
+    addGamingPoint = async (userId, type, value) => {
 
-    if (!userId || !type || isNaN(value)) return
+        if (!userId || !type || isNaN(value)) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $inc: { [`GamingCount.${type}`]: value } },
-        { upsert: true }
-    )
+        await Database.User.updateOne(
+            { id: userId },
+            { $inc: { [`GamingCount.${type}`]: value } },
+            { upsert: true }
+        )
 
-}
+    }
 
-Database.prototype.subtractItem = async (userId, ItemDB, amount) => {
+    subtractItem = async (userId, ItemDB, amount) => {
 
-    if (!userId || !ItemDB || isNaN(amount)) return
+        if (!userId || !ItemDB || isNaN(amount)) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $inc: { [ItemDB]: -amount } },
-        { upsert: true }
-    )
+        await Database.User.updateOne(
+            { id: userId },
+            { $inc: { [ItemDB]: -amount } },
+            { upsert: true }
+        )
 
-    return
-}
+        return
+    }
 
-Database.prototype.updateUserData = async (userId, keyData, valueData) => {
+    updateUserData = async (userId, keyData, valueData) => {
 
-    if (!userId || !keyData || !valueData) return
+        if (!userId || !keyData || !valueData) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { [keyData]: valueData },
-        { upsert: true }
-    )
-    return
+        await Database.User.updateOne(
+            { id: userId },
+            { [keyData]: valueData },
+            { upsert: true }
+        )
+        return
 
-}
+    }
 
-Database.prototype.pushUserData = async (userId, keyData, dataToPush) => {
+    pushUserData = async (userId, keyData, dataToPush) => {
 
-    if (!userId || !keyData || !dataToPush) return
+        if (!userId || !keyData || !dataToPush) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $push: { [keyData]: { $each: [dataToPush] } } },
-        { upsert: true }
-    )
-    return
+        await Database.User.updateOne(
+            { id: userId },
+            { $push: { [keyData]: { $each: [dataToPush] } } },
+            { upsert: true }
+        )
+        return
 
-}
+    }
 
-Database.prototype.pullUserData = async (userId, keyData, dataToPush) => {
+    pullUserData = async (userId, keyData, dataToPush) => {
 
-    if (!userId || !keyData || !dataToPush) return
+        if (!userId || !keyData || !dataToPush) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $pull: { [keyData]: dataToPush } },
-        { upsert: true }
-    )
-    return
+        await Database.User.updateOne(
+            { id: userId },
+            { $pull: { [keyData]: dataToPush } },
+            { upsert: true }
+        )
+        return
 
-}
+    }
 
-Database.prototype.deleteGiveaway = async (DataId, All = false) => {
+    deleteGiveaway = async (DataId, All = false) => {
 
-    if (!DataId) return
+        if (!DataId) return
 
-    return All
-        ? await Database.Giveaway.deleteMany({ GuildId: DataId })
-        : await Database.Giveaway.deleteOne({ MessageID: DataId })
+        return All
+            ? await Database.Giveaway.deleteMany({ GuildId: DataId })
+            : await Database.Giveaway.deleteOne({ MessageID: DataId })
 
-}
+    }
 
-Database.prototype.registerChannelControl = (pullOrPush = '', where = '', channelId = '') => {
+    registerChannelControl = (pullOrPush = '', where = '', channelId = '') => {
 
-    if (!pullOrPush || !where || !channelId) return
+        if (!pullOrPush || !where || !channelId) return
 
-    pullOrPush === 'push'
-        ? Database.Cache.push(`GameChannels.${where}`, channelId)
-        : Database.Cache.pull(`GameChannels.${where}`, channelId)
-    return
-}
+        pullOrPush === 'push'
+            ? Database.Cache.push(`GameChannels.${where}`, channelId)
+            : Database.Cache.pull(`GameChannels.${where}`, channelId)
+        return
+    }
 
-Database.prototype.deleteUser = async (userId) => {
+    deleteUser = async (userId) => {
 
-    await Database.User.deleteOne({ id: userId })
-    return
+        await Database.User.deleteOne({ id: userId })
+        return
 
-}
+    }
 
-Database.prototype.addLotery = async (value, clientId) => {
+    addLotery = async (value, clientId) => {
 
-    if (!value || isNaN(value)) return
+        if (!value || isNaN(value)) return
 
-    await Database.Lotery.updateOne(
-        { id: clientId },
-        { $inc: { Prize: value } },
-        { upsert: true }
-    )
+        await Database.Lotery.updateOne(
+            { id: clientId },
+            { $inc: { Prize: value } },
+            { upsert: true }
+        )
 
-    return
+        return
 
-}
+    }
 
-Database.prototype.delete = async (userId, key) => {
+    delete = async (userId, key) => {
 
-    if (!userId || !key) return
+        if (!userId || !key) return
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $unset: { [key]: 1 } }
-    )
-    return
+        await Database.User.updateOne(
+            { id: userId },
+            { $unset: { [key]: 1 } }
+        )
+        return
 
-}
+    }
 
-Database.prototype.PushTransaction = async (userId, Frase) => {
+    PushTransaction = async (userId, Frase) => {
 
-    if (!userId || !Frase) return
+        if (!userId || !Frase) return
 
-    let Data = require('../functions/plugins/data')
+        let userData = await Database.User.findOne({ id: userId }, 'Balance'),
+            balance = userData?.Balance || 0
 
-    let userData = await Database.User.findOne({ id: userId }, 'Balance'),
-        balance = userData?.Balance || 0
+        await Database.User.updateOne(
+            { id: userId },
+            { $push: { Transactions: { $each: [{ time: `${Date.format(0, true)} - ${balance}`, data: `${Frase}` }], $position: 0 } } },
+            { upsert: true }
+        )
+        return
+    }
 
-    await Database.User.updateOne(
-        { id: userId },
-        { $push: { Transactions: { $each: [{ time: `${Data(0, true)} - ${balance}`, data: `${Frase}` }], $position: 0 } } },
-        { upsert: true }
-    )
+    registerUser = async (user, blocked) => {
 
-    return
+        if (blocked || !user || user?.bot) return
 
-}
+        let u = await Database.User.findOne({ id: user.id })
+        if (u || u?.id === user.id) return
 
-Database.prototype.registerUser = async (user, blocked) => {
+        new Database.User({ id: user.id }).save()
 
-    if (blocked || !user || user?.bot) return
+        await Database.User.updateOne(
+            { id: user.id },
+            {
+                $unset: {
+                    PrivateChannel: 1,
+                    Walls: 1,
+                    Perfil: 1,
+                    Letters: 1,
+                    Transactions: 1
+                }
+            },
+            { upsert: true }
+        )
 
-    let u = await Database.User.findOne({ id: user.id })
-    if (u || u?.id === user.id) return
+        return
+    }
 
-    new Database.User({ id: user.id }).save()
-        
-    await Database.User.updateOne(
-        { id: user.id },
-        {
-            $unset: {
-                PrivateChannel: 1,
-                Walls: 1,
-                Perfil: 1,
-                Letters: 1,
-                Transactions: 1
-            }
-        },
-        { upsert: true }
-    )
-    
-    return
-}
+    registerServer = async (guild, client) => {
 
-Database.prototype.registerServer = async (guild, client) => {
+        if (!guild || !guild?.id) return
 
-    if (!guild || !guild?.id) return
+        let clientData = await Database.Client.findOne({ id: client.user.id }, 'Blacklist.Guilds')
+        if (clientData?.Blacklist?.Guilds.includes(guild.id)) return
 
-    let clientData = await Database.Client.findOne({ id: client.user.id }, 'Blacklist.Guilds')
-    if (clientData?.Blacklist?.Guilds.includes(guild.id)) return
+        let g = await Database.Guild.findOne({ id: guild.id })
 
-    let g = await Database.Guild.findOne({ id: guild.id })
+        if (g || g?.id === guild.id) return
 
-    if (g || g?.id === guild.id) return
+        new Database.Guild({ id: guild.id }).save()
 
-    new Database.Guild({ id: guild.id }).save()
+        await client?.channels?.cache?.get(Database.Config.LogChannelId)?.send(`${Database.Emojis.Database} | DATABASE | O servidor **${guild.name}** foi registrado com sucesso!`).catch(() => { })
 
-    await client?.channels?.cache?.get(Database.Config.LogChannelId)?.send(`${Database.Emojis.Database} | DATABASE | O servidor **${guild.name}** foi registrado com sucesso!`).catch(() => { })
+        await Database.Guild.updateOne(
+            { id: guild.id },
+            {
+                $unset: {
+                    Blockchannels: 1,
+                    ReactionRole: 1,
+                    LockdownChannels: 1,
+                    CommandBlocks: 1,
+                    AfkSystem: 1,
+                    Autorole: 1
+                }
+            },
+            { upsert: true }
+        )
 
-    await Database.Guild.updateOne(
-        { id: guild.id },
-        {
-            $unset: {
-                Blockchannels: 1,
-                ReactionRole: 1,
-                LockdownChannels: 1,
-                CommandBlocks: 1,
-                AfkSystem: 1,
-                Autorole: 1
-            }
-        },
-        { upsert: true }
-    )
+        return true
+    }
 
-    return true
-}
+    newCommandRegister = async (message, date, clientId, commandName) => {
 
-Database.prototype.newCommandRegister = async (message, date, clientId, commandName) => {
+        new Database.LogRegister({
+            Author: `${message.author.tag} - ${message.author.id}` || 'Indefinido',
+            Server: `${message.guild.name} - ${message.guild.id}` || 'Indefinido',
+            Command: message.content || 'Indefinido',
+            Time: date || 0
+        }).save()
 
-    new Database.LogRegister({
-        Author: `${message.author.tag} - ${message.author.id}` || 'Indefinido',
-        Server: `${message.guild.name} - ${message.guild.id}` || 'Indefinido',
-        Command: message.content || 'Indefinido',
-        Time: date || 0
-    }).save()
+        await Database.Client.updateOne(
+            { id: clientId },
+            {
+                $inc: {
+                    ComandosUsados: 1,
+                    [`CommandsCount.${commandName}`]: 1
+                }
+            },
+            { upsert: true }
+        )
 
-    await Database.Client.updateOne(
-        { id: clientId },
-        {
-            $inc: {
-                ComandosUsados: 1,
-                [`CommandsCount.${commandName}`]: 1
-            }
-        },
-        { upsert: true }
-    )
+        return
+    }
 
-    return
-}
+    registerClient = async (clientId) => {
 
-Database.prototype.registerClient = async (clientId) => {
+        let data = await Database.Client.findOne({ id: clientId })
+        if (data) return
+        return new Database.Client({ id: clientId }).save()
 
-    let data = await Database.Client.findOne({ id: clientId })
-    if (data) return
-    return new Database.Client({ id: clientId }).save()
+    }
 
 }
 

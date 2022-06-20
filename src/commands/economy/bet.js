@@ -1,21 +1,13 @@
-const Bet = require('./classes/bet')
-
 module.exports = {
     name: 'bet',
     aliases: ['apostar', 'aposta'],
     category: 'economy',
     ClientPermissions: ['ADD_REACTIONS'],
     emoji: '💵',
-    usage: '<bet> <info>',
+    usage: '/bet',
     description: 'Aposte dinheiro no chat',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-
-        let member = client.getUser(client, message, args, 'member')
-
-        if (member && !['global', 'init'].includes(args[0]?.toLowerCase())) return new Bet().betWithUser(client, message, args, prefix, MessageEmbed, member)
-
-        return new Bet().execute(client, message, args, prefix, MessageEmbed)
-
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/bet\``)
     }
 }

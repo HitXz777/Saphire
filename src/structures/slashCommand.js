@@ -20,7 +20,7 @@ module.exports = async (client) => {
         }
     })
 
-    const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_CLIENT_BOT_TOKEN);
+    const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_CLIENT_BOT_TOKEN)
 
     return (async () => {
         try {

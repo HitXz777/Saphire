@@ -472,16 +472,16 @@ module.exports = {
 
             let index = users.findIndex(author => author.id === message.author.id)
 
-            if (index === -1) users = await Database.User.find({}, 'id Balance')
+            if (index === -1) users = await Database.User.find({ Balance: { $gt: 0 } }, 'id Balance').sort('-Balance').limit(10)
 
-            let RankingSorted = index >= 0 ? users : users.filter(d => d.Balance > 0).sort((a, b) => b.Balance - a.Balance)
+            let RankingSorted = users
             index = RankingSorted.findIndex(author => author.id === message.author.id)
             let data = RankingSorted.map((u, i) => { return { i: i, id: u.id, Balance: u.Balance } })
 
             if (!data.length) return msg.edit(`${e.Info} | Não há ninguém no ranking`).catch(() => { })
 
             let AuthorRank = index === -1 ? 'N/A' : index + 1,
-                rank = data.slice(0, 10).map((a, i) => `**${Medals(i)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.Balance} ${moeda}\n`).join('\n')
+                rank = data.map((a, i) => `**${Medals(i)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.Balance} ${moeda}\n`).join('\n')
 
             if (!data.length) rank = 'Não há ninguém no ranking'
 

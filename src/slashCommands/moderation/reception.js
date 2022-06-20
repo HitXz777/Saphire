@@ -1,11 +1,12 @@
 const Notify = require('../../../modules/functions/plugins/notify')
 const client = require('../../../index')
+const util = require('../../structures/util')
 
 module.exports = {
     name: 'reception',
     description: '[moderation] Configure o sistema de recepção',
     dm_permission: false,
-    default_member_permissions: client.perms.ADMINISTRATOR,
+    default_member_permissions: util.slashCommandsPermissions.ADMINISTRATOR,
     type: 1,
     options: [
         {

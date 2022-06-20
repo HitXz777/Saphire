@@ -39,18 +39,17 @@ module.exports = {
                 `${e.gain} Recebeu ${din} Safiras dando o cú ${user ? `de ${user.user.tag}` : ''}`
             )
 
-
             return message.reply(`${e.Check} | ${message.author}, o cliente anônimo gostou dos ${msg} e te pagou +${din} ${moeda}`).catch(() => { })
-        } else {
-
-            Database.subtract(message.author.id, din)
-
-            Database.PushTransaction(
-                message.author.id,
-                `${e.loss} Perdeu ${din} Safiras dando o cú ${user ? `de ${user.user.tag}` : ''}`
-            )
-
-            return message.reply(`${e.Deny} | ${message.author}, o cliente anônimo não gostou dos ${msg} e seu prejuízo foi de -${din} ${moeda}`).catch(() => { })
         }
+
+        Database.subtract(message.author.id, din)
+
+        Database.PushTransaction(
+            message.author.id,
+            `${e.loss} Perdeu ${din} Safiras dando o cú ${user ? `de ${user.user.tag}` : ''}`
+        )
+
+        return message.reply(`${e.Deny} | ${message.author}, o cliente anônimo não gostou dos ${msg} e seu prejuízo foi de -${din} ${moeda}`).catch(() => { })
+
     }
 }

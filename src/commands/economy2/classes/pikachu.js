@@ -88,7 +88,7 @@ class Pikachu {
 
         async function startZeppelin() {
             registerChannel()
-            let resultToTimeout = [5000, 5000, 5000, 5000, 5000, 10000, 6000, 15000, 20000, 30000, 40000, 25000, 50000, 60000, 45000, 70000, 80000, 90000, 75000][Math.floor(Math.random() * 19)],
+            let resultToTimeout = [5000, 5000, 5000, 5000, 5000, 10000, 6000, 15000, 20000, 30000, 40000, 25000, 50000, 60000, 45000, 70000, 80000, 90000, 75000].random(),
                 timeResult = Math.floor(Math.random() * resultToTimeout) + 2000
 
             let msg = await message.reply({

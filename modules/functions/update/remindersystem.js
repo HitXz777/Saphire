@@ -227,7 +227,7 @@ async function reminderStart(user, data) {
                 }
             )
 
-            return message.reply(`${e.ReminderBook} | Tudo bem! Eu vou te lembrar novamente em **${Data(DefinedTime)}** daqui **${client.GetTimeout(DefinedTime, 0, false)}**`).catch(() => { })
+            return message.reply(`${e.ReminderBook} | Tudo bem! Eu vou te lembrar novamente em **${Date.format(DefinedTime)}** daqui **${client.GetTimeout(DefinedTime, 0, false)}**`).catch(() => { })
         }
     }
 

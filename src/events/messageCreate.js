@@ -73,9 +73,12 @@ client.on('messageCreate', async message => {
         return message.reply(`${e.Deny} | Meus comandos foram bloqueados neste canal.`).then(msg => setTimeout(() => msg.delete().catch(() => { }), 4500))
 
     if (!command) {
-        let frases = [`Eu não tenho esse comando não... Que tal usar o \`${prefix}help\` ?`, `Olha... Eu não tenho esse comando não, sabe? Tenta usar o \`${prefix}help\`, lá tem todos os meus comandos.`, `Viiiish, comando desconhecido, foi mal.`, `Conheço esse comando aí não... Verifica a ortografia e tenta novamente`, `Huuum, quer usar o \`${prefix}help\` não?`],
-            resposta = frases[Math.floor(Math.random() * frases.length)]
-        return message.reply(`${e.Deny} | ${resposta}`)
+        let didYouMean = await cmd.didYouMean(client.commandsNames()) // Credits: JackSkelt#3063 - 904891162362519562
+        let resposta = [`Eu não tenho esse comando não... Que tal usar o \`${prefix}help\` ?`, `Olha... Eu não tenho esse comando não, sabe? Tenta usar o \`${prefix}help\`, lá tem todos os meus comandos.`, `Viiiish, comando desconhecido, foi mal.`, `Conheço esse comando aí não... Verifica a ortografia e tenta novamente`, `Huuum, quer usar o \`${prefix}help\` não?`].random()
+
+        return didYouMean
+            ? message.reply(`${e.Info} | Eu acho que você quis dizer \`${prefix}${didYouMean}\``)
+            : message.reply(`${e.Deny} | ${resposta}`)
     }
 
     for (const perm of ['READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'EMBED_LINKS', 'ADD_REACTIONS'])

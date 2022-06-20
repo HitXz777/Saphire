@@ -18,6 +18,14 @@ class SlashCommand extends Modals {
         const command = this.client.slashCommands.get(this.interaction.commandName);
         if (!command) return
 
+        let staff = [...clientData.Administradores, this.Database.Config.ownerId]
+
+        if (['admin', 'open'].includes(command.name) && !staff.includes(this.interaction.user.id))
+            return await this.interaction.reply({
+                content: `${this.e.Deny} | Este comando é exclusivo para meus administradores.`,
+                ephemeral: true
+            })
+
         await command.execute({
             interaction: this.interaction,
             emojis: this.e,
@@ -30,7 +38,7 @@ class SlashCommand extends Modals {
             member: member
         }).catch(async err => {
             this.error(this.interaction, err)
-            
+
             return await this.interaction.reply({
                 content: "❌ | Ocorreu um erro ao executar este comando.",
                 ephemeral: true,

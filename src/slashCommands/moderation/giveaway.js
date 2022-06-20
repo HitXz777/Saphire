@@ -1,10 +1,11 @@
 const client = require('../../../index')
+const util = require('../../structures/util')
 
 module.exports = {
     name: 'giveaway',
     description: '[moderation] Crie sorteios no servidor',
     type: 1,
-    default_member_permissions: client.perms.MANAGE_CHANNELS,
+    default_member_permissions: util.slashCommandsPermissions.MANAGE_CHANNELS,
     dm_permission: false,
     options: [
         {
