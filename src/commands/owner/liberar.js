@@ -1,5 +1,4 @@
-const { e } = require('../../../JSON/emojis.json'),
-    Database = require('../../../modules/classes/Database')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'liberar',
@@ -12,6 +11,14 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
+        let clientData = await Database.Client.findOne({ id: client.user.id }, 'ComandosBloqueados')
+        if (!clientData) return message.reply(`${e.Database} | Database | Nenhum dado foi encontrado.`)
+
+        const comandosBloqueados = clientData?.ComandosBloqueados || []
+
+        if (comandosBloqueados.length === 0)
+            return message.reply(`${e.Deny} | Não há nenhum comando bloqueado.`)
+
         if (!args[0]) return message.reply(`${e.Info} | Apenas o nome do comando que deseja desbloquear.\nExemplo: \`${prefix}liberar botinfo\``)
 
         if (['tudo', 'all'].includes(args[0]?.toLowerCase())) {
@@ -23,14 +30,6 @@ module.exports = {
 
             return message.reply(`${e.Check} | Todos os comandos foram liberados.`)
         }
-
-        let clientData = await Database.Client.findOne({ id: client.user.id }, 'ComandosBloqueados')
-        if (!clientData) return message.reply(`${e.Database} | Database | Nenhum dado foi encontrado.`)
-
-        const comandosBloqueados = clientData?.ComandosBloqueados || []
-        
-        if (comandosBloqueados.length === 0)
-            return message.reply(`${e.Deny} | Não há nenhum comando bloqueado.`)
 
         let cmd = client.commands.get(args[0]) || client.commands.get(client.aliases.get(args[0]))
 

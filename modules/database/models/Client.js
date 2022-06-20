@@ -9,6 +9,7 @@ module.exports = model("Client", new Schema({
     Administradores: Array,
     TopGlobal: Object,
     ComandosBloqueados: Array,
+    ComandosBloqueadosSlash: Array,
     VipCodes: Array,
     BackgroundAcess: Array,
     BlockedUsers: Array,

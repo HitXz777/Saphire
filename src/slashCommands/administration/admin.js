@@ -2,6 +2,7 @@ module.exports = {
     name: 'admin',
     description: '[administration] Comandos privados para meus administradores',
     dm_permission: false,
+    admin: true,
     type: 1,
     options: [
         {
@@ -371,6 +372,10 @@ module.exports = {
                             value: 'reboot'
                         },
                         {
+                            name: 'Comandos Bloqueados',
+                            value: 'bugs'
+                        },
+                        {
                             name: 'Sincronizar usuários Cache/Database',
                             value: 'rebootUsers'
                         },
@@ -477,6 +482,7 @@ module.exports = {
             case 'create_invite': createNewInvite(); break;
             case 'rebootUsers': RebootUsersOnDatabase(); break;
             case 'rebootGuilds': RebootGuildsOnDatabase(); break;
+            case 'bugs': comandos_bloqueados(); break;
 
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
@@ -529,6 +535,30 @@ module.exports = {
             })
 
 
+        }
+
+        async function comandos_bloqueados() {
+
+            let bugs = clientData?.ComandosBloqueadosSlash || []
+
+            if (bugs.length === 0 || !clientData)
+                return await interaction.reply({
+                    content: `${e.Database} | Database | Nenhum dado foi encontrado.`,
+                    ephemeral: true
+                })
+
+            const BugsMapped = bugs.map(bug => `**${bug.cmd}**\n\`${bug.error}\``).join('\n')
+
+            return await interaction.reply({
+                embeds: [
+                    {
+                        color: client.blue,
+                        title: `${e.Gear} Lista de Bugs`,
+                        description: BugsMapped || 'Nada por aqui',
+                        footer: { text: `${bugs.length || 0} Bugs` }
+                    }
+                ]
+            })
         }
 
         async function subtract_Likes() {

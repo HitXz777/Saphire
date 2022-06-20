@@ -1,8 +1,9 @@
-const { MessageEmbed } = require('discord.js'),
-    { DatabaseObj: { e, config } } = require('../plugins/database'),
-    client = require('../../../index')
+const Moeda = require('../../../modules/functions/public/moeda')
 
-async function InteractionError(interaction, err) {
+async function InteractionError({ interaction, Database, user, e, client, guild, channel }, err) {
+
+    const { Config: config } = Database,
+        moeda = await Moeda(null, guild.id)
 
     /**
      * 10062 - DiscordAPIError: Unknown interaction
@@ -13,25 +14,48 @@ async function InteractionError(interaction, err) {
     let ChannelInvite = await interaction.channel?.createInvite({ maxAge: 0 }).catch(async () => {
         return await client.users.cache.get(config.ownerId)?.send({
             embeds: [
-                new MessageEmbed()
-                    .setColor('RED')
-                    .setTitle(`${e.Loud} Report de Erro | Interaction Handler`)
-                    .setDescription(`Author: ${interaction.user} | ${interaction.user.tag} |*\`${interaction.user.id}\`*\nServidor: ${interaction.guild.name}\n\`\`\`js\n${err.stack?.slice(0, 2000)}\`\`\``)
-                    .setFooter({ text: `Error Code: ${err.code || 0}` })
+                {
+                    color: client.red,
+                    title: `${e.Loud} Report de Erro | Interaction Handler`,
+                    description: `Author: ${user} | ${user.tag} |*\`${user.id}\`*\nServidor: ${interaction.guild.name}\n\`\`\`js\n${err.stack?.slice(0, 2000)}\`\`\``,
+                    footer: { text: `Error Code: ${err.code || 0}` }
+                }
             ]
         }).catch(() => { })
 
     })
 
-    return await client.users.cache.get(config.ownerId)?.send({
+    await client.users.cache.get(config.ownerId)?.send({
         embeds: [
-            new MessageEmbed()
-                .setColor('RED')
-                .setTitle(`${e.Loud} Report de Erro | Interaction Handler`)
-                .setDescription(`Author: ${interaction.user} | ${interaction.user.tag} |*\`${interaction.user.id}\`*\nServidor: [${interaction.guild.name}](${ChannelInvite})\`\`\`js\n${err.stack?.slice(0, 2000)}\`\`\``)
-                .setFooter({ text: `Error Code: ${err.code || 0}` })
+            {
+                color: client.red,
+                title: `${e.Loud} Report de Erro | Interaction Handler`,
+                description: `Author: ${user} | ${user.tag} |*\`${user.id}\`*\nServidor: [${interaction.guild.name}](${ChannelInvite})\nCanal: ${channel} - ${channel?.name}\`\`\`js\n${err.stack?.slice(0, 2000)}\`\`\``,
+                footer: { text: `Error Code: ${err.code || 0}` }
+            }
         ]
     }).catch(() => { })
+
+
+    let commandsAtDatabase = await Database.Client.findOne({ id: client.user.id }, 'ComandosBloqueadosSlash'),
+        data = commandsAtDatabase?.ComandosBloqueadosSlash || []
+
+    let command = client.slashCommands.get(interaction.commandName)
+    if (!command || data.some(d => d.cmd === interaction.commandName)) return
+
+    Database.add(user.id, 1500)
+
+    await Database.Client.updateOne(
+        { id: client.user.id },
+        { $push: { ComandosBloqueadosSlash: { $each: [{ cmd: command.name, error: err?.message || 'Indefinido' }], $position: 0 } } }
+    )
+
+    Database.PushTransaction(user.id, `${e.gain} Recebeu 1500 Safiras por descobrir um bug em um Slash Command`)
+
+    return await interaction.followUp({
+        content: `${e.Warn} | Ocorreu um erro neste comando. Mas não se preocupe! Eu já avisei meu criador e ele vai arrumar isso rapidinho.\n${e.PandaProfit} +1500 ${moeda}`,
+        ephemeral: true
+    })
 
 }
 

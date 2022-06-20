@@ -20,7 +20,7 @@ class SlashCommand extends Modals {
 
         let staff = [...clientData.Administradores, this.Database.Config.ownerId]
 
-        if (['admin', 'open'].includes(command.name) && !staff.includes(this.interaction.user.id))
+        if (command.admin && !staff.includes(this.interaction.user.id))
             return await this.interaction.reply({
                 content: `${this.e.Deny} | Este comando é exclusivo para meus administradores.`,
                 ephemeral: true
@@ -37,12 +37,12 @@ class SlashCommand extends Modals {
             clientData: clientData,
             member: member
         }).catch(async err => {
-            this.error(this.interaction, err)
-
-            return await this.interaction.reply({
+            await this.interaction.reply({
                 content: "❌ | Ocorreu um erro ao executar este comando.",
                 ephemeral: true,
             })
+
+            return this.error(this, err)
         })
 
         return this.registerCommand()
@@ -68,6 +68,14 @@ class SlashCommand extends Modals {
         if (!member.permissions?.toArray()?.includes('ADMINISTRATOR') && guildData?.Blockchannels?.Channels?.includes(channel.id))
             return await interaction.reply({
                 content: `${e.Deny} | Meus comandos foram bloqueados neste canal.`,
+                ephemeral: true
+            })
+
+        let comandosBloqueados = clientData?.ComandosBloqueadosSlash || [],
+            cmdBlocked = comandosBloqueados?.find(Cmd => Cmd.cmd === interaction.commandName)
+        if (cmdBlocked)
+            return await interaction.reply({
+                content: `${e.BongoScript} | Este Slash Command foi bloqueado por algum Bug/Erro ou pelos meus administradores.\n> Quer fazer algúm reporte? Use o comando \`/bug\`\n> Motivo do bloqueio: ${cmdBlocked?.error || 'Motivo não informado.'}`,
                 ephemeral: true
             })
 
