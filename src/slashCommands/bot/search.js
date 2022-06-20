@@ -35,19 +35,19 @@ module.exports = {
         if (resultCommands.length > 0) {
             COMMANDS = resultCommands.map(cmd => `\`${prefix}${cmd}\``).join(', ')
             if (COMMANDS.length > 1024)
-                COMMANDS = '`Muitos resultados. Diga um valor mais preciso`'
+                COMMANDS = '`Muitos resultados. Pesquise algo mais preciso`'
         }
 
         if (resultAliases.length > 0) {
             ALIASES = resultAliases.map(alias => `\`${prefix}${alias}\``).join(', ')
             if (ALIASES.length > 1024)
-                ALIASES = '`Muitos resultados. Diga um valor mais preciso`'
+                ALIASES = '`Muitos resultados. Pesquise algo mais preciso`'
         }
 
         if (resultSlashCommands.length > 0) {
             SLASHCOMMANDS = resultSlashCommands.map(slash => `\`/${slash}\``).join(', ')
             if (SLASHCOMMANDS.length > 1024)
-                SLASHCOMMANDS = '`Muitos resultados. Diga um valor mais preciso`'
+                SLASHCOMMANDS = '`Muitos resultados. Pesquise algo mais preciso`'
         }
 
         return await interaction.reply({
