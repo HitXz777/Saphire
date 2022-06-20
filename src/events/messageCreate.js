@@ -74,10 +74,10 @@ client.on('messageCreate', async message => {
 
     if (!command) {
         let didYouMean = await cmd.didYouMean(client.commandsNames()) // Credits: JackSkelt#3063 - 904891162362519562
-        let resposta = [`Eu não tenho esse comando não... Que tal usar o \`${prefix}help\` ?`, `Olha... Eu não tenho esse comando não, sabe? Tenta usar o \`${prefix}help\`, lá tem todos os meus comandos.`, `Viiiish, comando desconhecido, foi mal.`, `Conheço esse comando aí não... Verifica a ortografia e tenta novamente`, `Huuum, quer usar o \`${prefix}help\` não?`].random()
+        let resposta = [`Eu não tenho esse comando não... Que tal usar o \`${prefix}help\` ou o \`/search\` ?`, `Olha... Eu não tenho esse comando não, sabe? Tenta usar o \`${prefix}help\` ou o \`/search\`, lá tem todos os meus comandos.`, `Viiiish, comando desconhecido, foi mal. Usa o \`/search\`, quem sabe?`, `Conheço esse comando aí não... Verifica a ortografia e tenta novamente. Ou pesquise usando o \`/search\``, `Huuum, quer usar o \`${prefix}help\` ou o \`/search\` não?`].random()
 
         return didYouMean
-            ? message.reply(`${e.Info} | Eu acho que você quis dizer \`${prefix}${didYouMean}\``)
+            ? message.reply(`${e.Info} | Eu acho que você quis dizer \`${prefix}${didYouMean}\`. Mas se não for, tente usar o comando \`/search\``)
             : message.reply(`${e.Deny} | ${resposta}`)
     }
 

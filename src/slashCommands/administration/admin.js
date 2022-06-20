@@ -800,9 +800,9 @@ module.exports = {
                     ephemeral: true
                 })
 
-            let clan = await Database.Clan.findOne({ id: id })
+            let clan = await Database.Clan.findOne({ id: id }, 'id')
 
-            if (!clan)
+            if (!clan?.id)
                 return await interaction.reply({
                     content: `${e.Deny} | Este clan não existe.`,
                     ephemeral: true
