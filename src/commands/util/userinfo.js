@@ -5,7 +5,7 @@ const { e } = require('../../../JSON/emojis.json'),
 
 module.exports = {
     name: 'userinfo',
-    aliases: ['ui', 'search', 'localize'],
+    aliases: ['ui', 'localize'],
     category: 'util',
     ClientPermissions: ['EMBED_LINKS', 'ADD_REACTIONS'],
     emoji: `${e.Info}`,

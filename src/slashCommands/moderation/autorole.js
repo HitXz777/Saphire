@@ -41,7 +41,7 @@ module.exports = {
         },
         {
             name: 'information',
-            description: '[moderation] Mais inforamações sobre o autorole',
+            description: '[moderation] Mais informações sobre o autorole',
             type: 1,
             options: [
                 {

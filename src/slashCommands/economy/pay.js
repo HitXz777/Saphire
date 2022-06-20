@@ -2,7 +2,7 @@ const Moeda = require('../../../modules/functions/public/moeda')
 
 module.exports = {
     name: 'pay',
-    description: '[economy] Page outras pessoas',
+    description: '[economy] Pague outras pessoas',
     dm_permission: false,
     type: 1,
     options: [
