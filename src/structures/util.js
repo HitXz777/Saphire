@@ -1,4 +1,4 @@
-const Intents = [ //TODO: Mudar para events
+const RawClientEvents = [ //TODO: Mudar para events
     "READY",
     "RESUMED",
     "VOICE_SERVER_UPDATE",
@@ -335,7 +335,7 @@ const ignoreUsersOptions = [
 ]
 
 module.exports = {
-    Intents,
+    RawClientEvents,
     Colors,
     Events,
     ShardEvents,
