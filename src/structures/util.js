@@ -101,7 +101,58 @@ const ColorsTranslate = {
     Blurple: "Violeta",
     Greyple: "Verde Acinzentado",
     DarkButNotBlack: "Escuro, mas não preto",
-    NotQuiteBlack: "Não tão preto"
+    NotQuiteBlack: "Não tão preto",
+    DEFAULT: "Padrão",
+    AQUA: "Água",
+    DARK_AQUA: "Água Escura",
+    GREEN: "Verde",
+    DARK_GREEN: "Verde Escuro",
+    BLUE: "Azul",
+    DARK_BLUE: "Azul Escuro",
+    PURPLE: "Roxo",
+    DARK_PURPLE: "Roxo Escuro",
+    LUMINOUS_VIVID_PINK: "Rosa Vívido Luminoso",
+    DARK_VIVID_PINK: "Rosa Vívido Escuro",
+    GOLD: "Ouro",
+    DARK_GOLD: "Ouro Escuro",
+    ORANGE: "Laranja",
+    DARK_ORANGE: "Laranja Escuro",
+    RED: "Vermelho",
+    DARK_RED: "Vermelho Escuro",
+    GREY: "Cinza",
+    DARK_GREY: "Cinza Escuro",
+    DARKER_GREY: "Cinza Mais Escuro",
+    LIGHT_GREY: "Cinza Claro",
+    NAVY: "Oceano Apagado",
+    DARK_NAVY: "Oceano Escuro",
+    YELLOW: "Amarelo",
+}
+
+const EmbedColors = {
+    DEFAULT: "#000000",
+    AQUA: "#1ABC9C",
+    DARK_AQUA: "#11806A",
+    GREEN: "#2ECC71",
+    DARK_GREEN: "#1F8B4C",
+    BLUE: "#3498DB",
+    DARK_BLUE: "#206694",
+    PURPLE: "#9B59B6",
+    DARK_PURPLE: "#71368A",
+    LUMINOUS_VIVID_PINK: "#E91E63",
+    DARK_VIVID_PINK: "#AD1457",
+    GOLD: "#F1C40F",
+    DARK_GOLD: "#C27C0E",
+    ORANGE: "#E67E22",
+    DARK_ORANGE: "#A84300",
+    RED: "#E74C3C",
+    DARK_RED: "#992D22",
+    GREY: "#95A5A6",
+    DARK_GREY: "#979C9F",
+    DARKER_GREY: "#7F8C8D",
+    LIGHT_GREY: "#BCC0C0",
+    NAVY: "#34495E",
+    DARK_NAVY: "#2C3E50",
+    YELLOW: "#FFFF00"
 }
 
 const Events = {
@@ -274,4 +325,23 @@ const slashCommandsPermissions = {
     MODERATE_MEMBERS: 0x0000010000000000
 }
 
-module.exports = { Intents, Colors, Events, ShardEvents, ColorsTranslate, Permissions, slashCommandsPermissions }
+const ignoreUsersOptions = [
+    'serversRemove',
+    'logregisterDelete',
+    'cacheDelete',
+    'clanDelete',
+    'set_ServerPremium',
+    'remove_ServerPremium'
+]
+
+module.exports = {
+    Intents,
+    Colors,
+    Events,
+    ShardEvents,
+    ColorsTranslate,
+    Permissions,
+    slashCommandsPermissions,
+    EmbedColors,
+    ignoreUsersOptions
+}

@@ -55,11 +55,10 @@ client.on('messageCreate', async message => {
     AfkSystem(message)
 
     if (message.content?.toLowerCase() === '@saphire' || message.content?.toLowerCase() === 'saphire' || message.content === `<@${client.user.id}>` || message.content === `<@&${client.user.id}>`)
-        message.channel.send(`${e.SaphireHi} | \`${prefix}help\`ou \`/\``)
+        message.channel.send(`${e.SaphireHi} | \`${prefix}help\` ou \`/\``)
 
-    const
-        args = message.content.slice(prefix.length).trim().split(/ +/g),
-        cmd = args.shift().toLowerCase()
+    const args = message.content.slice(prefix.length).trim().split(/ +/g)
+    const cmd = args.shift().toLowerCase()
 
     if (!message.content.startsWith(prefix) || cmd.length == 0) return
     if (args.join(' ').length > 1500) return message.reply(`${e.Deny} | O limite máximo de caracteres nas mensagens são de 1500 caracteres.`)

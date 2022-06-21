@@ -53,7 +53,7 @@ const data = {
 for (let gif of gifData) {
     data.options[0].choices.push({
         name: gif.name,
-        value: gif.name
+        value: gif.JSON
     })
 }
 
@@ -66,10 +66,10 @@ module.exports = {
         let gifRequest = options.getString('action')
         let option = gifData.find(g => g.JSON === gifRequest)
         let member = options.getMember('user')
-        let textOne = option.embedTextOne.replace('$user', user).replace('$member', member)
-        let textTwo = option.embedTextTwo?.replace('$user', user).replace('$member', member)
+        let textOne = option.embedTextOne?.replace('$user', user)?.replace('$member', member)
+        let textTwo = option.embedTextTwo?.replace('$user', user)?.replace('$member', member)
         let rand = () => {
-            return g[option.name][Math.floor(Math.random() * g[option.name].length)]
+            return g[option.JSON][Math.floor(Math.random() * g[option.JSON].length)]
         }
 
         if (member.id === client.user.id)

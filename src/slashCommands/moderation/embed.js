@@ -20,6 +20,7 @@ module.exports = {
     name: 'embed',
     description: '[moderation] Crie embeds facilmente',
     dm_permission: false,
+    default_member_permissions: util.slashCommandsPermissions.MANAGE_MESSAGES,
     type: 1,
     options: [
         {

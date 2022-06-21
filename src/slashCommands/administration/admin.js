@@ -1,3 +1,5 @@
+const util = require('../../structures/util')
+
 module.exports = {
     name: 'admin',
     description: '[administration] Comandos privados para meus administradores',
@@ -177,6 +179,10 @@ module.exports = {
                         {
                             name: 'Experience',
                             value: 'xpSet'
+                        },
+                        {
+                            name: 'Novo Servidor Premium',
+                            value: 'set_ServerPremium'
                         }
                     ]
                 },
@@ -267,6 +273,10 @@ module.exports = {
                         {
                             name: 'Estrela 6',
                             value: 'estrelaRemove6'
+                        },
+                        {
+                            name: 'Servidor Premium',
+                            value: 'remove_ServerPremium'
                         }
                     ]
                 },
@@ -376,6 +386,10 @@ module.exports = {
                             value: 'bugs'
                         },
                         {
+                            name: 'Lista de Servidores Premium',
+                            value: 'serverPremiumList'
+                        },
+                        {
                             name: 'Sincronizar usuários Cache/Database',
                             value: 'rebootUsers'
                         },
@@ -420,10 +434,6 @@ module.exports = {
         let subCommand = options.getSubcommand()
         let amount = options.getInteger('quantity')
 
-        function check() {
-            return ['serversRemove', 'logregisterDelete', 'cacheDelete', 'clanDelete'].includes(func) || subCommand === 'options'
-        }
-
         if (!user && !check())
             return await interaction.reply({
                 content: `${e.Deny} | Nenhum usuário encontrado.`,
@@ -455,6 +465,7 @@ module.exports = {
             case 'designer': set_Designer(); break;
             case 'levelSet': set_Level(); break;
             case 'xpSet': set_Xp(); break;
+            case 'set_ServerPremium': set_ServerPremium(); break;
 
             case 'admRemove': remove_Administrator(); break;
             case 'modRemove': remove_Moderator(); break;
@@ -465,6 +476,7 @@ module.exports = {
             case 'designerRemove': remove_Designer(); break;
             case 'serversRemove': remove_Servers(); break;
             case 'blacklistRemove': remove_Blacklist(); break;
+            case 'remove_ServerPremium': remove_ServerPremium(); break;
 
             case 'logregisterDelete': delete_Logregister(); break;
             case 'cacheDelete': delete_Cache(); break;
@@ -483,6 +495,7 @@ module.exports = {
             case 'rebootUsers': RebootUsersOnDatabase(); break;
             case 'rebootGuilds': RebootGuildsOnDatabase(); break;
             case 'bugs': comandos_bloqueados(); break;
+            case 'serverPremiumList': serverPremiumList(); break;
 
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
@@ -535,6 +548,163 @@ module.exports = {
             })
 
 
+        }
+
+        async function set_ServerPremium() {
+
+            let server = client.guilds.cache.get(id)
+
+            if (!server)
+                return await interaction.reply({
+                    content: `${e.Info} | Forneça o ID de um servidor para adiciona-lo na lista de Servidores Premium.`,
+                    ephemeral: true
+                })
+
+            if (clientData.PremiumServers?.includes(server.id))
+                return await interaction.reply({
+                    content: `${e.Info} | Este servidor já faz parte do sistema premium.`,
+                    ephemeral: true
+                })
+
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                { $push: { PremiumServers: server.id } }
+            )
+
+            const Notify = require('../../../modules/functions/plugins/notify')
+            Notify(server.id, 'SERVER PREMIUM SYSTEM', 'Este servidor foi adicionado na lista de Servidores Premium.')
+            return await interaction.reply({
+                content: `${e.Check} | O servidor **${server.name}** \`${server.id}\` foi adicionado a lista de Servidores Premium com sucesso!`
+            })
+
+        }
+
+        async function remove_ServerPremium() {
+
+            let server = client.guilds.cache.get(id)
+
+            if (!server)
+                return await interaction.reply({
+                    content: `${e.Info} | Forneça o ID de um servidor para remove-lo da lista de Servidores Premium.`,
+                    ephemeral: true
+                })
+
+            if (!clientData.PremiumServers?.includes(server.id))
+                return await interaction.reply({
+                    content: `${e.Deny} | Este servidor não faz parte do sistema premium.`,
+                    ephemeral: true
+                })
+
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                { $pull: { PremiumServers: server.id } }
+            )
+
+            const Notify = require('../../../modules/functions/plugins/notify')
+            Notify(server.id, 'SERVER PREMIUM SYSTEM', 'Este servidor foi removido da lista de Servidores Premium.')
+            return await interaction.reply({
+                content: `${e.Check} | O servidor **${server.name}** \`${server.id}\` foi removido da lista de Servidores Premium com sucesso!`
+            })
+
+        }
+
+        async function serverPremiumList() {
+
+            const premiumServers = clientData.PremiumServers || []
+
+            if (premiumServers.length === 0)
+                return await interaction.reply({
+                    content: `${e.Deny} | Não há nenhum servidor na lista.`,
+                    ephemeral: true
+                })
+
+            let embeds = EmbedGenerator(premiumServers),
+                emojis = ['⬅️', '➡️', '❌'],
+                control = 0
+
+            const msg = await interaction.reply({
+                embeds: [embeds[0]],
+                fetchReply: true
+            })
+
+            if (embeds?.length > 1)
+                for (let i of emojis) msg.react(i).catch(() => { })
+            else return
+
+            const collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === interaction.user.id,
+                time: 30000,
+                errors: ['time']
+            })
+                .on('collect', (reaction) => {
+
+                    if (reaction.emoji.name === emojis[2])
+                        return collector.stop
+
+                    if (reaction.emoji.name === emojis[0]) {
+                        control--
+                        return embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control++
+                    }
+
+                    if (reaction.emoji.name === emojis[1]) {
+                        control++
+                        return embeds[control] ? msg.edit({ embeds: [embeds[control]] }).catch(() => { }) : control--
+                    }
+                    return
+                })
+                .on('end', () => msg.edit({ content: `${e.Deny} Comando cancelado.` }).catch(() => { }))
+
+            function EmbedGenerator(array) {
+
+                let amount = 5,
+                    Page = 1,
+                    embeds = [],
+                    length = array.length / 5 <= 1 ? 1 : parseInt((array.length / 5) + 1)
+
+                for (let i = 0; i < array.length; i += 5) {
+
+                    let current = array.slice(i, amount),
+                        description = current.map(serverId => {
+
+                            let guild = client.guilds.cache.get(serverId)
+
+                            if (!guild) {
+                                removeServer(serverId)
+                                return `${e.Deny} | Servidor removido.`
+                            }
+
+                            return `${guild.name} - \`${guild.id}\``
+                        }).join("\n"),
+                        PageCount = `${length > 1 ? `${Page}/${length}` : ''}`
+
+                    if (current.length > 0) {
+
+                        embeds.push({
+                            color: client.blue,
+                            title: `${e.CoroaDourada} Server Premium List ${PageCount}`,
+                            description: `${description || 'Nenhum item encontrado'}`,
+                            footer: {
+                                text: `${array.length} servidores contabilizados`
+                            },
+                        })
+
+                        Page++
+                        amount += 5
+
+                    }
+
+                }
+
+                return embeds;
+            }
+
+            async function removeServer(serverId) {
+                await Database.Client.updateOne(
+                    { id: client.user.id },
+                    { $pull: { PremiumServers: serverId } }
+                )
+                return
+            }
         }
 
         async function comandos_bloqueados() {
@@ -800,6 +970,7 @@ module.exports = {
                     ephemeral: true
                 })
 
+            console.log(id)
             let clan = await Database.Clan.findOne({ id: id }, 'id')
 
             if (!clan?.id)
@@ -1404,6 +1575,10 @@ module.exports = {
                 content: `${e.Check} | Bônus de ${amount} ${e.Coin} Safiras foram entregues a ${user.tag}.`,
                 ephemeral: true
             })
+        }
+
+        function check() {
+            return util.ignoreUsersOptions.includes(func) || subCommand === 'options'
         }
 
         return

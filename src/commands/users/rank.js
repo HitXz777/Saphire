@@ -472,7 +472,7 @@ module.exports = {
 
             let index = users.findIndex(author => author.id === message.author.id)
 
-            if (index === -1) users = await Database.User.find({ Balance: { $gt: 0 } }, 'id Balance').sort('-Balance').limit(10)
+            // if (index === -1) users = await Database.User.find({ Balance: { $gt: 0 } }, 'id Balance').sort('-Balance').limit(10)
 
             let RankingSorted = users
             index = RankingSorted.findIndex(author => author.id === message.author.id)
@@ -540,7 +540,6 @@ module.exports = {
                 let InLocaleRanking = data.splice(Num, 1)
 
                 return msg.edit({ content: InLocaleRanking.map(a => `**${Medals(Num)} ${GetUser(a.id)}** - *\`${a.id}\`*\n${e.Bells} ${a.Balance || 0} ${moeda}`).join('\n') })
-
             }
 
         }

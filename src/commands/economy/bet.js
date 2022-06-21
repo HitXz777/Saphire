@@ -1,3 +1,5 @@
+const { e } = require('../../../JSON/emojis.json')
+
 module.exports = {
     name: 'bet',
     aliases: ['apostar', 'aposta'],
