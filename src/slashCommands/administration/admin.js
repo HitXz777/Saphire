@@ -386,6 +386,14 @@ module.exports = {
                             value: 'bugs'
                         },
                         {
+                            name: 'Bloquear Comando',
+                            value: 'block_command'
+                        },
+                        {
+                            name: 'Liberar Comando',
+                            value: 'open_command'
+                        },
+                        {
                             name: 'Lista de Servidores Premium',
                             value: 'serverPremiumList'
                         },
@@ -396,6 +404,10 @@ module.exports = {
                         {
                             name: 'Sincronizar servidores Cache/Database',
                             value: 'rebootGuilds'
+                        },
+                        {
+                            name: 'Lista de Servidores',
+                            value: 'serverList'
                         },
                         {
                             name: 'Reboot',
@@ -410,6 +422,11 @@ module.exports = {
                 {
                     name: 'input',
                     description: 'Informações adicionais',
+                    type: 3
+                },
+                {
+                    name: 'input2',
+                    description: 'Informações adicionais 2',
                     type: 3
                 }
             ]
@@ -430,6 +447,7 @@ module.exports = {
         let func = options.getString('function')
         let id = options.getString('id')
         let input = options.getString('input')
+        let input2 = options.getString('input2')
         let user = client.users.cache.get(id) || options.getUser('mention')
         let subCommand = options.getSubcommand()
         let amount = options.getInteger('quantity')
@@ -496,6 +514,9 @@ module.exports = {
             case 'rebootGuilds': RebootGuildsOnDatabase(); break;
             case 'bugs': comandos_bloqueados(); break;
             case 'serverPremiumList': serverPremiumList(); break;
+            case 'serverList': serverList(); break;
+            case 'block_command': block_command(); break;
+            case 'open_command': open_command(); break;
 
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
@@ -739,6 +760,80 @@ module.exports = {
             })
         }
 
+        async function serverList() {
+
+            const Servers = await client.guilds.cache
+            const ServersArray = []
+
+            Servers.forEach(server => {
+                ServersArray.push({ name: server.name, id: server.id, members: server.members.cache.size })
+            })
+
+            function EmbedGenerator() {
+
+                let amount = 10,
+                    Page = 1,
+                    embeds = [],
+                    length = ServersArray.length / 10 <= 1 ? 1 : parseInt((ServersArray.length / 10) + 1)
+
+                for (let i = 0; i < ServersArray.length; i += 10) {
+
+                    let current = ServersArray.slice(i, amount),
+                        description = current.map(server => `**${server.members}.** ${server.name} - \`${server.id}\``).join("\n")
+
+                    embeds.push({
+                        color: client.blue,
+                        title: `🛡️ Lista de todos os servidores | ${Page}/${length}`,
+                        description: `${description}`,
+                        footer: {
+                            text: `${Servers?.size || 0} Servidores`
+                        }
+                    })
+
+                    Page++
+                    amount += 10
+
+                }
+
+                return embeds;
+            }
+
+            let embed = EmbedGenerator(),
+                msg = await interaction.reply({ embeds: [embed[0]], fetchReply: true }),
+                collector = msg.createReactionCollector({
+                    filter: (reaction, user) => ['⬅️', '➡️', '❌'].includes(reaction.emoji.name) && user.id === interaction.user.id,
+                    idle: 60000
+                }),
+                control = 0
+
+            if (embed.length > 1)
+                for (const emoji of ['⬅️', '➡️', '❌'])
+                    msg.react(emoji).catch(() => { })
+
+            collector.on('collect', (reaction) => {
+
+                if (reaction.emoji.name === '❌')
+                    return collector.stop()
+
+                if (reaction.emoji.name === '⬅️') {
+                    control--
+                    return embed[control] ? msg.edit({ embeds: [embed[control]] }).catch(() => { }) : control++
+                }
+
+                if (reaction.emoji.name === '➡️') {
+                    control++
+                    return embed[control] ? msg.edit({ embeds: [embed[control]] }).catch(() => { }) : control--
+                }
+
+            });
+
+            collector.on('end', () => {
+                msg.reactions.removeAll().catch(() => { })
+                return msg.edit(`${e.Deny} | Comando cancelado.`).catch(() => { })
+            });
+
+        }
+
         async function get_stats() {
 
             const axios = require('axios')
@@ -789,6 +884,108 @@ module.exports = {
                     }
                 ]
             }).catch(() => { })
+        }
+
+        async function open_command() {
+
+            const comandosBloqueados = clientData?.ComandosBloqueadosSlash || []
+
+            if (comandosBloqueados.length === 0)
+                return await interaction.reply({
+                    content: `${e.Deny} | Não há nenhum comando bloqueado.`,
+                    ephemeral: true
+                })
+
+            const commandName = input
+
+            if (['all', 'todos', 'tudo'].includes(commandName?.toLowerCase())) {
+
+                await Database.Client.updateOne(
+                    { id: client.user.id },
+                    { $unset: { ComandosBloqueadosSlash: 1 } }
+                )
+
+                return await interaction.reply({
+                    content: `${e.Check} | Todos os comandos foram desbloqueados.`
+                })
+            }
+
+            if (!commandName)
+                return await interaction.reply({
+                    content: `${e.Deny} | Selecione pelo menos um comando via input`,
+                    ephemeral: true
+                })
+
+            let commandClient = client.slashCommands.get(commandName)
+
+            if (!commandClient)
+                return await interaction.reply({
+                    content: `${e.Deny} | Comando não encontrado.`,
+                    ephemeral: true
+                })
+
+            if (!comandosBloqueados?.some(cmds => cmds.cmd === commandClient.name))
+                return await interaction.reply({
+                    content: `${e.Info} | Este comando não está bloqueado.`,
+                    ephemeral: true
+                })
+
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                { $pull: { ComandosBloqueadosSlash: { cmd: commandClient.name } } }
+            )
+
+            return await interaction.reply({
+                content: `${e.Check} | O comando **\`/${commandClient.name}\`** foi liberado com sucesso.`
+            })
+        }
+
+        async function block_command() {
+
+            const commandName = input
+            const reason = input2 || 'Nenhuma razão informada'
+
+            if (!commandName)
+                return await interaction.reply({
+                    content: `${e.Deny} | Selecione pelo menos um comando via input`,
+                    ephemeral: true
+                })
+
+            let commandClient = client.slashCommands.get(commandName)
+
+            if (!commandClient)
+                return await interaction.reply({
+                    content: `${e.Deny} | Comando não encontrado.`,
+                    ephemeral: true
+                })
+
+            let comandosBloqueados = clientData?.ComandosBloqueadosSlash || []
+
+            if (comandosBloqueados?.some(cmds => cmds.cmd === commandClient.name))
+                return await interaction.reply({
+                    content: `${e.Info} | Este comando já está bloqueado.`,
+                    ephemeral: true
+                })
+
+            await Database.Client.updateOne(
+                { id: client.user.id },
+                {
+                    $push: {
+                        ComandosBloqueadosSlash: {
+                            $each: [
+                                {
+                                    cmd: commandClient.name,
+                                    error: reason
+                                }
+                            ], $position: 0
+                        }
+                    }
+                }
+            )
+
+            return await interaction.reply({
+                content: `${e.Check} | O comando **\`/${commandClient.name}\`** foi bloqueado com a razão **${reason}**`
+            })
         }
 
         async function RebootUsersOnDatabase() {

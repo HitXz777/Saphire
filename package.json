@@ -2,7 +2,7 @@
   "name": "saphire",
   "version": "1.0.0",
   "description": "A little giant bot",
-  "main": "index.js",
+  "main": "shard.js",
   "type": "commonjs",
   "scripts": {
     "start": ".",
@@ -20,7 +20,6 @@
   },
   "homepage": "https://github.com/SaphireBot/Saphire",
   "dependencies": {
-    "@discordjs/builders": "^0.15.0",
     "@discordjs/rest": "^0.5.0",
     "@iamtraction/google-translate": "^1.1.2",
     "ark.db": "^2.7.1",
@@ -32,7 +31,6 @@
     "dotenv": "^16.0.0",
     "figlet": "^1.5.2",
     "fromnow": "^3.0.1",
-    "glob": "^8.0.1",
     "kitsu.js": "^2.0.0",
     "moment": "^2.29.3",
     "moment-timezone": "^0.5.34",
