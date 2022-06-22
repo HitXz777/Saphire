@@ -759,8 +759,8 @@ class ModalInteraction extends Modals {
             rolesData.splice(i, 1, {
                 roleId: data.roleId,
                 title: title || data.title,
-                emoji: emoji === '❌' ? null : data.emoji || null,
-                description: description === 'null' ? null : data.description || null
+                emoji: emoji === '❌' ? null : emoji,
+                description: description === 'null' ? null : description
             })
 
             await Database.Guild.updateOne(

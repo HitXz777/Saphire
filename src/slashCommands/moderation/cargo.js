@@ -333,7 +333,7 @@ module.exports = {
 
             if (newColor !== null) {
                 newData.color = newColor
-                edited.push(`Cor: \`${util.ColorsTranslate[options.getString('cor')]}\``)
+                edited.push(`Cor: \`${util.ColorsTranslate[options.getString('cor')] || 'Padrão'}\``)
             }
 
             if (mentionable !== null) {

@@ -1,5 +1,5 @@
 const Database = require('./Database'),
-    { Config: config } = Database,
+    { Config: config, Emojis: e } = Database,
     { getEmoji } = require('../functions/plugins/eventPlugins'),
     client = require('../../index'),
     Modals = require('./Modals')
@@ -27,101 +27,10 @@ class SelectMenuInteraction extends Modals {
             case 'newReminder': this.newReminder(this.interaction); break;
             case 'report': this.letterReport(); break;
             case 'reportTransactions': this.reportTransactions(); break;
-            case 'newReactionRole': this.newReactionRole(); break;
-            case 'newCollectionReactionRole': this.newCollectionReactionRole(); break;
             default: this.checkEditReactionRole(); break;
         }
 
         return
-    }
-
-    async newGiveaway() {
-
-        const { message, interaction, channel, guild, user } = this
-
-        let reference = message.reference,
-            Message = await channel.messages.fetch(reference.messageId)
-
-        if (user.id !== Message.author.id)
-            return await interaction.reply({
-                content: `❌ | Opa opa! Não foi você que iniciou o comando. Então, este não é o seu lugar.`,
-                ephemeral: true
-            })
-
-        let data = await Database.Guild.findOne({ id: guild.id }, 'GiveawayChannel Prefix'),
-            prefix = data?.Prefix || '-',
-            ChannelId = data?.GiveawayChannel,
-            Channel = guild.channels.cache.has(ChannelId)
-
-        if (!ChannelId)
-            return await interaction.reply({
-                content: `❌ | Esse servidor não tem nenhum canal de sorteios configurado. Configure um canal usando \`${prefix}giveaway config #canalDeSorteios\`.`,
-                ephemeral: true
-            })
-
-        if (ChannelId && !Channel) {
-
-            await Database.Guild.updateOne(
-                { id: guild.id },
-                { $unset: { GiveawayChannel: 1 } }
-            )
-
-            return await interaction.reply({
-                content: `❌ | O canal presente no meu banco de dados não condiz com nenhum canal do servidor. Por favor, configure um novo usando: \`${prefix}giveaway config #canalDeSorteios\`.`,
-                ephemeral: true
-            })
-        }
-
-        if (!Channel)
-            return await interaction.reply({
-                content: `❌ | O canal presente no meu banco de dados não condiz com nenhum canal do servidor. Por favor, configure um novo usando: \`${prefix}giveaway config #canalDeSorteios\`.`,
-                ephemeral: true
-            })
-
-        return await interaction.showModal(this.newGiveawayCreate)
-
-    }
-
-    async newReactionRole() {
-
-        const { guild, user, interaction } = this
-
-        let member = guild.members.cache.get(user.id)
-        if (!member) return
-
-        let perms = member.permissions.toArray() || []
-
-        if (!perms.includes('MANAGE_ROLES') && !perms.includes('ADMINISTRATOR'))
-            return await interaction.reply({
-                content: '❌ | Você não tem permissão para mexer no sistema de reaction roles.',
-                ephemeral: true
-            })
-
-        let guildData = await Database.Guild.findOne({ id: guild.id }, 'ReactionRole'),
-            collections = guildData?.ReactionRole || []
-
-        if (!collections || collections.length === 0)
-            return await interaction.reply({
-                content: '❌ | Este servidor não possui nenhuma coleção de reaction role. Você pode criar uma clicando em "Collection" no menu de opções.',
-                ephemeral: true
-            }).catch(() => { })
-
-        return await interaction.showModal(this.newReactionRoleCreate)
-
-    }
-
-    async newCollectionReactionRole() {
-
-        let data = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
-            collections = data?.ReactionRole || []
-
-        if (collections?.length >= 20)
-            return await this.interaction.reply({
-                content: '❌ | O limite é de 20 coleções de reaction roles por servidor. *(Por enquanto)*',
-                ephemeral: true
-            })
-
-        return await this.interaction.showModal(this.newCollection)
     }
 
     async refreshReactionRole(val) {
@@ -153,7 +62,7 @@ class SelectMenuInteraction extends Modals {
 
         if (!ReactionRoleData || ReactionRoleData.length === 0)
             return await interaction.followUp({
-                content: '❌ | Este servidor não possui nenhuma coleção de reaction role.',
+                content: '❌ | Este servidor não possui nenhuma coleção de reaction role. Delete esta mensagem ou reconfigure tudo novamente.',
                 ephemeral: true
             })
 
@@ -354,9 +263,11 @@ class SelectMenuInteraction extends Modals {
         let guildData = await Database.Guild.findOne({ id: this.guild.id }, 'ReactionRole'),
             collections = guildData?.ReactionRole || [],
             collection = collections.find(coll => coll.rolesData.find(role => role.roleId === this.value)),
-            roleData = collection.rolesData.find(role => role.roleId === this.value)
+            roleData = collection?.rolesData.find(role => role.roleId === this.value)
 
-        await this.interaction.showModal(this.editReactionRole(roleData))
+        if (!roleData) return
+
+        return await this.interaction.showModal(this.editReactionRole(roleData))
     }
 
 }
