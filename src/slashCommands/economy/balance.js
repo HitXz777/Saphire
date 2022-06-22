@@ -1,7 +1,7 @@
 module.exports = {
     name: 'balance',
     description: '[economy] Confira suas finanças',
-    dm_permission: false,
+    dm_permission: true,
     type: 1,
     options: [
         {

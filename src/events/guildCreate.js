@@ -4,7 +4,7 @@ const { DatabaseObj: { e, config } } = require('../../modules/functions/plugins/
     Database = require('../../modules/classes/Database')
 
 client.on("guildCreate", async (guild) => {
-    
+
     let clientData = await Database.Client.findOne({ id: client.user.id }, 'Blacklist'),
         blacklistServers = clientData?.Blacklist?.Guilds || []
 
@@ -64,8 +64,8 @@ client.on("guildCreate", async (guild) => {
 
         const fetchedLogs = await guild.fetchAuditLogs({ limit: 1, type: 'BOT_ADD', }),
             guildLog = fetchedLogs.entries.first()
-        
-            if (!guildLog) return
+
+        if (!guildLog) return
 
         let { executor, target } = guildLog
 

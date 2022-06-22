@@ -1,7 +1,7 @@
 const { Database: JSON } = require('ark.db'),
     Models = require('../database/Models')
 
-    class Database extends Models {
+class Database extends Models {
     constructor() {
         super()
         this.BgLevel = new JSON('../../JSON/levelwallpapers.json')
@@ -198,6 +198,15 @@ const { Database: JSON } = require('ark.db'),
 
     }
 
+    setPrefix = async (newPrefix, guildId) => {
+
+        await Database.Guild.updateOne(
+            { id: guildId },
+            { Prefix: newPrefix }
+        )
+        return
+    }
+
     pushUserData = async (userId, keyData, dataToPush) => {
 
         if (!userId || !keyData || !dataToPush) return
@@ -274,7 +283,17 @@ const { Database: JSON } = require('ark.db'),
             { $unset: { [key]: 1 } }
         )
         return
+    }
 
+    guildDelete = async (guildId, key) => {
+
+        if (!guildId || !key) return
+
+        await Database.Guild.updateOne(
+            { id: guildId },
+            { $unset: { [key]: 1 } }
+        )
+        return
     }
 
     PushTransaction = async (userId, Frase) => {

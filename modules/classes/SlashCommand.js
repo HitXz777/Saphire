@@ -52,9 +52,9 @@ class SlashCommand extends Modals {
 
         const { guild, client, e, Database, interaction, user, channel } = this
 
-        let guildData = await Database.Guild.findOne({ id: guild.id })
+        let guildData = await Database.Guild.findOne({ id: guild?.id })
         let clientData = await Database.Client.findOne({ id: client.user.id })
-        let member = guild.members.cache.get(user.id)
+        let member = guild?.members.cache.get(user.id)
 
         if (clientData.Rebooting?.ON)
             return await interaction.reply({ content: `${e.Loading} | Reiniciando em breve...\n${e.BookPages} | ${clientData.Rebooting?.Features || 'Nenhum dado fornecido'}` })
@@ -65,7 +65,7 @@ class SlashCommand extends Modals {
                 ephemeral: true
             })
 
-        if (!member.permissions?.toArray()?.includes('ADMINISTRATOR') && guildData?.Blockchannels?.Channels?.includes(channel.id))
+        if (!member?.permissions?.toArray()?.includes('ADMINISTRATOR') && guildData?.Blockchannels?.Channels?.includes(channel.id))
             return await interaction.reply({
                 content: `${e.Deny} | Meus comandos foram bloqueados neste canal.`,
                 ephemeral: true
