@@ -56,23 +56,38 @@ module.exports = {
                     value: `${emojisChoosen[0]} ${user}`
                 }
             ],
-            footer: { text: 'O emoji será sorteado após 10 segundos sem nenhuma entrada.' }
+            footer: { text: 'O emoji será sorteado após 15 segundos sem nenhuma entrada.' }
         }
 
         Database.Cache.push('emojiBet', channel.id)
+        Database.subtract(user.id, value)
+        Database.PushTransaction(
+            user.id,
+            `${e.loss} Apostou ${value} Safiras no Emoji Bet`
+        )
         let msg = await interaction.reply({
             embeds: [embed],
             components: buttons,
             fetchReply: true
         })
 
-        return msg.createMessageComponentCollector({
+        let collector = msg.createMessageComponentCollector({
             filter: int => true,
-            idle: 10000
+            idle: 15000
         })
             .on('collect', async int => {
 
                 const { customId, user: author } = int
+
+                if (customId === 'finalize') {
+                    if (author.id !== user.id)
+                        return await int.reply({
+                            content: `${e.Deny} | Apenas ${user} pode finalizar este emoji bet.`,
+                            ephemeral: true
+                        })
+
+                    return collector.stop()
+                }
 
                 if (participants.find(d => d.user === author.id))
                     return await int.reply({
@@ -100,6 +115,12 @@ module.exports = {
 
                 embed.fields[1].value = participants.map(d => `${d.emoji} <@${d.user}>`).join('\n')
                 embed.fields[0].value = `${total} ${moeda}`
+
+                Database.subtract(author.id, value)
+                Database.PushTransaction(
+                    user.id,
+                    `${e.loss} Apostou ${value} Safiras no Emoji Bet`
+                )
 
                 return msg.edit({ embeds: [embed], components: buttons }).catch(() => { })
             })
@@ -130,6 +151,12 @@ module.exports = {
                 embed.color = client.green
                 embed.footer = { text: 'Finalizado' }
 
+                Database.add(winData.user, total)
+                Database.PushTransaction(
+                    user.id,
+                    `${e.gain} Ganhou ${total} Safiras no Emoji Bet`
+                )
+
                 await interaction.followUp({
                     content: `${e.Check} | O emoji bet foi finalizado. O vencedor desta rodada foi o emoji ${winData.emoji} de <@${winData.user}>. Levando pra casa o total de **${total} ${moeda}**.`
                 })
@@ -137,6 +164,8 @@ module.exports = {
                 return msg.edit({ content: null, embeds: [embed], components: [] }).catch(() => { })
             })
 
+        return
+        
         function getEmojis() {
 
             let emojisArray = []
@@ -305,6 +334,17 @@ module.exports = {
                             emoji: emojisChoosen[19],
                             custom_id: 'd5',
                             style: 'SECONDARY'
+                        }
+                    ]
+                },
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 2,
+                            label: 'FINALIZAR EMOJIBET',
+                            custom_id: 'finalize',
+                            style: 'SUCCESS'
                         }
                     ]
                 }
