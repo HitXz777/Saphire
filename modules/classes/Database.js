@@ -311,6 +311,11 @@ class Database extends Models {
         return
     }
 
+    getUsers = async (usersIdInArray, filter) => {
+        let data = await Database.User.find({ id: { $in: usersIdInArray } }, filter)
+        return data
+    }
+
     registerUser = async (user, blocked) => {
 
         if (blocked || !user || user?.bot) return

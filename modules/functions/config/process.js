@@ -12,12 +12,13 @@ process.on('unhandledRejection', async (reason) => {
      * 10004 Unknown Guild
      * 10008 Unknown Message
      * 50035 Invalid Form Body (Error Handling Filter)
+     * 50013 Missing Permissions
      * 11000 Duplicated Creating Document Mongoose - Ignore Error
      * 50001 DiscordAPIError: Missing Access (send message)
      * 10062 Unknow Interaction
      */
 
-    if ([500, 10004, 10008, 50035, 11000, 50001, 10062].includes(reason.code)) return
+    if ([500, 10004, 10008, 50035, 11000, 50001, 10062, 50013].includes(reason.code)) return
 
     return await client.users.cache.get(`${config.ownerId}`)?.send({
         embeds: [

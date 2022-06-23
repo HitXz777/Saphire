@@ -6,7 +6,7 @@ const { DatabaseObj: { e, config } } = require('../../modules/functions/plugins/
 
 client.on('guildMemberAdd', async (member) => {
 
-    if (!member.guild.available) return
+    if (!member.guild.available || member.user.bot) return
 
     const guild = await Database.Guild.findOne({ id: member.guild.id }, 'Prefix Autorole WelcomeChannel Antifake LogChannel'),
         clientData = await Database.Client.findOne({ id: client.user.id }, 'PremiumServers')

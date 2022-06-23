@@ -9,9 +9,15 @@ module.exports = {
             description: 'Quem será seu oponente nesta partida?',
             type: 6,
             required: true
+        },
+        {
+            name: 'bet',
+            description: 'Aposte uma quantia com seu oponente',
+            type: 4,
+            min_value: 1
         }
     ],
-    async execute({ interaction: interaction, emojis: e, database: Database }) {
+    async execute({ interaction: interaction, emojis: e, database: Database, guildData: guildData }) {
 
         const { user, options, channel } = interaction
 
@@ -21,8 +27,20 @@ module.exports = {
                 ephemeral: true
             })
 
-        Database.Cache.push('lastClick', channel.id)
         const opponent = options.getUser('oponente')
+        const amount = options.getInteger('bet')
+        const isBet = amount
+        const moeda = guildData.Moeda || `${e.Coin} Safiras`
+        let control = {
+            playNow: [opponent.id, user.id].random(),
+            buttons: getButtons(),
+            customIds: [],
+            clicks: 0,
+            userEmoji: '🔴',
+            opponentEmoji: '⚪',
+            userMoney: 0,
+            opponentMoney: 0
+        }
 
         if (opponent.id === user.id)
             return await interaction.reply({
@@ -36,8 +54,60 @@ module.exports = {
                 ephemeral: true
             })
 
+        Database.Cache.push('lastClick', channel.id)
+
+        if (isBet) {
+
+            let data = await Database.getUsers([user.id, opponent.id], 'id Balance')
+            let userData = data.find(d => d.id === user.id)
+            let opponentData = data.find(d => d.id === opponent.id)
+
+            if (!userData) {
+                Database.Cache.pull('lastClick', channel.id)
+
+                Database.registerUser(user)
+                return await interaction.reply({
+                    content: `${e.Deny} | Tente novamente. Efetuei seu cadastro no banco de dados.`,
+                    ephemeral: true
+                })
+            }
+
+            if (!opponentData) {
+                Database.Cache.pull('lastClick', channel.id)
+
+                Database.registerUser(opponent)
+                return await interaction.reply({
+                    content: `${e.Deny} | Tente novamente. Efetuei seu de ${opponent} no banco de dados.`,
+                    ephemeral: true
+                })
+            }
+
+            let userMoney = userData.Balance || 0
+            let opponentMoney = opponentData.Balance || 0
+
+            if (!opponentMoney || opponentMoney < amount) {
+                Database.Cache.pull('lastClick', channel.id)
+
+                return await interaction.reply({
+                    content: `${e.Deny} | ${opponent} não tem todo esse dinheiro.`,
+                    ephemeral: true
+                })
+            }
+
+            if (!userMoney || userMoney < amount) {
+                Database.Cache.pull('lastClick', channel.id)
+
+                return await interaction.reply({
+                    content: `${e.Deny} | Você não tem todo esse dinheiro.`,
+                    ephemeral: true
+                })
+            }
+
+        }
+
+        let betMessage = isBet ? `\n${e.Info} | ${user} está querendo apostar ${amount} ${moeda}.` : ''
         let msg = await interaction.reply({
-            content: `${e.QuestionMark} | ${opponent}, você está sendo desafiado por ${user} para uma partida de *Last Click*.`,
+            content: `${e.QuestionMark} | ${opponent}, você está sendo desafiado por ${user} para uma partida de *Last Click*.${betMessage}`,
             components: [
                 {
                     type: 1,
@@ -61,7 +131,7 @@ module.exports = {
         })
 
         const collector = msg.createMessageComponentCollector({
-            filter: int => int.user.id === opponent.user.id,
+            filter: int => [opponent.id, user.id].includes(int.user.id),
             time: 60000,
             max: 1
         })
@@ -71,6 +141,7 @@ module.exports = {
 
                 if (customId === 'refuse') {
                     collector.stop()
+                    Database.Cache.pull('lastClick', channel.id)
                     return msg.edit({
                         content: `${e.Deny} | Desafio recusado`,
                         components: []
@@ -78,6 +149,13 @@ module.exports = {
                 }
 
                 int.deferUpdate().catch(() => { })
+                if (user.id === int.user.id) return
+
+                if (isBet) {
+                    Database.subtract(user.id, amount)
+                    Database.subtract(opponent.id, amount)
+                }
+
                 return initGame()
             })
             .on('end', (i, reason) => {
@@ -90,12 +168,6 @@ module.exports = {
             })
 
         async function initGame() {
-
-            let control = {
-                playNow: [opponent.id, user.id].random(),
-                buttons: getButtons(),
-                customIds: []
-            }
 
             msg.edit({
                 content: `<@${control.playNow}>, é sua vez.`,
@@ -113,7 +185,7 @@ module.exports = {
                     int.deferUpdate().catch(() => { })
                     if (author.id !== control.playNow) return
 
-                    let buttonIndex = { a1: 0, a2: 0, a3: 0, a4: 0, a5: 0, b1: 1, b2: 1, b3: 1, b4: 1, b5, c1: 2, c2: 2, c3: 2, c4: 2, c5: 2, d1: 3, d2: 3, d3: 3, d4: 3, d5: 3 }[`${customId}`]
+                    let buttonIndex = { a1: 0, a2: 0, a3: 0, a4: 0, a5: 0, b1: 1, b2: 1, b3: 1, b4: 1, b5: 1, c1: 2, c2: 2, c3: 2, c4: 2, c5: 2, d1: 3, d2: 3, d3: 3, d4: 3, d5: 3 }[`${customId}`]
 
                     if (control.customIds.includes(customId)) return
 
@@ -121,18 +193,88 @@ module.exports = {
 
                     let buttom = control.buttons[buttonIndex].components.find(data => data.custom_id === customId)
 
-                    buttom.emoji = ['💣', e.CoolDoge, e.CoolDoge, e.CoolDoge, e.CoolDoge].random()
+                    let isBomb = Math.floor(Math.random() * 100) < 10
+
+                    control.clicks++
+                    buttom.emoji = isBomb ? '💥' : control.playNow === user.id ? control.userEmoji : control.opponentEmoji
                     buttom.disabled = true
-                    buttom.style = 'PRIMARY'
-                    await validateButton(customId)
+                    buttom.style = isBomb ? 'DANGER' : 'PRIMARY'
+                    control.playNow = control.playNow === user.id ? opponent.id : user.id
+
+                    if (isBomb) {
+                        collector.stop()
+                        await disableAllButtons(control)
+                        let loserId = control.playNow === user.id ? opponent.id : user.id
+                        let isBetMessage = ''
+
+                        if (isBet) {
+                            Database.add(control.playNow, amount * 2)
+                            isBetMessage = `\n${e.Info} | <@${control.playNow}> ganhou um total de ${amount * 2} ${moeda}`
+                        }
+
+                        return msg.edit({
+                            content: `👑 | <@${loserId}> clicou na bomba e <@${control.playNow}> venceu a partida.${isBetMessage}`,
+                            components: control.buttons
+                        })
+                    }
+
+                    if (control.clicks >= 20) {
+                        collector.stop()
+                        if (isBet) {
+                            Database.add(user.id, amount)
+                            Database.add(opponent.id, amount)
+                        }
+                        return msg.edit({ content: '👑 Ambos venceram.', components: control.buttons })
+                    }
+
+                    return msg.edit({ content: `<@${control.playNow}>, é sua vez.`, components: control.buttons })
                 })
                 .on('end', (i, reason) => {
                     Database.Cache.pull('lastClick', channel.id)
+                    if (reason === 'user') return
+                    
+                    if (isBet) {
+                        Database.add(user.id, amount)
+                        Database.add(opponent.id, amount)
+                    }
+
                     return msg.edit({
                         content: `${e.Deny} | Game cancelado por falta de resposta`,
                         components: []
                     }).catch(() => { })
                 })
+        }
+
+        function disableAllButtons(control) {
+
+            let allButtons = [
+                control.buttons[0].components[0],
+                control.buttons[0].components[1],
+                control.buttons[0].components[2],
+                control.buttons[0].components[3],
+                control.buttons[0].components[4],
+                control.buttons[1].components[0],
+                control.buttons[1].components[1],
+                control.buttons[1].components[2],
+                control.buttons[1].components[3],
+                control.buttons[1].components[4],
+                control.buttons[2].components[0],
+                control.buttons[2].components[1],
+                control.buttons[2].components[2],
+                control.buttons[2].components[3],
+                control.buttons[2].components[4],
+                control.buttons[3].components[0],
+                control.buttons[3].components[1],
+                control.buttons[3].components[2],
+                control.buttons[3].components[3],
+                control.buttons[3].components[4]
+            ]
+
+            for (let button of allButtons)
+                if (!button.disabled)
+                    button.disabled = true
+                else continue
+            return
         }
 
         function getButtons() {
@@ -288,37 +430,6 @@ module.exports = {
                     ]
                 }
             ]
-        }
-
-        function validateButton() {
-
-            let a1 = buttons[0].components[0],
-                a2 = buttons[0].components[1],
-                a3 = buttons[0].components[2],
-                a4 = buttons[0].components[3],
-                a5 = buttons[0].components[4],
-                b1 = buttons[1].components[0],
-                b2 = buttons[1].components[1],
-                b3 = buttons[1].components[2],
-                b4 = buttons[1].components[3],
-                b5 = buttons[1].components[4],
-                c1 = buttons[2].components[0],
-                c2 = buttons[2].components[1],
-                c3 = buttons[2].components[2],
-                c4 = buttons[2].components[3],
-                c5 = buttons[2].components[4],
-                d1 = buttons[3].components[0],
-                d2 = buttons[3].components[1],
-                d3 = buttons[3].components[2],
-                d4 = buttons[3].components[3],
-                d5 = buttons[3].components[4]
-
-            // a1 a2 a3 a4 a5
-            // b1 b2 b3 b4 b5
-            // c1 c2 c3 c4 c5
-            // d1 d2 d3 d4 d5
-
-            return
         }
     }
 }
