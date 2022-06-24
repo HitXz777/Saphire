@@ -114,6 +114,7 @@ module.exports = {
                 total += value
 
                 embed.fields[1].value = participants.map(d => `${d.emoji} <@${d.user}>`).join('\n')
+                embed.fields[1].name = `Participantes (${participants.length})`
                 embed.fields[0].value = `${total} ${moeda}`
 
                 Database.subtract(author.id, value)

@@ -5,12 +5,10 @@ module.exports = {
     aliases: ['biscoito'],
     category: 'random',
     emoji: '🥠',
-    usage: '<biscoitodasorte>',
+    usage: '/biscoitodasorte',
     description: 'Quer tentar a sorte hoje?',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-
-        let BiscMessage = f.BiscoitoDaSorte[Math.floor(Math.random() * f.BiscoitoDaSorte.length)]
-        message.channel.send(`🥠 | ${BiscMessage}`)
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/biscoitodasorte\``)
     }
 }

@@ -1,10 +1,12 @@
+const { f } = require('../../../JSON/frases.json')
+
 module.exports = {
-    name: 'kidbengala',
-    description: '[random] Faça o Kid Bengala dizer alguma coisa.',
+    name: 'biscoitodasorte',
+    description: '[random] Abra um biscoito da sorte',
     dm_permission: false,
     type: 1,
     options: [],
-    async execute({ interaction: interaction, emojis: e }) {
+    async execute({ interaction: interaction, emojis: e, client: client }) {
 
         await interaction.deferReply({})
 
@@ -13,27 +15,21 @@ module.exports = {
                 content: `${e.Info} | Eu preciso da permissão \`GERENCIAR WEBHOOKS\` para continuar com este comando.`
             })
 
-        let text = [
-            'Um dia... Serei apenas eu e você.',
-            'E aí, bora?',
-            'Caminhos se abrem quando eu chego...',
-            'Doeu... Não aguento... Eu escuto muitas coisas desse tipo.',
-            'Outro dia fui comprar uma cueca, a vendedora disse que não tinha meu tamanho, é mole?'
-        ].random()
-
-        return interaction.channel.createWebhook("Kid Bengala", {
-            avatar: "https://media.discordapp.net/attachments/893361065084198954/989689839962177536/unknown.png?width=473&height=473",
+        return interaction.channel.createWebhook(`Biscoito da Sorte | ${client.user.username}`, {
+            avatar: 'https://media.discordapp.net/attachments/893361065084198954/989696948296642560/kisspng-fortune-cookie-chinese-cuisine-biscuits-vector-gra-fortune-cookie-clipart-page-3-wordworks-co-5beb111c5249a2.1608451115421319963371.png?width=473&height=473'
         })
             .then(webHook => sendMessageWebHook(webHook))
             .catch(async err => {
                 return await interaction.editReply({
-                    content: `${e.Warn} | Erro ao criar a WebHook.\n> \`${err}\``
+                    content: `${e.Warn} | Houve um erro ao criar a WebHook.\n> \`${err}\``
                 }).catch(() => { })
             })
 
         async function sendMessageWebHook(webHook) {
 
-            return webHook.send({ content: text })
+            let BiscMessage = f.BiscoitoDaSorte.random()
+
+            return webHook.send({ content: BiscMessage })
                 .then(async () => {
                     webHook.delete().catch(() => { })
 
