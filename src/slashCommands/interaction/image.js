@@ -96,7 +96,7 @@ module.exports = {
                     content: `${e.Info} | Os usuários não podem ser o mesmo.`
                 })
 
-            return await interaction.editReply({ files: [new MessageAttachment(await Canvas.fuse(avatar1, avatar2), 'fuse.png')] })
+            return await interaction.editReply({ files: [new MessageAttachment(await Canvas.fuse(avatar, avatar2), 'fuse.png')] })
         }
 
         async function trig() {
