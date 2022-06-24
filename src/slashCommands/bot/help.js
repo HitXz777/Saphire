@@ -16,7 +16,7 @@ module.exports = {
             color = await Colors(user.id)
 
         let SaphireInviteLink = `https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=applications.commands%20bot`,
-            ghostServer = client.guilds.cache.get(config.ghostServerId),
+            ghostServer = client.guilds.cache.get(config.saphiresHome),
             serverInvite = ghostServer ? ` ou quem sabe entrar na [${ghostServer.name}](${config.MoonServerLink}) para se divertir?` : '',
             PrincipalEmbed = {
                 color: color,

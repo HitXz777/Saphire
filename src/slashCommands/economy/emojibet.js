@@ -31,6 +31,7 @@ module.exports = {
         let userData = await Database.User.findOne({ id: user.id }, 'Balance')
         let userBalance = userData?.Balance || 0
         let moeda = guildData?.Moeda || `${e.Coin} Safiras`
+        let alreadyWarned = []
 
         if (!userBalance || userBalance <= 0 || userBalance < value)
             return await interaction.reply({
@@ -48,15 +49,15 @@ module.exports = {
             fields: [
 
                 {
-                    name: 'Prêmio acumulado',
+                    name: `${e.MoneyWings} Prêmio acumulado`,
                     value: `${total} ${moeda}`
                 },
                 {
-                    name: 'Participantes',
+                    name: '👥 Participantes (1)',
                     value: `${emojisChoosen[0]} ${user}`
                 }
             ],
-            footer: { text: 'O emoji será sorteado após 15 segundos sem nenhuma entrada.' }
+            footer: { text: 'O emoji será sorteado após 30 segundos.' }
         }
 
         Database.Cache.push('emojiBet', channel.id)
@@ -73,7 +74,7 @@ module.exports = {
 
         let collector = msg.createMessageComponentCollector({
             filter: int => true,
-            idle: 15000
+            time: 30000
         })
             .on('collect', async int => {
 
@@ -89,11 +90,17 @@ module.exports = {
                     return collector.stop()
                 }
 
-                if (participants.find(d => d.user === author.id))
+                if (participants.find(d => d.user === author.id)) {
+
+                    if (alreadyWarned.includes(author.id))
+                        return int.deferUpdate().catch(() => { })
+
+                    alreadyWarned.push(author.id)
                     return await int.reply({
                         content: `${e.Info} | Você já entrou neste emoji bet`,
                         ephemeral: true
                     })
+                }
 
                 let authorData = await Database.User.findOne({ id: author.id }, 'Balance')
                 if (!authorData?.Balance || authorData.Balance < value)
@@ -114,7 +121,7 @@ module.exports = {
                 total += value
 
                 embed.fields[1].value = participants.map(d => `${d.emoji} <@${d.user}>`).join('\n')
-                embed.fields[1].name = `Participantes (${participants.length})`
+                embed.fields[1].name = `👥 Participantes (${participants.length})`
                 embed.fields[0].value = `${total} ${moeda}`
 
                 Database.subtract(author.id, value)
@@ -166,7 +173,7 @@ module.exports = {
             })
 
         return
-        
+
         function getEmojis() {
 
             let emojisArray = []
@@ -343,7 +350,7 @@ module.exports = {
                     components: [
                         {
                             type: 2,
-                            label: 'FINALIZAR EMOJIBET',
+                            label: `FINALIZAR EMOJIBET - (${user.username})`,
                             custom_id: 'finalize',
                             style: 'SUCCESS'
                         }
