@@ -33,7 +33,7 @@ module.exports = {
                             let format = `🆗 <${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`
                             emojisArray.push(format)
                         })
-                        .catch(() => message.reply(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji}) | Ou isso não é um emoji customizado ou o servidor já atingiu o limite de emojis.`))
+                        .catch(() => msg.edit(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji}) | Ou isso não é um emoji customizado ou o servidor já atingiu o limite de emojis.`))
                     continue
                 }
 
@@ -43,8 +43,8 @@ module.exports = {
             return msg.edit(`${e.Check} | Adição concluída:\n${emojisArray.map(x => `> ${x}`).join('\n')}`).catch(() => { })
         }
 
-        if (!args[0]) return message.reply(`${e.Info} | Adicione emojis no servidor. Posso adicionar vários de uma vez, só mandar seperados com espaços. <EMOJI> <EMOJI> <EMOJI> `)
-        if (args[20]) return message.reply(`${e.Deny} | Eu só posso adicionar 20 emojis por vez`)
+        if (!args[0]) return msg.edit(`${e.Info} | Adicione emojis no servidor. Posso adicionar vários de uma vez, só mandar seperados com espaços. <EMOJI> <EMOJI> <EMOJI> `)
+        if (args[20]) return msg.edit(`${e.Deny} | Eu só posso adicionar 20 emojis por vez`)
 
         for (const rawEmoji of args) {
             const parsedEmoji = Util.parseEmoji(rawEmoji)
@@ -57,7 +57,7 @@ module.exports = {
                         let format = `🆗 <${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`
                         emojisArray.push(format)
                     })
-                    .catch(() => message.reply(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji}) | Ou isso não é um emoji customizado ou o servidor já atingiu o limite de emojis.`))
+                    .catch(() => msg.edit(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji}) | Ou isso não é um emoji customizado ou o servidor já atingiu o limite de emojis.`))
                 continue
             }
 

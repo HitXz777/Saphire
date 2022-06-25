@@ -38,8 +38,13 @@ class SlashCommand extends Modals {
             member: member
         }).catch(async err => {
             await this.interaction.reply({
-                content: "❌ | Ocorreu um erro ao executar este comando.",
+                content: "❌ | Ocorreu um erro ao executar este comando. Eu já avisei meu criador sobre isso. Se você quiser enviar mais detalhes que possa ajudar, use o comando `/bug`. Obrigado pela paciência e desculpa o transtorno.",
                 ephemeral: true,
+            }).catch(async () => {
+                await this.interaction.followUp({
+                    content: "❌ | Ocorreu um erro ao executar este comando. Eu já avisei meu criador sobre isso. Se você quiser enviar mais detalhes que possa ajudar, use o comando `/bug`. Obrigado pela paciência e desculpa o transtorno.",
+                    ephemeral: true,
+                }).catch(() => { })
             })
 
             return this.error(this, err)

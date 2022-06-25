@@ -1,5 +1,4 @@
 const { e } = require('../../../JSON/emojis.json')
-const { MessageEmbed } = require('discord.js')
 const { config } = require('../../../JSON/config.json')
 const client = require('../../../index')
 
@@ -40,13 +39,17 @@ process.on('uncaughtExceptionMonitor', async (error, origin) => {
 
     return await client.users.cache.get(`${config.ownerId}`)?.send({
         embeds: [
-            new MessageEmbed()
-                .setColor('RED').setTitle(`${e.Loud} Report de Erro | uncaughtExceptionMonitor`)
-                .setDescription(`\`\`\`js\n${error.stack.slice(0, 2000)}\`\`\``)
-                .setFooter({ text: `Error Code: ${error.code || 0}` }),
-            new MessageEmbed()
-                .setColor('RED')
-                .setDescription(`\`\`\`js\n${origin}\`\`\``)
+            {
+                color: client.red,
+                title: `${e.Loud} Report de Erro | uncaughtExceptionMonitor`,
+                description: `\`\`\`js\n${error.stack.slice(0, 2000)}\`\`\``,
+                footer: { text: `Error Code: ${error.code || 0}` }
+            },
+            {
+                color: client.red,
+                description: `\`\`\`js\n${origin}\`\`\``
+
+            }
         ]
     }).catch(() => console.log(reason, origin))
 
