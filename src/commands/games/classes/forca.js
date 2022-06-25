@@ -5,6 +5,7 @@ class Forca {
     async game(client, Database, theWord, interaction, isRandom) {
 
         const { MessageEmbed } = require('discord.js')
+
         let e = Database.Emojis
 
         let { user, channel } = interaction
@@ -51,16 +52,24 @@ class Forca {
                 .setTitle(`${e.duvida} Forca Game - ${status}/7`)
                 .setDescription(`\`\`\`txt\n${wordFormated}\n\`\`\``)
 
-            await interaction.reply({
-                content: `${e.Check} | Palavra escolhida: \`${word}\``,
-                ephemeral: true
-            })
+            msg = isRandom ?
+                await interaction.reply({
+                    content: `${e.Info} | Essa palavra possui **${word.length} letras.**${control.authorWord === user.id ? `\n✏️ | Essa palavra foi enviada por ${user}. *(Claro, ele/a não participa dessa rodada)*` : ''}`,
+                    embeds: [embed],
+                    fetchReply: true
+                })
+                : await (async () => {
+                    await interaction.reply({
+                        content: `${e.Check} | Palavra escolhida: \`${word}\``,
+                        ephemeral: true
+                    })
 
-            msg = await channel.send({
-                content: `${e.Info} | Essa palavra possui **${word.length} letras.**${control.authorWord === user.id ? `\n✏️ | Essa palavra foi enviada por ${user}. *(Claro, ele/a não participa dessa rodada)*` : ''}`,
-                embeds: [embed],
-                fetchReply: true
-            })
+                    return await interaction.channel.send({
+                        content: `${e.Info} | Essa palavra possui **${word.length} letras.**${control.authorWord === user.id ? `\n✏️ | Essa palavra foi enviada por ${user}. *(Claro, ele/a não participa dessa rodada)*` : ''}`,
+                        embeds: [embed],
+                        fetchReply: true
+                    })
+                })()
 
             let collector = channel.createMessageCollector({
                 filter: m => true,
@@ -74,7 +83,6 @@ class Forca {
                         content = Message.content?.toLowerCase()
 
                     control.resend++
-                    if (control.resend >= 7) refreshMessage()
 
                     if (!validate.test(content)) return
                     if (lettersUsed.includes(content)) return
@@ -86,16 +94,20 @@ class Forca {
                         embed.setTitle(`${e.duvida} Forca Game - ${status}/7`)
                             .setColor(client.green)
                             .setDescription(`${Message.author} acertou a palavra!\`\`\`txt\n${wordFormated}\n\`\`\``)
-                            .setFooter({ text: `Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}` })
 
                         Database.addItem(Message.author.id, 'ForcaCount', 1)
                         control.endedCollector = false
                         collector.stop()
                         msg.delete(() => { })
-                        return Message.reply({ content: `${e.SaphireOk} | Boa ${Message.author}. É isso aí!`, embeds: [embed] }).catch(() => { })
+                        Message.reply({ content: `${e.SaphireOk} | Boa ${Message.author}. É isso aí!`, embeds: [embed] }).catch(() => { })
+
+                        return
                     } else {
 
-                        if (content.length === 1) validateLetter(content)
+                        if (content.length === 1) {
+                            validateLetter(content)
+                            if (control.resend >= 7) refreshMessage()
+                        }
                         else return
 
                         if (status >= 7) {
@@ -160,7 +172,6 @@ class Forca {
 
         async function refreshMessage() {
             control.resend = 0
-            msg.delete().catch(() => { })
             return msg = await channel.send({ content: `${e.Info} | Essa palavra possui **${word.length} letras.**`, embeds: [embed] })
         }
 
@@ -178,6 +189,7 @@ class Forca {
             if (count === 0) status++
 
             wordFormated = control.trass.join('')
+            embed.setFooter({ text: `Letras usadas: ${lettersUsed.join(' ') || 'Nenhuma'}` })
             return wordFormated
         }
 

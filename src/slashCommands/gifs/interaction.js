@@ -4,7 +4,7 @@ const { e } = require('../../../JSON/emojis.json')
 let gifData = [
     { JSON: 'Baka', name: 'Baka', description: 'Chame alguém de baka', embedTextOne: '🗣️ $user está te chamando de baka, $member.', embedTextTwo: '🗣️ $member e $user estão se chamando de baka, oh my God' },
     { JSON: 'Soco', name: 'Soco', description: 'Dê um soco bem dado em alguém', embedTextOne: '👊 $user está te dando socos $member', embedTextTwo: '👊 $member retribuiu o soco $user' },
-    { JSON: 'Onegai', name: 'Improrar', description: 'Implorar não faz mal', embedTextOne: '🙏 $user está te implorando $member' },
+    { JSON: 'Onegai', name: 'Implorar', description: 'Implorar não faz mal', embedTextOne: '🙏 $user está te implorando $member' },
     { JSON: 'Olhando', name: 'Olhando', description: 'Apeans olhando...', embedTextOne: '👀 $user está te olhando $member', embedTextTwo: '👀 $member também está te olhando $user' },
     { JSON: 'Beijar', name: 'Beijar', description: 'Beije e beije', embedTextOne: '💋 $user está te beijando $member', embedTextTwo: '💋 $member devolvou seu beijo $user' },
     { JSON: 'Morder', name: 'Morder', description: 'As vezes, mordem faz bem', embedTextOne: `${e.Bite} $user está mordendo $member`, embedTextTwo: `${e.Bite} $member & $user estão se mordendo` },

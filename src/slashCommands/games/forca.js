@@ -31,7 +31,7 @@ module.exports = {
             })
 
         const subCommand = interaction.options.getSubcommand()
-        const random = subCommand === 'random' ? true : false
+        const random = subCommand === 'random'
         const word = interaction.options.getString('palavra')?.toLowerCase()
 
         if (!random && !word) return forcaInfo()
