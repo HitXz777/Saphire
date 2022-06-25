@@ -51,7 +51,12 @@ class Forca {
                 .setTitle(`${e.duvida} Forca Game - ${status}/7`)
                 .setDescription(`\`\`\`txt\n${wordFormated}\n\`\`\``)
 
-            msg = await interaction.reply({
+            await interaction.reply({
+                content: `${e.Check} | Palavra escolhida: \`${word}\``,
+                ephemeral: true
+            })
+
+            msg = await channel.send({
                 content: `${e.Info} | Essa palavra possui **${word.length} letras.**${control.authorWord === user.id ? `\n✏️ | Essa palavra foi enviada por ${user}. *(Claro, ele/a não participa dessa rodada)*` : ''}`,
                 embeds: [embed],
                 fetchReply: true

@@ -14,6 +14,9 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
+        let emojisArray = []
+        let msg = await message.channel.send(`${e.Loading} | Adicionando emojis...`)
+
         if (message.reference?.messageId) {
 
             let Message = message.channel.messages.cache.get(message.reference.messageId).content,
@@ -25,15 +28,19 @@ module.exports = {
                 if (parsedEmoji.id) {
                     const extension = parsedEmoji.animated ? ".gif" : ".png"
                     const url = `https://cdn.discordapp.com/emojis/${parsedEmoji.id + extension}`
-                    message.guild.emojis.create(url, parsedEmoji.name)
-                        .then((emoji) => message.reply(`${emoji} | Emoji adicionado com sucesso!`))
+                    await message.guild.emojis.create(url, parsedEmoji.name)
+                        .then(emoji => {
+                            let format = `🆗 <${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`
+                            emojisArray.push(format)
+                        })
                         .catch(() => message.reply(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji}) | Ou isso não é um emoji customizado ou o servidor já atingiu o limite de emojis.`))
                     continue
                 }
-                message.reply(`${e.QuestionMark} | Isso é mesmo um emoji customizado? (${rawEmoji})`)
+
+                emojisArray.push(`❌ ${rawEmoji}`)
             }
 
-            return
+            return msg.edit(`${e.Check} | Adição concluída:\n${emojisArray.map(x => `> ${x}`).join('\n')}`).catch(() => { })
         }
 
         if (!args[0]) return message.reply(`${e.Info} | Adicione emojis no servidor. Posso adicionar vários de uma vez, só mandar seperados com espaços. <EMOJI> <EMOJI> <EMOJI> `)
@@ -45,13 +52,19 @@ module.exports = {
             if (parsedEmoji.id) {
                 const extension = parsedEmoji.animated ? ".gif" : ".png"
                 const url = `https://cdn.discordapp.com/emojis/${parsedEmoji.id + extension}`
-                message.guild.emojis.create(url, parsedEmoji.name)
-                    .then((emoji) => message.reply(`${emoji} | Emoji adicionado com sucesso!`))
-                    .catch(err => message.reply(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji})`))
-            } else { message.reply(`${e.QuestionMark} | Isso é mesmo um emoji customizado? (${rawEmoji})`) }
+                await message.guild.emojis.create(url, parsedEmoji.name)
+                    .then(emoji => {
+                        let format = `🆗 <${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`
+                        emojisArray.push(format)
+                    })
+                    .catch(() => message.reply(`${e.Deny} | Falha ao adicionar esse emoji: (${rawEmoji}) | Ou isso não é um emoji customizado ou o servidor já atingiu o limite de emojis.`))
+                continue
+            }
+
+            emojisArray.push(`❌ ${rawEmoji}`)
         }
 
-        return
+        return msg.edit(`${e.Check} | Adição concluída:\n${emojisArray.map(x => `> ${x}`).join('\n')}`).catch(() => { })
 
     }
 }
