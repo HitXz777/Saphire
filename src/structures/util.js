@@ -1,4 +1,4 @@
-const RawClientEvents = [ //TODO: Mudar para events
+const RawClientEvents = [
     "READY",
     "RESUMED",
     "VOICE_SERVER_UPDATE",

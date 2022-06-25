@@ -1,4 +1,4 @@
-const { f } = require('../../../JSON/frases.json')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'biscoitodasorte',
