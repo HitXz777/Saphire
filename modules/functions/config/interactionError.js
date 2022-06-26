@@ -52,7 +52,7 @@ async function InteractionError({ interaction, Database, user, e, client, guild,
 
     Database.PushTransaction(user.id, `${e.gain} Recebeu 1500 Safiras por descobrir um bug em um Slash Command`)
 
-    return await interaction.followUp({
+    return await interaction.reply({
         content: `${e.Warn} | Ocorreu um erro neste comando. Mas não se preocupe! Eu já avisei meu criador e ele vai arrumar isso rapidinho.\n${e.PandaProfit} +1500 ${moeda}`,
         ephemeral: true
     })

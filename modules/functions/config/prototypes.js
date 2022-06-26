@@ -1,10 +1,19 @@
 /**
- * ESSE SISTEMA DE PROTOTYPES FOI UMA GAMBIARRA FEITA POR PURA CURIOSIDADE PELOS SEGUINTES MEMBROS:
- * IDEALIZADOR: JackSkelt#3063 - 904891162362519562
- * ESCRITA: Rody:1000 - 451619591320371213
- * ACOMPANHANTE: Seeker#2083 = 750714601284304986
+ * Requerindo o Discord para criação de protótipos dentro e suas classes
  */
 
+const { Guild, GuildMember } = require('discord.js')
+
+/**
+ * ESSE SISTEMA DE PROTOTYPES FOI UMA GAMBIARRA FEITA POR PURA CURIOSIDADE PELOS SEGUINTES MEMBROS:
+ * IDEALIZADOR DO PROTOTYPES: JackSkelt#3063 - 904891162362519562
+ * ESCRITA: Rody:1000 - 451619591320371213
+ * IDEALIZADOR DO "clientPermissions": Seeker#2083 = 750714601284304986
+ */
+
+/**
+ * Função adicionado ao Array que pega um item aleatório do mesmo.
+ */
 Array.prototype.random = function (times = 0, repeat = false) {
 
     if (times > 0) {
@@ -100,4 +109,12 @@ function checkSimilarity(str1, str2) { // Credits: JackSkelt#3063 - 904891162362
     t /= 2
 
     return ((matches / len1) + (matches / len2) + ((matches - t) / matches)) / 3.0
+}
+
+Guild.prototype.clientPermissions = function (Permission) {  // Credits: Seeker#2083 = 750714601284304986
+    return this.me.permissions.has(Permission)
+}
+
+GuildMember.prototype.memberPermissions = function (Permission) {
+    return this.permissions.has(Permission)
 }

@@ -25,7 +25,7 @@ module.exports = {
     ],
     async execute({ interaction: interaction, client: client, database: Database, emojis: e }) {
 
-        if (!interaction.guild.me.permissions.toArray().includes('MANAGE_MESSAGES'))
+        if (!interaction.guild.clientPermissions('MANAGE_MESSAGES'))
             return await interaction.reply({
                 content: `${e.Deny} | Eu preciso da permissão **GERENCIAR MENSAGENS** para poder jogar forca.`
             })

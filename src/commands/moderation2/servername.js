@@ -4,20 +4,11 @@ module.exports = {
     name: 'servername',
     aliases: ['setservername'],
     category: 'moderation',
-    UserPermissions: ['ADMINISTRATOR'],
-    ClientPermissions: ['MANAGE_GUILD'],
     emoji: `${e.ModShield}`,
-    usage: '<servername> <Novo Nome>',
+    usage: '/servername',
     description: 'Mude o nome do servidor',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-
-        let Name = args.join(' ')
-        if (!Name) return message.reply(`${e.Deny} | Escolha um nome para o seu servidor`)
-        if (Name.length > 100 || Name.length < 2) { return message.reply(`${e.Deny} | O nome do servidor deve estar entre **2~100 caracteres**`) }
-
-        message.guild.setName(Name, [`${message.author.tag} foi o autor deste comando.`]).then(() => {
-            return message.reply(`${e.Check} | Nome alterado com sucesso.`)
-        }).catch(err => { return message.channel.send(`${e.Warn} | Houve um erro na execução deste comando.\n\`${err}\``) })
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/say\``)
     }
 }

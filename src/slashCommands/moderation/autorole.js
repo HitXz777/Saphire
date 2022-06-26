@@ -81,7 +81,7 @@ module.exports = {
         const { options, guild, user } = interaction,
             { Config: config } = Database
 
-        if (!guild.me.permissions.toArray().includes('MANAGE_ROLES'))
+        if (!guild.clientPermissions('MANAGE_ROLES'))
             return await interaction.reply({
                 content: `${e.Deny} | Eu preciso da permissão **\`GERENCIAR CARGOS\`** para continuar com este comando.`,
                 ephemeral: true

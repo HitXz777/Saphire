@@ -246,7 +246,7 @@ module.exports = {
 
         const { options, guild, user } = interaction
 
-        if (!guild.me.permissions.toArray().includes('MANAGE_ROLES'))
+        if (!guild.clientPermissions('MANAGE_ROLES'))
             return await interaction.reply({
                 content: `${e.Deny} | Para prosseguir com este comando, eu preciso da permissão **\`GERENCIAR CARGOS\`**`,
                 ephemeral: true

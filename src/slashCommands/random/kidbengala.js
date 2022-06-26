@@ -8,7 +8,7 @@ module.exports = {
 
         await interaction.deferReply({})
 
-        if (!interaction.guild.me.permissions.toArray().includes('MANAGE_WEBHOOKS'))
+        if (!interaction.guild.clientPermissions('MANAGE_WEBHOOKS'))
             return await interaction.editReply({
                 content: `${e.Info} | Eu preciso da permissão \`GERENCIAR WEBHOOKS\` para continuar com este comando.`
             })

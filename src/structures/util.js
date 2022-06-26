@@ -263,7 +263,7 @@ const Permissions = {
     DEAFEN_MEMBERS: "Ensurdecer membros",
     MOVE_MEMBERS: "Mover membros",
     USE_VAD: "Usar detecção de voz",
-    CHANGE_NICKNAME: "Mudar apelido",
+    CHANGE_NICKNAME: "Alterar apelido",
     MANAGE_NICKNAMES: "Gerenciar apelidos",
     MANAGE_ROLES: "Gerenciar cargos",
     MANAGE_WEBHOOKS: "Gerenciar Webhooks",

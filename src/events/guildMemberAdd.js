@@ -25,7 +25,7 @@ client.on('guildMemberAdd', async (member) => {
 
     if (guild.Antifake && clientData?.PremiumServers?.includes(member.guild.id)) {
 
-        if (!member.guild.me.permissions.toArray().includes('KICK_MEMBERS')) {
+        if (!member.guild.clientPermissions('KICK_MEMBERS')) {
 
             await Database.Guild.updateOne(
                 { id: member.guild.id },

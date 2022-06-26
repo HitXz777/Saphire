@@ -122,7 +122,7 @@ module.exports = {
         const { options, guild, user, channel: intChannel } = interaction
 
         for (let perm of [{ discord: 'MANAGE_CHANNELS', user: 'GERENCIAR CANAIS' }, { discord: 'MANAGE_MESSAGES', user: 'GERENCIAR MENSAGENS' }])
-            if (!guild.me.permissions.toArray().includes(perm.discord))
+            if (!guild.clientPermissions(perm.discord))
                 return await interaction.reply({
                     content: `❌ | Eu preciso da permissão **\`${perm.user}\`**. Por favor, me dê esta permissão que eu vou conseguir fazer o sorteio.`,
                     ephemeral: true

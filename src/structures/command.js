@@ -7,7 +7,7 @@ module.exports = (client) => {
 
         for (let file of commands) {
             let pull = require(`../commands/${dir}/${file}`)
-            
+
             if (pull.name)
                 client.commands.set(pull.name, pull)
             else continue

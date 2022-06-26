@@ -355,13 +355,12 @@ module.exports = {
 
         for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
-        msg.createReactionCollector({
+        return msg.createReactionCollector({
             filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
             max: 15,
             time: 30000,
             errors: ['time', 'max']
         })
-
             .on('collect', (reaction, user) => {
 
                 reaction.users.remove(user.id).catch(() => { })
@@ -390,7 +389,6 @@ module.exports = {
                     return msg.edit({ embeds: [IndEmbed] }).catch(() => { })
                 }
             })
-
             .on('end', () => {
 
                 msg.reactions.removeAll().catch(() => { })
