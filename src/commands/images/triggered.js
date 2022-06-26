@@ -1,7 +1,4 @@
-const { MessageAttachment } = require('discord.js')
-const { Canvas } = require("canvacord")
 const { e } = require('../../../JSON/emojis.json')
-const Error = require('../../../modules/functions/config/errors')
 
 module.exports = {
     name: 'triggered',
@@ -9,21 +6,10 @@ module.exports = {
     category: 'images',
     ClientPermissions: ['ATTACH_FILES'],
     emoji: `${e.Trig}`,
-    usage: '<trig> [@user]',
+    usage: '/image',
     description: 'Triggeeeeered!',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-
-        let user = message.mentions.users.first() || await message.guild.members.cache.get(args[0]) || message.mentions.repliedUser || message.author
-        let avatar = user.displayAvatarURL({ dynamic: true, format: "png", size: 1024 })
-
-        try {
-            return message.reply(`${e.Loading} | Carregando...`).then(async msg => {
-                msg.delete().catch(() => { })
-                message.reply({ files: [new MessageAttachment(await Canvas.trigger(avatar), "triggered.gif")] })
-            })
-        } catch (err) {
-            Error(message, err)
-        }
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/image\``)
     }
 }

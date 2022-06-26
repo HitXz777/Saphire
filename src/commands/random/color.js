@@ -5,7 +5,6 @@ module.exports = {
     name: 'color',
     aliases: ['cor', 'hex', 'cores', 'codhex'],
     category: 'random',
-
     ClientPermissions: ['EMBED_LINKS'],
     emoji: '🎨',
     usage: '<color> <ColorName>/<#hex>',

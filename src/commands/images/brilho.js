@@ -3,7 +3,6 @@ const { e } = require('../../../JSON/emojis.json')
 const { Canvas } = require('canvacord')
 const Error = require('../../../modules/functions/config/errors')
 
-
 module.exports = {
     name: 'brilho',
     aliases: ['brightness '],

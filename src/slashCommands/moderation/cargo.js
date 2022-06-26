@@ -1,4 +1,3 @@
-const client = require('../../../index')
 const util = require('../../structures/util')
 
 const editObject = {

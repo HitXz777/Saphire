@@ -1,8 +1,4 @@
-const { MessageAttachment } = require('discord.js')
 const { e } = require('../../../JSON/emojis.json')
-const { Canvas } = require('canvacord')
-const Error = require('../../../modules/functions/config/errors')
-
 
 module.exports = {
     name: 'pixelate',
@@ -10,24 +6,10 @@ module.exports = {
     category: 'images',
     ClientPermissions: ['ATTACH_FILES'],
     emoji: '🔲',
-    usage: '<pixelate> [@user]',
+    usage: '/editimage',
     description: 'Pixel nas fotos',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-
-        let user = message.mentions.users.first() || message.mentions.repliedUser  || message.author
-        let avatar = user.displayAvatarURL({ format: 'png' })
-
-        let pixels = parseInt(args[1]) || parseInt(args[0]) || 7
-        if (pixels > 100 || pixels < 1)
-            return message.reply(`${e.Deny} | A quantidade de pixels deve estar entre **1 e 100**`)
-
-        try {
-            const msg = await message.reply(`${e.Loading} | Carregando...`)
-            message.reply({ files: [new MessageAttachment(await Canvas.pixelate(avatar, pixels), 'pixelate.png')] })
-            msg.delete().catch(() => { })
-        } catch (err) {
-            Error(message, err)
-        }
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/editimage\``)
     }
 }
