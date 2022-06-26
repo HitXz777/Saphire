@@ -1,7 +1,7 @@
 const
     { readdirSync } = require("fs"),
     { MessageSelectMenu, MessageActionRow } = require("discord.js"),
-    { DatabaseObj: { e, config } } = require("../../../modules/functions/plugins/database")
+    { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'help',
@@ -13,6 +13,8 @@ module.exports = {
     description: 'Central de Ajuda',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
+
+        const { Config: config } = Database
 
         let SaphireInviteLink = `https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=applications.commands%20bot`,
             ghostServer = client.guilds.cache.get(config.saphiresHome),
