@@ -126,7 +126,7 @@ module.exports = {
 
                 Database.subtract(author.id, value)
                 Database.PushTransaction(
-                    user.id,
+                    author.id,
                     `${e.loss} Apostou ${value} Safiras no Emoji Bet`
                 )
 
@@ -161,7 +161,7 @@ module.exports = {
 
                 Database.add(winData.user, total)
                 Database.PushTransaction(
-                    user.id,
+                    winData.user,
                     `${e.gain} Ganhou ${total} Safiras no Emoji Bet`
                 )
 
