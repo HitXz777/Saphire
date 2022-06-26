@@ -5,16 +5,10 @@ module.exports = {
     aliases: ['safada'],
     category: 'random',
     emoji: '😏',
-    usage: '<safado(a)> [@user]',
+    usage: '/medidor',
     description: 'Quantos % @user é safado(a)?',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-
-        let num = Math.floor(Math.random() * 100) + 1
-        let user = client.getUser(client, message, args, 'member') || message.member
-
-        if (user.id === client.user.id) { return message.reply(`${e.SaphireTimida} | Eu não sou gada, sai pra lá.`) }
-
-        return message.reply(`😏 | Posso falar com certeza, que ${user} é ${num}% safado*(a)*.`)
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/medidor\``)
     }
 }

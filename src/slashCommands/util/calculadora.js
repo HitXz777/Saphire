@@ -57,7 +57,7 @@ module.exports = {
 
             const emb = {
                 color: client.blue,
-                title: `${client.user.username}'s Calculadora`,
+                title: `Calculadora da ${client.user.username}`,
                 description: "```0```"
             }
 

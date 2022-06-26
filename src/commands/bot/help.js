@@ -19,6 +19,7 @@ module.exports = {
         let SaphireInviteLink = `https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=applications.commands%20bot`,
             ghostServer = client.guilds.cache.get(config.saphiresHome),
             serverInvite = ghostServer ? ` ou quem sabe entrar na [${ghostServer.name}](${config.MoonServerLink}) para se divertir?` : '',
+            attInvite = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot%20applications.commands&permissions=2146958847&guild_id=${message.guild.id}&disable_guild_select=true`,
             PrincipalEmbed = new MessageEmbed()
                 .setColor('#246FE0')
                 .setTitle(`${e.BlueHeart} Centralzinha de Ajuda da ${client.user.username}`)
@@ -30,7 +31,7 @@ module.exports = {
                 .addField(`${e.CoroaDourada} Premium Stage`, `Tem interesse em desbloquear comandos únicos? Use \`${prefix}premium\` e descubra mais.`)
                 .addField('🆕 Atualizações', 'Acesse a segunda aba do painel de ajuda e fique por dentro de tudo.')
                 .addField(`${e.Stonks} New Reaction Role System`, `Siiiim! Agora eu possuo um sistema de Reaction Role! Vem dar uma olhada! \`${prefix}reactionrole\``)
-                .addField(`⭐ Slash Commands`, 'Alguns comandos foram movidos para Slash Commands. Use `/help` e confira as alterações.')
+                .addField(`⭐ Slash Commands`, `Alguns comandos foram movidos para Slash Commands. Use \`/help\` e confira as alterações. Caso o Slash Commands não esteja aparecendo para você, [atualize as minhas permissões](${attInvite})`)
                 .addField(`${e.bug} Discord Bugs`, 'Devido a uma instabilidade da API do Discord, a economia global da Saphire foi resetada. Um sistema de segurança já foi criado para que isso não aconteça novamente.')
                 .setFooter({ text: 'Este painel se fechará após 1 minuto de inatividade' }),
 

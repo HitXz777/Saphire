@@ -10,7 +10,7 @@ module.exports = {
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
 
-        let rand = f.Piadas[Math.floor(Math.random() * f.Piadas.length)]
+        let rand = f.Piadas.random()
         return message.reply(rand)
     }
 }
