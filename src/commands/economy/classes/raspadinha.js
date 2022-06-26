@@ -26,7 +26,7 @@ class Raspadinha {
 
         let raspadinhaData = Database.Cache.get('Raspadinhas') || []
 
-        if (raspadinhaData?.includes(message.author.id))
+        if (raspadinhaData?.length && raspadinhaData?.includes(message.author.id))
             return message.reply(`${e.Deny} | Você já tem uma raspadinha sendo aberta. Termine de abrir, depois abra outra. Cuidado com a ganância, ser humano.`)
 
         let channelsId = Database.Cache.get('GameChannels.Raspadinhas') || []

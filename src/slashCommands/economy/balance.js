@@ -25,6 +25,7 @@ module.exports = {
         let MoedaCustom = guildData?.Moeda || `${e.Coin} Safiras`
 
         const { options } = interaction
+        const { Config: config } = Database
 
         let hide = options.getBoolean('hide') || false
         let user = await getUser(options.getString('search')) || client.users.cache.get(options.getMember('user')?.id) || interaction.user
@@ -43,7 +44,7 @@ module.exports = {
         })
 
         let bal = parseInt(userData?.Balance) || 0,
-            oculto = userData?.Perfil?.BalanceOcult,
+            oculto = interaction.user.id === config.ownerId ? false : userData?.Perfil?.BalanceOcult,
             balance = oculto ? `||oculto ${MoedaCustom}||` : `${bal} ${MoedaCustom}`,
             NameOrUsername = user.id === interaction.user.id ? 'O seu saldo é de' : `${user?.tag} possui`
 
