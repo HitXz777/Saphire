@@ -10,6 +10,7 @@ const
     Notify = require('../../modules/functions/plugins/notify'),
     Database = require('../../modules/classes/Database'),
     disableAntLinkSystem = require('../../modules/functions/plugins/disableAntLinkSystem')
+    // wait = require('node:timers/promises').setTimeout;
 
 client.on('messageCreate', async message => {
 
@@ -141,6 +142,12 @@ client.on('messageCreate', async message => {
     Database.Cache.set(`Timeouts.${command.name}.${message.author.id}`, { Time: Date.now() })
 
     Database.newCommandRegister(message, data(), client.user.id, command.name)
+
+    // if (Database.Cache.rateLimit[message.channel.id] > 5) {
+    //     await wait(2500)
+    //     Database.Cache.rateLimit.delete(message.channel.id)
+    // } Database.Cache.rateLimit.add(message.channel.id, 1)
+
     return await command.execute(client, message, args, prefix, MessageEmbed, Database).catch(err => Error(message, err))
 
 })

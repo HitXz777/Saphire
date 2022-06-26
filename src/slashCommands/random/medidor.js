@@ -73,7 +73,7 @@ module.exports = {
             },
             {
                 name: 'brotheragem',
-                message: `$emoji | Eu sei que ${user} tem umas tendências estrenhas, por isso, eu sei que o nível de brotheragem é de ${num}%.`,
+                message: `$emoji | Eu sei que ${user} tem umas tendências estranhas, por isso, eu sei que o nível de brotheragem é de ${num}%.`,
                 emoji: e.Nagatoro
             },
             {
@@ -85,8 +85,6 @@ module.exports = {
 
         let result = choices.find(data => data.name === medida)
         result.message = result.message.replace('$emoji', result.emoji)
-
-        // if (user.id === client.user.id) return message.reply(`${e.SaphireTimida} | Eu não sou gada, sai pra lá.`)
 
         return await interaction.reply({
             content: result.message
