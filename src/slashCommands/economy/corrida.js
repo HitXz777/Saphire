@@ -232,6 +232,7 @@ module.exports = {
         async function newWinner(atualize, MessageRunning, winnerData, result) {
 
             clearInterval(atualize)
+            MessageRunning.delete()
 
             Database.Cache.push('corrida', channel.id)
             Database.add(winnerData.id, total)
@@ -250,7 +251,7 @@ module.exports = {
                 value: result
             }
 
-            return MessageRunning.edit({
+            return channel.send({
                 embeds: [embed]
             })
 
