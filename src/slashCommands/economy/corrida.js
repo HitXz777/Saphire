@@ -23,6 +23,13 @@ module.exports = {
             min_value: 2,
             max_value: 24,
             required: true
+        },
+        {
+            name: 'distance',
+            description: 'Distância a ser percorrida',
+            type: 10,
+            min_value: 3.0,
+            max_value: 5.0
         }
     ],
     async execute({ interaction: interaction, client: client, database: Database, emojis: e, guildData: guildData }) {
@@ -39,6 +46,7 @@ module.exports = {
         let buttons = await getButtons()
         let value = options.getInteger('value')
         let players = options.getInteger('players')
+        let limitToReach = options.getNumber('distance') || 4.0
         let authorData = await Database.User.findOne({ id: author.id }, 'Color')
         let color = authorData?.Color?.Set || client.blue
         let moeda = guildData?.Moeda || `${e.Coin} Safiras`
@@ -196,7 +204,6 @@ module.exports = {
             }
 
             let data = () => usersJoined.map(d => `${d.distance.toFixed(2)} ${d.dots}${d.animal}`).join('\n')
-            let limitToReach = 4.0
 
             let MessageRunning = await channel.send({
                 content: data(),
@@ -234,7 +241,7 @@ module.exports = {
             clearInterval(atualize)
             MessageRunning.delete()
 
-            Database.Cache.push('corrida', channel.id)
+            Database.Cache.pull('corrida', channel.id)
             Database.add(winnerData.id, total)
             Database.PushTransaction(
                 winnerData.id,
@@ -251,6 +258,7 @@ module.exports = {
                 value: result
             }
 
+            Database.Cache.pull('corrida', channel.id)
             return channel.send({
                 embeds: [embed]
             })
