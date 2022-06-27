@@ -1,5 +1,5 @@
 /**
- * Requerindo o Discord para criação de protótipos dentro e suas classes
+ * Requerindo o Discord para criação de protótipos dentro de suas classes
  */
 
 const { Guild, GuildMember } = require('discord.js')
