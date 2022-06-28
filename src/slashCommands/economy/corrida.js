@@ -28,8 +28,25 @@ module.exports = {
             name: 'distance',
             description: 'Distância a ser percorrida',
             type: 10,
-            min_value: 3.0,
-            max_value: 5.0
+            required: true,
+            choices: [
+                {
+                    name: '3.0',
+                    value: 3.0,
+                },
+                {
+                    name: '3.5',
+                    value: 3.5,
+                },
+                {
+                    name: '4.0',
+                    value: 4.0,
+                },
+                {
+                    name: '4.5',
+                    value: 4.5,
+                }
+            ]
         }
     ],
     async execute({ interaction: interaction, client: client, database: Database, emojis: e, guildData: guildData }) {
@@ -46,7 +63,7 @@ module.exports = {
         let buttons = await getButtons()
         let value = options.getInteger('value')
         let players = options.getInteger('players')
-        let limitToReach = options.getNumber('distance') || 4.0
+        let limitToReach = options.getNumber('distance')
         let authorData = await Database.User.findOne({ id: author.id }, 'Color')
         let color = authorData?.Color?.Set || client.blue
         let moeda = guildData?.Moeda || `${e.Coin} Safiras`
@@ -171,13 +188,15 @@ module.exports = {
                 if (usersJoined.length >= players) {
                     iniciated = true
                     collector.stop()
-                    msg.edit({ embeds: [embed], components: [] })
                     return await initCorrida()
                 }
 
                 return msg.edit({ embeds: [embed], components: buttons })
             })
             .on('end', async (i, r) => {
+
+                if (usersJoined.length >= 2) return await initCorrida()
+
                 if (iniciated) return
                 Database.Cache.pull('corrida', channel.id)
                 if (r === 'idle')
@@ -191,8 +210,10 @@ module.exports = {
 
         async function initCorrida() {
 
+            msg.edit({ embeds: [embed], components: [] })
+
             if (usersJoined.length < 2) {
-                Database.Cache.push('corrida', channel.id)
+                Database.Cache.pull('corrida', channel.id)
 
                 for (let player of usersJoined) {
                     Database.add(player.id, value)
