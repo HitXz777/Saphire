@@ -247,6 +247,11 @@ class Database extends Models {
 
         if (!pullOrPush || !where || !channelId) return
 
+        if (where === 'Quiz')
+            pullOrPush === 'push'
+                ? Database.Cache.push('Quiz', channelId)
+                : Database.Cache.pull('Quiz', channelId)
+
         pullOrPush === 'push'
             ? Database.Cache.push(`GameChannels.${where}`, channelId)
             : Database.Cache.pull(`GameChannels.${where}`, channelId)
