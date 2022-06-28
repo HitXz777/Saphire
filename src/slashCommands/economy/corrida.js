@@ -195,9 +195,9 @@ module.exports = {
             })
             .on('end', async (i, r) => {
 
+                if (iniciated) return
                 if (usersJoined.length >= 2) return await initCorrida()
 
-                if (iniciated) return
                 Database.Cache.pull('corrida', channel.id)
                 if (r === 'idle')
                     return msg.edit({
