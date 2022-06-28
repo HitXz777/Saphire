@@ -1,5 +1,5 @@
 /**
- * Requerindo o Discord para criação de protótipos dentro e suas classes
+ * Requerindo o Discord para criação de protótipos dentro de suas classes
  */
 
 const { Guild, GuildMember } = require('discord.js')
@@ -7,12 +7,12 @@ const { Guild, GuildMember } = require('discord.js')
 /**
  * ESSE SISTEMA DE PROTOTYPES FOI UMA GAMBIARRA FEITA POR PURA CURIOSIDADE PELOS SEGUINTES MEMBROS:
  * IDEALIZADOR DO PROTOTYPES: JackSkelt#3063 - 904891162362519562
- * ESCRITA: Rody:1000 - 451619591320371213
- * IDEALIZADOR DO "clientPermissions": Seeker#2083 = 750714601284304986
+ * ESCRITA: Rody#1000 - 451619591320371213
+ * IDEALIZADOR DO "clientPermissions": Seeker#2083 - 750714601284304986
  */
 
 /**
- * Função adicionado ao Array que pega um item aleatório do mesmo.
+ * Função adicionada ao Array que pega um item aleatório do mesmo.
  */
 Array.prototype.random = function (times = 0, repeat = false) {
 
@@ -111,7 +111,7 @@ function checkSimilarity(str1, str2) { // Credits: JackSkelt#3063 - 904891162362
     return ((matches / len1) + (matches / len2) + ((matches - t) / matches)) / 3.0
 }
 
-Guild.prototype.clientPermissions = function (Permission) {  // Credits: Seeker#2083 = 750714601284304986
+Guild.prototype.clientPermissions = function (Permission) {
     return this.me.permissions.has(Permission)
 }
 
