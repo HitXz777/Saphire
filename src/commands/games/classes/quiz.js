@@ -319,7 +319,7 @@ class Quiz {
                     if (control.accept)
                         return init(true)
 
-                        Database.registerChannelControl('pull', 'Quiz', message.channel.id)
+                    Database.registerChannelControl('pull', 'Quiz', message.channel.id)
 
                     msg.edit(`${e.Check} | **${question}**\n> Ninguém acertou essa pergunta.`).catch(() => { })
                     const msgCancel = await message.channel.send(`${e.Loading} | Quiz encerrado. Ninguém acertou a pergunta. Recomeçar?`),
