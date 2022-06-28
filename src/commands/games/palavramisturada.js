@@ -45,7 +45,6 @@ module.exports = {
             if (palavra == mixed) return GetAndValidateWord()
 
             return start()
-
         }
 
         async function start() {
