@@ -1,17 +1,14 @@
-const { e } = require('../../../JSON/emojis.json'),
-    Quiz = require('./classes/quiz')
+const { e } = require('../../../JSON/emojis.json')
 
 module.exports = {
     name: 'quiz',
     aliases: ['q'],
     category: 'games',
     emoji: `${e.QuestionMark}`,
-    usage: 'quiz <info>',
+    usage: '/quiz',
     description: 'Quiz é bem legal, garanto.',
 
     execute: async (client, message, args, prefix, MessageEmbed, Database) => {
-
-        return new Quiz().init(client, message, args, prefix, MessageEmbed, Database, e)
-
+        return message.reply(`${e.Info} | Este comando foi movido para Slash Command e será excluído em breve. Use \`/quiz\``)
     }
 }
