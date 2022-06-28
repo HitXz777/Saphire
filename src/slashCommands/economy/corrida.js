@@ -269,9 +269,9 @@ module.exports = {
                 `${e.gain} Ganhou ${total} Safiras em uma corrida de animais`
             )
 
-            embed.fields[1].value = usersJoined.map(data => {
+            embed.fields[1].value = usersJoined.map((data, i) => {
                 let crown = data.id === winnerData.id ? '👑' : ''
-                return `${data.animal} <@${data.id}> ${crown}`
+                return `${i + 1} ${data.animal} <@${data.id}> ${crown}`
             }).join('\n')
 
             embed.fields[2] = {
