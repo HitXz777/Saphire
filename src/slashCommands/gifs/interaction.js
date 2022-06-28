@@ -66,11 +66,19 @@ module.exports = {
         let gifRequest = options.getString('action')
         let option = gifData.find(g => g.JSON === gifRequest)
         let member = options.getMember('user')
+
+        if (!member)
+            return await interaction.reply({
+                content: `${e.Deny} | Nenhum usuário foi encontrado.`,
+                ephemeral: true
+            })
+
         let textOne = option.embedTextOne?.replace('$user', user)?.replace('$member', member)
         let textTwo = option.embedTextTwo?.replace('$user', user)?.replace('$member', member)
         let rand = () => {
             return g[option.JSON][Math.floor(Math.random() * g[option.JSON].length)]
         }
+
 
         if (member.id === client.user.id)
             return await interaction.reply({
