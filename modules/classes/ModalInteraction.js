@@ -38,6 +38,7 @@ class ModalInteraction extends Modals {
             case 'reactionRoleCreateModal': this.reactionRoleCreateModal(this); break;
             case 'transactionsModalReport': this.transactionsModalReport(); break;
             case 'newCollectionReactionRoles': this.newCollectionReactionRoles(); break;
+            case 'newAnimeCharacter': this.addCharacter(); break;
             default:
                 break;
         }
@@ -250,6 +251,73 @@ class ModalInteraction extends Modals {
             content: `✅ | Novo status definido com sucesso!\n📝 | ${newStatus}`,
             ephemeral: true
         })
+    }
+
+    addCharacter = async ({ interaction, fields, client } = this) => {
+
+        let characters = Database.Characters.get('Characters') || [],
+            image = fields.getTextInputValue('image'),
+            name = fields.getTextInputValue('name'),
+            anime = fields.getTextInputValue('anime')
+
+        if (!image.includes('https://media.discordapp.net/attachments') && !image.includes('https://cdn.discordapp.com/attachments/'))
+            return await interaction.reply({
+                content: `${e.Deny} | Verique se o link da imagem segue um desses formatos: \`https://media.discordapp.net/attachments\` | \`https://cdn.discordapp.com/attachments/\``,
+                ephemeral: true
+            })
+
+        let has = characters?.find(data => data.image == image)
+
+        if (has)
+            return await interaction.reply({
+                content: `${e.Deny} | Esta mesma imagem já existe no banco de dados.`,
+                ephemeral: true
+            })
+
+        const { formatString } = require('../../src/commands/games/plugins/gamePlugins')
+        let msg = await interaction.reply({
+            content: `${e.QuestionMark} | Você confirma adicionar o personagem **\`${formatString(name)}\`** do anime \`${anime}\` no banco de dados do **Quiz Anime Theme**?`,
+            embeds: [{
+                color: client.blue,
+                image: { url: image || null },
+                description: 'Se a imagem do personagem não aparecer, quer dizer que o link não é compatível.'
+            }],
+            fetchReply: true
+        }),
+            emojis = ['✅', '❌'], clicked = false
+
+        for (let i of emojis) msg.react(i).catch(() => { })
+        let collector = msg.createReactionCollector({
+            filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === interaction.user.id,
+            time: 60000,
+            max: 1,
+            erros: ['time', 'max']
+        })
+            .on('collect', (r) => {
+
+                if (r.emoji.name === emojis[1])
+                    return collector.stop()
+
+                return this.pushNewCaracter(msg, { name: name, image: image, anime: anime }, formatString)
+
+            })
+            .on('end', (i, r) => {
+                if (r !== 'user') return
+                return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [] }).catch(() => { })
+            })
+    }
+
+    async pushNewCaracter(msg, { name: name, image: image, anime: anime }, formatString) {
+
+        Database.Characters.push('Characters', { name: name, image: image, anime: anime })
+        return msg.edit({
+            content: `${e.Check} | Personagem adicionado com sucesso!`,
+            embeds: [{
+                color: this.client.blue,
+                image: { url: image || null },
+                description: `Nome: **\`${formatString(name)}\`**\nAnime: **\`${anime || '\`ANIME NOT FOUND\`'}\`**`
+            }]
+        }).catch(() => { })
     }
 
     reactionRoleCreateModal = async ({ interaction, fields, user, channel, guild } = this) => {

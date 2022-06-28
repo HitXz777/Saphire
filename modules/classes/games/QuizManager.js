@@ -1,5 +1,5 @@
 const quizData = require('../../../JSON/quiz.json'),
-    { formatString, emoji, formatNumberCaracters } = require('../../../src/commands/games/plugins/gamePlugins'),
+    { formatString, emoji, formatNumberCaracters, getUser } = require('../../../src/commands/games/plugins/gamePlugins'),
     Database = require('../Database'),
     { e } = require('../../../JSON/emojis.json')
 
@@ -14,7 +14,7 @@ class QuizManager {
         this.guild = data.interaction.guild
         this.clientData = data.clientData
         this.admins = this.clientData?.Administradores || []
-        this.control = { embed: {}, usersPoints: [], animePaginationList: [], selectMenuForEmbedsTrading: [] }
+        this.control = { embed: {}, usersPoints: [], animePaginationList: [], embedsTrading: [], selectMenuForEmbedsTrading: [] }
     }
 
     async normalQuiz() {
@@ -694,7 +694,7 @@ class QuizManager {
 
                     }
 
-                    control.embedsTrading = embeds
+                    control.embedsTrading = [...embeds]
                     return
                 }
 
@@ -818,7 +818,7 @@ class QuizManager {
 
     async getAndShowUserStatus() {
 
-        let user = this.options.getUser('user') || this.author
+        let user = this.options.getUser('user') || getUser(this.options.getString('search')) || this.author
         let data = await Database.User.findOne({ id: user.id }, 'QuizCount GamingCount')
         let quizCount = data?.QuizCount || 0
         let flagCount = data?.GamingCount?.FlagCount || 0

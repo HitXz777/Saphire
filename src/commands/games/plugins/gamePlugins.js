@@ -88,6 +88,16 @@ function formatNumberCaracters(number) {
     return number < 10 ? `0${number}` : `${number}`
 }
 
+function getUser(dataResource) {
+    if (!dataResource) return null
+    return client.users.cache.find(data => {
+        return data.username?.toLowerCase() === dataResource?.toLowerCase()
+            || data.tag?.toLowerCase() === dataResource?.toLowerCase()
+            || data.discriminator === dataResource?.toLowerCase()
+            || data.id === dataResource?.toLowerCase()
+    })
+}
+
 module.exports = {
     formatString,
     formatArray,
@@ -96,5 +106,6 @@ module.exports = {
     registerGameChannel,
     formatNumberCaracters,
     emoji,
-    formatWord
+    formatWord,
+    getUser
 }

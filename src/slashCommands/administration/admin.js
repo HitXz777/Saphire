@@ -382,6 +382,18 @@ module.exports = {
                             value: 'reboot'
                         },
                         {
+                            name: 'New Anime Character',
+                            value: 'newCharacter'
+                        },
+                        {
+                            name: 'Delete Anime Character',
+                            value: 'delAnimeCharacter'
+                        },
+                        {
+                            name: 'Delete Anime From Quiz',
+                            value: 'delAnime'
+                        },
+                        {
                             name: 'Comandos Bloqueados',
                             value: 'bugs'
                         },
@@ -432,7 +444,7 @@ module.exports = {
             ]
         }
     ],
-    async execute({ interaction: interaction, client: client, database: Database, emojis: e, clientData: clientData }) {
+    async execute({ interaction: interaction, client: client, database: Database, emojis: e, clientData: clientData, modals: modals }) {
 
         const { options } = interaction
         const { Config: config } = Database
@@ -517,6 +529,9 @@ module.exports = {
             case 'serverList': serverList(); break;
             case 'block_command': block_command(); break;
             case 'open_command': open_command(); break;
+            case 'newCharacter': add_Character(); break;
+            case 'delAnimeCharacter': delete_Character(); break;
+            case 'delAnime': delete_Anime(); break;
 
             default: await interaction.reply({
                 content: `${e.Deny} | **${func}** | Não é um argumento válido.`,
@@ -544,6 +559,127 @@ module.exports = {
                 content: `${e.Check} | Os dados econônicos de **${user.tag} \`${user.id}\`** foram deletados com sucesso.`,
                 ephemeral: true
             })
+
+        }
+
+        async function delete_Character() {
+
+            let characters = Database.Characters.get('Characters') || []
+
+            if (!input)
+                return await interaction.reply({
+                    content: `${e.Deny} | Escreva o nome do anime, personagem ou o link da imagem na opção \`input\``,
+                    ephemeral: true
+                })
+
+            let has = characters?.find(p => p.name.toLowerCase() === input.toLowerCase()
+                || p.name.toLowerCase().includes(input.toLowerCase())
+                || p.image === input)
+                || null
+
+            if (!has)
+                return await interaction.reply({
+                    content: `${e.Deny} | Esse personagem não existe no banco de dados.`,
+                    ephemeral: true
+                })
+
+            const { formatString } = require('../../commands/games/plugins/gamePlugins')
+            let msg = await interaction.reply({
+                content: `${e.QuestionMark} | Você confirma deletar o personagem **\`${formatString(has.name)}\`** do banco de dados do **Quiz Anime Theme**?`,
+                embeds: [{
+                    color: client.blue,
+                    image: { url: has.image || null },
+                    description: 'Se a imagem do personagem não aparecer, quer dizer que o link não é compatível.'
+                }],
+                fetchReply: true
+            }),
+                emojis = ['✅', '❌'], clicked = false
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+            let collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === interaction.user.id,
+                time: 60000,
+                max: 1,
+                erros: ['time', 'max']
+            })
+                .on('collect', (r) => {
+
+                    if (r.emoji.name === emojis[1])
+                        return collector.stop()
+
+                    clicked = true
+                    let newSet = characters.filter(data => data.name !== has.name)
+
+                    Database.Characters.set('Characters', [...newSet])
+                    return msg.edit({
+                        content: `${e.Check} | O personagem **\`${formatString(has.name)}\`** foi deletado com sucesso!`,
+                        embeds: [{
+                            color: client.blue,
+                            image: { url: has.image || null },
+                            description: null
+                        }]
+                    }).catch(() => { })
+                })
+                .on('end', () => {
+                    if (clicked) return
+                    return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [] }).catch(() => { })
+                })
+
+        }
+
+        async function delete_Anime() {
+
+            let characters = Database.Characters.get('Characters') || []
+
+            if (!input)
+                return await interaction.reply({
+                    content: `${e.Deny} | Informe o nome do anime na opção \`input\``,
+                    ephemeral: true
+                })
+
+            let has = characters?.find(p => p.anime?.toLowerCase() === input.toLowerCase()
+                || p.anime?.toLowerCase().includes(input)
+                || p.anime === input
+                || null
+            )
+
+            if (!has)
+                return await interaction.reply({
+                    content: `${e.Deny} | Esse anime não existe no banco de dados.`,
+                    ephemeral: true
+                })
+
+            const { formatString } = require('../../commands/games/plugins/gamePlugins')
+            let msg = await interaction.reply({
+                content: `${e.QuestionMark} | Você confirma deletar o anime **\`${formatString(has.anime)}\`** do banco de dados do **Quiz Anime Theme**?\n${e.Info} | Este anime possui **\`${characters.filter(data => data.anime === has.anime)?.length || 0}\`** personagens.`,
+                fetchReply: true
+            }),
+                emojis = ['✅', '❌'], clicked = false
+
+            for (let i of emojis) msg.react(i).catch(() => { })
+            let collector = msg.createReactionCollector({
+                filter: (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === interaction.user.id,
+                time: 60000,
+                max: 1,
+                erros: ['time', 'max']
+            })
+                .on('collect', (r) => {
+
+                    if (r.emoji.name === emojis[1])
+                        return collector.stop()
+
+                    clicked = true
+                    let newSet = characters.filter(data => data.anime !== has.anime)
+
+                    Database.Characters.set('Characters', [...newSet])
+                    return msg.edit({
+                        content: `${e.Check} | O anime **\`${formatString(has.anime)}\`** foi deletado com sucesso!`
+                    }).catch(() => { })
+                })
+                .on('end', () => {
+                    if (clicked) return
+                    return msg.edit({ content: `${e.Deny} | Comando cancelado.`, embeds: [] }).catch(() => { })
+                })
 
         }
 
@@ -938,6 +1074,10 @@ module.exports = {
             return await interaction.reply({
                 content: `${e.Check} | O comando **\`/${commandClient.name}\`** foi liberado com sucesso.`
             })
+        }
+
+        async function add_Character() {
+            return await interaction.showModal(modals.newAnimeCharacter)
         }
 
         async function block_command() {

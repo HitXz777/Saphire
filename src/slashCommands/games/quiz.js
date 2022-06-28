@@ -34,6 +34,11 @@ module.exports = {
                     name: 'user',
                     description: 'Usuário que você deseja ver o status',
                     type: 6
+                },
+                {
+                    name: 'search',
+                    description: 'Pesquise usuários por nome ou id',
+                    type: 3
                 }
             ]
         },

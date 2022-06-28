@@ -4,6 +4,52 @@ class Modals {
         return { ...this }
     }
 
+    newAnimeCharacter = {
+        title: 'New Anime Character Quiz Data',
+        custom_id: "newAnimeCharacter",
+        components: [
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 4,
+                        custom_id: "name",
+                        label: "Nome do personagem",
+                        style: 1,
+                        placeholder: "Naruto",
+                        required: true
+                    }
+                ]
+            },
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 4,
+                        custom_id: "image",
+                        label: "Link da imagem",
+                        style: 1,
+                        placeholder: "https://media.discordapp.net/attachments/977336529129209907/977342165632036914/unknown.png",
+                        required: true
+                    }
+                ]
+            },
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 4,
+                        custom_id: "anime",
+                        label: "Nome do Anime",
+                        style: 1,
+                        placeholder: "Naruto Shippuden",
+                        required: true
+                    }
+                ]
+            }
+        ]
+    }
+
     sendLetter = {
         title: 'New Letter',
         custom_id: "newLetter",
