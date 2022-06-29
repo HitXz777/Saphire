@@ -10,33 +10,48 @@ module.exports = {
         {
             name: 'channel',
             description: 'Canal em que os comandos serão desbloqueados',
-            type: 7,
-            required: true
+            type: 3,
+            autocomplete: true
         },
         {
             name: 'bots',
             description: 'Desbloquear comandos de bots?',
             type: 5
+        },
+        {
+            name: 'select_channel_manually',
+            description: 'Selecione um canal manualmente',
+            type: 7
         }
     ],
-    async execute({ interaction: interaction, database: Database, emojis: e, guildData: guildData }) {
+    async execute({ interaction: interaction, database: Database, emojis: e, guildData: guildData, guild: guild }) {
 
-        const { options } = interaction
+        const { options, user } = interaction
 
-        let channel = options.getChannel('channel')
+        let channelId = options.getString('channel')
         let blockBots = options.getBoolean('bots')
+        let channel = guild.channels.cache.get(channelId) || options.getChannel('select_channel_manually')
+        let channelsBlocked = guildData.Blockchannels?.Channels || []
+
+        if (!channel)
+            return await interaction.reply({
+                content: `${e.Deny} | Nenhum canal não encontrado`,
+                ephemeral: true
+            })
+
+        if (!channelsBlocked.includes(channel.id))
+            return await interaction.reply({
+                content: `${e.Deny} | Este canal não está bloqueado.`,
+                ephemeral: true
+            })
 
         if (!['GUILD_TEXT', 'GUILD_NEWS'].includes(channel.type))
             return await interaction.reply({
-                content: `${e.Deny} | Apenas canais de texto e anúncios estão disponíveis neste comando.`
+                content: `${e.Deny} | Apenas canais de texto e anúncios estão disponíveis neste comando.`,
+                ephemeral: true
             })
 
         if (blockBots) return BloquearBots()
-
-        if (!guildData?.Blockchannels.Channels?.includes(channel.id))
-            return await interaction.reply({
-                content: `${e.Info} | O canal ${channel} não está bloqueado.`
-            })
 
         const msg = await interaction.reply({
             content: `${e.QuestionMark} | Você deseja desbloquear todos os meus comandos no canal ${channel}?`,
@@ -47,7 +62,7 @@ module.exports = {
         for (const i of emojis) msg.react(i).catch(() => { })
 
         return msg.awaitReactions({
-            filter: (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === interaction.user.id,
+            filter: (reaction, u) => ['✅', '❌'].includes(reaction.emoji.name) && u.id === user.id,
             max: 1,
             time: 15000,
             errors: ['time']
@@ -57,17 +72,17 @@ module.exports = {
             if (reaction.emoji.name === emojis[0]) {
 
                 await Database.Guild.updateOne(
-                    { id: interaction.guild.id },
-                    { $pull: { 'Blockchannels.Channels': channel.id } },
+                    { id: guild.id },
+                    { $pull: { 'Blockchannels.Channels': channelId } },
                     { upsert: true }
                 )
 
                 return msg.edit({
-                    content: `✅ | ${interaction.user} desbloqueou todos os meus comandos no canal ${channel}.`
+                    content: `✅ | ${user} desbloqueou todos os meus comandos no canal ${channel}.`
                 }).catch(() => { })
 
             } else
-                return msg.edit(`${e.Deny} | Request cancelada por: ${interaction.user}`).catch(() => { })
+                return msg.edit(`${e.Deny} | Request cancelada por: ${user}`).catch(() => { })
 
         }).catch(() => msg.edit(`${e.Deny} | Request cancelada por: Tempo expirado.`).catch(() => { }))
 
@@ -79,11 +94,11 @@ module.exports = {
                 })
 
             const msg = await interaction.reply({
-                content: `${e.QuestionMark} | ${interaction.user}, você quer desbloquear todos os comandos de todos os bots neste canal?\n${e.SaphireObs} | Vale lembrar que Administradores **NÃO** são imunes a esse bloqueio.`,
+                content: `${e.QuestionMark} | ${user}, você quer desbloquear todos os comandos de todos os bots neste canal?\n${e.SaphireObs} | Vale lembrar que Administradores **NÃO** são imunes a esse bloqueio.`,
                 fetchReply: true
             }),
                 emojis = ['✅', '❌'],
-                filter = (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === interaction.user.id
+                filter = (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === user.id
 
             for (const emoji of emojis) msg.react(emoji).catch(() => { })
 
@@ -93,13 +108,13 @@ module.exports = {
                 if (reaction.emoji.name === emojis[0]) {
 
                     await Database.Guild.updateOne(
-                        { id: interaction.guild.id },
+                        { id: guild.id },
                         { $pull: { 'Blockchannels.Bots': channel.id } },
                         { upsert: true }
                     )
-                    return msg.edit(`✅ | ${interaction.user} desbloqueou todos comandos de todos os bots canal ${channel}.`).catch(() => { })
+                    return msg.edit(`✅ | ${user} desbloqueou todos comandos de todos os bots canal ${channel}.`).catch(() => { })
 
-                } else return msg.edit(`${e.Deny} | Request cancelada por: ${interaction.user}`).catch(() => { })
+                } else return msg.edit(`${e.Deny} | Request cancelada por: ${user}`).catch(() => { })
             }).catch(() => msg.edit(`${e.Deny} | Request cancelada por: Tempo expirado.`).catch(() => { }))
         }
 

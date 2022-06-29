@@ -32,6 +32,7 @@ class SlashCommand extends Modals {
             database: this.Database,
             client: this.client,
             data: this,
+            guild: this.guild,
             modals: this.modals,
             guildData: guildData,
             clientData: clientData,
@@ -81,6 +82,32 @@ class SlashCommand extends Modals {
             { $inc: { ComandosUsados: 1 } },
             { upsert: true }
         )
+    }
+
+    async autoComplete() {
+        const { name, value, type } = this.interaction.options.getFocused(true)
+        let mapped = undefined
+
+        if (name === 'channel') {
+            let data = await this.Database.Guild.findOne({ id: this.guild.id }, 'Blockchannels'),
+                channelsBlocked = data?.Blockchannels?.Channels || [],
+                named = channelsBlocked.map(channelId => this.guild.channels.cache.get(channelId))
+
+            let fill = named.filter(ch => ch?.name.includes(value)) || []
+            mapped = fill.map(ch => ({ name: ch.name, value: ch.id }))
+        }
+
+        if (name === 'users_banned') {
+
+            let banneds = await this.guild.bans.fetch()
+            let banned = banneds.toJSON()
+
+            banned.length = 25
+            let fill = banned.filter(data => data?.user.tag.includes(value) || data?.user.id.includes(value)) || []
+            mapped = fill.map(data => ({ name: `${data.user.tag} - ${data.user.id} | ${data.reason || 'Sem razão definida'}`, value: data.user.id }))
+        }
+
+        return await this.interaction.respond(mapped)
     }
 }
 
