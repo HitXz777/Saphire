@@ -472,7 +472,7 @@ class QuizManager {
 
     async listCharacters() {
 
-        const { client, control, interaction, author, clientData, admins } = this
+        const { client, control, interaction, author, admins } = this
         let characters = Database.Characters.get('Characters') || []
 
         if (!characters || characters.length === 0)
@@ -504,14 +504,14 @@ class QuizManager {
                     : int?.values[0]
 
                 if (customId === 'right') {
-
+                    console.log(control.atualPage)
                     if (control.atualPage === 'animeList') {
                         control.embedTradeControl++
                         if (control.embedTradeControl >= embeds.length) control.embedTradeControl = 0
                         return msg.edit({
                             content: null,
                             embeds: [embeds[control.embedTradeControl]],
-                            components: [buttons(embeds), selectMenuForEmbedsTrading[control.embedTradeControl]]
+                            components: [buttons(embeds), control.selectMenuForEmbedsTrading[control.embedTradeControl]]
                         }).catch(() => { })
                     }
 
@@ -748,6 +748,7 @@ class QuizManager {
 
         function EmbedGenerator(arrayCharacters) {
 
+            control.atualPage = 'animeList'
             let array = [...new Set(arrayCharacters?.map(c => c.anime?.toLowerCase()))].sort()
 
             let amount = 15,
