@@ -1,4 +1,3 @@
-const passCode = require('../../../modules/functions/plugins/PassCode')
 const Colors = require('../../../modules/functions/plugins/colors')
 
 module.exports = {
